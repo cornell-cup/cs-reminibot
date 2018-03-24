@@ -59,8 +59,8 @@ class TCPConnection(object):
             self.__connection_refused = True
 
         except socket.error as e:
-            msg = "Could not destroy the connection with " + self.__IP + "."\
-                    log_exn_info(e, msg=msg)
+            msg = "Could not destroy the connection with " + self.__IP + "."
+            log_exn_info(e, msg=msg)
 
         return
 

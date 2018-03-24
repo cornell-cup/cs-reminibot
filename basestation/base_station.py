@@ -2,20 +2,19 @@
 Base Station for the MiniBot.
 """
 
-# external
 import tornado
 import os
 
-# internal
 from basestation.connection.base_connection import BaseConnection
-from basestation.bot.base_station_bot import BaseStationBot as BSBot
+from basestation.bot.pi_bot import PiBot
+from basestation.bot.sim_bot import SimBot
 
 class BaseStation:
     def __init__(self):
         self.active_bots = {}
         self.active_sessions = {}
         self.port = None
-        self.connections = BaseConnection()
+        # self.connections = BaseConnection()
 
     # ============ RUNNING BASESTATION ============
 
@@ -34,7 +33,7 @@ class BaseStation:
         """
         return list(self.active_bots.keys())
 
-    def add_bot(self, bot_id, ip, port):
+    def add_bot(self, bot_id, port, type, ip=None):
         """
         Adds a bot to the list of active bots, if the connection
         is established successfully.
@@ -44,7 +43,10 @@ class BaseStation:
             ip (str):
             port (int):
         """
-        new_bot = BSBot(bot_id, ip, port=port)
+        if type == "PIBOT":
+            new_bot = PiBot()
+        elif type == "SIMBOT":
+            new_bot = SimBot()
 
         if new_bot.is_active():
             return new_bot.get_id()
