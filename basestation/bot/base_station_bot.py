@@ -20,3 +20,6 @@ class BaseStationBot:
 
     def get_ip(self):
         return self.ip
+
+    def is_active(self):
+        return self.tcp_connection.is_connection_active()

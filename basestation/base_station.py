@@ -9,6 +9,7 @@ import os
 # internal
 from basestation.connection.base_connection import BaseConnection
 from basestation.bot.base_station_bot import BaseStationBot as BSBot
+from session.session import Session
 
 class BaseStation:
     def __init__(self):
@@ -75,16 +76,25 @@ class BaseStation:
     # ================== SESSIONS ==================
 
     def list_active_sessions(self):
-        pass
+        return self.active_sessions
 
     def add_session(self, session_id):
-        pass
+        if session_id not in self.active_sessions.keys():
+            self.active_sessions[session_id] = Session(session_id)
+            return True
+        else:
+            raise Exception("Session is already active with session_id = " + session_id + ". Not adding the session")
 
     def remove_session(self, session_id):
-        pass
+        del self.active_sessions[session_id]
+        return session_id not in self.active_sessions
 
     def add_bot_to_session(self, session_id, bot_id):
-        pass
+        if bot_id not in self.active_bots:
+            raise Exception("Bot is not active. Failed to add bot" + bot_id + " to session " + session_id)
+        bot = self.active_bots[bot_id]
+        self.active_sessions[session_id].add(bot)
+        return True
 
 if __name__=="__main__":
     bs = BaseStation()
