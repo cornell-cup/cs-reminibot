@@ -26,6 +26,7 @@ class ClientInterface:
         self.settings = {
             "static_path": os.path.join(os.path.dirname(__file__), "static")
         }
+        
     def start(self):
         """
         Starts server for application.
