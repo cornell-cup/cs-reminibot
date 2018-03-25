@@ -1,7 +1,7 @@
 """
 Base Station Bot.
 """
-from basestation.connection.tcp_connection import TCPConnection
+from connection.tcp_connection import TCPConnection
 
 class BaseStationBot:
     def __init__(self, bot_id, ip, port=10000):

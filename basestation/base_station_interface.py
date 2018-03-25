@@ -11,7 +11,7 @@ import logging
 import sys
 
 # Minibot imports.
-from basestation.base_station import BaseStation
+from base_station import BaseStation
 
 class BaseInterface:
     """

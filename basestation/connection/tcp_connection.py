@@ -4,8 +4,8 @@ TCP Connection.
 This is imported from cs-minibot.
 """
 
-from basestation.util.thread_synchronization import *
-from basestation.util.exception_handling import *
+from util.thread_synchronization import *
+from util.exception_handling import *
 
 import socket
 

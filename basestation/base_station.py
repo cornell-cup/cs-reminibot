@@ -8,7 +8,7 @@ from string import digits, ascii_lowercase, ascii_uppercase
 
 # internal
 # from connection.base_connection import BaseConnection
-from basestation.bot.base_station_bot import BaseStationBot as BSBot
+from bot.base_station_bot import BaseStationBot as BSBot
 from session.session import Session
 
 class BaseStation:
