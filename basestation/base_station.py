@@ -2,25 +2,32 @@
 Base Station for the MiniBot.
 """
 
-import tornado
-import os
+# external
+from random import choice
+from string import digits, ascii_lowercase, ascii_uppercase
 
-from basestation.connection.base_connection import BaseConnection
-from basestation.bot.pi_bot import PiBot
-from basestation.bot.sim_bot import SimBot
+# internal
+# from connection.base_connection import BaseConnection
+from bot.base_station_bot import BaseStationBot as BSBot
+from session.session import Session
 
 class BaseStation:
     def __init__(self):
         self.active_bots = {}
         self.active_sessions = {}
-        self.port = None
+        self.active_playgrounds = {}
         # self.connections = BaseConnection()
 
-    # ============ RUNNING BASESTATION ============
+    # ==================== ID GENERATOR ====================
 
-    def run(self, port):
-        self.port = port
-        print("Running Basestation...")
+    def generate_id():
+        """
+        Generates a unique 5 character id composed of digits, lowercase, 
+        and uppercase letters.
+        """
+        chars = digits + ascii_lowercase + ascii_uppercase
+        unique_id = "".join([choices(chars) for i in range(5)])
+        return unique_id
 
     # ==================== BOTS ====================
 
@@ -77,17 +84,23 @@ class BaseStation:
     # ================== SESSIONS ==================
 
     def list_active_sessions(self):
-        pass
+        # return self.active_sessions.keys()
+        return "hey there bb"
 
-    def add_session(self, session_id):
-        pass
+    def has_session(session_id):
+        return session_id in self.active_sessions
+
+    def add_session(self):
+        session_id = generate_id()
+        self.active_sessions[session_id] = Session(session_id)
+        return session_id in self.active_sessions
 
     def remove_session(self, session_id):
-        pass
+        del self.active_sessions[session_id]
+        return session_id not in self.active_sessions
 
     def add_bot_to_session(self, session_id, bot_id):
-        pass
-
-if __name__=="__main__":
-    bs = BaseStation()
-    bs.run(1234)
+        if bot_id not in self.active_bots:
+            raise Exception("Bot is not active. Failed to add bot" + bot_id + " to session " + session_id)
+        bot = self.active_bots[bot_id]
+        return self.active_sessions[session_id].add_bot_id_to_session(bot.get_id())

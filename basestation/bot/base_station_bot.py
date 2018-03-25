@@ -1,8 +1,7 @@
 """
 Base Station Bot.
 """
-
-from basestation.connection.tcp_connection import TCPConnection
+from connection.tcp_connection import TCPConnection
 
 class Bot:
     def __init__(self, bot_id, ip, port=10000):
@@ -20,3 +19,6 @@ class Bot:
 
     def get_ip(self):
         return self.ip
+
+    def is_active(self):
+        return self.tcp_connection.is_connection_active()
