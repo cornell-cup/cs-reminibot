@@ -3,9 +3,6 @@ Base Station for the MiniBot.
 """
 
 # external
-import tornado
-import 
-
 from random import choice
 from string import digits, ascii_lowercase, ascii_uppercase
 
@@ -31,7 +28,6 @@ class BaseStation:
         chars = digits + ascii_lowercase + ascii_uppercase
         unique_id = "".join([choices(chars) for i in range(5)])
         return unique_id
-
 
     # ==================== BOTS ====================
 
