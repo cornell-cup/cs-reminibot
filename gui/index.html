@@ -1,112 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>MiniBot GUI</title>
+	<title>MiniBot Client GUI</title>
 	<!-- IMPORTS -->
-	<link rel="stylesheet" href="./static/css/gui_update.css"/>
-	<link rel="stylesheet" href="./static/css/vendor/prettify/prettify.css">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
-	<!-- blockly imports -->
-	<script src="./static/js/vendor/blockly/blockly_compressed.js"></script>
-	<script src="./static/js/vendor/blockly/javascript_compressed.js"></script>
-	<script src="./static/js/vendor/blockly/python_compressed.js"></script>
-	<script src="./static/js/vendor/blockly/blocks_compressed.js"></script>
-	<script src="./static/js/vendor/blockly/en.js"></script>
-
-	<!-- END IMPORTS -->
 </head>
 
 <body>
 	<!-- HTML HERE -->
 	<div id="root"></div>
-	<xml id="toolbox" style="display:none;">
-		<category name = "Control" colour = "220">
-			<block type="controls_repeat_ext"></block>
-			<block type="controls_repeat"></block>
-			<block type="controls_for"></block>
-			<block type="controls_forEach"></block>
-			<block type="controls_flow_statements"></block>
-			<block type="controls_whileUntil"></block>
-		</category>
-		<category name = "Logic" colour = "90">
-			<block type="logic_compare"></block>
-			<block type="logic_negate"></block>
-			<block type="logic_boolean"></block>
-			<block type="logic_operation"></block>
-			<block type="logic_ternary"></block>
-			<block type="logic_null"></block>
-			<block type="controls_if"></block>
-			<block type="controls_ifelse"></block>
-		</category>
-		<category name = "Math" colour = "300">
-			<block type="math_number"></block>
-			<block type="math_arithmetic"></block>
-			<block type="math_single"></block>
-			<block type="math_trig"></block>
-			<block type="math_constant"></block>
-			<block type="math_number_property"></block>
-			<block type="math_change"></block>
-			<block type="math_round"></block>
-			<block type="math_on_list"></block>
-			<block type="math_modulo"></block>
-			<block type="math_constrain"></block>
-		</category>
-		<category name = "Text" colour = "0">
-			<block type="text"></block>
-			<block type="text_join"></block>
-			<block type="text_create_join_container"></block>
-			<block type="text_create_join_item"></block>
-			<block type="text_print"></block>
-			<block type="text_append"></block>
-			<block type="text_isEmpty"></block>
-			<block type="text_indexOf"></block>
-			<block type="text_charAt"></block>
-			<block type="text_length"></block>
-		</category>
-		<category name = "Lists" colour = "250">
-			<block type="lists_create_empty"></block>
-			<block type="lists_repeat"></block>
-			<block type="lists_isEmpty"></block>
-			<block type="lists_length"></block>
-		</category>
-		<category name = "Color" colour = "75">
-			<block type="colour_picker"></block>
-			<block type="colour_random"></block>
-			<block type="colour_rgb"></block>
-			<block type="colour_blend"></block>
-		</category>
-		<category name = "Minibot" colour = "300">
-			<block type="move_power"></block>
-			<block type="move_power_time"></block>
-			<block type="stop_moving"></block>
-			<block type="set_power"></block>
-			<block type="turn_power"></block>
-			<block type="turn_power_time"></block>
-			<block type="wait_seconds"></block>
-			<block type="send_commands"></block>
-			<block type="wait_for_commands"></block>
-			<block type="while_wait_for_commands"></block>
-			<block type="sees_color"></block>
-		</category>
-		<category name = "Variables" colour = "200" custom = "VARIABLE">
-			<block type="variables_set"></block>
-			<block type="variables_get"></block>
-		</category>
-		<category name = "Functions" colour = "100" custom = "PROCEDURE">
-		</category>
-		<!-- ADDING CUSTOM BLOCKS -->
-	</xml>
-
 	<!-- basic imports -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 	<script src="http://pixijs.download/release/pixi.min.js"></script>
-
-	<!-- IMPORT CUSTOM BLOCKS -->
-	<script type="text/javascript"
-			src="./static/js/blocks/custom_blocks.js"></script>
-	<script type="text/javascript"
-			src="./static/js/blocks/custom_json.js"></script>
-	<script src="./static/js/vendor/prettify/prettify.js"></script>
 	<!-- manual scripts -->
 	<script src="./static/build/app.bundle.js"></script>
 	<!--<script src="./static/js/blockly.js"></script>-->
