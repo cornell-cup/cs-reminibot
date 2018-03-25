@@ -40,7 +40,7 @@ class BaseStation:
         """
         return list(self.active_bots.keys())
 
-    def add_bot(self, bot_id, ip, port):
+    def add_bot(self, bot_id, port, type, ip=None):
         """
         Adds a bot to the list of active bots, if the connection
         is established successfully.
@@ -50,7 +50,10 @@ class BaseStation:
             ip (str):
             port (int):
         """
-        new_bot = BSBot(bot_id, ip, port=port)
+        if type == "PIBOT":
+            new_bot = PiBot()
+        elif type == "SIMBOT":
+            new_bot = SimBot()
 
         if new_bot.is_active():
             return new_bot.get_id()

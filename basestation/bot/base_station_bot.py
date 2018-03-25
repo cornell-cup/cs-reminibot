@@ -3,7 +3,7 @@ Base Station Bot.
 """
 from connection.tcp_connection import TCPConnection
 
-class BaseStationBot:
+class Bot:
     def __init__(self, bot_id, ip, port=10000):
         self.id = bot_id
         self.port = port
