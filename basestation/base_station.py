@@ -7,8 +7,8 @@ from random import choice
 from string import digits, ascii_lowercase, ascii_uppercase
 
 # internal
-from basestation.connection.base_connection import BaseConnection
-from basestation.bot.base_station_bot import BaseStationBot as BSBot
+# from connection.base_connection import BaseConnection
+from bot.base_station_bot import BaseStationBot as BSBot
 from session.session import Session
 
 class BaseStation:
@@ -16,7 +16,7 @@ class BaseStation:
         self.active_bots = {}
         self.active_sessions = {}
         self.active_playgrounds = {}
-        self.connections = BaseConnection()
+        # self.connections = BaseConnection()
 
     # ==================== ID GENERATOR ====================
 
@@ -81,7 +81,8 @@ class BaseStation:
     # ================== SESSIONS ==================
 
     def list_active_sessions(self):
-        return self.active_sessions.keys()
+        # return self.active_sessions.keys()
+        return "hey there bb"
 
     def has_session(session_id):
         return session_id in self.active_sessions
