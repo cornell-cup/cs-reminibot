@@ -25,7 +25,8 @@ class BaseInterface:
         """
         self.port = port
         self.handlers = [
-            ("/", BaseStationHandler)
+            ("/", BaseStationHandler),
+            ("/start", ClientHandler)
         ]
         self.settings = {
             "static_path": os.path.join(os.path.dirname(__file__), "static")
@@ -54,6 +55,14 @@ class BaseStationHandler(tornado.web.RequestHandler):
     def get(self):
         self.write("Hi There")
         # self.render("WebSocket_Test_index.html", title="Title", items=[])
+
+class ClientHandler(tornado.web.RequestHandler):
+
+
+    def get(self):
+        # self.write("hello")
+        self.render("../gui/index.html", title = "Title",items=[])
+
 
 if __name__ == "__main__":
     """
