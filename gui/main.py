@@ -1,5 +1,5 @@
 """
-Main file from which client GUI HTTP interface begins.
+Main file from which client GUI begins.
 """
 
 import tornado
