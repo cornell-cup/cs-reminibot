@@ -13,6 +13,7 @@ import sys
 # Minibot imports.
 from base_station import BaseStation
 
+
 class BaseInterface:
     """
     Class which contains the base station and necessary functions for running the
@@ -23,15 +24,16 @@ class BaseInterface:
         Initializes base station
         :param port: Port number from which basestation runs.
         """
-        self.port = port
-        self.handlers = [
-            ("/", BaseStationHandler),
-            ("/start", ClientHandler)
-        ]
-        self.settings = {
-            "static_path": os.path.join(os.path.dirname(__file__), "static")
-        }
         self.base_station = BaseStation()
+        self.port = port
+        self.settings = {
+            "static_path": os.path.join(os.path.dirname(__file__), "../static"),
+            "cookie_secret": str(self.base_station.add_session())
+        }
+        self.handlers = [
+            ("/", BaseStationHandler, dict(base_station=self.base_station)),
+            ("/start", ClientHandler, dict(base_station=self.base_station))
+        ]
 
     def start(self):
         """
@@ -50,18 +52,29 @@ class BaseInterface:
 
 class BaseStationHandler(tornado.web.RequestHandler):
     """
-    Displays the GUI front-end.
+    Displays the Base Station GUI.
     """
+    def initialize(self, base_station):
+        self.base_station = base_station
+
     def get(self):
-        self.write("Hi There")
-        # self.render("WebSocket_Test_index.html", title="Title", items=[])
+        session_id = self.get_secure_cookie("user_id")
+        self.write("Welcome to Base Station " + str(session_id))
 
 class ClientHandler(tornado.web.RequestHandler):
-
+    """
+    Displays the Client GUI.
+    """
+    def initialize(self, base_station):
+        self.base_station = base_station
 
     def get(self):
-        # self.write("hello")
-        self.render("../gui/index.html", title = "Title",items=[])
+        if not self.get_secure_cookie("user_id"):
+            new_id = self.base_station.add_session();
+            self.set_secure_cookie("user_id", new_id)
+        
+        session_id = self.get_secure_cookie("user_id")
+        self.render("../static/gui/index.html", title = "Title")
 
 
 if __name__ == "__main__":
