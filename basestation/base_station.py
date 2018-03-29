@@ -20,13 +20,13 @@ class BaseStation:
 
     # ==================== ID GENERATOR ====================
 
-    def generate_id():
+    def generate_id(self):
         """
         Generates a unique 5 character id composed of digits, lowercase, 
         and uppercase letters.
         """
         chars = digits + ascii_lowercase + ascii_uppercase
-        unique_id = "".join([choices(chars) for i in range(5)])
+        unique_id = "".join([choice(chars) for i in range(5)])
         return unique_id
 
     # ==================== BOTS ====================
@@ -84,18 +84,41 @@ class BaseStation:
     # ================== SESSIONS ==================
 
     def list_active_sessions(self):
-        # return self.active_sessions.keys()
-        return "hey there bb"
+        """
+        Returns all of the session_id in active_sessions
+
+        Returns:
+            list : list of session_id
+        """
+        return self.active_sessions.keys()
 
     def has_session(session_id):
+        """
+        Returns True if session_id exists in active_sessions
+
+        Returns:
+            boolean
+        """
         return session_id in self.active_sessions
 
     def add_session(self):
-        session_id = generate_id()
+        """
+        Adds a new session to active_sessions
+
+        Returns:
+            session_id (str): a unique id
+        """
+        session_id = self.generate_id()
         self.active_sessions[session_id] = Session(session_id)
-        return session_id in self.active_sessions
+        return session_id
 
     def remove_session(self, session_id):
+        """
+        Removes a session from active_sessions
+
+        Argss:
+            session_id (str): a unique id
+        """
         del self.active_sessions[session_id]
         return session_id not in self.active_sessions
 
