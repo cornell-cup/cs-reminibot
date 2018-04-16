@@ -33,7 +33,7 @@ class BaseInterface:
         self.handlers = [
             ("/", BaseStationHandler, dict(base_station=self.base_station)),
             ("/start", ClientHandler, dict(base_station=self.base_station)),
-            ("/vision", VisionHandler, dict(base_station=self.base_station))
+            ("/vision", VisionHandler)
         ]
         self.locations = {}
 
