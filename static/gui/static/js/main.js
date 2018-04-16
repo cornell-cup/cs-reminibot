@@ -10,9 +10,9 @@ class AddBot extends React.Component {
         };
 
         this.updateInputValue = this.updateInputValue.bind(this);
-        this.buttonPress = this.buttonPress.bind(this);
-        this.selectBot = this.selectBot.bind(this);
-        this.buttonMapPress = this.buttonMapPress.bind(this);
+        this.addBotListener = this.addBotListener.bind(this);
+        this.selectBotListener = this.selectBotListener.bind(this);
+        this.buttonMapListener = this.buttonMapListener.bind(this);
     }
 
     updateInputValue(event) {
