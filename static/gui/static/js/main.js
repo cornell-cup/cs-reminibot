@@ -30,7 +30,6 @@ class AddBot extends React.Component {
     }
 
     buttonMapListener(event) {
-        console.log("button map press");
         console.log(event);
     }
 
