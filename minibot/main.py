@@ -17,7 +17,6 @@ import os
     Loads UserScript file.
     Reloads file when it is run from GUI to reflect changes.
 """
-US = importlib.import_module('minibot.scripts.UserScript')
 
 CONFIG_LOCATION = '/home/pi/cs-minibot/minibot/configs/config.json'
 
