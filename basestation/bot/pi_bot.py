@@ -18,12 +18,21 @@ class PiBot(BaseStationBot, object):
         self.tcp_connection.destroy()
 
     def get_ip(self):
+        """
+        return ip address of bot
+        """
         return self.ip
 
     def is_active(self):
+        """
+        check if tcp connection is alive
+        """
         return self.tcp_connection.is_connection_active()
 
     def sendKV(self, key, value):
+        """
+        send command with specified key and value
+        """
         return self.tcp_connection.sendKV(key, value)
 
     class TCPListener(threading.Thread):
@@ -32,6 +41,9 @@ class PiBot(BaseStationBot, object):
             self.tcp_connection = t
 
         def run(self):
+            """
+            wait for incoming data as long as tcp connection is alive
+            """
             try:
                 while True:
                     if self.tcp_connection.is_connection_active():
@@ -43,6 +55,9 @@ class PiBot(BaseStationBot, object):
                 log_exn_info(e, msg = msg)
 
         def tcp_parse_incoming(self, data):
+            """
+            parse incoming data
+            """
             start = data.find("<<<<")
             end = data.find(">>>>")
             comma = data.find(",")
