@@ -20,19 +20,19 @@ class AddBot extends React.Component {
         this.state.bot_name = event.target.value;
     }
 
-    buttonPress(event) {
+    addBotListener(event) {
         console.log("button press");
         var li = this.state.bot_list;
         li.push(this.state.bot_name);
         this.setState({bot_list: li});
     }
 
-    selectBot(event) {
+    selectBotListener(event) {
         console.log("select bot");
         console.log(event.target.value);
     }
 
-    buttonMapPress(event) {
+    buttonMapListener(event) {
         console.log("button map press");
         console.log(event.target.id);
     }
@@ -55,18 +55,18 @@ class AddBot extends React.Component {
                     <tbody>
                         <tr>
                             <td>
-                            <div>Bot Name or whatever Leo wants:</div>
+                            <div>Bot Name:</div>
                             <form>
                                 <label>
                                     <input type="text" name="bot_name" onChange={evt => this.updateInputValue(evt)}/>
                                 </label>
                             </form>
                             </td>
-                            <td><button style={styles.Button} onClick={this.buttonPress}>Add Bot</button></td>
+                            <td><button style={styles.Button} onClick={this.addBotListener}>Add Bot</button></td>
                         </tr>
                         <tr>
                         <td><div> Bot List: </div></td>
-                        <td><select style={styles.Select} onChange={this.selectBot}>
+                        <td><select style={styles.Select} onChange={this.selectBotListener}>
                             {
                                 this.state.bot_list.map(function(bot_name, idx){
                                     return <option
@@ -85,17 +85,17 @@ class AddBot extends React.Component {
                         <tbody>
                         <tr>
                             <td></td>
-                            <td><button className="btn" id="f" onClick={this.buttonMapPress}>forward</button></td>
+                            <td><button className="btn" id="f" onClick={this.buttonMapListener}>forward</button></td>
                             <td></td>
                         </tr>
                         <tr>
-                            <td><button className="btn" id="l" onClick={this.buttonMapPress}>left</button></td>
-                            <td><button className="btn" id="s" onClick={this.buttonMapPress}>stop</button></td>
-                            <td><button className="btn" id="r" onClick={this.buttonMapPress}>right</button></td>
+                            <td><button className="btn" id="l" onClick={this.buttonMapListener}>left</button></td>
+                            <td><button className="btn" id="s" onClick={this.buttonMapListener}>stop</button></td>
+                            <td><button className="btn" id="r" onClick={this.buttonMapListener}>right</button></td>
                         </tr>
                         <tr>
                             <td></td>
-                            <td><button className="btn" id="b" onClick={this.buttonMapPress}>backward</button></td>
+                            <td><button className="btn" id="b" onClick={this.buttonMapListener}>backward</button></td>
                             <td></td>
                         </tr>
                         </tbody>
