@@ -34,7 +34,7 @@ class AddBot extends React.Component {
 
     buttonMapListener(event) {
         console.log("button map press");
-        console.log(event.target.id);
+        console.log(event);
     }
 
     render() {
@@ -85,17 +85,17 @@ class AddBot extends React.Component {
                         <tbody>
                         <tr>
                             <td></td>
-                            <td><button className="btn" id="f" onClick={this.buttonMapListener}>forward</button></td>
+                            <td><button className="btn btn-f" onClick={() => this.buttonMapListener("forward")}>forward</button></td>
                             <td></td>
                         </tr>
                         <tr>
-                            <td><button className="btn" id="l" onClick={this.buttonMapListener}>left</button></td>
-                            <td><button className="btn" id="s" onClick={this.buttonMapListener}>stop</button></td>
-                            <td><button className="btn" id="r" onClick={this.buttonMapListener}>right</button></td>
+                            <td><button className="btn btn-l" onClick={() => this.buttonMapListener("left")}>left</button></td>
+                            <td><button className="btn btn-s" onClick={() => this.buttonMapListener("stop")}>stop</button></td>
+                            <td><button className="btn btn-r" onClick={() => this.buttonMapListener("right")}>right</button></td>
                         </tr>
                         <tr>
                             <td></td>
-                            <td><button className="btn" id="b" onClick={this.buttonMapListener}>backward</button></td>
+                            <td><button className="btn btn-b" onClick={() => this.buttonMapListener("backward")}>backward</button></td>
                             <td></td>
                         </tr>
                         </tbody>
