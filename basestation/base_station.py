@@ -26,7 +26,7 @@ class BaseStation:
         and uppercase letters.
         """
         chars = digits + ascii_lowercase + ascii_uppercase
-        unique_id = "".join([choice(chars) for i in range(5)])
+        unique_id = "".join([choice(chars) for i in range(7)])
         return unique_id
 
     # ==================== BOTS ====================
@@ -40,7 +40,7 @@ class BaseStation:
         """
         return list(self.active_bots.keys())
 
-    def add_bot(self, bot_id, port, type, ip=None):
+    def add_bot(self, port, type, ip=None):
         """
         Adds a bot to the list of active bots, if the connection
         is established successfully.
@@ -50,8 +50,9 @@ class BaseStation:
             ip (str):
             port (int):
         """
+        bot_id = self.generate_id()
         if type == "PIBOT":
-            new_bot = PiBot()
+            new_bot = PiBot(bot_id, port, ip)
         elif type == "SIMBOT":
             new_bot = SimBot()
 
