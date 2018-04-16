@@ -16,19 +16,16 @@ class AddBot extends React.Component {
     }
 
     updateInputValue(event) {
-        console.log("update input value");
         this.state.bot_name = event.target.value;
     }
 
     addBotListener(event) {
-        console.log("button press");
         var li = this.state.bot_list;
         li.push(this.state.bot_name);
         this.setState({bot_list: li});
     }
 
     selectBotListener(event) {
-        console.log("select bot");
         console.log(event.target.value);
     }
 
@@ -80,7 +77,8 @@ class AddBot extends React.Component {
                         </tr>
                     </tbody>
                 </table>
-                <div id="button map">
+                <div>
+                    Movement
                     <table>
                         <tbody>
                         <tr>
@@ -122,13 +120,6 @@ class ClientGUI extends React.Component{
         return (
             <div>
                 <div> Welcome to Client GUI : </div>
-                <div>{this.props.userid}</div>
-                <form>
-                    <label>
-                        Name:
-                        <input type="text" name="name" onChange={evt => this.updateInputValue(evt)}/>
-                    </label>
-                </form>
                 <AddBot/>
             </div>
         )
