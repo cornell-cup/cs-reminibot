@@ -1,3 +1,5 @@
 # Minibot Software
 
-Pray for us
+Not all heroes wear capes.
+
+Pray for us.
