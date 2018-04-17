@@ -59,6 +59,8 @@ class BaseStationHandler(tornado.web.RequestHandler):
 
     def get(self):
         session_id = self.get_secure_cookie("user_id")
+        if session_id:
+            session_id = session_id.decode("utf-8") 
         self.write("Welcome to Base Station " + str(session_id))
 
 class ClientHandler(tornado.web.RequestHandler):
@@ -74,14 +76,17 @@ class ClientHandler(tornado.web.RequestHandler):
             self.set_secure_cookie("user_id", new_id)
         
         session_id = self.get_secure_cookie("user_id")
+        if session_id:
+            session_id = session_id.decode("utf-8") 
         self.render("../static/gui/index.html", title = "Title")
 
     def post(self):
         data = json.loads(self.request.body.decode())
-        print(data) 
+        key = data['key']
 
         session_id = self.get_secure_cookie("user_id")
-        key= data['key']
+        if session_id:
+            session_id = session_id.decode("utf-8") 
 
         if key == "ADDBOT":
             bot_ip = data['bot_ip']
@@ -91,6 +96,14 @@ class ClientHandler(tornado.web.RequestHandler):
 
             bot_id = self.base_station.add_bot(bot_name, port, bot_type, bot_ip)
             self.base_station.add_bot_to_session(session_id, bot_id)
+            self.write(bot_id)
+        elif key == "WHEELS":
+            bot_name = data['bot_name']
+            direction = data['direction']
+            power = str(data['power'])
+
+            bot_id = self.base_station.bot_name_to_bot_id(bot_name)
+            self.base_station.move_wheels_bot(session_id, bot_id, direction, power)
 
 
 if __name__ == "__main__":
