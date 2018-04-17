@@ -100,7 +100,6 @@ class BaseStation:
         else:
             value = "0,0,0,0"
 
-        print(value)
         self.active_bots[bot_id].sendKV("WHEELS", value)
         return True
 
@@ -165,5 +164,4 @@ class BaseStation:
         if bot_id not in self.active_bots:
             raise Exception("Bot is not active. Failed to add bot" + bot_id + " to session " + session_id)
         bot = self.active_bots[bot_id]
-        print(self.active_sessions)
         return self.active_sessions[session_id].add_bot_id_to_session(bot.get_id())

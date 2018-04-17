@@ -9,6 +9,7 @@ class AddBot extends React.Component {
             bot_ip: "",
             bot_list: [],
             selected_bot: "",
+            power: 0
         };
 
         this.updateInputValue = this.updateInputValue.bind(this);
@@ -19,6 +20,10 @@ class AddBot extends React.Component {
 
     updateInputValue(event) {
         this.state.bot_ip = event.target.value;
+    }
+
+    updatePowerValue(event) {
+        this.state.power = event.target.value;
     }
 
     addBotListener(event) {
@@ -61,7 +66,7 @@ class AddBot extends React.Component {
                 key: "WHEELS",
                 bot_name: _this.state.selected_bot,
                 direction: value,
-                power: 50,
+                power: _this.state.power,
             })
             })
                 .then(function(response) {
@@ -135,6 +140,12 @@ class AddBot extends React.Component {
                         </tr>
                         </tbody>
                     </table>
+                    <form>
+                        <label>
+                            Power
+                            <input type="text" name="wheel_power" onChange={evt => this.updatePowerValue(evt)}/>
+                        </label>
+                    </form>
                 </div>
             </div>
         );
