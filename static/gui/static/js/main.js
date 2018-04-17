@@ -1,11 +1,12 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
+var axios = require('axios');
 
 class AddBot extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            bot_name: "",
+            bot_ip: "",
             bot_list: []
         };
 
@@ -16,13 +17,32 @@ class AddBot extends React.Component {
     }
 
     updateInputValue(event) {
-        this.state.bot_name = event.target.value;
+        this.state.bot_ip = event.target.value;
     }
 
     addBotListener(event) {
         var li = this.state.bot_list;
-        li.push(this.state.bot_name);
+        li.push(this.state.bot_ip);
         this.setState({bot_list: li});
+
+        const _this = this;
+        axios({
+            method:'POST',
+            url:'/start',
+            data: JSON.stringify({
+                key: "ADDBOT",
+                bot_name: "minibot" + this.state.bot_ip.substring(this.state.bot_ip.length - 2),
+                bot_ip: this.state.bot_ip,
+                port: "10000",
+                bot_type: "PIBOT",
+            })
+            })
+                .then(function(response) {
+                    console.log('Succesfully Added');
+            })
+                .catch(function (error) {
+                    console.log(error);
+        })
     }
 
     selectBotListener(event) {
@@ -54,7 +74,7 @@ class AddBot extends React.Component {
                             <div>Bot Name:</div>
                             <form>
                                 <label>
-                                    <input type="text" name="bot_name" onChange={evt => this.updateInputValue(evt)}/>
+                                    <input type="text" name="bot_ip" onChange={evt => this.updateInputValue(evt)}/>
                                 </label>
                             </form>
                             </td>
@@ -64,11 +84,11 @@ class AddBot extends React.Component {
                         <td><div> Bot List: </div></td>
                         <td><select style={styles.Select} onChange={this.selectBotListener}>
                             {
-                                this.state.bot_list.map(function(bot_name, idx){
+                                this.state.bot_list.map(function(bot_ip, idx){
                                     return <option
                                                 key={idx}
-                                                value={bot_name}>
-                                           {bot_name}
+                                                value={bot_ip}>
+                                           {bot_ip}
                                            </option>
                                 })
                             }
