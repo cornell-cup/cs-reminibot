@@ -7,7 +7,8 @@ class AddBot extends React.Component {
         super(props);
         this.state = {
             bot_ip: "",
-            bot_list: []
+            bot_list: [],
+            selected_bot: "",
         };
 
         this.updateInputValue = this.updateInputValue.bind(this);
@@ -21,9 +22,10 @@ class AddBot extends React.Component {
     }
 
     addBotListener(event) {
-        var li = this.state.bot_list;
-        li.push(this.state.bot_ip);
-        this.setState({bot_list: li});
+        let li = this.state.bot_list;
+        let bot_name = "minibot" + this.state.bot_ip.substring(this.state.bot_ip.length - 2)
+        li.push(bot_name);
+        this.setState({bot_list: li, selected_bot: bot_name});
 
         const _this = this;
         axios({
@@ -46,11 +48,27 @@ class AddBot extends React.Component {
     }
 
     selectBotListener(event) {
-        console.log(event.target.value);
+        let bot_name = event.target.value;
+        this.setState({selected_bot: bot_name});
     }
 
-    buttonMapListener(event) {
-        console.log(event);
+    buttonMapListener(value) {
+        const _this = this;
+        axios({
+            method:'POST',
+            url:'/start',
+            data: JSON.stringify({
+                key: "WHEELS",
+                bot_name: _this.state.selected_bot,
+                direction: value,
+                power: 50,
+            })
+            })
+                .then(function(response) {
+            })
+                .catch(function (error) {
+                    console.log(error);
+        })
     }
 
     render() {
