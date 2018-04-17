@@ -76,6 +76,34 @@ class BaseStation:
         del self.active_bots[bot_id]
         return bot_id not in self.active_bots
 
+    def bot_name_to_bot_id(self, bot_name):
+        for bot_id, bot in self.active_bots.items():
+            if bot.get_name() == bot_name:
+                return bot_id
+        return None
+
+    def move_wheels_bot(self, session_id, bot_id, direction, power):
+        session = self.active_sessions[session_id]
+        if not session or not session.has_bot(bot_id):
+            return False
+
+        direction = direction.lower()
+        neg_power = "-" + power
+        if direction == "forward" or direction == "fw":
+            value = ",".join([power, power, power, power])
+        elif direction == "backward" or direction == "bw":
+            value = ",".join([neg_power, neg_power, neg_power, neg_power])
+        elif direction == "left" or direction == "lt":
+            value = ",".join([neg_power, power, neg_power, power])
+        elif direction == "right" or direction == "rt":
+            value = ",".join([power, neg_power, power, neg_power])
+        else:
+            value = "0,0,0,0"
+
+        print(value)
+        self.active_bots[bot_id].sendKV("WHEELS", value)
+        return True
+
     def get_bot(self, bot_id):
         return self.active_bots[bot_id]
 
@@ -137,4 +165,5 @@ class BaseStation:
         if bot_id not in self.active_bots:
             raise Exception("Bot is not active. Failed to add bot" + bot_id + " to session " + session_id)
         bot = self.active_bots[bot_id]
+        print(self.active_sessions)
         return self.active_sessions[session_id].add_bot_id_to_session(bot.get_id())
