@@ -8,7 +8,8 @@ from string import digits, ascii_lowercase, ascii_uppercase
 
 # internal
 # from connection.base_connection import BaseConnection
-from bot.base_station_bot import BaseStationBot as BSBot
+from bot.pi_bot import PiBot
+from bot.sim_bot import SimBot
 from session.session import Session
 
 class BaseStation:
@@ -40,7 +41,7 @@ class BaseStation:
         """
         return list(self.active_bots.keys())
 
-    def add_bot(self, port, type, ip=None):
+    def add_bot(self, bot_name, port, type, ip=None):
         """
         Adds a bot to the list of active bots, if the connection
         is established successfully.
@@ -52,9 +53,11 @@ class BaseStation:
         """
         bot_id = self.generate_id()
         if type == "PIBOT":
-            new_bot = PiBot(bot_id, port, ip)
+            new_bot = PiBot(bot_id, bot_name, ip, port)
         elif type == "SIMBOT":
             new_bot = SimBot()
+
+        self.active_bots[bot_id] = new_bot
 
         if new_bot.is_active():
             return new_bot.get_id()
@@ -124,6 +127,13 @@ class BaseStation:
         return session_id not in self.active_sessions
 
     def add_bot_to_session(self, session_id, bot_id):
+        """
+        Adds bot id to session given session id.
+
+        Argss:
+            session_id (str): a unique id
+            bot_id (str): a unique id
+        """
         if bot_id not in self.active_bots:
             raise Exception("Bot is not active. Failed to add bot" + bot_id + " to session " + session_id)
         bot = self.active_bots[bot_id]

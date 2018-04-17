@@ -76,6 +76,22 @@ class ClientHandler(tornado.web.RequestHandler):
         session_id = self.get_secure_cookie("user_id")
         self.render("../static/gui/index.html", title = "Title")
 
+    def post(self):
+        data = json.loads(self.request.body.decode())
+        print(data) 
+
+        session_id = self.get_secure_cookie("user_id")
+        key= data['key']
+
+        if key == "ADDBOT":
+            bot_ip = data['bot_ip']
+            bot_name = data['bot_name']
+            bot_type = data['bot_type']
+            port = data['port']
+
+            bot_id = self.base_station.add_bot(bot_name, port, bot_type, bot_ip)
+            self.base_station.add_bot_to_session(session_id, bot_id)
+
 
 if __name__ == "__main__":
     """
