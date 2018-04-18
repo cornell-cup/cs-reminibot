@@ -1,12 +1,15 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
+var axios = require('axios');
 
 class AddBot extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            bot_name: "",
-            bot_list: []
+            bot_ip: "",
+            bot_list: [],
+            selected_bot: "",
+            power: 0
         };
 
         this.updateInputValue = this.updateInputValue.bind(this);
@@ -16,21 +19,61 @@ class AddBot extends React.Component {
     }
 
     updateInputValue(event) {
-        this.state.bot_name = event.target.value;
+        this.state.bot_ip = event.target.value;
+    }
+
+    updatePowerValue(event) {
+        this.state.power = event.target.value;
     }
 
     addBotListener(event) {
-        var li = this.state.bot_list;
-        li.push(this.state.bot_name);
-        this.setState({bot_list: li});
+        let li = this.state.bot_list;
+        let bot_name = "minibot" + this.state.bot_ip.substring(this.state.bot_ip.length - 2)
+        li.push(bot_name);
+        this.setState({bot_list: li, selected_bot: bot_name});
+
+        const _this = this;
+        axios({
+            method:'POST',
+            url:'/start',
+            data: JSON.stringify({
+                key: "ADDBOT",
+                bot_name: "minibot" + this.state.bot_ip.substring(this.state.bot_ip.length - 2),
+                bot_ip: this.state.bot_ip,
+                port: "10000",
+                bot_type: "PIBOT",
+            })
+            })
+                .then(function(response) {
+                    console.log('Succesfully Added');
+            })
+                .catch(function (error) {
+                    console.log(error);
+        })
     }
 
     selectBotListener(event) {
-        console.log(event.target.value);
+        let bot_name = event.target.value;
+        this.setState({selected_bot: bot_name});
     }
 
-    buttonMapListener(event) {
-        console.log(event);
+    buttonMapListener(value) {
+        const _this = this;
+        axios({
+            method:'POST',
+            url:'/start',
+            data: JSON.stringify({
+                key: "WHEELS",
+                bot_name: _this.state.selected_bot,
+                direction: value,
+                power: _this.state.power,
+            })
+            })
+                .then(function(response) {
+            })
+                .catch(function (error) {
+                    console.log(error);
+        })
     }
 
     render() {
@@ -54,7 +97,7 @@ class AddBot extends React.Component {
                             <div>Bot Name:</div>
                             <form>
                                 <label>
-                                    <input type="text" name="bot_name" onChange={evt => this.updateInputValue(evt)}/>
+                                    <input type="text" name="bot_ip" onChange={evt => this.updateInputValue(evt)}/>
                                 </label>
                             </form>
                             </td>
@@ -64,11 +107,11 @@ class AddBot extends React.Component {
                         <td><div> Bot List: </div></td>
                         <td><select style={styles.Select} onChange={this.selectBotListener}>
                             {
-                                this.state.bot_list.map(function(bot_name, idx){
+                                this.state.bot_list.map(function(bot_ip, idx){
                                     return <option
                                                 key={idx}
-                                                value={bot_name}>
-                                           {bot_name}
+                                                value={bot_ip}>
+                                           {bot_ip}
                                            </option>
                                 })
                             }
@@ -97,6 +140,12 @@ class AddBot extends React.Component {
                         </tr>
                         </tbody>
                     </table>
+                    <form>
+                        <label>
+                            Power
+                            <input type="text" name="wheel_power" onChange={evt => this.updatePowerValue(evt)}/>
+                        </label>
+                    </form>
                 </div>
             </div>
         );
