@@ -88,15 +88,9 @@ class ClientHandler(tornado.web.RequestHandler):
         if session_id:
             session_id = session_id.decode("utf-8") 
 
-        if key == "ADDBOT":
-            bot_ip = data['bot_ip']
+        if key == "CONNECTBOT":
             bot_name = data['bot_name']
-            bot_type = data['bot_type']
-            port = data['port']
-
-            bot_id = self.base_station.add_bot(bot_name, port, bot_type, bot_ip)
-            self.base_station.add_bot_to_session(session_id, bot_id)
-            self.write(bot_id)
+            self.base_station.add_bot_to_session(session_id, bot_name)
         elif key == "WHEELS":
             bot_name = data['bot_name']
             direction = data['direction']
@@ -104,6 +98,8 @@ class ClientHandler(tornado.web.RequestHandler):
 
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             self.base_station.move_wheels_bot(session_id, bot_id, direction, power)
+        elif key == "DISCOVERBOTS":
+            self.write(json.dumps(self.base_station.get_active_bots_names()).encode())
 
 
 if __name__ == "__main__":

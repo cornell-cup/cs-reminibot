@@ -6,7 +6,7 @@ class AddBot extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            bot_ip: "",
+            bot_name: "",
             bot_list: [],
             selected_bot: "",
             power: 0
@@ -19,7 +19,21 @@ class AddBot extends React.Component {
     }
 
     updateInputValue(event) {
-        this.state.bot_ip = event.target.value;
+        this.state.bot_name = event.target.value;
+        const _this = this;
+        axios({
+            method:'POST',
+            url:'/start',
+            data: JSON.stringify({
+                key: "DISCOVERBOTS"
+            })
+            })
+                .then(function(response) {
+                    console.log(response.data)
+            })
+                .catch(function (error) {
+                    console.log(error);
+        })
     }
 
     updatePowerValue(event) {
@@ -28,7 +42,7 @@ class AddBot extends React.Component {
 
     addBotListener(event) {
         let li = this.state.bot_list;
-        let bot_name = "minibot" + this.state.bot_ip.substring(this.state.bot_ip.length - 2)
+        let bot_name = this.state.bot_name
         li.push(bot_name);
         this.setState({bot_list: li, selected_bot: bot_name});
 
@@ -37,11 +51,8 @@ class AddBot extends React.Component {
             method:'POST',
             url:'/start',
             data: JSON.stringify({
-                key: "ADDBOT",
-                bot_name: "minibot" + this.state.bot_ip.substring(this.state.bot_ip.length - 2),
-                bot_ip: this.state.bot_ip,
-                port: "10000",
-                bot_type: "PIBOT",
+                key: "CONNECTBOT",
+                bot_name: this.state.bot_name
             })
             })
                 .then(function(response) {
@@ -97,7 +108,7 @@ class AddBot extends React.Component {
                             <div>Bot Name:</div>
                             <form>
                                 <label>
-                                    <input type="text" name="bot_ip" onChange={evt => this.updateInputValue(evt)}/>
+                                    <input type="text" name="bot_name" onChange={evt => this.updateInputValue(evt)}/>
                                 </label>
                             </form>
                             </td>
@@ -107,11 +118,11 @@ class AddBot extends React.Component {
                         <td><div> Bot List: </div></td>
                         <td><select style={styles.Select} onChange={this.selectBotListener}>
                             {
-                                this.state.bot_list.map(function(bot_ip, idx){
+                                this.state.bot_list.map(function(bot_name, idx){
                                     return <option
                                                 key={idx}
-                                                value={bot_ip}>
-                                           {bot_ip}
+                                                value={bot_name}>
+                                           {bot_name}
                                            </option>
                                 })
                             }
