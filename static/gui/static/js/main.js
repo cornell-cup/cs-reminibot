@@ -2,6 +2,41 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 var axios = require('axios');
 
+class Scripts extends React.Component {
+    constructor(props){
+        super(props);
+        this.state = {
+            bot_name: "",
+            scripts: []
+        }
+    }
+
+    componentWillMount(){
+        this.setState({bot_name: this.props.bot_name})
+    }
+
+    getScripts(){
+         const _this = this;
+         axios({
+             method:'GET',
+             url:'/getScripts',
+             })
+                 .then(function(response) {
+                     _this.setState({scripts: response.data});
+             })
+                 .catch(function (error) {
+                     console.log(error);
+         });
+    }
+
+    render() {
+        return (
+            <div> Scripts, {this.bot_name} </div>
+
+        )
+    }
+}
+
 class AddBot extends React.Component {
     constructor(props) {
         super(props);
@@ -9,7 +44,7 @@ class AddBot extends React.Component {
             bot_name: "",
             bot_list: [],
             selected_bot: "",
-            power: 0
+            power: 0,
         };
 
         this.updateInputValue = this.updateInputValue.bind(this);
@@ -66,6 +101,7 @@ class AddBot extends React.Component {
     selectBotListener(event) {
         let bot_name = event.target.value;
         this.setState({selected_bot: bot_name});
+        this.props.updateBotName(bot_name);
     }
 
     buttonMapListener(value) {
@@ -167,19 +203,20 @@ class ClientGUI extends React.Component{
     constructor(props) {
         super(props);
         this.state = {
-            name: ""
+            bot_name: ""
         }
     }
 
-    updateInputValue(event) {
-        this.setState({name: event.target.value});
+    updateBotName(event) {
+        this.setState({bot_name: event.target.value});
     }
 
     render() {
         return (
             <div>
                 <div> Welcome to Client GUI : </div>
-                <AddBot/>
+                <AddBot updateBotName = {this.updateBotName} />
+                <Scripts bot_name={this.bot_name}/>
             </div>
         )
     }
