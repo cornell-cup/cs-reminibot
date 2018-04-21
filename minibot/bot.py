@@ -36,3 +36,7 @@ class Bot():
     def stop(self):
         self.motors.set_speed(0, 0)
 
+    def set_wheel_power(self, left, right):
+        self.motors.set_speed(left, right)
+
+

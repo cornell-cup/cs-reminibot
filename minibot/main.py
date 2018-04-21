@@ -18,7 +18,7 @@ import os
     Reloads file when it is run from GUI to reflect changes.
 """
 
-CONFIG_LOCATION = '/home/pi/cs-minibot/minibot/configs/config.json'
+CONFIG_LOCATION = '/home/pi/cs-reminibot/minibot/configs/config.json'
 
 p = None
 def main():
@@ -58,8 +58,6 @@ def parse_command(cmd, bot):
         except Exception as e:
             print(e)
             pass
-    else:
-        print("key is not wheels")
 
 if __name__ == "__main__":
     main()
