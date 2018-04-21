@@ -1,21 +1,18 @@
 """
 Base Station Bot.
 """
-from basestation.connection.tcp_connection import TCPConnection
+
+from connection.tcp_connection import TCPConnection
 import threading
-from basestation.util.exception_handling import *
-from basestation.bot.base_station_bot import BaseStationBot
+from util.exception_handling import *
+from bot.base_station_bot import BaseStationBot
 
 class PiBot(BaseStationBot, object):
-    def __init__(self, bot_id, ip, port=10000):
-        super(PiBot, self).__init__(bot_id)
+    def __init__(self, bot_id, bot_name, ip, port=10000):
+        super(PiBot, self).__init__(bot_id, bot_name)
         self.port = port
         self.ip = ip
-
         self.tcp_connection = TCPConnection(ip, port=port)
-
-    def __del__(self):
-        self.tcp_connection.destroy()
 
     def get_ip(self):
         """
