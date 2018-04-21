@@ -9,8 +9,7 @@
     "babel-loader": "^7.1.2",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
-    "react-tabs": "^2.0.0",
-    "react-autosuggest": "^9.3.4"
+    "react-tabs": "^2.0.0"
   },
   "babel": {
     "presets": [
