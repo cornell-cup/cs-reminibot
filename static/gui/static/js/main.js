@@ -18,8 +18,11 @@ class Scripts extends React.Component {
     getScripts(){
          const _this = this;
          axios({
-             method:'GET',
-             url:'/getScripts',
+             method:'POST',
+             url:'/',
+             data: JSON.stringify({
+                 key: "SCRIPTS"
+             })
              })
                  .then(function(response) {
                      _this.setState({scripts: response.data});
@@ -31,7 +34,15 @@ class Scripts extends React.Component {
 
     render() {
         return (
-            <div> Scripts, {this.bot_name} </div>
+            <div>
+                <div> Scripts </div>
+                <div>
+                    <div>Select Script</div>
+
+                </div>
+                <div> Run Script </div>
+                <div> Save Script </div>
+            </div>
 
         )
     }

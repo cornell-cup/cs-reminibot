@@ -100,6 +100,8 @@ class ClientHandler(tornado.web.RequestHandler):
             self.base_station.move_wheels_bot(session_id, bot_id, direction, power)
         elif key == "DISCOVERBOTS":
             self.write(json.dumps(self.base_station.get_active_bots_names()).encode())
+        elif key == "SCRIPTS":
+            
 
 
 if __name__ == "__main__":
