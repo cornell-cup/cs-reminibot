@@ -58,6 +58,14 @@ def parse_command(cmd, bot):
         except Exception as e:
             print(e)
             pass
+    elif key == "SCRIPTS":
+        values = value.split(",")
+        if len(values) == 0:
+            print("GETTING SCRIPTS")
+        elif len(values) == 1:
+            print("RUNNING SCRIPTS")
+        elif len(values) == 2:
+            print("SAVING SCRIPTS")
 
 if __name__ == "__main__":
     main()
