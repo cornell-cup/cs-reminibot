@@ -235,3 +235,7 @@ class BaseStation:
         print(self.active_bots)
         bot = self.active_bots[bot_id]
         return self.active_sessions[session_id].add_bot_id_to_session(bot.get_id())
+
+    def remove_bot_from_session(self, session_id, bot_id):
+        session = self.active_sessions[session_id]
+        session.remove_bot_id_from_session(bot_id)
