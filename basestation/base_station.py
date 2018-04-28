@@ -215,7 +215,7 @@ class BaseStation:
         """
         Removes a session from active_sessions
 
-        Argss:
+        Args:
             session_id (str): a unique id
         """
         del self.active_sessions[session_id]
@@ -225,7 +225,7 @@ class BaseStation:
         """
         Adds bot id to session given session id and bot name.
 
-        Argss:
+        Args:
             session_id (str): a unique id
             bot_id (str): a unique id
         """

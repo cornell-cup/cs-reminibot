@@ -93,9 +93,21 @@ class AddBot extends React.Component {
         console.log("handle remove");
         console.log(this.state);
         var li = this.state.items;
-        console.log("type: " + li[event.idx].type);
-        li.splice(event.idx, 1);
-        this.setState({items: li});
+        //supposed to delete a bot from the list but i'm bad at react
+        //console.log("type: " + li[event.idx].type);
+        //li.splice(event.idx, 1);
+        //this.setState({items: li});
+        /*axios({
+            method:'POST',
+            url:'/removeBot',
+            data: JSON.stringify({name: this.props.currentBot}),
+        })
+        .then(function(response) {
+            console.log('removed bot successfully');
+        })
+        .catch(function (error) {
+            console.warn(error);
+        });*/
     }
 
     render() {
@@ -138,7 +150,7 @@ class AddBot extends React.Component {
                             }
                             </select></td>
                         <td><button style={styles.Button} bot_list={this.state.bot_list}
-                                            onClick = {() => _this.handleRemove()}>Remove</button></td>
+                                            onClick = {() => _this.deleteBotListener()}>Remove</button></td>
                         </tr>
                     </tbody>
                 </table>
