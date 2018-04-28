@@ -106,15 +106,18 @@ class ClientHandler(tornado.web.RequestHandler):
             value = data['value']
             bot_name = data['bot_name']
             bot_id = self.base_station.bot_name_to_bot_id(bot_name);
+            bot = self.base_station.get_bot(bot_id)
 
             if len(value) == 0:
                 print("GETTING SCRIPTS")
-                bot = self.base_station.get_bot(bot_id)
                 bot.sendKV("SCRIPTS", '')
             elif len(value) == 1:
                 print("SENDING SCRIPTS")
+                bot.sendKV("SCRIPTS", value[0])
             elif len(value) == 2:
                 print("SAVING SCRIPTS")
+                bot.sendKV("SCRIPTS", ",".join(value))
+
 
 
             
