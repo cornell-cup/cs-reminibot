@@ -66,6 +66,10 @@ def parse_command(cmd, bot):
             print("RUNNING SCRIPTS")
         elif len(values) == 2:
             print("SAVING SCRIPTS")
+            file = open("/home/pi/cs-reminibot/minibot/scripts"/ + values[0], 'w')
+         
+            print(values[0])
+            print(values[1])
 
 if __name__ == "__main__":
     main()
