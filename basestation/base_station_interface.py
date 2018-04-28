@@ -90,6 +90,8 @@ class ClientHandler(tornado.web.RequestHandler):
 
         if key == "CONNECTBOT":
             bot_name = data['bot_name']
+            print("bot " + str(bot_name))
+            print("session " + str(session_id))
             self.base_station.add_bot_to_session(session_id, bot_name)
         elif key == "WHEELS":
             bot_name = data['bot_name']
@@ -101,6 +103,20 @@ class ClientHandler(tornado.web.RequestHandler):
         elif key == "DISCOVERBOTS":
             self.write(json.dumps(self.base_station.get_active_bots_names()).encode())
         elif key == "SCRIPTS":
+            value = data['value']
+            bot_name = data['bot_name']
+            bot_id = self.base_station.bot_name_to_bot_id(bot_name);
+
+            if len(value) == 0:
+                print("GETTING SCRIPTS")
+                bot = self.base_station.get_bot(bot_id)
+                bot.sendKV("SCRIPTS", '')
+            elif len(value) == 1:
+                print("SENDING SCRIPTS")
+            elif len(value) == 2:
+                print("SAVING SCRIPTS")
+
+
             
 
 

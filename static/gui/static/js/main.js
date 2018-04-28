@@ -9,20 +9,22 @@ class Scripts extends React.Component {
             bot_name: "",
             scripts: []
         }
+
+        this.getScripts = this.getScripts.bind(this);
     }
 
-    componentWillMount(){
-        this.setState({bot_name: this.props.bot_name})
-    }
-
+    //data field is empty
     getScripts(){
          const _this = this;
+         console.log(this.state.bot_name);
          axios({
              method:'POST',
-             url:'/',
+             url:'/start',
              data: JSON.stringify({
-                 key: "SCRIPTS"
-             })
+                 key: "SCRIPTS",
+                 bot_name: this.state.bot_name,
+                 value: []
+                })
              })
                  .then(function(response) {
                      _this.setState({scripts: response.data});
@@ -32,13 +34,25 @@ class Scripts extends React.Component {
          });
     }
 
+    componentDidUpdate(){
+        if (this.props.bot_name != this.state.bot_name){
+            const _this = this;
+            _this.setState({ bot_name: this.props.bot_name }, () => {
+              console.log("updated script name: " + this.state.bot_name);
+              this.getScripts();
+            });
+
+        }
+    }
+
+
+
     render() {
         return (
             <div>
-                <div> Scripts </div>
+                <div> Scripts For:  {this.props.bot_name} </div>
                 <div>
                     <div>Select Script</div>
-
                 </div>
                 <div> Run Script </div>
                 <div> Save Script </div>
@@ -103,16 +117,19 @@ class AddBot extends React.Component {
             })
                 .then(function(response) {
                     console.log('Succesfully Added');
+                    _this.props.updateBotName(bot_name);
+
             })
                 .catch(function (error) {
                     console.log(error);
         })
+
+
     }
 
     selectBotListener(event) {
         let bot_name = event.target.value;
         this.setState({selected_bot: bot_name});
-        this.props.updateBotName(bot_name);
     }
 
     buttonMapListener(value) {
@@ -216,10 +233,15 @@ class ClientGUI extends React.Component{
         this.state = {
             bot_name: ""
         }
+
+        this.updateBotName = this.updateBotName.bind(this);
     }
 
-    updateBotName(event) {
-        this.setState({bot_name: event.target.value});
+    updateBotName(value) {
+        const _this = this;
+        _this.setState({ bot_name: value }, () => {
+          console.log("updated bot name to: " + this.state.bot_name);
+        });
     }
 
     render() {
@@ -227,7 +249,7 @@ class ClientGUI extends React.Component{
             <div>
                 <div> Welcome to Client GUI : </div>
                 <AddBot updateBotName = {this.updateBotName} />
-                <Scripts bot_name={this.bot_name}/>
+                <Scripts bot_name={this.state.bot_name} />
             </div>
         )
     }
