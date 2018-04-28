@@ -20,6 +20,7 @@ class AddBot extends React.Component {
 
     updateInputValue(event) {
         this.state.bot_name = event.target.value;
+        console.log("discover bot");
         const _this = this;
         axios({
             method:'POST',
@@ -29,7 +30,7 @@ class AddBot extends React.Component {
             })
             })
                 .then(function(response) {
-                    console.log(response.data)
+                    console.log(response.data);
             })
                 .catch(function (error) {
                     console.log(error);
@@ -87,6 +88,16 @@ class AddBot extends React.Component {
         })
     }
 
+     /* removes selected object from list*/
+    deleteBotListener(event) {
+        console.log("handle remove");
+        console.log(this.state);
+        var li = this.state.items;
+        console.log("type: " + li[event.idx].type);
+        li.splice(event.idx, 1);
+        this.setState({items: li});
+    }
+
     render() {
         var styles = {
             Select: {
@@ -99,6 +110,7 @@ class AddBot extends React.Component {
                 float: 'left'
             }
         }
+        var _this = this;
         return (
             <div>
                 <table>
@@ -117,16 +129,16 @@ class AddBot extends React.Component {
                         <tr>
                         <td><div> Bot List: </div></td>
                         <td><select style={styles.Select} onChange={this.selectBotListener}>
-                            {
-                                this.state.bot_list.map(function(bot_name, idx){
-                                    return <option
-                                                key={idx}
-                                                value={bot_name}>
-                                           {bot_name}
-                                           </option>
+                            {this.state.bot_list.map(function(bot_name, idx){
+                                return <option
+                                            key={idx}
+                                            value={bot_name}>
+                                            {bot_name}</option>
                                 })
                             }
-                        </select></td>
+                            </select></td>
+                        <td><button style={styles.Button} bot_list={this.state.bot_list}
+                                            onClick = {() => _this.handleRemove()}>Remove</button></td>
                         </tr>
                     </tbody>
                 </table>
