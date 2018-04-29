@@ -66,10 +66,33 @@ def parse_command(cmd, bot):
             print("RUNNING SCRIPTS")
         elif len(values) == 2:
             print("SAVING SCRIPTS")
-            file = open("/home/pi/cs-reminibot/minibot/scripts"/ + values[0], 'w')
-         
+            file = open("/home/pi/cs-reminibot/minibot/scripts/" + values[0], 'w')
+            val = process_string(values[1])
+            file.write(val)
+            file.close()
             print(values[0])
             print(values[1])
+            p = spawn_script_process(p, bot, values[0])
+
+
+def process_string(value):
+    cmds = value.splitlines()
+    str = "def run(bot):\n"
+    for i in range(len(cmds)):
+        str += "    " + cmds[i]+ "\n"
+    print(str)
+    return str
+
+def spawn_script_process(p, bot, scriptname):
+    time.sleep(0.1)
+    p = Thread(target=run_script, args=[bot, scriptname])
+    p.start()
+    return p
+
+def run_script(bot, scriptname):
+    index = scriptname.find(".")
+    script = importlib.import_module("minibot.scripts." + scriptname[0: index])
+    script.run(bot)
 
 if __name__ == "__main__":
     main()
