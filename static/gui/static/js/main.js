@@ -18,6 +18,7 @@ class AddBot extends React.Component {
         this.buttonMapListener = this.buttonMapListener.bind(this);
     }
 
+    /*print statement for when active bots are discovered*/
     updateInputValue(event) {
         this.state.bot_name = event.target.value;
         console.log("discover bot");
@@ -37,10 +38,12 @@ class AddBot extends React.Component {
         })
     }
 
+    /*update power value when bot moves*/
     updatePowerValue(event) {
         this.state.power = event.target.value;
     }
 
+    /*adds bot name to list*/
     addBotListener(event) {
         let li = this.state.bot_list;
         let bot_name = this.state.bot_name
@@ -64,11 +67,13 @@ class AddBot extends React.Component {
         })
     }
 
+    /*listener for dropdown menu*/
     selectBotListener(event) {
         let bot_name = event.target.value;
         this.setState({selected_bot: bot_name});
     }
 
+    /*listener for direction buttons*/
     buttonMapListener(value) {
         const _this = this;
         axios({
