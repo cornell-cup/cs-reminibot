@@ -17,6 +17,7 @@ class Session:
         return True
 
     def remove_bot_id_from_session(self, bot_id):
+        print(self.bots)
         self.bots.remove(bot_id)
 
     def has_bot(self, bot_id):

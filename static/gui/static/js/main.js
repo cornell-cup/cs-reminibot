@@ -91,23 +91,23 @@ class AddBot extends React.Component {
      /* removes selected object from list*/
     deleteBotListener(event) {
         console.log("handle remove");
-        console.log(this.state);
-        var li = this.state.items;
-        //supposed to delete a bot from the list but i'm bad at react
-        //console.log("type: " + li[event.idx].type);
-        //li.splice(event.idx, 1);
-        //this.setState({items: li});
-        /*axios({
+        var li = this.state.bot_list;
+        li.pop(this.state.bot_name);
+        this.setState({bot_list: li});
+
+        axios({
             method:'POST',
-            url:'/removeBot',
-            data: JSON.stringify({name: this.props.currentBot}),
+            url:'/start',
+            data: JSON.stringify(
+            {key: "DISCONNECTBOT",
+             bot: this.state.bot_name}),
         })
         .then(function(response) {
             console.log('removed bot successfully');
         })
         .catch(function (error) {
             console.warn(error);
-        });*/
+        });
     }
 
     render() {

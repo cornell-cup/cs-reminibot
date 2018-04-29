@@ -231,7 +231,7 @@ class BaseStation:
         """
         bot_id = self.bot_name_to_bot_id(bot_name)
         if bot_id not in self.active_bots:
-            raise Exception("Bot is not active. Failed to add bot" + bot_id + " to session " + session_id)
+            raise Exception("Bot is not active. Failed to add bot" + str(bot_id) + " to session " + str(session_id))
         print(self.active_bots)
         bot = self.active_bots[bot_id]
         return self.active_sessions[session_id].add_bot_id_to_session(bot.get_id())
