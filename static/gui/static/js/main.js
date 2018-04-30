@@ -18,8 +18,10 @@ class AddBot extends React.Component {
         this.buttonMapListener = this.buttonMapListener.bind(this);
     }
 
+    /*print statement for when active bots are discovered*/
     updateInputValue(event) {
         this.state.bot_name = event.target.value;
+        console.log("discover bot");
         const _this = this;
         axios({
             method:'POST',
@@ -29,17 +31,19 @@ class AddBot extends React.Component {
             })
             })
                 .then(function(response) {
-                    console.log(response.data)
+                    console.log(response.data);
             })
                 .catch(function (error) {
                     console.log(error);
         })
     }
 
+    /*update power value when bot moves*/
     updatePowerValue(event) {
         this.state.power = event.target.value;
     }
 
+    /*adds bot name to list*/
     addBotListener(event) {
         let li = this.state.bot_list;
         let bot_name = this.state.bot_name
@@ -63,11 +67,13 @@ class AddBot extends React.Component {
         })
     }
 
+    /*listener for dropdown menu*/
     selectBotListener(event) {
         let bot_name = event.target.value;
         this.setState({selected_bot: bot_name});
     }
 
+    /*listener for direction buttons*/
     buttonMapListener(value) {
         const _this = this;
         axios({
@@ -87,6 +93,28 @@ class AddBot extends React.Component {
         })
     }
 
+     /* removes selected object from list*/
+    deleteBotListener(event) {
+        console.log("handle remove");
+        var li = this.state.bot_list;
+        li.pop(this.state.bot_name);
+        this.setState({bot_list: li});
+
+        axios({
+            method:'POST',
+            url:'/start',
+            data: JSON.stringify(
+            {key: "DISCONNECTBOT",
+             bot: this.state.bot_name}),
+        })
+        .then(function(response) {
+            console.log('removed bot successfully');
+        })
+        .catch(function (error) {
+            console.warn(error);
+        });
+    }
+
     render() {
         var styles = {
             Select: {
@@ -99,6 +127,7 @@ class AddBot extends React.Component {
                 float: 'left'
             }
         }
+        var _this = this;
         return (
             <div>
                 <table>
@@ -117,19 +146,20 @@ class AddBot extends React.Component {
                         <tr>
                         <td><div> Bot List: </div></td>
                         <td><select style={styles.Select} onChange={this.selectBotListener}>
-                            {
-                                this.state.bot_list.map(function(bot_name, idx){
-                                    return <option
-                                                key={idx}
-                                                value={bot_name}>
-                                           {bot_name}
-                                           </option>
+                            {this.state.bot_list.map(function(bot_name, idx){
+                                return <option
+                                            key={idx}
+                                            value={bot_name}>
+                                            {bot_name}</option>
                                 })
                             }
-                        </select></td>
+                            </select></td>
+                        <td><button style={styles.Button} bot_list={this.state.bot_list}
+                                            onClick = {() => _this.deleteBotListener()}>Remove</button></td>
                         </tr>
                     </tbody>
                 </table>
+
                 <div>
                     Movement
                     <table>

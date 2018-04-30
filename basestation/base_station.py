@@ -33,7 +33,7 @@ class BaseStation:
     def generate_id(self):
         """
         Generates a unique 5 character id composed of digits, lowercase, 
-        and uppercase letters.
+        and uppercase letters
         """
         chars = digits + ascii_lowercase + ascii_uppercase
         unique_id = "".join([choice(chars) for i in range(7)])
@@ -72,6 +72,9 @@ class BaseStation:
             bot_id (str):
             ip (str):
             port (int):
+
+        Return:
+            id of newly added bot
         """
         bot_id = self.generate_id()
         if not bot_name: 
@@ -96,18 +99,42 @@ class BaseStation:
         Removes minibot from list of active bots by name.
 
         Args:
-            bot_id (str):
+            bot_id (str): bot id of removed bot
+
+        Return:
+            True if bot was successfully removed
+            False otherwise
         """
         del self.active_bots[bot_id]
         return bot_id not in self.active_bots
 
     def bot_name_to_bot_id(self, bot_name):
+        """
+        Returns bot id corresponding to bot name
+
+        Args:
+            bot_name (str):
+
+        """
         for bot_id, bot in self.active_bots.items():
             if bot.get_name() == bot_name:
                 return bot_id
         return None
 
     def move_wheels_bot(self, session_id, bot_id, direction, power):
+        """
+        Gives wheels power based on user input
+
+        Args:
+            session_id:
+            bot_id:
+            direction:
+            power:
+
+        Return:
+            True if bot successfully received direction
+            False otherwise
+        """
         session = self.active_sessions[session_id]
         if not session or not session.has_bot(bot_id):
             return False
@@ -129,6 +156,12 @@ class BaseStation:
         return True
 
     def get_bot(self, bot_id):
+        """
+        Returns bot object corresponding to bot id
+
+        Args:
+            bot_id:
+        """
         return self.active_bots[bot_id]        
 
     def discover_bots(self):
@@ -182,7 +215,7 @@ class BaseStation:
         """
         Removes a session from active_sessions
 
-        Argss:
+        Args:
             session_id (str): a unique id
         """
         del self.active_sessions[session_id]
@@ -192,13 +225,49 @@ class BaseStation:
         """
         Adds bot id to session given session id and bot name.
 
-        Argss:
+        Args:
             session_id (str): a unique id
             bot_id (str): a unique id
         """
         bot_id = self.bot_name_to_bot_id(bot_name)
         if bot_id not in self.active_bots:
-            raise Exception("Bot is not active. Failed to add bot" + bot_id + " to session " + session_id)
+            raise Exception("Bot is not active. Failed to add bot" + str(bot_id) + " to session " + str(session_id))
         print(self.active_bots)
         bot = self.active_bots[bot_id]
         return self.active_sessions[session_id].add_bot_id_to_session(bot.get_id())
+
+    def remove_bot_from_session(self, session_id, bot_id):
+        """"
+        Removes bot from session
+
+        Args:
+            session_id (str): a unique id
+            bot_id (str): a unique id
+        """
+        session = self.active_sessions[session_id]
+        session.remove_bot_id_from_session(bot_id)
+
+    def get_bot_privacy(self, bot_id):
+        """
+        Returns true if bot is private, false otherwise
+
+        Args:
+            bot_id (str): a unique id
+        """
+        if bot_id not in self.active_bots:
+            raise Exception(str(bot_id) + " is not active")
+        bot = self.active_bots[bot_id]
+        return bot.get_is_private()
+
+    def set_bot_privacy(self, bot_id, is_private):
+        """
+        Sets privacy of bot
+
+        Args:
+            bot_id (str): a unique id
+            is_private (bool): true if private, false otherwise
+        """
+        if bot_id not in self.active_bots:
+            raise Exception(str(bot_id) + " is not active")
+        bot = self.active_bots[bot_id]
+        bot.set_is_private(is_private)
