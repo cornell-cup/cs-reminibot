@@ -211,5 +211,5 @@ class BaseStation:
         :return:
         """
         if self.basestation_key == "":
-            self.basestation_key = "key" + self.generate_id()
+            self.basestation_key = self.generate_id()
         return self.basestation_key
