@@ -105,11 +105,8 @@ class ClientHandler(tornado.web.RequestHandler):
             self.write(json.dumps(self.base_station.get_active_bots_names()).encode())
         elif key == "DISCONNECTBOT":
             bot_name = data['bot']
-            print("bot name: " + bot_name)
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
-            print(self.base_station.get_active_bots_names)
             self.base_station.remove_bot_from_session(session_id, bot_id)
-            print(self.base_station.get_active_bots_names)
 
 
 if __name__ == "__main__":
