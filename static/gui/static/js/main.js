@@ -9,7 +9,6 @@ class AddBot extends React.Component {
             bot_name: "",
             bot_list: [],
             selected_bot: "",
-            private_string: "",
             power: 0
         };
 
@@ -72,13 +71,6 @@ class AddBot extends React.Component {
     selectBotListener(event) {
         let bot_name = event.target.value;
         this.setState({selected_bot: bot_name});
-        this.setState({private_string: bot_name + " is private"})
-    }
-
-    /*listener for privacy button*/
-    convertPrivacyListener(event) {
-        bot = this.state.bot_name;
-        //change privacy_string
     }
 
     /*listener for direction buttons*/
@@ -164,11 +156,6 @@ class AddBot extends React.Component {
                             </select></td>
                         <td><button style={styles.Button} bot_list={this.state.bot_list}
                                             onClick = {() => _this.deleteBotListener()}>Remove</button></td>
-                        </tr>
-                        <tr>
-                        <td></td>
-                        <td><div id="private">{this.state.private_string}</div></td>
-                        <td><button style={styles.Button} onClick = {this.convertPrivacyListener}>Convert</button></td>
                         </tr>
                     </tbody>
                 </table>
