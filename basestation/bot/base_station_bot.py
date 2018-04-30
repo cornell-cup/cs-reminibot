@@ -7,6 +7,7 @@ class BaseStationBot(object):
     def __init__(self, bot_id, bot_name):
         self.id = bot_id
         self.name = bot_name
+        self.is_private = True
        
     def get_id(self):
     	return self.id
@@ -14,4 +15,9 @@ class BaseStationBot(object):
     def get_name(self):
     	return self.name
 
+    def get_is_private(self):
+        return self.is_private
+
+    def set_is_private(self, bool):
+        self.is_private = bool
 
