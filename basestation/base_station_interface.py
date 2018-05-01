@@ -26,12 +26,17 @@ class BaseInterface:
         """
         self.base_station = BaseStation()
         self.port = port
+
+        self.base_station_key = self.base_station.get_base_station_key()
+        """prints key to console"""
+        print(self.base_station_key)
+
         self.settings = {
             "static_path": os.path.join(os.path.dirname(__file__), "../static"),
             "cookie_secret": str(self.base_station.add_session())
         }
         self.handlers = [
-            ("/", BaseStationHandler, dict(base_station=self.base_station)),
+            ("/" + self.base_station_key, BaseStationHandler, dict(base_station=self.base_station)),
             ("/start", ClientHandler, dict(base_station=self.base_station))
         ]
 
