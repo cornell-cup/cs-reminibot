@@ -28,6 +28,8 @@ class BaseStation:
         self.bot_discover_thread = threading.Thread(target=self.discover_and_create_bots)
         self.bot_discover_thread.start()
         # self.connections = BaseConnection()
+
+        self.basestation_key = ""
     # ==================== ID GENERATOR ====================
 
     def generate_id(self):
@@ -202,3 +204,12 @@ class BaseStation:
         print(self.active_bots)
         bot = self.active_bots[bot_id]
         return self.active_sessions[session_id].add_bot_id_to_session(bot.get_id())
+
+    def get_base_station_key(self):
+        """
+        Returns basestation key to access basestation gui. If there is no key, a key is randomly generated
+        :return:
+        """
+        if self.basestation_key == "":
+            self.basestation_key = self.generate_id()
+        return self.basestation_key
