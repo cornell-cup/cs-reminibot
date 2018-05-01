@@ -75,7 +75,6 @@ class ClientHandler(tornado.web.RequestHandler):
     """
     def initialize(self, base_station):
         self.base_station = base_station
-        print("")
 
     def get(self):
         if not self.get_secure_cookie("user_id"):
@@ -91,7 +90,6 @@ class ClientHandler(tornado.web.RequestHandler):
         data = json.loads(self.request.body.decode())
         key = data['key']
 
-        print(data)
         session_id = self.get_secure_cookie("user_id")
         if session_id:
             session_id = session_id.decode("utf-8") 

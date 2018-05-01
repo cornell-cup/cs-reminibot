@@ -21,7 +21,6 @@ class AddBot extends React.Component {
     /*print statement for when active bots are discovered*/
     updateInputValue(event) {
         this.state.bot_name = event.target.value;
-        console.log("discover bot");
         const _this = this;
         axios({
             method:'POST',
@@ -95,7 +94,6 @@ class AddBot extends React.Component {
 
      /* removes selected object from list*/
     deleteBotListener(event) {
-        console.log("handle remove");
         var li = this.state.bot_list;
         li.pop(this.state.bot_name);
         this.setState({bot_list: li});
@@ -145,15 +143,17 @@ class AddBot extends React.Component {
                         </tr>
                         <tr>
                         <td><div> Bot List: </div></td>
-                        <td><select style={styles.Select} onChange={this.selectBotListener}>
-                            {this.state.bot_list.map(function(bot_name, idx){
-                                return <option
-                                            key={idx}
-                                            value={bot_name}>
-                                            {bot_name}</option>
-                                })
-                            }
-                            </select></td>
+                        <td>
+                            <select style={styles.Select} onChange={this.selectBotListener}>
+                                {this.state.bot_list.map(function(bot_name, idx){
+                                    return <option
+                                                key={idx}
+                                                value={bot_name}>
+                                                {bot_name}</option>
+                                    })
+                                }
+                            </select>
+                        </td>
                         <td><button style={styles.Button} bot_list={this.state.bot_list}
                                             onClick = {() => _this.deleteBotListener()}>Remove</button></td>
                         </tr>
