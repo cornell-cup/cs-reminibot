@@ -13,6 +13,10 @@ class PiBot(BaseStationBot, object):
         self.port = port
         self.ip = ip
         self.tcp_connection = TCPConnection(ip, port=port)
+        self.tcp_listener_thread = self.TCPListener(self.tcp_connection)
+        self.tcp_listener_thread.start()
+
+        return
 
     def get_ip(self):
         """
