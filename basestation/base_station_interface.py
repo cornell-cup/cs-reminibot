@@ -66,7 +66,6 @@ class BaseStationHandler(tornado.web.RequestHandler):
         session_id = self.get_secure_cookie("user_id")
         if session_id:
             session_id = session_id.decode("utf-8")
-        self.base_station.add_session(session_id);
         self.write("Welcome to Base Station " + str(session_id))
 
 class ClientHandler(tornado.web.RequestHandler):
