@@ -21,6 +21,7 @@ class TCP(object):
         self.command = ""
         self.active = False
         TCP.tcp = self
+        
     def isConnected(self):
         """
         :return true if connection is active

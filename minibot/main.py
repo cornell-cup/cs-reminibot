@@ -33,7 +33,8 @@ def main():
     thread_udp.start()
     while True:
         tcpCmd = tcpInstance.get_command()
-        parse_command(tcpCmd, bot)
+        key, val = parse_command(tcpCmd, bot)
+        tcpInstance.send_to_basestation(key, val)
         time.sleep(0.01)
 
 def parse_command(cmd, bot):
@@ -73,6 +74,7 @@ def parse_command(cmd, bot):
             print(values[0])
             print(values[1])
             p = spawn_script_process(p, bot, values[0])
+    return "MESSAGE", "LGBTQHDLFJSKCLEEELEEEYAAA"
 
 
 def process_string(value):
