@@ -111,6 +111,7 @@ class ClientHandler(tornado.web.RequestHandler):
             if len(value) == 0:
                 print("GETTING SCRIPTS")
                 bot.sendKV("SCRIPTS", '')
+
             elif len(value) == 1:
                 print("SENDING SCRIPTS")
                 bot.sendKV("SCRIPTS", value[0])
