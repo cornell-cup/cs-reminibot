@@ -109,6 +109,7 @@ class ClientHandler(tornado.web.RequestHandler):
         elif key == "DISCONNECTBOT":
             bot_name = data['bot']
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
+
             self.base_station.remove_bot_from_session(session_id, bot_id)
 
 

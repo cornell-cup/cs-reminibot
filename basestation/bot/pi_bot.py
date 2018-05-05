@@ -8,8 +8,8 @@ from util.exception_handling import *
 from bot.base_station_bot import BaseStationBot
 
 class PiBot(BaseStationBot, object):
-    def __init__(self, bot_id, bot_name, ip, port=10000):
-        super(PiBot, self).__init__(bot_id, bot_name)
+    def __init__(self, bot_id, bot_name, isPrivate, ip, port=10000):
+        super(PiBot, self).__init__(bot_id, bot_name, isPrivate)
         self.port = port
         self.ip = ip
         self.tcp_connection = TCPConnection(ip, port=port)

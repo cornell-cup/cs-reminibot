@@ -83,7 +83,7 @@ class BaseStation:
             bot_name = "minibot" + ip[len(ip)-3:].replace('.', '')
 
         if type == "PIBOT":
-            new_bot = PiBot(bot_id, bot_name, ip, port)
+            new_bot = PiBot(bot_id, bot_name, True, ip, port)
         elif type == "SIMBOT":
             new_bot = SimBot()
 
@@ -193,7 +193,7 @@ class BaseStation:
         """
         return self.active_sessions.keys()
 
-    def has_session(session_id):
+    def has_session(self, session_id):
         """
         Returns True if session_id exists in active_sessions
 
@@ -232,9 +232,7 @@ class BaseStation:
             bot_id (str): a unique id
         """
         bot_id = self.bot_name_to_bot_id(bot_name)
-        if bot_id not in self.active_bots:
-            raise Exception("Bot is not active. Failed to add bot" + str(bot_id) + " to session " + str(session_id))
-        print(self.active_bots)
+
         bot = self.active_bots[bot_id]
         return self.active_sessions[session_id].add_bot_id_to_session(bot.get_id())
 
@@ -248,6 +246,39 @@ class BaseStation:
         """
         session = self.active_sessions[session_id]
         session.remove_bot_id_from_session(bot_id)
+
+    def get_bot_privacy(self, bot_id):
+        """
+        Returns true if bot is private, false otherwise
+
+        Args:
+            bot_id (str): a unique id
+        """
+        if bot_id not in self.active_bots:
+            print(str(bot_id) + " is not active")
+            return True
+        bot = self.active_bots[bot_id]
+        return bot.get_is_private()
+
+    def set_bot_privacy(self, bot_id, session_id, is_private):
+        """
+        Sets privacy of bot. Returns false if bot id is not associated with
+        an active bot
+
+        Args:
+            bot_id (str): a unique id
+            is_private (bool): true if private, false otherwise
+        """
+        if bot_id not in self.active_bots:
+            print(str(bot_id) + " is not active")
+            return False
+
+        if not self.active_sessions[session_id].has_bot(bot_id):
+            print("session " + str(session_id) + " does not own " + str(bot_id))
+            return False
+
+        bot = self.active_bots[bot_id]
+        bot.set_is_private(is_private)
 
     def get_base_station_key(self):
         """
