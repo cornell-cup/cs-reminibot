@@ -233,10 +233,6 @@ class BaseStation:
         """
         bot_id = self.bot_name_to_bot_id(bot_name)
 
-        if not self.active_sessions[session_id].has_bot(bot_name):
-            print("session " + str(session_id) + " does not own " + str(bot_id))
-            return False
-
         bot = self.active_bots[bot_id]
         return self.active_sessions[session_id].add_bot_id_to_session(bot.get_id())
 
