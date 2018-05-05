@@ -5,25 +5,37 @@ Base Station for the MiniBot.
 # external
 from random import choice
 from string import digits, ascii_lowercase, ascii_uppercase
+import time
+import threading
 
 # internal
 # from connection.base_connection import BaseConnection
-from bot.base_station_bot import BaseStationBot as BSBot
+from bot.pi_bot import PiBot
+from bot.sim_bot import SimBot
 from session.session import Session
+from connection.udp_connection import UDPConnection
+
 
 class BaseStation:
     def __init__(self):
         self.active_bots = {}
         self.active_sessions = {}
         self.active_playgrounds = {}
+
+        self.__udp_connection = UDPConnection()
+        self.__udp_connection.start()
+
+        self.bot_discover_thread = threading.Thread(target=self.discover_and_create_bots)
+        self.bot_discover_thread.start()
         # self.connections = BaseConnection()
 
+        self.basestation_key = ""
     # ==================== ID GENERATOR ====================
 
     def generate_id(self):
         """
         Generates a unique 5 character id composed of digits, lowercase, 
-        and uppercase letters.
+        and uppercase letters
         """
         chars = digits + ascii_lowercase + ascii_uppercase
         unique_id = "".join([choice(chars) for i in range(7)])
@@ -31,16 +43,29 @@ class BaseStation:
 
     # ==================== BOTS ====================
 
-    def list_active_bots_names(self):
+    def get_active_bots_names(self):
         """
         Returns a list of the Bot IDs.
 
         Returns:
             (list<str>): List of IDs of all active bots.
         """
-        return list(self.active_bots.keys())
+        return list([bot.get_name() for _, bot in self.active_bots.items()])
 
-    def add_bot(self, port, type, ip=None):
+    def discover_and_create_bots(self):
+        """
+        Discovers active bots, creates an Bot object for each one, and stores 
+        them in active bots. 
+        """
+        while True:
+            avaliable_bots = self.discover_bots()
+            added_bots_ip = set(self.get_bots_ip_address())
+            for ip in avaliable_bots:
+                if ip not in added_bots_ip:
+                    self.add_bot(port=10000, type="PIBOT", ip=ip)
+            time.sleep(1)
+
+    def add_bot(self, port, type, ip=None, bot_name=None):
         """
         Adds a bot to the list of active bots, if the connection
         is established successfully.
@@ -49,12 +74,20 @@ class BaseStation:
             bot_id (str):
             ip (str):
             port (int):
+
+        Return:
+            id of newly added bot
         """
         bot_id = self.generate_id()
+        if not bot_name: 
+            bot_name = "minibot" + ip[len(ip)-3:].replace('.', '')
+
         if type == "PIBOT":
-            new_bot = PiBot(bot_id, port, ip)
+            new_bot = PiBot(bot_id, bot_name, ip, port)
         elif type == "SIMBOT":
             new_bot = SimBot()
+
+        self.active_bots[bot_id] = new_bot
 
         if new_bot.is_active():
             return new_bot.get_id()
@@ -68,16 +101,83 @@ class BaseStation:
         Removes minibot from list of active bots by name.
 
         Args:
-            bot_id (str):
+            bot_id (str): bot id of removed bot
+
+        Return:
+            True if bot was successfully removed
+            False otherwise
         """
         del self.active_bots[bot_id]
         return bot_id not in self.active_bots
 
+    def bot_name_to_bot_id(self, bot_name):
+        """
+        Returns bot id corresponding to bot name
+
+        Args:
+            bot_name (str):
+
+        """
+        for bot_id, bot in self.active_bots.items():
+            if bot.get_name() == bot_name:
+                return bot_id
+        return None
+
+    def move_wheels_bot(self, session_id, bot_id, direction, power):
+        """
+        Gives wheels power based on user input
+
+        Args:
+            session_id:
+            bot_id:
+            direction:
+            power:
+
+        Return:
+            True if bot successfully received direction
+            False otherwise
+        """
+        session = self.active_sessions[session_id]
+        if not session or not session.has_bot(bot_id):
+            return False
+
+        direction = direction.lower()
+        neg_power = "-" + power
+        if direction == "forward" or direction == "fw":
+            value = ",".join([power, power, power, power])
+        elif direction == "backward" or direction == "bw":
+            value = ",".join([neg_power, neg_power, neg_power, neg_power])
+        elif direction == "left" or direction == "lt":
+            value = ",".join([neg_power, power, neg_power, power])
+        elif direction == "right" or direction == "rt":
+            value = ",".join([power, neg_power, power, neg_power])
+        else:
+            value = "0,0,0,0"
+
+        self.active_bots[bot_id].sendKV("WHEELS", value)
+        return True
+
     def get_bot(self, bot_id):
-        return self.active_bots[bot_id]
+        """
+        Returns bot object corresponding to bot id
+
+        Args:
+            bot_id:
+        """
+        return self.active_bots[bot_id]        
 
     def discover_bots(self):
-        pass
+        """
+        Returns a list of the names of PiBots, which are detectable
+        through UDP broadcast.
+        """
+        return list(self.__udp_connection.get_addresses())
+
+    def get_bots_ip_address(self):
+        """
+        Returns a list of the ip addresses of all active bots.
+        """
+        return [bot.get_ip() for _, bot in self.active_bots.items()]
 
     def set_position_of_bot(self, bot_id, pos):
         pass
@@ -117,14 +217,44 @@ class BaseStation:
         """
         Removes a session from active_sessions
 
-        Argss:
+        Args:
             session_id (str): a unique id
         """
         del self.active_sessions[session_id]
         return session_id not in self.active_sessions
 
-    def add_bot_to_session(self, session_id, bot_id):
+    def add_bot_to_session(self, session_id, bot_name):
+        """
+        Adds bot id to session given session id and bot name.
+
+        Args:
+            session_id (str): a unique id
+            bot_id (str): a unique id
+        """
+        bot_id = self.bot_name_to_bot_id(bot_name)
         if bot_id not in self.active_bots:
-            raise Exception("Bot is not active. Failed to add bot" + bot_id + " to session " + session_id)
+            raise Exception("Bot is not active. Failed to add bot" + str(bot_id) + " to session " + str(session_id))
+        print(self.active_bots)
         bot = self.active_bots[bot_id]
         return self.active_sessions[session_id].add_bot_id_to_session(bot.get_id())
+
+    def remove_bot_from_session(self, session_id, bot_id):
+        """"
+        Removes bot from session
+
+        Args:
+            session_id (str): a unique id
+            bot_id (str): a unique id
+        """
+        session = self.active_sessions[session_id]
+        session.remove_bot_id_from_session(bot_id)
+
+    def get_base_station_key(self):
+        """
+        Returns basestation key to access basestation gui. If there is no key, a key is randomly generated
+        :return:
+        """
+        if self.basestation_key == "":
+            self.basestation_key = self.generate_id()
+        return self.basestation_key
+

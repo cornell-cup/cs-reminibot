@@ -26,12 +26,18 @@ class BaseInterface:
         """
         self.base_station = BaseStation()
         self.port = port
+
+        self.base_station_key = self.base_station.get_base_station_key()
+        """prints key to console"""
+        print(self.base_station_key)
+
         self.settings = {
             "static_path": os.path.join(os.path.dirname(__file__), "../static"),
             "cookie_secret": str(self.base_station.add_session())
         }
         self.handlers = [
             ("/", BaseStationHandler, dict(base_station=self.base_station)),
+            ("/" + self.base_station_key, BaseStationHandler, dict(base_station=self.base_station)),
             ("/start", ClientHandler, dict(base_station=self.base_station)),
             ("/vision", VisionHandler)
         ]
@@ -61,6 +67,9 @@ class BaseStationHandler(tornado.web.RequestHandler):
 
     def get(self):
         session_id = self.get_secure_cookie("user_id")
+        if session_id:
+            session_id = session_id.decode("utf-8")
+        self.base_station.add_session(session_id);
         self.write("Welcome to Base Station " + str(session_id))
 
 class ClientHandler(tornado.web.RequestHandler):
@@ -76,8 +85,11 @@ class ClientHandler(tornado.web.RequestHandler):
             self.set_secure_cookie("user_id", new_id)
         
         session_id = self.get_secure_cookie("user_id")
+        if session_id:
+            session_id = session_id.decode("utf-8") 
         self.render("../static/gui/index.html", title = "Title")
 
+<<<<<<< HEAD
 class VisionHandler(tornado.websocket.WebSocketHandler):
     #this is an example implementation of websockets in Tornado
 
@@ -107,6 +119,33 @@ class VisionHandler(tornado.websocket.WebSocketHandler):
 
     def on_close(self):
         print("WebSocket closed")
+=======
+    def post(self):
+        data = json.loads(self.request.body.decode())
+        key = data['key']
+
+        session_id = self.get_secure_cookie("user_id")
+        if session_id:
+            session_id = session_id.decode("utf-8") 
+
+        if key == "CONNECTBOT":
+            bot_name = data['bot_name']
+            self.base_station.add_bot_to_session(session_id, bot_name)
+        elif key == "WHEELS":
+            bot_name = data['bot_name']
+            direction = data['direction']
+            power = str(data['power'])
+
+            bot_id = self.base_station.bot_name_to_bot_id(bot_name)
+            self.base_station.move_wheels_bot(session_id, bot_id, direction, power)
+        elif key == "DISCOVERBOTS":
+            self.write(json.dumps(self.base_station.get_active_bots_names()).encode())
+        elif key == "DISCONNECTBOT":
+            bot_name = data['bot']
+            bot_id = self.base_station.bot_name_to_bot_id(bot_name)
+            self.base_station.remove_bot_from_session(session_id, bot_id)
+
+>>>>>>> develop
 
 if __name__ == "__main__":
     """
