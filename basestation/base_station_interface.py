@@ -89,7 +89,31 @@ class ClientHandler(tornado.web.RequestHandler):
             session_id = session_id.decode("utf-8") 
         self.render("../static/gui/index.html", title = "Title")
 
-<<<<<<< HEAD
+    def post(self):
+        data = json.loads(self.request.body.decode())
+        key = data['key']
+
+        session_id = self.get_secure_cookie("user_id")
+        if session_id:
+            session_id = session_id.decode("utf-8")
+
+        if key == "CONNECTBOT":
+            bot_name = data['bot_name']
+            self.base_station.add_bot_to_session(session_id, bot_name)
+        elif key == "WHEELS":
+            bot_name = data['bot_name']
+            direction = data['direction']
+            power = str(data['power'])
+
+            bot_id = self.base_station.bot_name_to_bot_id(bot_name)
+            self.base_station.move_wheels_bot(session_id, bot_id, direction, power)
+        elif key == "DISCOVERBOTS":
+            self.write(json.dumps(self.base_station.get_active_bots_names()).encode())
+        elif key == "DISCONNECTBOT":
+            bot_name = data['bot']
+            bot_id = self.base_station.bot_name_to_bot_id(bot_name)
+            self.base_station.remove_bot_from_session(session_id, bot_id)
+
 class VisionHandler(tornado.websocket.WebSocketHandler):
     #this is an example implementation of websockets in Tornado
 
@@ -119,33 +143,6 @@ class VisionHandler(tornado.websocket.WebSocketHandler):
 
     def on_close(self):
         print("WebSocket closed")
-=======
-    def post(self):
-        data = json.loads(self.request.body.decode())
-        key = data['key']
-
-        session_id = self.get_secure_cookie("user_id")
-        if session_id:
-            session_id = session_id.decode("utf-8") 
-
-        if key == "CONNECTBOT":
-            bot_name = data['bot_name']
-            self.base_station.add_bot_to_session(session_id, bot_name)
-        elif key == "WHEELS":
-            bot_name = data['bot_name']
-            direction = data['direction']
-            power = str(data['power'])
-
-            bot_id = self.base_station.bot_name_to_bot_id(bot_name)
-            self.base_station.move_wheels_bot(session_id, bot_id, direction, power)
-        elif key == "DISCOVERBOTS":
-            self.write(json.dumps(self.base_station.get_active_bots_names()).encode())
-        elif key == "DISCONNECTBOT":
-            bot_name = data['bot']
-            bot_id = self.base_station.bot_name_to_bot_id(bot_name)
-            self.base_station.remove_bot_from_session(session_id, bot_id)
-
->>>>>>> develop
 
 if __name__ == "__main__":
     """
