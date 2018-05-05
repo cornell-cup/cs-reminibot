@@ -4,10 +4,10 @@ Extends Bot class.
 """
 
 class BaseStationBot(object):
-    def __init__(self, bot_id, bot_name):
+    def __init__(self, bot_id, bot_name, isPrivate):
         self.id = bot_id
         self.name = bot_name
-        self.is_private = True
+        self.is_private = isPrivate
        
     def get_id(self):
     	return self.id

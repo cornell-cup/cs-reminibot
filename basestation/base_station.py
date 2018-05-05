@@ -80,7 +80,7 @@ class BaseStation:
             bot_name = "minibot" + ip[len(ip)-3:].replace('.', '')
 
         if type == "PIBOT":
-            new_bot = PiBot(bot_id, bot_name, ip, port)
+            new_bot = PiBot(bot_id, bot_name, True, ip, port)
         elif type == "SIMBOT":
             new_bot = SimBot()
 
@@ -200,7 +200,7 @@ class BaseStation:
         """
         bot_id = self.bot_name_to_bot_id(bot_name)
         if bot_id not in self.active_bots:
-            raise Exception("Bot is not active. Failed to add bot" + bot_id + " to session " + session_id)
+            return False
         print(self.active_bots)
         bot = self.active_bots[bot_id]
         return self.active_sessions[session_id].add_bot_id_to_session(bot.get_id())
