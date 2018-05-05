@@ -34,7 +34,7 @@ def main():
     while True:
         tcpCmd = tcpInstance.get_command()
         key, val = parse_command(tcpCmd, bot)
-        tcpInstance.send_to_basestation(key, val)
+        #tcpInstance.send_to_basestation(key, val)
         time.sleep(0.01)
 
 def parse_command(cmd, bot):
@@ -55,6 +55,7 @@ def parse_command(cmd, bot):
     if key == "WHEELS":
         try:
             values = value.split(",")
+            print(values)
             bot.set_wheel_power(int(values[0]), int(values[1]))
         except Exception as e:
             print(e)

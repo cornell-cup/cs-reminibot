@@ -41,16 +41,13 @@ class TCP(object):
         Sends information back to the basestation. can only execute if the
         connection is active
         """
+        print(self.active)
         if self.active:
             # connection is active, send
-            try:
-                message = "<<<<" + key + "," + value + ">>>>"
-                # appending \n to the message as java reader socket blocks until new line is encountered
-                self.connectionSocket.send(message + "\n")
-            except socket.error as e:
-                print("Send failed")
-        else:
-            print("Send failed")
+            message = "<<<<" + key + "," + value + ">>>>"
+            # appending \n to the message as java reader socket blocks until new line is encountered
+            print("SENDNINGINGINING")
+            self.connectionSocket.send(message.encode('utf-8'))
 
     def run(self):
         while TCP.tcp is None:
