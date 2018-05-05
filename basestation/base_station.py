@@ -160,7 +160,7 @@ class BaseStation:
         """
         return self.active_sessions.keys()
 
-    def has_session(session_id):
+    def has_session(self, session_id):
         """
         Returns True if session_id exists in active_sessions
 
@@ -201,7 +201,6 @@ class BaseStation:
         bot_id = self.bot_name_to_bot_id(bot_name)
         if bot_id not in self.active_bots:
             return False
-        print(self.active_bots)
         bot = self.active_bots[bot_id]
         return self.active_sessions[session_id].add_bot_id_to_session(bot.get_id())
 
@@ -213,20 +212,22 @@ class BaseStation:
             bot_id (str): a unique id
         """
         if bot_id not in self.active_bots:
-            raise Exception(str(bot_id) + " is not active")
+            print(str(bot_id) + " is not active")
+            return True
         bot = self.active_bots[bot_id]
         return bot.get_is_private()
 
     def set_bot_privacy(self, bot_id, is_private):
         """
-        Sets privacy of bot
+        Sets privacy of bot. Returns false if bot id is not associated with
+        an active bot
 
         Args:
             bot_id (str): a unique id
             is_private (bool): true if private, false otherwise
         """
         if bot_id not in self.active_bots:
-            raise Exception(str(bot_id) + " is not active")
+            return False
         bot = self.active_bots[bot_id]
         bot.set_is_private(is_private)
 
