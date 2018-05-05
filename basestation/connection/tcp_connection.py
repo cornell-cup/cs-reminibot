@@ -41,7 +41,12 @@ class TCPConnection(object):
             (bool): True if the TCP connection between this device and the
                 device with `IP == getIP()` is active
         """
-        return not self.__connection_refused
+        try:
+            self.__client_socket.send("testing connection".encode())
+            return True
+        except Exception as e:
+            self.__client_socket.close()
+            return False
 
     def getIP(self):
         """
@@ -62,7 +67,7 @@ class TCPConnection(object):
             msg = "Could not destroy the connection with " + self.__IP + "."
             log_exn_info(e, msg=msg)
 
-        return
+        return False
 
     @synchronized
     def sendKV(self, key, value):
