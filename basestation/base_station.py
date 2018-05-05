@@ -55,14 +55,20 @@ class BaseStation:
     def discover_and_create_bots(self):
         """
         Discovers active bots, creates an Bot object for each one, and stores 
-        them in active bots. 
+        them in active bots. If existing bot is not active, remove it from active_bots.
         """
         while True:
             avaliable_bots = self.discover_bots()
-            added_bots_ip = set(self.get_bots_ip_address())
+            added_bots_ip_dict = self.get_bots_ip_address()
             for ip in avaliable_bots:
-                if ip not in added_bots_ip:
-                    self.add_bot(port=10000, type="PIBOT", ip=ip)
+                if ip in added_bots_ip_dict:
+                    bot_id = added_bots_ip_dict[ip]
+                    if not self.get_bot(bot_id).is_active():
+                        self.__udp_connection.set_address_inactive(ip)
+                        self.remove_bot(bot_id)
+                else:
+                    if self.__udp_connection.is_address_active(ip):
+                        self.add_bot(port=10000, type="PIBOT", ip=ip)
             time.sleep(1)
 
     def add_bot(self, port, type, ip=None, bot_name=None):
@@ -177,7 +183,7 @@ class BaseStation:
         """
         Returns a list of the ip addresses of all active bots.
         """
-        return [bot.get_ip() for _, bot in self.active_bots.items()]
+        return {bot.get_ip() : bot.get_id() for _, bot in self.active_bots.items()}
 
     def set_position_of_bot(self, bot_id, pos):
         pass
