@@ -46,7 +46,7 @@ class TCP(object):
             # connection is active, send
             message = "<<<<" + key + "," + value + ">>>>"
             # appending \n to the message as java reader socket blocks until new line is encountered
-            print("SENDNINGINGINING")
+            print("SENDNING data to basestation")
             self.connectionSocket.send(message.encode('utf-8'))
 
     def run(self):

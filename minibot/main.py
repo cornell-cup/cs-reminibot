@@ -64,8 +64,6 @@ def parse_command(cmd, bot, tcpInstance):
             pass
     elif key == "SCRIPTS":
         values = value.split(",")
-        print(values)
-        print(len(values))
         if len(value) == 0:
             print("GETTING SCRIPTS")
             path = "./minibot/scripts"
