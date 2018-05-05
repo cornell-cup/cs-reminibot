@@ -38,7 +38,7 @@ class BaseInterface:
         self.handlers = [
             ("/", BaseStationHandler, dict(base_station=self.base_station)),
             ("/" + self.base_station_key, BaseStationHandler, dict(base_station=self.base_station)),
-            ("/start", ClientHandler, dict(base_station=self.base_station)),
+            ("/start", ClientHandler, dict(base_station=self.base_station))
         ]
 
     def start(self):
