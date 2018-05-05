@@ -39,9 +39,7 @@ class BaseInterface:
             ("/", BaseStationHandler, dict(base_station=self.base_station)),
             ("/" + self.base_station_key, BaseStationHandler, dict(base_station=self.base_station)),
             ("/start", ClientHandler, dict(base_station=self.base_station)),
-            ("/vision", VisionHandler)
         ]
-        self.locations = {}
 
     def start(self):
         """
@@ -113,36 +111,6 @@ class ClientHandler(tornado.web.RequestHandler):
             bot_name = data['bot']
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             self.base_station.remove_bot_from_session(session_id, bot_id)
-
-class VisionHandler(tornado.websocket.WebSocketHandler):
-    #this is an example implementation of websockets in Tornado
-
-    def get(self):
-        botlist = []
-        for k in self.locations:
-            v = self.locations[k]
-            botlist.append({'id': k, 'x': v['x'], 'y': v['y'], 'size': v['size'], 'angle': v['angle'], 'type': v['type']})
-        self.write(json.dumps(botlist).encode())
-
-    def post(self):
-        info = json.loads(self.request.body.decode())
-        print("Received vision info: ", info)
-        tag_id = info['id']
-        x, y, z = info['x'], info['y'], info['z']
-        logging.info("Received vision data " + str((tag_id, x, y, z)))
-
-    def check_origin(self, origin):
-        return True
-
-    def open(self):
-        print("WebSocket opened")
-
-    def on_message(self, message):
-        print(u"You said: " + message)
-        self.write_message("message received")
-
-    def on_close(self):
-        print("WebSocket closed")
 
 if __name__ == "__main__":
     """
