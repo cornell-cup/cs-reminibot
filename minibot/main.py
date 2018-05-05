@@ -13,6 +13,9 @@ import time
 import importlib
 import os
 
+from os import listdir
+from os.path import isfile, join
+
 """
     Loads UserScript file.
     Reloads file when it is run from GUI to reflect changes.
@@ -33,11 +36,10 @@ def main():
     thread_udp.start()
     while True:
         tcpCmd = tcpInstance.get_command()
-        key, val = parse_command(tcpCmd, bot)
-        #tcpInstance.send_to_basestation(key, val)
+        parse_command(tcpCmd, bot, tcpInstance)
         time.sleep(0.01)
 
-def parse_command(cmd, bot):
+def parse_command(cmd, bot, tcpInstance):
     """
     Parses command sent by SendKV via TCP to the bot.
     Sent from BaseStation.
@@ -62,9 +64,16 @@ def parse_command(cmd, bot):
             pass
     elif key == "SCRIPTS":
         values = value.split(",")
-        if len(values) == 0:
+        print(values)
+        print(len(values))
+        if len(value) == 0:
             print("GETTING SCRIPTS")
-        elif len(values) == 1:
+            path = "./minibot/scripts"
+            files = [f for f in os.listdir(path) if f != '__init__.py']
+            files = ",".join(files)
+            print(files)
+            tcpInstance.send_to_basestation("SCRIPTS", files)
+        elif len(value) == 1:
             print("RUNNING SCRIPTS")
         elif len(values) == 2:
             print("SAVING SCRIPTS")
@@ -75,7 +84,6 @@ def parse_command(cmd, bot):
             print(values[0])
             print(values[1])
             p = spawn_script_process(p, bot, values[0])
-    return "MESSAGE", "LGBTQHDLFJSKCLEEELEEEYAAA"
 
 
 def process_string(value):
