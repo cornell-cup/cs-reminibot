@@ -1,6 +1,103 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 var axios = require('axios');
+import GridView from './components/gridview.js';
+import Blockly from './components/blockly.js';
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+
+/**
+ * Component for the Navbar on top
+ * Currently this does nothing except display some text and an image
+ */
+class Navbar extends React.Component {
+    render () {
+        return (
+            <div className="navbar">
+                <img className="logo" src = "./static/gui/static/img/logo.png"/><h1>ReMiniBot GUI</h1>
+            </div>
+        )
+    }
+}
+
+/**
+ * Top Level component for the GUI, includes two tabs
+ */
+class Platform extends React.Component {
+    render() {
+        return (
+            <div id='platform'>
+                <Tabs>
+                    <TabList>
+                        <Tab>Setup</Tab>
+                        <Tab>Coding/Control</Tab>
+                    </TabList>
+
+                    <TabPanel>
+                        <SetupTab />
+                    </TabPanel>
+                    <TabPanel>
+                        <ControlTab />
+                    </TabPanel>
+                </Tabs>
+            </div>
+        )
+    }
+}
+
+/**
+ * Component for the setup tab
+ * Contains:
+ * addBot, gridView
+ */
+class SetupTab extends React.Component {
+    render() {
+        return (
+            <div id ="tab_setup">
+                <div className="row">
+                    <div className="col-md-6">
+                        <AddBot/>
+                        <GridView/>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+}
+
+/**
+ * Component for the coding/control tab
+ * Contains:
+ * python, blockly, gridView, controlpanel
+ */
+class ControlTab extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            currentBot: ''
+        };
+        this.setCurrentBot = this.setCurrentBot.bind(this)
+     }
+
+     setCurrentBot(botName){
+        this.setState({
+            currentBot: botName
+        });
+     }
+
+    render(){
+        return (
+            <div id ="tab_control">
+                <div className="row">
+                    <div className="col-md-7">
+                        <Blockly/>
+                    </div>
+                    <div className="col-md-5">
+                    </div>
+                </div>
+            </div>
+        )
+    }
+}
 
 class AddBot extends React.Component {
     constructor(props) {
@@ -127,14 +224,14 @@ class AddBot extends React.Component {
         }
         var _this = this;
         return (
-            <div>
+            <div className = "control">
                 <table>
                     <tbody>
                         <tr>
                             <td>
-                            <div>Bot Name:</div>
                             <form>
                                 <label>
+                                    Bot Name:
                                     <input type="text" name="bot_name" onChange={evt => this.updateInputValue(evt)}/>
                                 </label>
                             </form>
@@ -142,8 +239,9 @@ class AddBot extends React.Component {
                             <td><button style={styles.Button} onClick={this.addBotListener}>Add Bot</button></td>
                         </tr>
                         <tr>
-                        <td><div> Bot List: </div></td>
                         <td>
+                            <label>
+                            Bot List:
                             <select style={styles.Select} onChange={this.selectBotListener}>
                                 {this.state.bot_list.map(function(bot_name, idx){
                                     return <option
@@ -153,6 +251,7 @@ class AddBot extends React.Component {
                                     })
                                 }
                             </select>
+                            </label>
                         </td>
                         <td><button style={styles.Button} bot_list={this.state.bot_list}
                                             onClick = {() => _this.deleteBotListener()}>Remove</button></td>
@@ -160,8 +259,8 @@ class AddBot extends React.Component {
                     </tbody>
                 </table>
 
-                <div>
-                    Movement
+                <div className = "newDiv">
+                    Movement:
                     <table>
                         <tbody>
                         <tr>
@@ -183,7 +282,7 @@ class AddBot extends React.Component {
                     </table>
                     <form>
                         <label>
-                            Power
+                            Power:
                             <input type="text" name="wheel_power" onChange={evt => this.updatePowerValue(evt)}/>
                         </label>
                     </form>
@@ -208,8 +307,8 @@ class ClientGUI extends React.Component{
     render() {
         return (
             <div>
-                <div> Welcome to Client GUI : </div>
-                <AddBot/>
+                <Navbar/>
+                <Platform/>
             </div>
         )
     }
