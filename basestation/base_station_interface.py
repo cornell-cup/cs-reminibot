@@ -36,7 +36,6 @@ class BaseInterface:
             "cookie_secret": str(self.base_station.add_session())
         }
         self.handlers = [
-            ("/", BaseStationHandler, dict(base_station=self.base_station)),
             ("/" + self.base_station_key, BaseStationHandler, dict(base_station=self.base_station)),
             ("/start", ClientHandler, dict(base_station=self.base_station))
         ]
