@@ -106,7 +106,7 @@ class AddBot extends React.Component {
             bot_name: "",
             bot_list: [],
             selected_bot: "",
-            power: 0
+            power: 50
         };
 
         this.updateInputValue = this.updateInputValue.bind(this);
@@ -143,8 +143,6 @@ class AddBot extends React.Component {
     addBotListener(event) {
         let li = this.state.bot_list;
         let bot_name = this.state.bot_name
-        li.push(bot_name);
-        this.setState({bot_list: li, selected_bot: bot_name});
 
         const _this = this;
         axios({
@@ -157,6 +155,10 @@ class AddBot extends React.Component {
             })
                 .then(function(response) {
                     console.log('Succesfully Added');
+                    if (!li.includes(bot_name)){
+                        li.push(bot_name);
+                        _this.setState({bot_list: li, selected_bot: bot_name});
+                    }
             })
                 .catch(function (error) {
                     console.log(error);
@@ -265,25 +267,25 @@ class AddBot extends React.Component {
                         <tbody>
                         <tr>
                             <td></td>
-                            <td><button className="btn btn-f" onClick={() => this.buttonMapListener("forward")}>forward</button></td>
+                            <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("forward")}>forward</button></td>
                             <td></td>
                         </tr>
                         <tr>
-                            <td><button className="btn btn-l" onClick={() => this.buttonMapListener("left")}>left</button></td>
-                            <td><button className="btn btn-s" onClick={() => this.buttonMapListener("stop")}>stop</button></td>
-                            <td><button className="btn btn-r" onClick={() => this.buttonMapListener("right")}>right</button></td>
+                            <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("left")}>left</button></td>
+                            <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("stop")}>stop</button></td>
+                            <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("right")}>right</button></td>
                         </tr>
                         <tr>
                             <td></td>
-                            <td><button className="btn btn-b" onClick={() => this.buttonMapListener("backward")}>backward</button></td>
+                            <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("backward")}>backward</button></td>
                             <td></td>
                         </tr>
                         </tbody>
                     </table>
-                    <form>
+                    <form className = "newDiv">
                         <label>
                             Power:
-                            <input type="text" name="wheel_power" onChange={evt => this.updatePowerValue(evt)}/>
+                            <input type="text" value = "50" name="wheel_power" onChange={evt => this.updatePowerValue(evt)}/>
                         </label>
                     </form>
                 </div>
