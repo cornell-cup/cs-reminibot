@@ -67,7 +67,7 @@ def parse_command(cmd, bot, tcpInstance):
         if len(value) == 0:
             print("GETTING SCRIPTS")
             path = "./minibot/scripts"
-            files = [f for f in os.listdir(path) if f != '__init__.py']
+            files = [f for f in os.listdir(path)]
             files = ",".join(files)
             print(files)
             tcpInstance.send_to_basestation("SCRIPTS", files)
