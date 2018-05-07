@@ -91,7 +91,7 @@ class ClientHandler(tornado.web.RequestHandler):
 
         session_id = self.get_secure_cookie("user_id")
         if session_id:
-            session_id = session_id.decode("utf-8") 
+            session_id = session_id.decode("utf-8")
 
         if key == "CONNECTBOT":
             bot_name = data['bot_name']
@@ -110,7 +110,6 @@ class ClientHandler(tornado.web.RequestHandler):
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
 
             self.base_station.remove_bot_from_session(session_id, bot_id)
-
 
 if __name__ == "__main__":
     """
