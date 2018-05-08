@@ -13,6 +13,11 @@ class PiBot(BaseStationBot, object):
         self.port = port
         self.ip = ip
         self.tcp_connection = TCPConnection(ip, port=port)
+        self.tcp_listener_thread = self.TCPListener(self.tcp_connection)
+        self.tcp_listener_thread.start()
+
+        self.scripts = []
+        return
 
     def get_ip(self):
         """
@@ -65,4 +70,6 @@ class PiBot(BaseStationBot, object):
             return True
 
         def tcp_act_on_incoming(self, key, value):
+            values = value.split(",")
+            self.scripts = values;
             print("key: " + key + ", value:" + value)

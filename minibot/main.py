@@ -13,6 +13,9 @@ import time
 import importlib
 import os
 
+from os import listdir
+from os.path import isfile, join
+
 """
     Loads UserScript file.
     Reloads file when it is run from GUI to reflect changes.
@@ -33,10 +36,10 @@ def main():
     thread_udp.start()
     while True:
         tcpCmd = tcpInstance.get_command()
-        parse_command(tcpCmd, bot)
+        parse_command(tcpCmd, bot, tcpInstance)
         time.sleep(0.01)
 
-def parse_command(cmd, bot):
+def parse_command(cmd, bot, tcpInstance):
     """
     Parses command sent by SendKV via TCP to the bot.
     Sent from BaseStation.
@@ -54,10 +57,51 @@ def parse_command(cmd, bot):
     if key == "WHEELS":
         try:
             values = value.split(",")
+            print(values)
             bot.set_wheel_power(int(values[0]), int(values[1]))
         except Exception as e:
             print(e)
             pass
+    elif key == "SCRIPTS":
+        values = value.split(",")
+        if len(value) == 0:
+            print("GETTING SCRIPTS")
+            path = "./minibot/scripts"
+            files = [f for f in os.listdir(path)]
+            files = ",".join(files)
+            print(files)
+            tcpInstance.send_to_basestation("SCRIPTS", files)
+        elif len(value) == 1:
+            print("RUNNING SCRIPTS")
+        elif len(values) == 2:
+            print("SAVING SCRIPTS")
+            file = open("/home/pi/cs-reminibot/minibot/scripts/" + values[0], 'w')
+            val = process_string(values[1])
+            file.write(val)
+            file.close()
+            print(values[0])
+            print(values[1])
+            p = spawn_script_process(p, bot, values[0])
+
+
+def process_string(value):
+    cmds = value.splitlines()
+    str = "def run(bot):\n"
+    for i in range(len(cmds)):
+        str += "    " + cmds[i]+ "\n"
+    print(str)
+    return str
+
+def spawn_script_process(p, bot, scriptname):
+    time.sleep(0.1)
+    p = Thread(target=run_script, args=[bot, scriptname])
+    p.start()
+    return p
+
+def run_script(bot, scriptname):
+    index = scriptname.find(".")
+    script = importlib.import_module("minibot.scripts." + scriptname[0: index])
+    script.run(bot)
 
 if __name__ == "__main__":
     main()

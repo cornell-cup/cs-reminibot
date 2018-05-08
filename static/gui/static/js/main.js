@@ -23,7 +23,24 @@ class Navbar extends React.Component {
  * Top Level component for the GUI, includes two tabs
  */
 class Platform extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            bot_name: ""
+        }
+
+        this.updateBotName = this.updateBotName.bind(this);
+    }
+
+    updateBotName(value) {
+        const _this = this;
+        _this.setState({ bot_name: value }, () => {
+          console.log("updated bot name to: " + this.state.bot_name);
+        });
+    }
+
     render() {
+        console.log(this.state.bot_name);
         return (
             <div id='platform'>
                 <Tabs>
@@ -33,10 +50,10 @@ class Platform extends React.Component {
                     </TabList>
 
                     <TabPanel>
-                        <SetupTab />
+                        <SetupTab updateBotName={this.updateBotName} bot_name={this.state.bot_name}/>
                     </TabPanel>
                     <TabPanel>
-                        <ControlTab />
+                        <ControlTab updateBotName={this.updateBotName} bot_name={this.state.bot_name}/>
                     </TabPanel>
                 </Tabs>
             </div>
@@ -55,7 +72,8 @@ class SetupTab extends React.Component {
             <div id ="tab_setup">
                 <div className="row">
                     <div className="col-md-6">
-                        <AddBot/>
+                        <AddBot updateBotName={this.props.updateBotName} />
+                        <Scripts bot_name={this.props.bot_name} />
                         <GridView/>
                     </div>
                 </div>
@@ -95,6 +113,162 @@ class ControlTab extends React.Component {
                     </div>
                 </div>
             </div>
+        )
+    }
+}
+
+class Python extends React.Component{
+    constructor(props){
+        super(props);
+
+        this.state = {
+            data: "",
+            filename: "myPythonCode.py"
+        }
+
+        this.handleInputChange = this.handleInputChange.bind(this);
+        this.handleFileNameChange = this.handleFileNameChange.bind(this);
+        this.download = this.download.bind(this);
+        this.run = this.run.bind(this);
+        this.save = this.save.bind(this);
+
+    }
+
+    handleFileNameChange(event){
+        this.setState({filename: event.target.value});
+    }
+
+    handleInputChange(event) {
+        this.setState({data: event.target.value});
+    }
+
+    download(event){
+        console.log("download listener");
+        event.preventDefault();
+        var element = document.createElement('a');
+        var filename = this.state.filename;
+        if(filename.substring(filename.length-4)!=".xml"){
+            filename += ".py";
+        }
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(this.state.data));
+        element.setAttribute('download', filename);
+        element.style.display = 'none';
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+    }
+
+    run(event){
+        console.log(this.props.bot_name);
+        axios({
+            method:'POST',
+            url:'/start',
+            data: JSON.stringify({
+                key: 'SCRIPTS',
+                value: [this.state.data],
+                bot_name: this.props.bot_name
+            }),
+        })
+        .then(function(response) {
+            console.log('sent script');
+        })
+        .catch(function (error) {
+            console.warn(error);
+        });
+    }
+
+    save(event){
+        axios({
+            method:'POST',
+            url:'/start',
+            data: JSON.stringify({
+                key: 'SCRIPTS',
+                value: [this.state.filename, this.state.data],
+                bot_name: this.props.bot_name
+            }),
+        })
+        .then(function(response) {
+            console.log('save script');
+        })
+        .catch(function (error) {
+            console.warn(error);
+        });
+    }
+
+
+    render(){
+        return(
+            <div>
+                <div> File name:  <input type="text" name="filename" value={this.state.filename} onChange={this.handleFileNameChange}/> </div>
+                <div> <textarea onChange={this.handleInputChange} >
+                </textarea></div>
+                <button id="submit" onClick={this.download}>Download</button><button id="run" onClick={this.run}>Run Code</button><button id="save" onClick={this.save}>Save Code</button>
+
+                <div>{this.state.data}</div>
+                <div>{this.state.filename}</div>
+
+            </div>
+        )
+
+    }
+
+}
+
+class Scripts extends React.Component {
+    constructor(props){
+        super(props);
+        this.state = {
+            bot_name: "",
+            scripts: []
+        }
+
+        this.getScripts = this.getScripts.bind(this);
+    }
+
+    //data field is empty
+    getScripts(){
+         const _this = this;
+         console.log(this.state.bot_name);
+         axios({
+             method:'POST',
+             url:'/start',
+             data: JSON.stringify({
+                 key: "SCRIPTS",
+                 bot_name: this.state.bot_name,
+                 value: []
+                })
+             })
+                 .then(function(response) {
+                     _this.setState({scripts: response.data});
+             })
+                 .catch(function (error) {
+                     console.log(error);
+         });
+    }
+
+    componentDidUpdate(){
+        if (this.props.bot_name != this.state.bot_name){
+            const _this = this;
+            _this.setState({ bot_name: this.props.bot_name }, () => {
+              console.log("updated script name: " + this.state.bot_name);
+              this.getScripts();
+            });
+
+        }
+    }
+
+    render() {
+        return (
+            <div>
+                <div> Scripts For:  {this.props.bot_name} </div>
+                <div>
+                    <div>Select Script</div>
+                </div>
+                <div> Run Script </div>
+                <div> <Python bot_name={this.state.bot_name}/> </div>
+                <div> Save Script </div>
+            </div>
+
         )
     }
 }
@@ -155,6 +329,7 @@ class AddBot extends React.Component {
             })
                 .then(function(response) {
                     console.log('Succesfully Added');
+                    _this.props.updateBotName(bot_name);
                     if (!li.includes(bot_name)){
                         li.push(bot_name);
                         _this.setState({bot_list: li, selected_bot: bot_name});
@@ -295,20 +470,10 @@ class AddBot extends React.Component {
 }
 
 class ClientGUI extends React.Component{
-    constructor(props) {
-        super(props);
-        this.state = {
-            name: ""
-        }
-    }
-
-    updateInputValue(event) {
-        this.setState({name: event.target.value});
-    }
-
     render() {
         return (
             <div>
+                <div> Welcome to Client GUI : </div>
                 <Navbar/>
                 <Platform/>
             </div>

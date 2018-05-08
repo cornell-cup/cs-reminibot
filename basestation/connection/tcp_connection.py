@@ -104,6 +104,7 @@ class TCPConnection(object):
                 Returns None if receive failed.
         """
         try:
+            print("I received!")
             return self.__client_socket.recv(1024).decode()
 
         except socket.error as e:
