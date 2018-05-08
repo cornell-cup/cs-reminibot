@@ -36,6 +36,21 @@ class UDPConnection(threading.Thread):
         self.__clean_addresses()
         return sorted(self.__IP_list.keys())
 
+    def set_address_inactive(self, ip):
+        """
+        Sets address to be active True or False
+        """
+        last_updated_time, active =  self.__IP_list[ip]
+        self.__IP_list[ip] = (last_updated_time, False)
+
+    def is_address_active(self, ip):
+        """
+        Returns:
+            (bool): True if the address is active.
+        """
+        last_updated_time, active = self.__IP_list[ip]
+        return active
+
     def run(self):
         """
         Runs the UDP Listener, and adds the IPs of the devices that are
@@ -45,7 +60,7 @@ class UDPConnection(threading.Thread):
             while True:
                 data = self.__listener_socket.recvfrom(512)
                 device_address = data[1][0]
-                self.__IP_list[device_address] = self.__get_current_time()
+                self.__IP_list[device_address] = (self.__get_current_time(), True)
 
         except socket.error as e:
             msg = "Unable to receive broadcasts sent to the port " + \
@@ -63,9 +78,10 @@ class UDPConnection(threading.Thread):
         now = self.__get_current_time()
         new_IP_list = {}
 
-        for address, last_updated_time in self.__IP_list.items():
+        for address, val in self.__IP_list.items():
+            last_updated_time, active = val
             if now - last_updated_time <= float(self.__update_threshold):
-                new_IP_list[address] = last_updated_time
+                new_IP_list[address] = (last_updated_time, active)
 
         self.__IP_list = new_IP_list
         return
