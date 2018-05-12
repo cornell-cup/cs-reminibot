@@ -170,8 +170,11 @@ class BaseStation:
         Args:
             bot_id:
         """
-        return self.active_bots[bot_id]        
-
+        if bot_id in self.active_bots:
+            return self.active_bots[bot_id]  
+        else:      
+            return None
+            
     def discover_bots(self):
         """
         Returns a list of the names of PiBots, which are detectable
@@ -238,9 +241,11 @@ class BaseStation:
             bot_id (str): a unique id
         """
         bot_id = self.bot_name_to_bot_id(bot_name)
-
-        bot = self.active_bots[bot_id]
-        return self.active_sessions[session_id].add_bot_id_to_session(bot.get_id())
+        if bot_id in self.active_bots:
+            bot = self.active_bots[bot_id]
+            return self.active_sessions[session_id].add_bot_id_to_session(bot.get_id())
+        else:
+            return False
 
     def remove_bot_from_session(self, session_id, bot_id):
         """"

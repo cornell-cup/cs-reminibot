@@ -111,24 +111,39 @@ class ClientHandler(tornado.web.RequestHandler):
 
         session_id = self.get_secure_cookie("user_id")
         if session_id:
-            session_id = session_id.decode("utf-8") 
+            session_id = session_id.decode("utf-8")
 
         if key == "CONNECTBOT":
             bot_name = data['bot_name']
+            print("bot " + str(bot_name))
+            print("session " + str(session_id))
             self.base_station.add_bot_to_session(session_id, bot_name)
         elif key == "WHEELS":
             bot_name = data['bot_name']
             direction = data['direction']
             power = str(data['power'])
-
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             self.base_station.move_wheels_bot(session_id, bot_id, direction, power)
         elif key == "DISCOVERBOTS":
             self.write(json.dumps(self.base_station.get_active_bots_names()).encode())
+        elif key == "SCRIPTS":
+            value = data['value']
+            bot_name = data['bot_name']
+            bot_id = self.base_station.bot_name_to_bot_id(bot_name);
+            bot = self.base_station.get_bot(bot_id)
+            if bot:
+                if len(value) == 0:
+                    print("GETTING SCRIPTS")
+                    bot.sendKV("SCRIPTS", '')
+                elif len(value) == 1:
+                    print("SENDING SCRIPTS")
+                    bot.sendKV("SCRIPTS", value[0])
+                elif len(value) == 2:
+                    print("SAVING SCRIPTS")
+                    bot.sendKV("SCRIPTS", ",".join(value))
         elif key == "DISCONNECTBOT":
             bot_name = data['bot']
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
-
             self.base_station.remove_bot_from_session(session_id, bot_id)
 
 if __name__ == "__main__":

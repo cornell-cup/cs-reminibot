@@ -36,6 +36,19 @@ class Bot():
     def stop(self):
         self.motors.set_speed(0, 0)
 
+
+    def move_forward(self, power):
+        self.motors.set_speed(power, power)
+
+    def move_backward(self, power):
+        self.motors.set_speed(-power, -power)
+
+    def turn_clockwise(self, power):
+        self.motors.set_speed(power, -power)
+
+    def turn_counter_clockwise(self, power):
+        self.motors.set_speed(-power, power)
+
     def set_wheel_power(self, left, right):
         self.motors.set_speed(left, right)
 
