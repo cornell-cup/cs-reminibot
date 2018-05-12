@@ -79,6 +79,7 @@ class BaseStationHandler(tornado.web.RequestHandler):
         if key == "DISPLAYDATA":
             bot_info = ""
             for bot_id, bot in self.base_station.active_bots.items():
+                #"^" used for split function on frontend
                 bot_info = bot_info + "Name:^ " + str(bot.get_name()) + "\n" \
                              + "Id:^ " + str(bot.get_id()) + "\n" \
                              + "Private?:^ " + str(bot.get_is_private()) + "\n" \

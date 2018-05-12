@@ -10,6 +10,7 @@ class BaseStationGUI extends React.Component{
         };
     }
 
+    /*receives bot data for each active bot and prints to gui*/
     updateGui(event) {
         const _this = this;
         axios({
@@ -21,13 +22,13 @@ class BaseStationGUI extends React.Component{
                     .then(function(response) {
                         console.log(response.data);
                         _this.setState({display_string: response.data});
-                        //this.state.display_string = response.data;
                 })
                     .catch(function (error) {
                         console.log(error);
         })
     }
 
+    /*updates the bot info every second*/
     componentDidMount(){
         setInterval(this.updateGui.bind(this), 1000);
     }
@@ -45,7 +46,8 @@ class BaseStationGUI extends React.Component{
                             <br/>
                         </span>
                     )
-                })}</div>
+                })}
+                </div>
             </div>
         )
     }
