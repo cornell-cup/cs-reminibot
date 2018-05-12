@@ -8,13 +8,10 @@ class BaseStationGUI extends React.Component{
         this.state = {
             display_string: ""
         };
-
-        this.updateGui = this.updateGui.bind(this);
     }
 
     updateGui(event) {
-        this.setState({display_string: event.target.value});
-        console.log(this.state.display_string);
+        const _this = this;
         axios({
                 method:'POST',
                 url: window.location.href,
@@ -23,21 +20,24 @@ class BaseStationGUI extends React.Component{
                 })
                     .then(function(response) {
                         console.log(response.data);
+                        _this.setState({display_string: response.data});
+                        //this.state.display_string = response.data;
                 })
                     .catch(function (error) {
                         console.log(error);
         })
     }
 
+    componentDidMount(){
+        setInterval(this.updateGui.bind(this), 1000);
+    }
+
     render() {
         return (
             <div>
                 <div> Welcome to BaseStation GUI : </div>
-                <form>
-                    <label>
-                        <input type="text" onChange={evt => this.updateGui(evt)}/>
-                    </label>
-                </form>
+                <div> Bot Info: </div>
+                <div>{this.state.display_string}</div>
             </div>
         )
     }
