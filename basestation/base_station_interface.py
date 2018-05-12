@@ -77,16 +77,7 @@ class BaseStationHandler(tornado.web.RequestHandler):
             session_id = session_id.decode("utf-8")
 
         if key == "DISPLAYDATA":
-            bot_info = ""
-            for bot_id, bot in self.base_station.active_bots.items():
-                #"^" used for split function on frontend
-                bot_info = bot_info + "Name:^ " + str(bot.get_name()) + "\n" \
-                             + "Id:^ " + str(bot.get_id()) + "\n" \
-                             + "Private?:^ " + str(bot.get_is_private()) + "\n" \
-                             + "IP:^ " + str(bot.get_ip()) + "\n" \
-                             + "Port:^ " + str(bot.get_port()) + "\n" + "\n"
-
-            self.write(json.dumps(bot_info))
+            self.write(json.dumps(self.base_station.format_bot_info()))
 
 class ClientHandler(tornado.web.RequestHandler):
     """
