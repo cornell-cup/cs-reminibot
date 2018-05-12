@@ -32,13 +32,13 @@ class BaseStation:
         self.basestation_key = ""
     # ==================== ID GENERATOR ====================
 
-    def generate_id(self):
+    def generate_id(self, length=7):
         """
-        Generates a unique 5 character id composed of digits, lowercase, 
+        Generates a unique 7 character id composed of digits, lowercase, 
         and uppercase letters
         """
         chars = digits + ascii_lowercase + ascii_uppercase
-        unique_id = "".join([choice(chars) for i in range(7)])
+        unique_id = "".join([choice(chars) for i in range(length)])
         return unique_id
 
     # ==================== BOTS ====================
