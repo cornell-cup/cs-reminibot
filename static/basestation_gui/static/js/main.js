@@ -35,9 +35,17 @@ class BaseStationGUI extends React.Component{
     render() {
         return (
             <div>
-                <div> Welcome to BaseStation GUI : </div>
+                <div> Welcome to BaseStation GUI! </div>
                 <div> Bot Info: </div>
-                <div>{this.state.display_string}</div>
+                <div>{this.state.display_string.split("\n").map(function(item) {
+                    return (
+                        <span>
+                            <strong>{item.split("^").slice(0, 1)}</strong>
+                            {item.split("^").slice(1, 2)}
+                            <br/>
+                        </span>
+                    )
+                })}</div>
             </div>
         )
     }
