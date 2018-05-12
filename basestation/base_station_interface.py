@@ -77,14 +77,15 @@ class BaseStationHandler(tornado.web.RequestHandler):
             session_id = session_id.decode("utf-8")
 
         if key == "DISPLAYDATA":
-            for bot in self.base_station.active_bots:
-                bot_info = "Name: " + bot.get_name() + "\n" \
-                             + "Id: " + bot.get_id() + "\n" \
-                             + "Privacy: " + bot.get_is_private() + "\n" \
-                             + "IP: " + bot.get_ip() + "\n" \
-                             + "Port: " + bot.get_port()
+            bot_info = ""
+            for bot_id, bot in self.base_station.active_bots.items():
+                bot_info = bot_info + "Name: " + str(bot.get_name()) + "\n" \
+                             + "Id: " + str(bot.get_id()) + "\n" \
+                             + "Private? " + str(bot.get_is_private()) + "\n" \
+                             + "IP: " + str(bot.get_ip()) + "\n" \
+                             + "Port: " + str(bot.get_port()) + "\n"
 
-            #self.write(json.dumps(display_string.encode()))
+            self.write(json.dumps(bot_info))
 
 class ClientHandler(tornado.web.RequestHandler):
     """

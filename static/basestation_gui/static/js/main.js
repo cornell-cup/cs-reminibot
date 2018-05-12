@@ -17,10 +17,9 @@ class BaseStationGUI extends React.Component{
         console.log(this.state.display_string);
         axios({
                 method:'POST',
-                url:'/',
+                url: window.location.href,
                 data: JSON.stringify({
-                    key: "DISPLAYDATA"
-                })
+                    key: "DISPLAYDATA"})
                 })
                     .then(function(response) {
                         console.log(response.data);
