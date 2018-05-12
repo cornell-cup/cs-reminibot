@@ -68,6 +68,24 @@ class BaseStationHandler(tornado.web.RequestHandler):
             session_id = session_id.decode("utf-8")
         self.render("../static/basestation_gui/index.html", title = "Title")
 
+    def post(self):
+        data = json.loads(self.request.body.decode())
+        key = data['key']
+
+        session_id = self.get_secure_cookie("user_id")
+        if session_id:
+            session_id = session_id.decode("utf-8")
+
+        if key == "DISPLAYDATA":
+            for bot in self.base_station.active_bots:
+                bot_info = "Name: " + bot.get_name() + "\n" \
+                             + "Id: " + bot.get_id() + "\n" \
+                             + "Privacy: " + bot.get_is_private() + "\n" \
+                             + "IP: " + bot.get_ip() + "\n" \
+                             + "Port: " + bot.get_port()
+
+            #self.write(json.dumps(display_string.encode()))
+
 class ClientHandler(tornado.web.RequestHandler):
     """
     Displays the Client GUI.
@@ -110,7 +128,6 @@ class ClientHandler(tornado.web.RequestHandler):
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
 
             self.base_station.remove_bot_from_session(session_id, bot_id)
-
 
 if __name__ == "__main__":
     """
