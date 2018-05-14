@@ -25,6 +25,12 @@ class PiBot(BaseStationBot, object):
         """
         return self.ip
 
+    def get_port(self):
+        """
+        return port value of bot
+        """
+        return self.port
+
     def is_active(self):
         """
         check if tcp connection is alive

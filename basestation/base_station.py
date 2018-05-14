@@ -32,13 +32,13 @@ class BaseStation:
         self.basestation_key = ""
     # ==================== ID GENERATOR ====================
 
-    def generate_id(self):
+    def generate_id(self, length=7):
         """
-        Generates a unique 5 character id composed of digits, lowercase, 
+        Generates a unique 7 character id composed of digits, lowercase, 
         and uppercase letters
         """
         chars = digits + ascii_lowercase + ascii_uppercase
-        unique_id = "".join([choice(chars) for i in range(7)])
+        unique_id = "".join([choice(chars) for i in range(length)])
         return unique_id
 
     # ==================== BOTS ====================
@@ -291,12 +291,27 @@ class BaseStation:
         bot = self.active_bots[bot_id]
         bot.set_is_private(is_private)
 
+    # ================== BASESTATION GUI ==================
+
     def get_base_station_key(self):
         """
         Returns basestation key to access basestation gui. If there is no key, a key is randomly generated
-        :return:
         """
         if self.basestation_key == "":
             self.basestation_key = self.generate_id()
         return self.basestation_key
+
+    def format_bot_info(self):
+        """
+        Returns information on every active bot with newline
+        """
+        bot_info = ""
+        for bot_id, bot in self.active_bots.items():
+            # "^" used for split function on frontend
+            bot_info = bot_info + "Name:^ " + str(bot.get_name()) + "\n" \
+                       + "Id:^ " + str(bot.get_id()) + "\n" \
+                       + "Private?:^ " + str(bot.get_is_private()) + "\n" \
+                       + "IP:^ " + str(bot.get_ip()) + "\n" \
+                       + "Port:^ " + str(bot.get_port()) + "\n" + "\n"
+        return bot_info
 

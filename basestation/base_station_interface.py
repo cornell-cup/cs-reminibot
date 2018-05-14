@@ -66,7 +66,18 @@ class BaseStationHandler(tornado.web.RequestHandler):
         session_id = self.get_secure_cookie("user_id")
         if session_id:
             session_id = session_id.decode("utf-8")
-        self.write("Welcome to Base Station " + str(session_id))
+        self.render("../static/basestation_gui/index.html", title = "Base Station")
+
+    def post(self):
+        data = json.loads(self.request.body.decode())
+        key = data['key']
+
+        session_id = self.get_secure_cookie("user_id")
+        if session_id:
+            session_id = session_id.decode("utf-8")
+
+        if key == "DISPLAYDATA":
+            self.write(json.dumps(self.base_station.format_bot_info()))
 
 class ClientHandler(tornado.web.RequestHandler):
     """
@@ -83,7 +94,7 @@ class ClientHandler(tornado.web.RequestHandler):
         session_id = self.get_secure_cookie("user_id")
         if session_id:
             session_id = session_id.decode("utf-8") 
-        self.render("../static/gui/index.html", title = "Title")
+        self.render("../static/gui/index.html", title = "Client")
 
     def post(self):
         data = json.loads(self.request.body.decode())
