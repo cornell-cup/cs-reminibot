@@ -188,6 +188,16 @@ class BaseStation:
         """
         return {bot.get_ip() : bot.get_id() for _, bot in self.active_bots.items()}
 
+    def get_bot_sessions(self, bot_id):
+        """
+        Returns a list of session_id connected to the bot associated with bot_id.
+        """
+        sessions = []
+        for session_id, session in self.active_sessions.items():
+            if session.has_bot(bot_id):
+                sessions.append(session_id)
+        return sessions
+
     def set_position_of_bot(self, bot_id, pos):
         pass
 
@@ -301,17 +311,23 @@ class BaseStation:
             self.basestation_key = self.generate_id()
         return self.basestation_key
 
-    def format_bot_info(self):
+    def get_bots_info(self):
         """
         Returns information on every active bot with newline
         """
         bot_info = ""
         for bot_id, bot in self.active_bots.items():
             # "^" used for split function on frontend
+            sessions = []
+            for session_id in self.get_bot_sessions(bot_id):
+                sessions.append((session_id, "Connected " + \
+                    self.active_sessions[session_id].get_time_connected_to_bot_id(bot_id)))
+
             bot_info = bot_info + "Name:^ " + str(bot.get_name()) + "\n" \
                        + "Id:^ " + str(bot.get_id()) + "\n" \
                        + "Private?:^ " + str(bot.get_is_private()) + "\n" \
                        + "IP:^ " + str(bot.get_ip()) + "\n" \
-                       + "Port:^ " + str(bot.get_port()) + "\n" + "\n"
+                       + "Port:^ " + str(bot.get_port()) + "\n" \
+                       + "Sessions:^ " + str(sessions) + "\n" + "\n"
         return bot_info
 

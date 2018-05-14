@@ -24,7 +24,7 @@ class BaseStationGUI extends React.Component{
                         _this.setState({display_string: response.data});
                 })
                     .catch(function (error) {
-                        console.log(error);
+                        // console.log(error);
         })
     }
 
@@ -38,9 +38,9 @@ class BaseStationGUI extends React.Component{
             <div>
                 <div> Welcome to BaseStation GUI! </div>
                 <div> Bot Info: </div>
-                <div>{this.state.display_string.split("\n").map(function(item) {
+                <div>{this.state.display_string.split("\n").map(function(item, i) {
                     return (
-                        <span>
+                        <span key={i}>
                             <strong>{item.split("^").slice(0, 1)}</strong>
                             {item.split("^").slice(1, 2)}
                             <br/>
