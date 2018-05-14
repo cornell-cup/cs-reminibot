@@ -77,7 +77,7 @@ class BaseStationHandler(tornado.web.RequestHandler):
             session_id = session_id.decode("utf-8")
 
         if key == "DISPLAYDATA":
-            self.write(json.dumps(self.base_station.format_bot_info()))
+            self.write(json.dumps(self.base_station.get_bots_info()))
 
 class ClientHandler(tornado.web.RequestHandler):
     """
