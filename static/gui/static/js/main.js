@@ -290,9 +290,14 @@ class AddBot extends React.Component {
         this.buttonMapListener = this.buttonMapListener.bind(this);
     }
 
+    componentDidMount(){
+        setInterval(this.getBotStatus.bind(this), 1000);
+    }
+
     /*print statement for when active bots are discovered*/
     updateInputValue(event) {
-        this.state.bot_name = event.target.value;
+        this.state.selected_bot = event.target.value;
+        console.log(this.state.selected_bot);
         const _this = this;
         axios({
             method:'POST',
@@ -317,7 +322,7 @@ class AddBot extends React.Component {
     /*adds bot name to list*/
     addBotListener(event) {
         let li = this.state.bot_list;
-        let bot_name = this.state.bot_name
+        let bot_name = this.state.selected_bot;
 
         const _this = this;
         axios({
@@ -372,13 +377,14 @@ class AddBot extends React.Component {
         var li = this.state.bot_list;
         li.pop(this.state.bot_name);
         this.setState({bot_list: li});
+        this.set
 
         axios({
             method:'POST',
             url:'/start',
             data: JSON.stringify(
             {key: "DISCONNECTBOT",
-             bot: this.state.bot_name}),
+             bot: this.state.selected_bot}),
         })
         .then(function(response) {
             console.log('removed bot successfully');
@@ -386,6 +392,25 @@ class AddBot extends React.Component {
         .catch(function (error) {
             console.warn(error);
         });
+    }
+
+    getBotStatus() {
+        const _this = this;
+        if (this.state.selected_bot) {
+            axios({
+                method:'POST',
+                url:'/start',
+                data: JSON.stringify({
+                    key: "BOTSTATUS",
+                    bot_name: this.state.selected_bot})
+                })
+                    .then(function(response) {
+                        console.log(response.data);
+                })
+                    .catch(function (error) {
+                        // console.log(error);
+            })
+        }
     }
 
     render() {
@@ -436,7 +461,6 @@ class AddBot extends React.Component {
                         </tr>
                     </tbody>
                 </table>
-
                 <div className = "newDiv">
                     Movement:
                     <table>

@@ -9,6 +9,7 @@ import os.path
 import json
 import logging
 import sys
+import time
 
 # Minibot imports.
 from base_station import BaseStation
@@ -136,6 +137,17 @@ class ClientHandler(tornado.web.RequestHandler):
             bot_name = data['bot']
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             self.base_station.remove_bot_from_session(session_id, bot_id)
+        elif key == "BOTSTATUS":
+            bot_name = data['bot_name']
+            bot_id = self.base_station.bot_name_to_bot_id(bot_name);
+            bot = self.base_station.get_bot(bot_id)
+            if bot:
+                bot.sendKV("BOTSTATUS", '')
+                time.sleep(5)
+                print("got status:")
+                print(bot.tcp_listener_thread.status)
+                # self.write(json.dumps(bot.tcp_listener_thread.status).encode())
+
 
 if __name__ == "__main__":
     """
