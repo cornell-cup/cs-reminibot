@@ -54,7 +54,7 @@ class Bot():
     def get_wheel_power(self):
         return self.motors.get_speed()
 
-    def get_sensor_feed(self):
+    def get_sensor_data(self):
         data = {}
         for name, sensor in self.sensors.items():
             data[name] = sensor.get_color_name()
