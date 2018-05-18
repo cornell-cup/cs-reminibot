@@ -375,7 +375,7 @@ class AddBot extends React.Component {
      /* removes selected object from list*/
     deleteBotListener(event) {
         var li = this.state.bot_list;
-        li.pop(this.state.bot_name);
+        li.pop(this.state.selected_bot);
         this.setState({bot_list: li});
         this.set
 
