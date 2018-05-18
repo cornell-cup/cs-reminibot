@@ -41,6 +41,7 @@ class PiBot(BaseStationBot, object):
         """
         send command with specified key and value
         """
+        print(value)
         return self.tcp_connection.sendKV(key, value)
 
     class TCPListener(threading.Thread):
@@ -77,9 +78,9 @@ class PiBot(BaseStationBot, object):
             return True
 
         def tcp_act_on_incoming(self, key, value):
-            values = value.split(",")
             if key == "SCRIPTS":
+                values = value.split(",")
                 self.scripts = values
             elif key == "BOTSTATUS":
-                self.status = values
-            print("key: " + key + ", value:" + value)
+                self.status = value
+            # print("key: " + key + ", value:" + value)
