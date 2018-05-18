@@ -31,7 +31,7 @@ class Bot():
         for sensor in config["sensors"]:
             name = sensor["name"]
             pin = sensor["pin"]
-            self.sensors[name] = ColorSensor(name, pin)
+            self.sensors[name] = ColorSensor(self, name, pin)
 
     def stop(self):
         self.motors.set_speed(0, 0)
