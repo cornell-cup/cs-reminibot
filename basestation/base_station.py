@@ -143,6 +143,9 @@ class BaseStation:
             True if bot successfully received direction
             False otherwise
         """
+        if not session_id or not bot_id:
+            return False
+            
         session = self.active_sessions[session_id]
         if not session or not session.has_bot(bot_id):
             return False

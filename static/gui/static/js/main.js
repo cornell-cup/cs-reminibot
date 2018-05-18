@@ -41,7 +41,6 @@ class Platform extends React.Component {
     }
 
     render() {
-        console.log(this.state.bot_name);
         return (
             <div id='platform'>
                 <Tabs>
@@ -290,9 +289,13 @@ class AddBot extends React.Component {
         this.buttonMapListener = this.buttonMapListener.bind(this);
     }
 
+    componentDidMount(){
+        setInterval(this.getBotStatus.bind(this), 500);
+    }
+
     /*print statement for when active bots are discovered*/
     updateInputValue(event) {
-        this.state.bot_name = event.target.value;
+        this.state.selected_bot = event.target.value;
         const _this = this;
         axios({
             method:'POST',
@@ -317,7 +320,7 @@ class AddBot extends React.Component {
     /*adds bot name to list*/
     addBotListener(event) {
         let li = this.state.bot_list;
-        let bot_name = this.state.bot_name
+        let bot_name = this.state.selected_bot;
 
         const _this = this;
         axios({
@@ -325,15 +328,17 @@ class AddBot extends React.Component {
             url:'/start',
             data: JSON.stringify({
                 key: "CONNECTBOT",
-                bot_name: this.state.bot_name
+                bot_name: this.state.selected_bot
             })
             })
                 .then(function(response) {
-                    console.log('Succesfully Added');
-                    _this.props.updateBotName(bot_name);
-                    if (!li.includes(bot_name)){
+                    if (response.data && !li.includes(bot_name)){
+                        console.log("Yep u gud")
                         li.push(bot_name);
+                         _this.props.updateBotName(bot_name);
                         _this.setState({bot_list: li, selected_bot: bot_name});
+                    } else {
+                        console.log("Nope")
                     }
             })
                 .catch(function (error) {
@@ -372,13 +377,14 @@ class AddBot extends React.Component {
         var li = this.state.bot_list;
         li.pop(this.state.bot_name);
         this.setState({bot_list: li});
+        this.set
 
         axios({
             method:'POST',
             url:'/start',
             data: JSON.stringify(
             {key: "DISCONNECTBOT",
-             bot: this.state.bot_name}),
+             bot: this.state.selected_bot}),
         })
         .then(function(response) {
             console.log('removed bot successfully');
@@ -386,6 +392,27 @@ class AddBot extends React.Component {
         .catch(function (error) {
             console.warn(error);
         });
+    }
+
+    getBotStatus() {
+        let bot_name = this.state.selected_bot;
+        let li = this.state.bot_list;
+        const _this = this;
+        if (li.includes(bot_name)) {
+            axios({
+                method:'POST',
+                url:'/start',
+                data: JSON.stringify({
+                    key: "BOTSTATUS",
+                    bot_name: this.state.selected_bot})
+                })
+                    .then(function(response) {
+                        console.log(response.data);
+                })
+                    .catch(function (error) {
+                        // console.log(error);
+            })
+        }
     }
 
     render() {
@@ -436,7 +463,6 @@ class AddBot extends React.Component {
                         </tr>
                     </tbody>
                 </table>
-
                 <div className = "newDiv">
                     Movement:
                     <table>

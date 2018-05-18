@@ -82,7 +82,14 @@ def parse_command(cmd, bot, tcpInstance):
             print(values[0])
             print(values[1])
             p = spawn_script_process(p, bot, values[0])
-
+    elif key == "BOTSTATUS":
+        print("getting bot status")
+        status = {}
+        status["motor_power"] = bot.get_wheel_power()
+        status["sensor_data"] = bot.get_sensor_data()
+        
+        status = str(status).replace("'", "\"")
+        tcpInstance.send_to_basestation("BOTSTATUS", status)
 
 def process_string(value):
     cmds = value.splitlines()

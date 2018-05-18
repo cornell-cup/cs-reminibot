@@ -36,7 +36,6 @@ class Bot():
     def stop(self):
         self.motors.set_speed(0, 0)
 
-
     def move_forward(self, power):
         self.motors.set_speed(power, power)
 
@@ -51,5 +50,15 @@ class Bot():
 
     def set_wheel_power(self, left, right):
         self.motors.set_speed(left, right)
+
+    def get_wheel_power(self):
+        return self.motors.get_speed()
+
+    def get_sensor_data(self):
+        data = {}
+        print(self.sensors)
+        for name, sensor in self.sensors.items():
+            data[name] = sensor.get_color_name()
+        return data
 
 

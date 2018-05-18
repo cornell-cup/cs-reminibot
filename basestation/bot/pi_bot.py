@@ -47,6 +47,7 @@ class PiBot(BaseStationBot, object):
         def __init__(self, t):
             super().__init__()
             self.tcp_connection = t
+            self.status = ""
 
         def run(self):
             """
@@ -76,6 +77,9 @@ class PiBot(BaseStationBot, object):
             return True
 
         def tcp_act_on_incoming(self, key, value):
-            values = value.split(",")
-            self.scripts = values;
-            print("key: " + key + ", value:" + value)
+            if key == "SCRIPTS":
+                values = value.split(",")
+                self.scripts = values
+            elif key == "BOTSTATUS":
+                self.status = value
+            # print("key: " + key + ", value:" + value)
