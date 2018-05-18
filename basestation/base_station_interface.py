@@ -114,7 +114,6 @@ class ClientHandler(tornado.web.RequestHandler):
             bot_name = data['bot_name']
             direction = data['direction']
             power = str(data['power'])
-            print(bot_name)
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             self.base_station.move_wheels_bot(session_id, bot_id, direction, power)
         elif key == "DISCOVERBOTS":

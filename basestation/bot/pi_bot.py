@@ -41,7 +41,6 @@ class PiBot(BaseStationBot, object):
         """
         send command with specified key and value
         """
-        print(value)
         return self.tcp_connection.sendKV(key, value)
 
     class TCPListener(threading.Thread):
