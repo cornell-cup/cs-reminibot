@@ -14,6 +14,10 @@ import time
 # Minibot imports.
 from base_station import BaseStation
 
+global_variable = {}
+
+def update_global_variable(key, val):
+    global_variable[key] = val
 
 class BaseInterface:
     """
@@ -151,33 +155,18 @@ class ClientHandler(tornado.web.RequestHandler):
 class VisionHandler(tornado.websocket.WebSocketHandler):
     #this is NOT an example implementation of websockets in Tornado
 
-    def initialize(self):
-        self.locations = ["nothing to see ehre"]
-
     def get(self):
-        self.write(json.dumps(self.locations).encode())
+        self.write(json.dumps(global_variable["vision"]).encode())
 
     def post(self):
         info = json.loads(self.request.body.decode())
         #print("Received vision info: ", info)
-        self.locations = {'id': info['id'], 'x': info['x'], 'y': info['y'], 'z': info['z']}
-        print("Received vision info: ", self.locations)
-        tag_id = self.locations['id']
-        x, y, z = self.locations['x'], self.locations['y'], self.locations['z']
-        logging.info("Received vision data " + str((tag_id, x, y, z)))
-
-    def check_origin(self, origin):
-        return True
-
-    def open(self):
-        print("WebSocket opened")
-
-    def on_message(self, message):
-        print(u"You said: " + message)
-        self.write_message("message received")
-
-    def on_close(self):
-        print("WebSocket closed")
+        locations = {'id': info['id'], 'x': info['x'], 'y': info['y'], 'z': info['z']}
+        print("Received vision info: ", locations)
+        update_global_variable("vision", locations)
+        # tag_id = self.locations['id']
+        # x, y, z = self.locations['x'], self.locations['y'], self.locations['z']
+        # logging.info("Received vision data " + str((tag_id, x, y, z)))
 
 
 if __name__ == "__main__":
