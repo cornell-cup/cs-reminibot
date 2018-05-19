@@ -291,6 +291,7 @@ class AddBot extends React.Component {
 
     componentDidMount(){
         setInterval(this.getBotStatus.bind(this), 500);
+        setInterval(this.getVisionData.bind(this), 500);
     }
 
     /*print statement for when active bots are discovered*/
@@ -413,6 +414,21 @@ class AddBot extends React.Component {
                         // console.log(error);
             })
         }
+    }
+
+    getVisionData() {
+        const _this = this;
+        axios({
+            method:'GET',
+            url:'/vision',
+            })
+                .then(function(response) {
+                    console.log(response.data);
+            })
+                .catch(function (error) {
+                    // console.log(error);
+        })
+
     }
 
     render() {
