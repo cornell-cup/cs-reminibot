@@ -413,6 +413,18 @@ class AddBot extends React.Component {
                         // console.log(error);
             })
         }
+
+        axios({
+            method:'GET',
+            url:'/vision',
+            })
+                .then(function(response) {
+                    console.log(response.data);
+            })
+                .catch(function (error) {
+                    // console.log(error);
+        })
+
     }
 
     render() {
