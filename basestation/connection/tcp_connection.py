@@ -92,7 +92,7 @@ class TCPConnection(object):
         except socket.error as e:
             msg = "Unable to send the message \"" + key + "," + value + "\" " \
                 "to " + self.__IP + "."
-            # log_exn_info(e, msg=msg)
+            log_exn_info(e, msg=msg)
             return False
 
     def receive(self):
@@ -108,6 +108,6 @@ class TCPConnection(object):
 
         except socket.error as e:
             msg = "Unable to receive from " + self.__IP + "."
-            # log_exn_info(e, msg=msg)
+            log_exn_info(e, msg=msg)
             self.__connection_refused = True
             return None

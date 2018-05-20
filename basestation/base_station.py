@@ -7,7 +7,6 @@ from random import choice
 from string import digits, ascii_lowercase, ascii_uppercase
 import time
 import threading
-import math
 
 # internal
 # from connection.base_connection import BaseConnection
@@ -17,14 +16,11 @@ from session.session import Session
 from connection.udp_connection import UDPConnection
 
 
-MAX_VISION_LOG_LENGTH = 10
-
 class BaseStation:
     def __init__(self):
         self.active_bots = {}
         self.active_sessions = {}
         self.active_playgrounds = {}
-        self.vision_log = []
 
         self.__udp_connection = UDPConnection()
         self.__udp_connection.start()
@@ -44,37 +40,6 @@ class BaseStation:
         chars = digits + ascii_lowercase + ascii_uppercase
         unique_id = "".join([choice(chars) for i in range(length)])
         return unique_id
-
-    # ==================== VISION ====================
-
-    def update_vision_log(self, value):
-        """
-        Updates vision log. Size of log based on MAX_VISION_LOG_LENGTH
-
-        Args:
-            values (dict): dictionary containing positions 
-        """
-        locations = {'id': value['id'], 'x': value['x'], 'y': value['y'], 'z': value['z']}
-        # print("Received1 vision info: ", locations)
-        self.vision_log.append(locations)
-        if len(self.vision_log) > MAX_VISION_LOG_LENGTH:
-            self.vision_log.pop(0)
-
-    def get_vision_data(self):
-        """
-        Returns most recent vision data
-        """
-        if self.vision_log:
-            return self.vision_log[-1]
-        else:
-            return {}
-
-    def get_vision_log(self):
-        """
-        Returns entire vision log.
-        """
-        return self.vision_log
-
 
     # ==================== BOTS ====================
 
@@ -185,28 +150,18 @@ class BaseStation:
         if not session or not session.has_bot(bot_id):
             return False
 
-        calib = self.active_bots[bot_id].get_calibration()
-        print("Calibration is " + str(calib))
         direction = direction.lower()
-        power = float(power)
-        
+        neg_power = "-" + power
         if direction == "forward" or direction == "fw":
-            left = int(calib[0] + power)
-            right = int(calib[1] + power)
-
-        if direction == "forward" or direction == "fw":
-            value = ",".join(str(x) for x in [left, right, left, right])
+            value = ",".join([power, power, power, power])
         elif direction == "backward" or direction == "bw":
-            value = ",".join(str(x) for x in [-left, -right, -left, -right])
+            value = ",".join([neg_power, neg_power, neg_power, neg_power])
         elif direction == "left" or direction == "lt":
-            value = ",".join(str(x) for x in [-left, right, -left, right])
+            value = ",".join([neg_power, power, neg_power, power])
         elif direction == "right" or direction == "rt":
-            value = ",".join(str(x) for x in [left, -right, left, -right])
+            value = ",".join([power, neg_power, power, neg_power])
         else:
             value = "0,0,0,0"
-
-        print(value)
-
 
         self.active_bots[bot_id].sendKV("WHEELS", value)
         return True
@@ -245,49 +200,6 @@ class BaseStation:
             if session.has_bot(bot_id):
                 sessions.append(session_id)
         return sessions
-
-    def collinear(self, p0, p1, p2):
-        x1, y1 = p1[0] - p0[0], p1[1] - p0[1]
-        x2, y2 = p2[0] - p0[0], p2[1] - p0[1]
-        return x1 * y2 - x2 * y1
-
-    def calibrate_wheel_power(self, session_id, bot_id):
-        #if vision system is on
-        log = self.vision_log
-        print(log)
-        self.move_wheels_bot(session_id, bot_id, "stop", '0')
-
-        start_index = -1
-        for i in range(len(self.vision_log) - 2):
-            if abs(float(self.vision_log[i]['x']) - float(self.vision_log[i+1]['x'])) > 1e-1 or \
-                    abs(float(self.vision_log[i]['y']) - float(self.vision_log[i+1]['y'])) > 1e-1:
-                start_index = i
-                break
-
-        if start_index < 0:
-            print("NO starting index found")
-            return
-
-        p0 = (float(self.vision_log[start_index]['x']), float(self.vision_log[start_index]['y']))
-        p1 = (float(self.vision_log[start_index+1]['x']), float(self.vision_log[start_index+1]['y']))
-        p2 = (float(self.vision_log[-1]['x']), float(self.vision_log[-1]['y']))
-
-        print(p0)
-        print(p1)
-        print(p2)
-
-        collinearity = self.collinear(p0, p1, p2)
-        print(collinearity)
-
-        m1 = (p1[1] - p0[1])/(p1[0]-p0[0])
-        m2 = (p2[1] - p0[1])/(p2[0]-p0[0])
-        tnAngle = (m1-m2)/(1+(m1*m2))
-
-        diff = math.atan(tnAngle)
-        print(diff)
-
-        self.active_bots[bot_id].set_calibration(diff)
-
 
     def set_position_of_bot(self, bot_id, pos):
         pass
