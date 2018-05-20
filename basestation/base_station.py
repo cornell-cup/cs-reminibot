@@ -21,6 +21,7 @@ class BaseStation:
         self.active_bots = {}
         self.active_sessions = {}
         self.active_playgrounds = {}
+        self.vision_log = []
 
         self.__udp_connection = UDPConnection()
         self.__udp_connection.start()
@@ -40,6 +41,36 @@ class BaseStation:
         chars = digits + ascii_lowercase + ascii_uppercase
         unique_id = "".join([choice(chars) for i in range(length)])
         return unique_id
+
+    # ==================== VISION ====================
+
+    def update_vision_log(self, value):
+        """
+        Updates vision log. Size of log based on MAX_VISION_LOG_LENGTH
+        Args:
+            values (dict): dictionary containing positions 
+        """
+        locations = {'id': value['id'], 'x': value['x'], 'y': value['y'], 'z': value['z']}
+        # print("Received1 vision info: ", locations)
+        self.vision_log.append(locations)
+        if len(self.vision_log) > MAX_VISION_LOG_LENGTH:
+            self.vision_log.pop(0)
+
+    def get_vision_data(self):
+        """
+        Returns most recent vision data
+        """
+        if self.vision_log:
+            return self.vision_log[-1]
+        else:
+            return None
+
+    def get_vision_log(self):
+        """
+        Returns entire vision log.
+        """
+        return self.vision_log
+
 
     # ==================== BOTS ====================
 
