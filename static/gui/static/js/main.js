@@ -423,7 +423,9 @@ class AddBot extends React.Component {
             url:'/vision',
             })
                 .then(function(response) {
-                    console.log(response.data);
+                    if (response.data) {
+                        console.log(response.data);
+                    }
             })
                 .catch(function (error) {
                     // console.log(error);
@@ -503,7 +505,7 @@ class AddBot extends React.Component {
                     <form className = "newDiv">
                         <label>
                             Power:
-                            <input type="text" value = "50" name="wheel_power" onChange={evt => this.updatePowerValue(evt)}/>
+                            <input type="text" defaultValue="50" name="wheel_power" onChange={evt => this.updatePowerValue(evt)}/>
                         </label>
                     </form>
                 </div>
