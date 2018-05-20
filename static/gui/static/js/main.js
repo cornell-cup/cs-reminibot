@@ -287,6 +287,7 @@ class AddBot extends React.Component {
         this.addBotListener = this.addBotListener.bind(this);
         this.selectBotListener = this.selectBotListener.bind(this);
         this.buttonMapListener = this.buttonMapListener.bind(this);
+        this.calibrateListener = this.calibrateListener.bind(this);
     }
 
     componentDidMount(){
@@ -296,7 +297,7 @@ class AddBot extends React.Component {
 
     /*print statement for when active bots are discovered*/
     updateInputValue(event) {
-        this.state.selected_bot = event.target.value;
+        this.state.bot_name = event.target.value;
         const _this = this;
         axios({
             method:'POST',
@@ -316,12 +317,14 @@ class AddBot extends React.Component {
     /*update power value when bot moves*/
     updatePowerValue(event) {
         this.state.power = event.target.value;
+        console.log(this.state.power);
     }
 
     /*adds bot name to list*/
     addBotListener(event) {
+        this.setState({selected_bot: this.state.bot_name})
         let li = this.state.bot_list;
-        let bot_name = this.state.selected_bot;
+        let bot_name = this.state.bot_name;
 
         const _this = this;
         axios({
@@ -329,7 +332,7 @@ class AddBot extends React.Component {
             url:'/start',
             data: JSON.stringify({
                 key: "CONNECTBOT",
-                bot_name: this.state.selected_bot
+                bot_name: bot_name
             })
             })
                 .then(function(response) {
@@ -356,6 +359,7 @@ class AddBot extends React.Component {
     /*listener for direction buttons*/
     buttonMapListener(value) {
         const _this = this;
+        console.log(_this.state.selected_bot);
         axios({
             method:'POST',
             url:'/start',
@@ -367,6 +371,7 @@ class AddBot extends React.Component {
             })
             })
                 .then(function(response) {
+                    //No Response
             })
                 .catch(function (error) {
                     console.log(error);
@@ -378,7 +383,6 @@ class AddBot extends React.Component {
         var li = this.state.bot_list;
         li.pop(this.state.selected_bot);
         this.setState({bot_list: li});
-        this.set
 
         axios({
             method:'POST',
@@ -395,6 +399,23 @@ class AddBot extends React.Component {
         });
     }
 
+    calibrateListener() {
+        const _this = this;
+        axios({
+            method:'POST',
+            url:'/start',
+            data: JSON.stringify({
+                key: "CALIBRATE",
+                bot_name: this.state.selected_bot})
+            })
+                .then(function(response) {
+                    console.log(response.data);
+            })
+                .catch(function (error) {
+                    // console.log(error);
+        })
+    }
+
     getBotStatus() {
         let bot_name = this.state.selected_bot;
         let li = this.state.bot_list;
@@ -408,7 +429,9 @@ class AddBot extends React.Component {
                     bot_name: this.state.selected_bot})
                 })
                     .then(function(response) {
-                        console.log(response.data);
+                        if (response.data) {
+                            console.log(response.data);
+                        }
                 })
                     .catch(function (error) {
                         // console.log(error);
@@ -423,7 +446,9 @@ class AddBot extends React.Component {
             url:'/vision',
             })
                 .then(function(response) {
-                    console.log(response.data);
+                    if (response.data) {
+                        // console.log(response.data);
+                    }
             })
                 .catch(function (error) {
                     // console.log(error);
@@ -481,21 +506,22 @@ class AddBot extends React.Component {
                 </table>
                 <div className = "newDiv">
                     Movement:
+                    <button className="btn btn-calibrate" onClick={() => this.calibrateListener()}>Calibration</button>
                     <table>
                         <tbody>
                         <tr>
                             <td></td>
-                            <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("forward")}>forward</button></td>
+                            <td><button className="btn btn-dir" onClick={() => this.buttonMapListener("forward")}>forward</button></td>
                             <td></td>
                         </tr>
                         <tr>
-                            <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("left")}>left</button></td>
-                            <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("stop")}>stop</button></td>
-                            <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("right")}>right</button></td>
+                            <td><button className="btn btn-dir" onClick={() => this.buttonMapListener("left")}>left</button></td>
+                            <td><button className="btn btn-dir" onClick={() => this.buttonMapListener("stop")}>stop</button></td>
+                            <td><button className="btn btn-dir" onClick={() => this.buttonMapListener("right")}>right</button></td>
                         </tr>
                         <tr>
                             <td></td>
-                            <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("backward")}>backward</button></td>
+                            <td><button className="btn btn-dir" onClick={() => this.buttonMapListener("backward")}>backward</button></td>
                             <td></td>
                         </tr>
                         </tbody>
@@ -503,7 +529,7 @@ class AddBot extends React.Component {
                     <form className = "newDiv">
                         <label>
                             Power:
-                            <input type="text" value = "50" name="wheel_power" onChange={evt => this.updatePowerValue(evt)}/>
+                            <input type="text" name="wheel_power" onChange={evt => this.updatePowerValue(evt)}/>
                         </label>
                     </form>
                 </div>

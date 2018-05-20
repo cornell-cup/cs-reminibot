@@ -149,6 +149,10 @@ table{
     background: #fff;
 }
 
-.btn_btn-dir {
+.btn-dir {
     background: #f37aff;
+}
+
+.btn_calibrate {
+    background: #8F8F8F;
 }

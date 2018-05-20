@@ -4,6 +4,7 @@ Base Station Bot.
 
 from connection.tcp_connection import TCPConnection
 import threading
+import math
 from util.exception_handling import *
 from bot.base_station_bot import BaseStationBot
 
@@ -15,6 +16,8 @@ class PiBot(BaseStationBot, object):
         self.tcp_connection = TCPConnection(ip, port=port)
         self.tcp_listener_thread = self.TCPListener(self.tcp_connection)
         self.tcp_listener_thread.start()
+
+        self.calibration = (0,0)
 
         self.scripts = []
         return
@@ -31,6 +34,12 @@ class PiBot(BaseStationBot, object):
         """
         return self.port
 
+    def get_calibration(self):
+        """
+        Return calibration parameter
+        """
+        return self.calibration
+
     def is_active(self):
         """
         check if tcp connection is alive
@@ -42,6 +51,28 @@ class PiBot(BaseStationBot, object):
         send command with specified key and value
         """
         return self.tcp_connection.sendKV(key, value)
+
+    def set_calibration(self, value):
+        """
+        Sets calibration parameter. Angle of differences is used. 
+        """
+        left = self.calibration[0]
+        right = self.calibration[1]
+        if value < 0:
+            #right wheel spins too much
+            left += math.ceil(math.exp(abs(value)))
+        else:
+            right += math.ceil(math.exp(abs(value)))
+
+        diff = left - right
+        diff+=1
+
+        if diff < 0:
+            self.calibration = (0, diff)
+        else:
+            self.calibration = (diff, 0)
+
+        print("new calibration" + str(self.calibration))
 
     class TCPListener(threading.Thread):
         def __init__(self, t):
