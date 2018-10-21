@@ -64,9 +64,53 @@ class Platform extends React.Component {
 /**
  * Component for the setup tab
  * Contains:
+ * dragon, laser tag
  * addBot, gridView
  */
 class SetupTab extends React.Component {
+    render() {
+        return (
+            <div id ="tab_setup">
+                <div className="row">
+                    <div className="col-md-6">
+                    <div>
+                        <Tabs>
+                            <TabList>
+                                <Tab>Dragon</Tab>
+                                <Tab>Laser</Tab>
+                            </TabList>
+                            <TabPanel>
+                            <DragonTab updateBotName={this.props.updateBotName} bot_name={this.props.bot_name}/>
+                            </TabPanel>
+                            <TabPanel>
+                            <LaserTab updateBotName={this.props.updateBotName} bot_name={this.props.bot_name}/>
+                            </TabPanel>
+                        </Tabs>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+}
+
+class DragonTab extends React.Component {
+    render() {
+        return (
+            <div id ="tab_setup">
+                <div className="row">
+                    <div className="col-md-6">
+                        <AddBot updateBotName={this.props.updateBotName} />
+                        <Scripts bot_name={this.props.bot_name} />
+                        <GridView/>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+}
+
+class LaserTab extends React.Component {
     render() {
         return (
             <div id ="tab_setup">
