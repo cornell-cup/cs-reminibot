@@ -76,9 +76,13 @@ class SetupTab extends React.Component {
                     <div>
                         <Tabs>
                             <TabList>
+                                <Tab>Normal</Tab>
                                 <Tab>Dragon</Tab>
                                 <Tab>Laser</Tab>
                             </TabList>
+                            <TabPanel>
+                            <NormalTab updateBotName={this.props.updateBotName} bot_name={this.props.bot_name}/>
+                            </TabPanel>
                             <TabPanel>
                             <DragonTab updateBotName={this.props.updateBotName} bot_name={this.props.bot_name}/>
                             </TabPanel>
@@ -94,10 +98,26 @@ class SetupTab extends React.Component {
     }
 }
 
+class NormalTab extends React.Component {
+    render() {
+        return (
+            <div id ="tab_normal">
+                <div className="row">
+                    <div className="col-md-6">
+                        <AddBot updateBotName={this.props.updateBotName} />
+                        <Scripts bot_name={this.props.bot_name} />
+                        <GridView/>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+}
+
 class DragonTab extends React.Component {
     render() {
         return (
-            <div id ="tab_setup">
+            <div id ="tab_dragon">
                 <div className="row">
                     <div className="col-md-6">
                         <AddBot updateBotName={this.props.updateBotName} />
@@ -113,7 +133,7 @@ class DragonTab extends React.Component {
 class LaserTab extends React.Component {
     render() {
         return (
-            <div id ="tab_setup">
+            <div id ="tab_laser">
                 <div className="row">
                     <div className="col-md-6">
                         <AddBot updateBotName={this.props.updateBotName} />
