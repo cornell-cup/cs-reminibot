@@ -787,6 +787,8 @@ class AddBotDragon extends React.Component {
                     </tbody>
                 </table>
                 <div className = "newDiv">
+
+
                     Movement:
                     <table>
                         <tbody>
@@ -806,22 +808,74 @@ class AddBotDragon extends React.Component {
                             <td></td>
                         </tr>
                         </tbody>
-                    Wings:
                     </table>
+
                     <table>
-                        <tbody>
-                            <tr>
-                                <td></td>
-                                <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("flap")}>flap</button></td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td></td>
-                                <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("extend")}>extend</button></td>
-                                <td></td>
-                            </tr>
-                        </tbody>
+                    <tbody>
+                    <tr>
+                    <td>
+                        Wings:
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td></td>
+                                    <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("flap")}>flap</button></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("extend")}>extend</button></td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                    <td>
+                        Tail:
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td></td>
+                                    <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("move")}>move</button></td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                    <td>
+                        Jaw:
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td></td>
+                                    <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("open")}>open</button></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("close")}>close</button></td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                    <td>
+                        Eyes:
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td></td>
+                                    <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("blink")}>blink</button></td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+
+                    </tr>
+                    </tbody>
                     </table>
+
                     <form className = "newDiv">
                         <label>
                             Power:
