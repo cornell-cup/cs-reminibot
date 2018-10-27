@@ -206,6 +206,16 @@ class BaseStation:
             return False
 
         # TODO after ECE people did their code
+        
+    def move_tail_bot(self, session_id, bot_id, power):
+        if not session_id or not bot_id:
+            return False
+
+        session = self.active_sessions[session_id]
+        if not session or not session.has_bot(bot_id):
+            return False
+
+        # TODO after ECE people did their code
 
     def get_bot(self, bot_id):
         """
