@@ -197,6 +197,16 @@ class BaseStation:
         self.active_bots[bot_id].sendKV("WHEELS", value)
         return True
 
+    def move_wings_bot(self, session_id, bot_id, power):
+        if not session_id or not bot_id:
+            return False
+
+        session = self.active_sessions[session_id]
+        if not session or not session.has_bot(bot_id):
+            return False
+
+        # TODO after ECE people did their code
+
     def get_bot(self, bot_id):
         """
         Returns bot object corresponding to bot id
