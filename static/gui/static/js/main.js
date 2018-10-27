@@ -592,6 +592,7 @@ class AddBotDragon extends React.Component {
         this.addBotListener = this.addBotListener.bind(this);
         this.selectBotListener = this.selectBotListener.bind(this);
         this.buttonMapListener = this.buttonMapListener.bind(this);
+        this.buttonMap2Listener = this.buttonMap2Listener.bind(this);
     }
 
     componentDidMount(){
@@ -666,6 +667,25 @@ class AddBotDragon extends React.Component {
             url:'/start',
             data: JSON.stringify({
                 key: "WHEELS",
+                bot_name: _this.state.selected_bot,
+                direction: value,
+                power: _this.state.power,
+            })
+            })
+                .then(function(response) {
+            })
+                .catch(function (error) {
+                    console.log(error);
+        })
+    }
+    
+    buttonMap2Listener (value) {
+                const _this = this;
+        axios({
+            method:'POST',
+            url:'/start',
+            data: JSON.stringify({
+                key: "SERVOS",
                 bot_name: _this.state.selected_bot,
                 direction: value,
                 power: _this.state.power,
