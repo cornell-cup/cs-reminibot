@@ -696,6 +696,24 @@ class AddBotDragon extends React.Component {
                     console.log(error);
         })
     }
+    
+    buttonTailListener () {
+                const _this = this;
+        axios({
+            method:'POST',
+            url:'/start',
+            data: JSON.stringify({
+                key: "TAIL",
+                bot_name: _this.state.selected_bot,
+                power: _this.state.power,
+            })
+            })
+                .then(function(response) {
+            })
+                .catch(function (error) {
+                    console.log(error);
+        })
+    }
 
     buttonTailListener () {
                 const _this = this;
