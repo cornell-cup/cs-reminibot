@@ -697,6 +697,61 @@ class AddBotDragon extends React.Component {
         })
     }
 
+    buttonTailListener () {
+                const _this = this;
+        axios({
+            method:'POST',
+            url:'/start',
+            data: JSON.stringify({
+                key: "TAIL",
+                bot_name: _this.state.selected_bot,
+                power: _this.state.power,
+            })
+            })
+                .then(function(response) {
+            })
+                .catch(function (error) {
+                    console.log(error);
+        })
+    }
+
+    buttonJawListener (value) {
+                const _this = this;
+        axios({
+            method:'POST',
+            url:'/start',
+            data: JSON.stringify({
+                key: "JAW",
+                bot_name: _this.state.selected_bot,
+                direction: value,
+                power: _this.state.power,
+            })
+            })
+                .then(function(response) {
+            })
+                .catch(function (error) {
+                    console.log(error);
+        })
+    }
+
+    buttonEyeListener () {
+                const _this = this;
+        axios({
+            method:'POST',
+            url:'/start',
+            data: JSON.stringify({
+                key: "EYE",
+                bot_name: _this.state.selected_bot,
+                power: _this.state.power,
+            })
+            })
+                .then(function(response) {
+            })
+                .catch(function (error) {
+                    console.log(error);
+        })
+    }
+
      /* removes selected object from list*/
     deleteBotListener(event) {
         var li = this.state.bot_list;
@@ -843,7 +898,7 @@ class AddBotDragon extends React.Component {
                                 </tr>
                                 <tr>
                                     <td></td>
-                                    <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("extend")}>extend</button></td>
+                                    <td><button className="btn_btn-dir" onClick={() => this.buttonTailListener()}>extend</button></td>
                                     <td></td>
                                 </tr>
                             </tbody>
@@ -867,12 +922,12 @@ class AddBotDragon extends React.Component {
                             <tbody>
                                 <tr>
                                     <td></td>
-                                    <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("open")}>open</button></td>
+                                    <td><button className="btn_btn-dir" onClick={() => this.buttonJawListener("open")}>open</button></td>
                                     <td></td>
                                 </tr>
                                 <tr>
                                     <td></td>
-                                    <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("close")}>close</button></td>
+                                    <td><button className="btn_btn-dir" onClick={() => this.buttonJawListener("close")}>close</button></td>
                                     <td></td>
                                 </tr>
                             </tbody>
@@ -884,7 +939,7 @@ class AddBotDragon extends React.Component {
                             <tbody>
                                 <tr>
                                     <td></td>
-                                    <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("blink")}>blink</button></td>
+                                    <td><button className="btn_btn-dir" onClick={() => this.buttonEyeListener()}>blink</button></td>
                                     <td></td>
                                 </tr>
                             </tbody>
