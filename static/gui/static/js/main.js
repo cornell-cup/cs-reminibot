@@ -752,14 +752,15 @@ class AddBotDragon extends React.Component {
         })
     }
 
-    buttonEyeListener () {
+    buttonBodyListener (value) {
                 const _this = this;
         axios({
             method:'POST',
             url:'/start',
             data: JSON.stringify({
-                key: "EYE",
+                key: "BODY",
                 bot_name: _this.state.selected_bot,
+                direction: value,
                 power: _this.state.power,
             })
             })
@@ -905,8 +906,8 @@ class AddBotDragon extends React.Component {
                     <table>
                     <tbody>
                     <tr>
+                    Wings:
                     <td>
-                        Wings:
                         <table>
                             <tbody>
                                 <tr>
@@ -916,7 +917,33 @@ class AddBotDragon extends React.Component {
                                 </tr>
                                 <tr>
                                     <td></td>
-                                    <td><button className="btn_btn-dir" onClick={() => this.buttonTailListener()}>extend</button></td>
+                                    <td><button className="btn_btn-dir" onClick={() => this.buttonWingListener()}>flap_left</button></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td><button className="btn_btn-dir" onClick={() => this.buttonWingListener()}>flap_right</button></td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                    <td>
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td></td>
+                                    <td><button className="btn_btn-dir" onClick={() => this.buttonWingListener()}>extend</button></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td><button className="btn_btn-dir" onClick={() => this.buttonWingListener()}>extend_left</button></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td><button className="btn_btn-dir" onClick={() => this.buttonWingListener()}>extend_right</button></td>
                                     <td></td>
                                 </tr>
                             </tbody>
@@ -952,18 +979,22 @@ class AddBotDragon extends React.Component {
                         </table>
                     </td>
                     <td>
-                        Eyes:
+                        Body:
                         <table>
                             <tbody>
                                 <tr>
                                     <td></td>
-                                    <td><button className="btn_btn-dir" onClick={() => this.buttonEyeListener()}>blink</button></td>
+                                    <td><button className="btn_btn-dir" onClick={() => this.buttonBodyListener("lift")}>lift</button></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td><button className="btn_btn-dir" onClick={() => this.buttonBodyListener("drop")}>drop</button></td>
                                     <td></td>
                                 </tr>
                             </tbody>
                         </table>
                     </td>
-
                     </tr>
                     </tbody>
                     </table>

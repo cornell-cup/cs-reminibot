@@ -237,7 +237,7 @@ class BaseStation:
 
         # TODO after ECE people did their code
 
-    def move_eye_bot(self, session_id, bot_id, power):
+    def move_body_bot(self, session_id, bot_id, direction, power):
         if not session_id or not bot_id:
             return False
 
