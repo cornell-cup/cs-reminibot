@@ -8,7 +8,7 @@ from minibot.hardware.gpio import DigitalOutput as MDigitalOutput
 import RPi.GPIO as RGPIO
 
 # Sets mode of the GPIO to BCM numbering.
-RGPIO.setmode(RGPIO.BCM)
+RGPIO.setmode(RGPIO.BOARD)
 
 class DigitalInput(MDigitalInput):
     """

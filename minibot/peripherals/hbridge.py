@@ -1,4 +1,5 @@
 from minibot.hardware.rpi.gpio import DigitalInput, DigitalOutput, PWM, RGPIO
+import time
 """
 Minibot H-Bridge.
 """
@@ -68,21 +69,23 @@ class HBridge():
 
     def stop(self):
         self.set_speed(0, 0)
-        # self.lExtend.set_duty_cycle(0)
-        # self.lFlap.set_duty_cycle(0)
-        # self.rExtend.set_duty_cycle(0)
-        # self.rFlap.set_duty_cycle(0)
+        try:
+            self.lExtend.stop()
+            self.lFlap.stop()
+            self.rFlap.stop()
+            self.rExtend.stop()
+        except:
+            print("Not in dragon mode")
 
     def both_wings(self):
-        RGPIO.setmode(RGPIO.BOARD)
-        RGPIO.setup(40, RGPIO.OUT)
-        self.lExtend = RGPIO.PWM(40, 50)
-        RGPIO.setup(38, RGPIO.OUT)
-        self.rExtend = RGPIO.PWM(36, 50)
-        RGPIO.setup(36, RGPIO.OUT)
-        self.lFlap = RGPIO.PWM(38, 50)
-        RGPIO.setup(32, RGPIO.OUT)
-        self.rFlap = RGPIO.PWM(32, 50)
+        RGPIO.setup(21, RGPIO.OUT)
+        self.lExtend = RGPIO.PWM(21, 50)
+        RGPIO.setup(16, RGPIO.OUT)
+        self.rExtend = RGPIO.PWM(16, 50)
+        RGPIO.setup(20, RGPIO.OUT)
+        self.lFlap = RGPIO.PWM(20, 50)
+        RGPIO.setup(12, RGPIO.OUT)
+        self.rFlap = RGPIO.PWM(12, 50)
 
         self.lExtend.start(5.5)
         self.lFlap.start(3.5)
@@ -92,132 +95,120 @@ class HBridge():
             self.lFlap.ChangeDutyCycle(6)
             self.rFlap.ChangeDutyCycle(5.5)
             print('flap up')
-            self.time.sleep(1)
+            time.sleep(1)
 
             self.lExtend.ChangeDutyCycle(3.5)
             self.rExtend.ChangeDutyCycle(2.5)
             print('extend')
-            self.time.sleep(1)
+            time.sleep(1)
 
             self.lExtend.ChangeDutyCycle(6.5)
             self.rExtend.ChangeDutyCycle(5.5)
             print('collapse')
-            self.time.sleep(1)
+            time.sleep(1)
 
             self.lFlap.ChangeDutyCycle(4.0)
             self.rFlap.ChangeDutyCycle(3.5)
             print('flap down')
-            self.time.sleep(1)
+            time.sleep(1)
 
     def left_extend(self):
-        RGPIO.setmode(RGPIO.BOARD)
-        RGPIO.setup(40, RGPIO.OUT)
-        self.lExtend = RGPIO.PWM(40, 50)
-        RGPIO.setup(36, RGPIO.OUT)
-        self.rExtend = RGPIO.PWM(36, 50)
-        RGPIO.setup(38, RGPIO.OUT)
-        self.lFlap = RGPIO.PWM(38, 50)
-        RGPIO.setup(32, RGPIO.OUT)
-        self.rFlap = RGPIO.PWM(32, 50)
+        RGPIO.setup(21, RGPIO.OUT)
+        self.lExtend = RGPIO.PWM(21, 50)
 
         self.lExtend.start(5.5)
         while True:
             # collapse
             self.lExtend.ChangeDutyCycle(1.5)
-            self.time.sleep(1)
+            time.sleep(1)
             print("second")
             # extend
             self.lExtend.ChangeDutyCycle(2.5)
-            self.time.sleep(1)
+            time.sleep(1)
             print("third")
 
     def left_flap(self):
-        RGPIO.setmode(RGPIO.BOARD)
-        RGPIO.setup(38, RGPIO.OUT)
-        self.lFlap = RGPIO.PWM(38, 50)
+        RGPIO.setup(20, RGPIO.OUT)
+        self.lFlap = RGPIO.PWM(20, 50)
 
         self.lFlap.start(3.5)
         while True:
             self.lFlap.ChangeDutyCycle(5.5)
-            self.time.sleep(1)
+            time.sleep(1)
             print("down")
             self.lFlap.ChangeDutyCycle(3.5)
-            self.time.sleep(1)
+            time.sleep(1)
             print("up")
 
     def left_wing(self):
-        RGPIO.setmode(RGPIO.BOARD)
-        RGPIO.setup(40, RGPIO.OUT)
-        self.lExtend = RGPIO.PWM(40, 50)
-        RGPIO.setup(38, RGPIO.OUT)
-        self.lFlap = RGPIO.PWM(38, 50)
+        RGPIO.setup(21, RGPIO.OUT)
+        self.lExtend = RGPIO.PWM(21, 50)
+        RGPIO.setup(20, RGPIO.OUT)
+        self.lFlap = RGPIO.PWM(20, 50)
 
         self.lExtend.start(5.5)
         self.lFlap.start(3.5)
         while True:
             self.lFlap.ChangeDutyCycle(5.5)
             print("flap up")
-            self.time.sleep(1)
+            time.sleep(1)
             self.lExtend.ChangeDutyCycle(2.5)
             print("extend")
-            self.time.sleep(1)
+            time.sleep(1)
             self.lExtend.ChangeDutyCycle(5.5)
             print("collapse")
-            self.time.sleep(1)
+            time.sleep(1)
             self.lFlap.ChangeDutyCycle(3.5)
             print("down")
-            self.time.sleep(1)
+            time.sleep(1)
 
     def right_extend(self):
-        RGPIO.setmode(RGPIO.BOARD)
-        RGPIO.setup(36, RGPIO.OUT)
-        self.rExtend = RGPIO.PWM(36, 50)
+        RGPIO.setup(16, RGPIO.OUT)
+        self.rExtend = RGPIO.PWM(16, 50)
 
         self.rExtend.start(3.5)
         while True:
             self.rExtend.ChangeDutyCycle(6.5)
-            self.time.sleep(1)
+            time.sleep(1)
             print("extend")
             self.rExtend.ChangeDutyCycle(3.5)
-            self.time.sleep(1)
+            time.sleep(1)
             print("third")
 
     def right_flap(self):
-        RGPIO.setmode(RGPIO.BOARD)
-        RGPIO.setup(32, RGPIO.OUT)
-        self.rFlap = RGPIO.PWM(32, 50)
+        RGPIO.setup(12, RGPIO.OUT)
+        self.rFlap = RGPIO.PWM(12, 50)
 
         self.rFlap.start(6)
         while True:
             self.rFlap.ChangeDutyCycle(4)
-            self.time.sleep(1)
+            time.sleep(1)
             print("up")
-            self.rFLap.ChangeDutyCycle(6.0)
-            self.time.sleep(1)
+            self.rFlap.ChangeDutyCycle(6.0)
+            time.sleep(1)
             print("down")
 
     def right_wing(self):
-        RGPIO.setmode(RGPIO.BOARD)
-        RGPIO.setup(36, RGPIO.OUT)
-        self.rExtend = RGPIO.PWM(36, 50)
-        RGPIO.setup(32, RGPIO.OUT)
-        self.rFlap = RGPIO.PWM(32, 50)
+        RGPIO.setup(16, RGPIO.OUT)
+        self.rExtend = RGPIO.PWM(16, 50)
+        RGPIO.setup(12, RGPIO.OUT)
+        self.rFlap = RGPIO.PWM(12, 50)
 
         self.rExtend.start(3.5)
         self.rFlap.start(6)
         while True:
             self.rFlap.ChangeDutyCycle(6)
             print("flap up")
-            self.time.sleep(1)
+            time.sleep(1)
 
             self.rExtend.ChangeDutyCycle(3.5)
             print("extend")
-            self.time.sleep(1)
+            time.sleep(1)
 
             self.rExtend.ChangeDutyCycle(6.5)
             print("collapse")
-            self.time.sleep(1)
+            time.sleep(1)
 
             self.rFlap.ChangeDutyCycle(4.0)
             print("flap down")
-            self.time.sleep(1)
+            time.sleep(1)
