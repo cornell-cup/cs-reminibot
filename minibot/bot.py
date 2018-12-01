@@ -65,3 +65,20 @@ class Bot():
     def both_wings_flap_and_extend(self):
         self.motors.both_wings()
 
+    def left_wing(self):
+        self.motors.left_wing()
+
+    def left_extend(self):
+        self.motors.left_extend()
+
+    def left_flap(self):
+        self.motors.left_flap()
+
+    def right_wing(self):
+        self.motors.right_wing()
+
+    def right_extend(self):
+        self.motors.right_extend()
+
+    def right_flap(self):
+        self.motors.right_flap()

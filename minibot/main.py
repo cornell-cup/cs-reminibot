@@ -66,19 +66,26 @@ def parse_command(cmd, bot, tcpInstance):
         try:
             print("HERE")
             if value == "0":
-                print("flap both")
-                bot.both_wings_flap_and_extend()
+                print("flap and extend left")
+                bot.left_wing()
             elif value == "1":
                 print("flap left")
+                bot.left_flap()
             elif value == "2":
                 print("flap right")
+                bot.right_flap()
             elif value == "3":
-                print("extend wings")
+                print("flap and extend right")
+                bot.right_wing()
             elif value == "4":
                 print("extend left")
-            else:
+                bot.left_extend()
+            elif value == "5":
                 print("extend right")
-            # bot.both_wings_flap_and_extend()
+                bot.right_extend()
+            else:
+                print("flap and extend both")
+                bot.both_wings_flap_and_extend()
         except Exception as e:
             print(e)
             pass

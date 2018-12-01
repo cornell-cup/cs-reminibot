@@ -890,7 +890,7 @@ class AddBotDragon extends React.Component {
                             <tbody>
                                 <tr>
                                     <td></td>
-                                    <td><button className="btn_btn-dir" onClick={() => this.buttonWingListener(0)}>flap</button></td>
+                                    <td><button className="btn_btn-dir" onClick={() => this.buttonWingListener(0)}>flap_extend_left</button></td>
                                     <td></td>
                                 </tr>
                                 <tr>
@@ -903,13 +903,9 @@ class AddBotDragon extends React.Component {
                                     <td><button className="btn_btn-dir" onClick={() => this.buttonWingListener(2)}>flap_right</button></td>
                                     <td></td>
                                 </tr>
-                            </tbody>
-                        </table>
-                        <table>
-                            <tbody>
                                 <tr>
                                     <td></td>
-                                    <td><button className="btn_btn-dir" onClick={() => this.buttonWingListener(3)}>extend</button></td>
+                                    <td><button className="btn_btn-dir" onClick={() => this.buttonWingListener(3)}>flap_extend_right</button></td>
                                     <td></td>
                                 </tr>
                                 <tr>
@@ -920,6 +916,11 @@ class AddBotDragon extends React.Component {
                                 <tr>
                                     <td></td>
                                     <td><button className="btn_btn-dir" onClick={() => this.buttonWingListener(5)}>extend_right</button></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td><button className="btn_btn-dir" onClick={() => this.buttonWingListener(6)}>flap_extend_both</button></td>
                                     <td></td>
                                 </tr>
                             </tbody>

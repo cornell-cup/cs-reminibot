@@ -118,7 +118,6 @@ class ClientHandler(tornado.web.RequestHandler):
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             self.base_station.move_wheels_bot(session_id, bot_id, direction, power)
         elif key == "WINGS":
-            # TODO finish this
             bot_name = data['bot_name']
             power = str(data['power'])
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
