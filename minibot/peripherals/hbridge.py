@@ -70,6 +70,13 @@ class HBridge():
             self.right_pin.set_low()
             self.right_pwm.set_duty_cycle(1-abs(right))
 
+    def stop(self):
+        self.set_speed(0, 0)
+        # self.lextend.set_duty_cycle(0)
+        # self.lflap.set_duty_cycle(0)
+        # self.rextend.set_duty_cycle(0)
+        # self.rflap.set_duty_cycle(0)
+
     def both_wings(self):
         self.lExtend.start(5.5)
         self.lFlap.start(3.5)

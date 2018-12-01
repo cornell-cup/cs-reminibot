@@ -34,7 +34,8 @@ class Bot():
             self.sensors[name] = ColorSensor(self, name, pin)
 
     def stop(self):
-        self.motors.set_speed(0, 0)
+        # self.motors.set_speed(0, 0)
+        self.motors.stop()
 
     def move_forward(self, power):
         self.motors.set_speed(power, power)
