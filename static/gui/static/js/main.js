@@ -679,7 +679,7 @@ class AddBotDragon extends React.Component {
         })
     }
     
-    buttonWingListener () {
+    buttonWingListener (value) {
                 const _this = this;
         axios({
             method:'POST',
@@ -687,7 +687,7 @@ class AddBotDragon extends React.Component {
             data: JSON.stringify({
                 key: "WINGS",
                 bot_name: _this.state.selected_bot,
-                power: _this.state.power,
+                power: value,
             })
             })
                 .then(function(response) {
@@ -890,17 +890,17 @@ class AddBotDragon extends React.Component {
                             <tbody>
                                 <tr>
                                     <td></td>
-                                    <td><button className="btn_btn-dir" onClick={() => this.buttonWingListener()}>flap</button></td>
+                                    <td><button className="btn_btn-dir" onClick={() => this.buttonWingListener(0)}>flap</button></td>
                                     <td></td>
                                 </tr>
                                 <tr>
                                     <td></td>
-                                    <td><button className="btn_btn-dir" onClick={() => this.buttonWingListener()}>flap_left</button></td>
+                                    <td><button className="btn_btn-dir" onClick={() => this.buttonWingListener(1)}>flap_left</button></td>
                                     <td></td>
                                 </tr>
                                 <tr>
                                     <td></td>
-                                    <td><button className="btn_btn-dir" onClick={() => this.buttonWingListener()}>flap_right</button></td>
+                                    <td><button className="btn_btn-dir" onClick={() => this.buttonWingListener(2)}>flap_right</button></td>
                                     <td></td>
                                 </tr>
                             </tbody>
@@ -909,17 +909,17 @@ class AddBotDragon extends React.Component {
                             <tbody>
                                 <tr>
                                     <td></td>
-                                    <td><button className="btn_btn-dir" onClick={() => this.buttonWingListener()}>extend</button></td>
+                                    <td><button className="btn_btn-dir" onClick={() => this.buttonWingListener(3)}>extend</button></td>
                                     <td></td>
                                 </tr>
                                 <tr>
                                     <td></td>
-                                    <td><button className="btn_btn-dir" onClick={() => this.buttonWingListener()}>extend_left</button></td>
+                                    <td><button className="btn_btn-dir" onClick={() => this.buttonWingListener(4)}>extend_left</button></td>
                                     <td></td>
                                 </tr>
                                 <tr>
                                     <td></td>
-                                    <td><button className="btn_btn-dir" onClick={() => this.buttonWingListener()}>extend_right</button></td>
+                                    <td><button className="btn_btn-dir" onClick={() => this.buttonWingListener(5)}>extend_right</button></td>
                                     <td></td>
                                 </tr>
                             </tbody>
