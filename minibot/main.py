@@ -62,6 +62,13 @@ def parse_command(cmd, bot, tcpInstance):
         except Exception as e:
             print(e)
             pass
+    elif key == "WINGS":
+        try:
+            print("HERE")
+            # bot.both_wings_flap_and_extend()
+        except Exception as e:
+            print(e)
+            pass
     elif key == "SCRIPTS":
         values = value.split(",")
         if len(value) == 0:

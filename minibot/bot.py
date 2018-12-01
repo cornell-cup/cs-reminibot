@@ -61,4 +61,6 @@ class Bot():
             data[name] = sensor.get_color_name()
         return data
 
+    def both_wings_flap_and_extend(self):
+        self.motors.both_wings()
 

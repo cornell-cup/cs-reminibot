@@ -1,3 +1,4 @@
+from minibot.hardware.rpi.gpio import DigitalInput, DigitalOutput, PWM, RGPIO
 """
 Minibot H-Bridge.
 """
@@ -19,6 +20,15 @@ class HBridge():
         self.left_pwm = left_pwm
         self.right_pin = right_pin
         self.right_pwm = right_pwm
+        RGPIO.setup(40, RGPIO.OUT)
+        RGPIO.setup(38, RGPIO.OUT)
+        RGPIO.setup(36, RGPIO.OUT)
+        RGPIO.setup(32, RGPIO.OUT)
+
+        self.lExtend = RGPIO.PWM(40, 50)
+        self.rExtend = RGPIO.PWM(36, 50)
+        self.lFlap = RGPIO.PWM(38, 50)
+        self.rFlap = RGPIO.PWM(32, 50)
 
         self.left_speed = 0
         self.right_speed = 0
@@ -59,4 +69,36 @@ class HBridge():
         else:
             self.right_pin.set_low()
             self.right_pwm.set_duty_cycle(1-abs(right))
+
+    def both_wings(self):
+        self.lExtend.start(5.5)
+        self.lFlap.start(3.5)
+        self.rExtend.start(3.5)
+        self.rFlap.start(6)
+        # TODO get rid of try statement with another button
+        # try:
+        while True:
+            self.lFlap.ChangeDutyCycle(6)
+            self.rFlap.ChangeDutyCycle(5.5)
+            print('flap up')
+            self.time.sleep(1)
+
+            self.lExtend.ChangeDutyCycle(3.5)
+            self.rExtend.ChangeDutyCycle(2.5)
+            print('extend')
+            self.time.sleep(1)
+
+            self.lExtend.ChangeDutyCycle(6.5)
+            self.rExtend.ChangeDutyCycle(5.5)
+            print('collapse')
+            self.time.sleep(1)
+
+            self.lFlap.ChangeDutyCycle(4.0)
+            self.rFlap.ChangeDutyCycle(3.5)
+            print('flap down')
+            self.time.sleep(1)
+
+        # except KeyboardInterrupt:
+        #     # p.stop()
+        #     RGPIO.cleanup()
 

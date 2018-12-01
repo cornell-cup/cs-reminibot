@@ -715,24 +715,6 @@ class AddBotDragon extends React.Component {
         })
     }
 
-    buttonTailListener () {
-                const _this = this;
-        axios({
-            method:'POST',
-            url:'/start',
-            data: JSON.stringify({
-                key: "TAIL",
-                bot_name: _this.state.selected_bot,
-                power: _this.state.power,
-            })
-            })
-                .then(function(response) {
-            })
-                .catch(function (error) {
-                    console.log(error);
-        })
-    }
-
     buttonJawListener (value) {
                 const _this = this;
         axios({
@@ -903,11 +885,7 @@ class AddBotDragon extends React.Component {
                         </tbody>
                     </table>
 
-                    <table>
-                    <tbody>
-                    <tr>
                     Wings:
-                    <td>
                         <table>
                             <tbody>
                                 <tr>
@@ -927,8 +905,6 @@ class AddBotDragon extends React.Component {
                                 </tr>
                             </tbody>
                         </table>
-                    </td>
-                    <td>
                         <table>
                             <tbody>
                                 <tr>
@@ -948,56 +924,6 @@ class AddBotDragon extends React.Component {
                                 </tr>
                             </tbody>
                         </table>
-                    </td>
-                    <td>
-                        Tail:
-                        <table>
-                            <tbody>
-                                <tr>
-                                    <td></td>
-                                    <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("move")}>move</button></td>
-                                    <td></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </td>
-                    <td>
-                        Jaw:
-                        <table>
-                            <tbody>
-                                <tr>
-                                    <td></td>
-                                    <td><button className="btn_btn-dir" onClick={() => this.buttonJawListener("open")}>open</button></td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td></td>
-                                    <td><button className="btn_btn-dir" onClick={() => this.buttonJawListener("close")}>close</button></td>
-                                    <td></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </td>
-                    <td>
-                        Body:
-                        <table>
-                            <tbody>
-                                <tr>
-                                    <td></td>
-                                    <td><button className="btn_btn-dir" onClick={() => this.buttonBodyListener("lift")}>lift</button></td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td></td>
-                                    <td><button className="btn_btn-dir" onClick={() => this.buttonBodyListener("drop")}>drop</button></td>
-                                    <td></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </td>
-                    </tr>
-                    </tbody>
-                    </table>
 
                     <form className = "newDiv">
                         <label>
