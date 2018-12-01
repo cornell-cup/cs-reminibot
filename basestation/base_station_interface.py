@@ -124,27 +124,26 @@ class ClientHandler(tornado.web.RequestHandler):
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             bot = self.base_station.get_bot(bot_id)
             bot.sendKV("WINGS", str(power))
-            #self.base_station.move_tail_bot(session_id, bot_id, power)
-        elif key == "TAIL":
-            # TODO finish this
-            bot_name = data['bot_name']
-            power = str(data['power'])
-            bot_id = self.base_station.bot_name_to_bot_id(bot_name)
-            self.base_station.move_wings_bot(session_id, bot_id, power)
-        elif key == "JAW":
-            # TODO finish this
-            bot_name = data['bot_name']
-            direction = data['direction']
-            power = str(data['power'])
-            bot_id = self.base_station.bot_name_to_bot_id(bot_name)
-            self.base_station.move_jaw_bot(session_id, bot_id, direction, power)
-        elif key == "BODY":
-            # TODO finish this
-            bot_name = data['bot_name']
-            direction = data['direction']
-            power = str(data['power'])
-            bot_id = self.base_station.bot_name_to_bot_id(bot_name)
-            self.base_station.move_body_bot(session_id, bot_id, direction, power)
+        # elif key == "TAIL":
+        #     # TODO finish this
+        #     bot_name = data['bot_name']
+        #     power = str(data['power'])
+        #     bot_id = self.base_station.bot_name_to_bot_id(bot_name)
+        #     self.base_station.move_wings_bot(session_id, bot_id, power)
+        # elif key == "JAW":
+        #     # TODO finish this
+        #     bot_name = data['bot_name']
+        #     direction = data['direction']
+        #     power = str(data['power'])
+        #     bot_id = self.base_station.bot_name_to_bot_id(bot_name)
+        #     self.base_station.move_jaw_bot(session_id, bot_id, direction, power)
+        # elif key == "BODY":
+        #     # TODO finish this
+        #     bot_name = data['bot_name']
+        #     direction = data['direction']
+        #     power = str(data['power'])
+        #     bot_id = self.base_station.bot_name_to_bot_id(bot_name)
+        #     self.base_station.move_body_bot(session_id, bot_id, direction, power)
         elif key == "DISCOVERBOTS":
             self.write(json.dumps(self.base_station.get_active_bots_names()).encode())
         elif key == "SCRIPTS":
