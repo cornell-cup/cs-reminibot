@@ -67,8 +67,9 @@ def parse_command(cmd, bot, tcpInstance):
             print("HERE")
             if value == "0":
                 print("flap both")
+                bot.both_wings_flap_and_extend()
             elif value == "1":
-                print ("flap left")
+                print("flap left")
             elif value == "2":
                 print("flap right")
             elif value == "3":
