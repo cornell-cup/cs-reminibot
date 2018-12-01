@@ -20,15 +20,15 @@ class HBridge():
         self.left_pwm = left_pwm
         self.right_pin = right_pin
         self.right_pwm = right_pwm
-        RGPIO.setup(40, RGPIO.OUT)
-        RGPIO.setup(38, RGPIO.OUT)
-        RGPIO.setup(36, RGPIO.OUT)
-        RGPIO.setup(32, RGPIO.OUT)
+        #RGPIO.setup(40, RGPIO.OUT)
+        #RGPIO.setup(38, RGPIO.OUT)
+        #RGPIO.setup(36, RGPIO.OUT)
+        #RGPIO.setup(32, RGPIO.OUT)
 
-        self.lExtend = RGPIO.PWM(40, 50)
-        self.rExtend = RGPIO.PWM(36, 50)
-        self.lFlap = RGPIO.PWM(38, 50)
-        self.rFlap = RGPIO.PWM(32, 50)
+        #self.lExtend = RGPIO.PWM(40, 50)
+        #self.rExtend = RGPIO.PWM(36, 50)
+        #self.lFlap = RGPIO.PWM(38, 50)
+        #self.rFlap = RGPIO.PWM(32, 50)
 
         self.left_speed = 0
         self.right_speed = 0
