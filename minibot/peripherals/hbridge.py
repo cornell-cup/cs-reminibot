@@ -37,7 +37,7 @@ class HBridge():
         """
         Returns the (left speed, right speed) tuple
         """
-        return (self.left_speed, self.right_speed)
+        return self.left_speed, self.right_speed
 
     def set_speed(self, left, right):
         """
@@ -75,7 +75,7 @@ class HBridge():
             self.rFlap.stop()
             self.rExtend.stop()
         except:
-            print("Not in dragon mode")
+            print("[ERROR] Not in dragon mode")
 
     def both_wings(self):
         RGPIO.setup(21, RGPIO.OUT)
@@ -93,22 +93,22 @@ class HBridge():
         self.rFlap.start(6)
         while True:
             self.lFlap.ChangeDutyCycle(6)
-            self.rFlap.ChangeDutyCycle(5.5)
+            self.rFlap.ChangeDutyCycle(4)
             print('flap up')
             time.sleep(1)
 
             self.lExtend.ChangeDutyCycle(3.5)
-            self.rExtend.ChangeDutyCycle(2.5)
+            self.rExtend.ChangeDutyCycle(5.5)
             print('extend')
             time.sleep(1)
 
             self.lExtend.ChangeDutyCycle(6.5)
-            self.rExtend.ChangeDutyCycle(5.5)
+            self.rExtend.ChangeDutyCycle(3.5)
             print('collapse')
             time.sleep(1)
 
             self.lFlap.ChangeDutyCycle(4.0)
-            self.rFlap.ChangeDutyCycle(3.5)
+            self.rFlap.ChangeDutyCycle(6.0)
             print('flap down')
             time.sleep(1)
 
@@ -168,7 +168,7 @@ class HBridge():
 
         self.rExtend.start(3.5)
         while True:
-            self.rExtend.ChangeDutyCycle(6.5)
+            self.rExtend.ChangeDutyCycle(5.5)
             time.sleep(1)
             print("extend")
             self.rExtend.ChangeDutyCycle(3.5)
@@ -197,18 +197,18 @@ class HBridge():
         self.rExtend.start(3.5)
         self.rFlap.start(6)
         while True:
-            self.rFlap.ChangeDutyCycle(6)
+            self.rFlap.ChangeDutyCycle(4)
             print("flap up")
             time.sleep(1)
 
-            self.rExtend.ChangeDutyCycle(3.5)
+            self.rExtend.ChangeDutyCycle(5.5)
             print("extend")
             time.sleep(1)
 
-            self.rExtend.ChangeDutyCycle(6.5)
+            self.rExtend.ChangeDutyCycle(3.5)
             print("collapse")
             time.sleep(1)
 
-            self.rFlap.ChangeDutyCycle(4.0)
+            self.rFlap.ChangeDutyCycle(6.0)
             print("flap down")
             time.sleep(1)
