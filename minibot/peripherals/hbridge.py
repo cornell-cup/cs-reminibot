@@ -78,6 +78,9 @@ class HBridge():
             print("[ERROR] Not in dragon mode")
 
     def both_wings(self):
+        RGPIO.cleanup()
+        RGPIO.setmode(RGPIO.BCM)
+      
         RGPIO.setup(21, RGPIO.OUT)
         self.lExtend = RGPIO.PWM(21, 50)
         RGPIO.setup(16, RGPIO.OUT)
@@ -113,6 +116,8 @@ class HBridge():
             time.sleep(1)
 
     def left_extend(self):
+        RGPIO.cleanup()
+        RGPIO.setmode(RGPIO.BCM)
         RGPIO.setup(21, RGPIO.OUT)
         self.lExtend = RGPIO.PWM(21, 50)
 
@@ -128,6 +133,8 @@ class HBridge():
             print("third")
 
     def left_flap(self):
+        RGPIO.cleanup()
+        RGPIO.setmode(RGPIO.BCM)
         RGPIO.setup(20, RGPIO.OUT)
         self.lFlap = RGPIO.PWM(20, 50)
 
@@ -141,6 +148,8 @@ class HBridge():
             print("up")
 
     def left_wing(self):
+        RGPIO.cleanup()
+        RGPIO.setmode(RGPIO.BCM)
         RGPIO.setup(21, RGPIO.OUT)
         self.lExtend = RGPIO.PWM(21, 50)
         RGPIO.setup(20, RGPIO.OUT)
@@ -163,6 +172,8 @@ class HBridge():
             time.sleep(1)
 
     def right_extend(self):
+        RGPIO.cleanup()
+        RGPIO.setmode(RGPIO.BCM)
         RGPIO.setup(16, RGPIO.OUT)
         self.rExtend = RGPIO.PWM(16, 50)
 
@@ -176,6 +187,8 @@ class HBridge():
             print("third")
 
     def right_flap(self):
+        RGPIO.cleanup()
+        RGPIO.setmode(RGPIO.BCM)
         RGPIO.setup(12, RGPIO.OUT)
         self.rFlap = RGPIO.PWM(12, 50)
 
@@ -189,6 +202,8 @@ class HBridge():
             print("down")
 
     def right_wing(self):
+        RGPIO.cleanup()
+        RGPIO.setmode(RGPIO.BCM)
         RGPIO.setup(16, RGPIO.OUT)
         self.rExtend = RGPIO.PWM(16, 50)
         RGPIO.setup(12, RGPIO.OUT)
