@@ -82,3 +82,21 @@ class Bot():
 
     def right_flap(self):
         self.motors.right_flap()
+
+    def push_up(self):
+        self.motors.push_up()
+
+    def head_nod(self):
+        self.motors.h_nod()
+
+    def head_turn(self):
+        self.motors.h_turn()
+
+    def d_forward(self):
+        self.motors.d_forward()
+
+    def d_backward(self):
+        self.motors.d_backward()
+
+    def d_stop(self):
+        self.motors.d_stop()

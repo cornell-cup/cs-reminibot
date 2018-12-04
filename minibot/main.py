@@ -89,6 +89,38 @@ def parse_command(cmd, bot, tcpInstance):
         except Exception as e:
             print(e)
             pass
+    elif key == "DWHEELS":
+        try:
+            print("HERE")
+            if value == "0":
+                print("forward")
+                bot.d_forward()
+            elif value == "1":
+                print("left")
+                # TODO
+            elif value == "2":
+                print("stop")
+                bot.d_stop()
+            elif value == "3":
+                print("right")
+                # TODO
+            elif value == "4":
+                print("backward")
+                bot.d_backward()
+        except Exception as e:
+            print(e)
+            pass
+    elif key == "BODY":
+        print("PUSHUP")
+        bot.push_up()
+    elif key == "HEAD":
+        print("HEAD")
+        if value == "0":
+            print("nod")
+            bot.head_nod()
+        elif value == "1":
+            print("turn")
+            bot.head_turn()
     elif key == "SCRIPTS":
         values = value.split(",")
         if len(value) == 0:

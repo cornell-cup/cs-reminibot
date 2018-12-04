@@ -678,8 +678,26 @@ class AddBotDragon extends React.Component {
                     console.log(error);
         })
     }
-    
-    buttonWingListener (value) {
+
+    buttonWheelsListener(value) {
+                const _this = this;
+        axios({
+            method:'POST',
+            url:'/start',
+            data: JSON.stringify({
+                key: "DWHEELS",
+                bot_name: _this.state.selected_bot,
+                power: value,
+            })
+            })
+                .then(function(response) {
+            })
+                .catch(function (error) {
+                    console.log(error);
+        })
+    }
+
+    buttonWingListener(value) {
                 const _this = this;
         axios({
             method:'POST',
@@ -696,45 +714,8 @@ class AddBotDragon extends React.Component {
                     console.log(error);
         })
     }
-    
-    buttonTailListener () {
-                const _this = this;
-        axios({
-            method:'POST',
-            url:'/start',
-            data: JSON.stringify({
-                key: "TAIL",
-                bot_name: _this.state.selected_bot,
-                power: _this.state.power,
-            })
-            })
-                .then(function(response) {
-            })
-                .catch(function (error) {
-                    console.log(error);
-        })
-    }
 
-    buttonJawListener (value) {
-                const _this = this;
-        axios({
-            method:'POST',
-            url:'/start',
-            data: JSON.stringify({
-                key: "JAW",
-                bot_name: _this.state.selected_bot,
-                direction: value,
-                power: _this.state.power,
-            })
-            })
-                .then(function(response) {
-            })
-                .catch(function (error) {
-                    console.log(error);
-        })
-    }
-
-    buttonBodyListener (value) {
+    buttonLegListener() {
                 const _this = this;
         axios({
             method:'POST',
@@ -742,8 +723,24 @@ class AddBotDragon extends React.Component {
             data: JSON.stringify({
                 key: "BODY",
                 bot_name: _this.state.selected_bot,
-                direction: value,
-                power: _this.state.power,
+            })
+            })
+                .then(function(response) {
+            })
+                .catch(function (error) {
+                    console.log(error);
+        })
+    }
+
+    buttonHeadListener(value) {
+                const _this = this;
+        axios({
+            method:'POST',
+            url:'/start',
+            data: JSON.stringify({
+                key: "HEAD",
+                bot_name: _this.state.selected_bot,
+                power: value,
             })
             })
                 .then(function(response) {
@@ -869,17 +866,17 @@ class AddBotDragon extends React.Component {
                         <tbody>
                         <tr>
                             <td></td>
-                            <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("forward")}>forward</button></td>
+                            <td><button className="btn_btn-dir" onClick={() => this.buttonWheelsListener(0)}>forward</button></td>
                             <td></td>
                         </tr>
                         <tr>
-                            <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("left")}>left</button></td>
-                            <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("stop")}>stop</button></td>
-                            <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("right")}>right</button></td>
+                            <td><button className="btn_btn-dir" onClick={() => this.buttonWheelsListener(1)}>left</button></td>
+                            <td><button className="btn_btn-dir" onClick={() => this.buttonWheelsListener(2)}>stop</button></td>
+                            <td><button className="btn_btn-dir" onClick={() => this.buttonWheelsListener(3)}>right</button></td>
                         </tr>
                         <tr>
                             <td></td>
-                            <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("backward")}>backward</button></td>
+                            <td><button className="btn_btn-dir" onClick={() => this.buttonWheelsListener(4)}>backward</button></td>
                             <td></td>
                         </tr>
                         </tbody>
@@ -921,6 +918,33 @@ class AddBotDragon extends React.Component {
                                 <tr>
                                     <td></td>
                                     <td><button className="btn_btn-dir" onClick={() => this.buttonWingListener(6)}>flap_extend_both</button></td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    Body:
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td></td>
+                                    <td><button className="btn_btn-dir" onClick={() => this.buttonLegListener()}>push_up</button></td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    Head:
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td></td>
+                                    <td><button className="btn_btn-dir" onClick={() => this.buttonHeadListener(0)}>nod</button></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td><button className="btn_btn-dir" onClick={() => this.buttonHeadListener(1)}>turn</button></td>
                                     <td></td>
                                 </tr>
                             </tbody>
