@@ -100,3 +100,9 @@ class Bot():
 
     def d_stop(self):
         self.motors.d_stop()
+
+    def d_left(self):
+        self.motors.d_left()
+ 
+    def d_right(self):
+        self.motors.d_right()

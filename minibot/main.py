@@ -54,6 +54,8 @@ def parse_command(cmd, bot, tcpInstance):
     end = cmd.find(">>>>")
     key = cmd[start + 4:comma]
     value = cmd[comma + 1:end]
+    if key != "":
+        print(key)
     if key == "WHEELS":
         try:
             values = value.split(",")
@@ -97,13 +99,13 @@ def parse_command(cmd, bot, tcpInstance):
                 bot.d_forward()
             elif value == "1":
                 print("left")
-                # TODO
+                bot.d_left()
             elif value == "2":
                 print("stop")
                 bot.d_stop()
             elif value == "3":
                 print("right")
-                # TODO
+                bot.d_right()
             elif value == "4":
                 print("backward")
                 bot.d_backward()

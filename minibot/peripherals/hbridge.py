@@ -1,5 +1,6 @@
 from minibot.hardware.rpi.gpio import DigitalInput, DigitalOutput, PWM, RGPIO
 import time
+from threading import Thread
 """
 Minibot H-Bridge.
 """
@@ -70,14 +71,14 @@ class HBridge():
             self.right_pwm.set_duty_cycle(1-abs(right))
 
     def stop(self):
-        self.set_speed(0, 0)
-        # try:
-        #     self.lExtend.stop()
-        #     self.lFlap.stop()
-        #     self.rFlap.stop()
-        #     self.rExtend.stop()
-        # except:
-        #     print("[ERROR] Not in dragon mode")
+        #self.set_speed(0, 0)
+        try:
+            self.lExtend.stop()
+            self.lFlap.stop()
+            self.rFlap.stop()
+            self.rExtend.stop()
+        except:
+            print("[ERROR] Not in dragon mode")
 
     def h_turn(self):
         RGPIO.cleanup()
@@ -108,6 +109,7 @@ class HBridge():
             print("up")
 
     def d_forward(self):
+        print("d_forward")
         RGPIO.cleanup()
         RGPIO.setmode(RGPIO.BCM)
 
@@ -116,11 +118,11 @@ class HBridge():
 
         RGPIO.setup(19, RGPIO.OUT)
         RGPIO.setup(26, RGPIO.OUT)
-        while True:
-            RGPIO.output(6, RGPIO.HIGH)
-            RGPIO.output(13, RGPIO.LOW)
-            RGPIO.setup(19, RGPIO.HIGH)
-            RGPIO.setup(26, RGPIO.LOW)
+        
+        RGPIO.output(19, RGPIO.LOW)
+        RGPIO.output(26, RGPIO.HIGH)
+        RGPIO.output(6, RGPIO.LOW)
+        RGPIO.output(13, RGPIO.HIGH)
 
     def d_backward(self):
         RGPIO.cleanup()
@@ -130,21 +132,52 @@ class HBridge():
         RGPIO.setup(26, RGPIO.OUT)
         RGPIO.setup(6, RGPIO.OUT)
         RGPIO.setup(13, RGPIO.OUT)
-        while True:
-            RGPIO.output(19, RGPIO.LOW)
-            RGPIO.output(26, RGPIO.HIGH)
-            RGPIO.setup(6, RGPIO.LOW)
-            RGPIO.setup(13, RGPIO.HIGH)
+            
+        RGPIO.output(6, RGPIO.HIGH)
+        RGPIO.output(13, RGPIO.LOW)
+        RGPIO.output(19, RGPIO.HIGH)
+        RGPIO.output(26, RGPIO.LOW)
+    
+    def d_left(self):
+        RGPIO.cleanup()
+        RGPIO.setmode(RGPIO.BCM)
+        
+        RGPIO.setup(19, RGPIO.OUT)
+        RGPIO.setup(26, RGPIO.OUT)
+        RGPIO.setup(6, RGPIO.OUT)
+        RGPIO.setup(13, RGPIO.OUT)
 
+        RGPIO.output(19, RGPIO.LOW)
+        RGPIO.output(26, RGPIO.HIGH)
+        RGPIO.output(6, RGPIO.HIGH)
+        RGPIO.output(13, RGPIO.LOW)
+
+    def d_right(self):
+        RGPIO.cleanup()
+        RGPIO.setmode(RGPIO.BCM)
+        RGPIO.setup(19, RGPIO.OUT)
+        RGPIO.setup(26, RGPIO.OUT)
+        RGPIO.setup(6, RGPIO.OUT)
+        RGPIO.setup(13, RGPIO.OUT)
+
+        RGPIO.output(19, RGPIO.HIGH)
+        RGPIO.output(26, RGPIO.LOW)
+        RGPIO.output(6, RGPIO.LOW)
+        RGPIO.output(13, RGPIO.HIGH)
     def d_stop(self):
+        print("d_stop")
         RGPIO.cleanup()
         RGPIO.setmode(RGPIO.BCM)
 
-        RGPIO.setup(4, RGPIO.OUT)
-        RGPIO.setup(24, RGPIO.OUT)
-        while True:
-            RGPIO.output(4, RGPIO.LOW)
-            RGPIO.output(24, RGPIO.LOW)
+        RGPIO.setup(6, RGPIO.OUT)
+        RGPIO.setup(13, RGPIO.OUT)
+        RGPIO.setup(19, RGPIO.OUT)
+        RGPIO.setup(26, RGPIO.OUT)
+            
+        RGPIO.output(6, RGPIO.LOW)
+        RGPIO.output(13, RGPIO.LOW)
+        RGPIO.output(19, RGPIO.LOW)
+        RGPIO.output(26, RGPIO.LOW)
 
     def push_up(self):
         RGPIO.cleanup()
