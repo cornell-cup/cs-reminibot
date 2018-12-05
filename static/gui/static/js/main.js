@@ -939,7 +939,7 @@ class AddBotDragon extends React.Component {
                             <tbody>
                                 <tr>
                                     <td></td>
-                                    <td><button className="btn_btn-dir" onClick={() => this.buttonHeadListener(0)}>nod</button></td>
+                                    <td><button className="btn_btn-dir" onClick={() => this.buttonHeadListener(0)}>jaw</button></td>
                                     <td></td>
                                 </tr>
                                 <tr>
