@@ -1101,6 +1101,24 @@ class AddBotLaser extends React.Component {
         });
     }
 
+    buttonWheelsListener(value) {
+                const _this = this;
+        axios({
+            method:'POST',
+            url:'/start',
+            data: JSON.stringify({
+                key: "DWHEELS",
+                bot_name: _this.state.selected_bot,
+                power: value,
+            })
+            })
+                .then(function(response) {
+            })
+                .catch(function (error) {
+                    console.log(error);
+        })
+    }
+
     getBotStatus() {
         let bot_name = this.state.selected_bot;
         let li = this.state.bot_list;
@@ -1203,17 +1221,17 @@ class AddBotLaser extends React.Component {
                         <tbody>
                         <tr>
                             <td></td>
-                            <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("forward")}>forward</button></td>
+                            <td><button className="btn_btn-dir" onClick={() => this.buttonWheelsListener(0)}>forward</button></td>
                             <td></td>
                         </tr>
                         <tr>
-                            <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("left")}>left</button></td>
-                            <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("stop")}>stop</button></td>
-                            <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("right")}>right</button></td>
+                            <td><button className="btn_btn-dir" onClick={() => this.buttonWheelsListener(1)}>left</button></td>
+                            <td><button className="btn_btn-dir" onClick={() => this.buttonWheelsListener(2)}>stop</button></td>
+                            <td><button className="btn_btn-dir" onClick={() => this.buttonWheelsListener(3)}>right</button></td>
                         </tr>
                         <tr>
                             <td></td>
-                            <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("backward")}>backward</button></td>
+                            <td><button className="btn_btn-dir" onClick={() => this.buttonWheelsListener(4)}>backward</button></td>
                             <td></td>
                         </tr>
                         </tbody>

@@ -39,6 +39,13 @@ class HBridge():
     # reset button
     p_reset = 13
 
+    ### Laser tag motors
+    l_motor_f = 27
+    l_motor_b = 25
+
+    r_motot_f = 6
+    r_motor_b = 12
+
     """
     Minibot H-Bridge class.
     """
@@ -68,6 +75,8 @@ class HBridge():
 
         left_pwm.set_frequency(100)
         right_pwm.set_frequency(100)
+
+        # for laser
         self.pwm_emitter = None
 
     def get_speed(self):
@@ -147,16 +156,11 @@ class HBridge():
         RGPIO.cleanup()
         RGPIO.setmode(RGPIO.BCM)
 
-        RGPIO.setup(6, RGPIO.OUT)
-        RGPIO.setup(13, RGPIO.OUT)
+        RGPIO.setup(self.l_motor_f, RGPIO.OUT)
+        RGPIO.setup(self.r_motor_f, RGPIO.OUT)
 
-        RGPIO.setup(19, RGPIO.OUT)
-        RGPIO.setup(26, RGPIO.OUT)
-        
-        RGPIO.output(19, RGPIO.LOW)
-        RGPIO.output(26, RGPIO.HIGH)
-        RGPIO.output(6, RGPIO.LOW)
-        RGPIO.output(13, RGPIO.HIGH)
+        RGPIO.output(self.r_motor_f, RGPIO.HIGH)
+        RGPIO.output(self.l_motor_f, RGPIO.HIGH)
 
     def d_backward(self):
         RGPIO.cleanup()
