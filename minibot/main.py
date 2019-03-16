@@ -151,6 +151,9 @@ def parse_command(cmd, bot, tcpInstance):
         
         status = str(status).replace("'", "\"")
         tcpInstance.send_to_basestation("BOTSTATUS", status)
+    elif key == "GUN":
+        print("minibot copied fire command")
+        bot.fire()
 
 def process_string(value):
     cmds = value.splitlines()

@@ -106,3 +106,6 @@ class Bot():
  
     def d_right(self):
         self.motors.d_right()
+
+    def b_fire(self):
+        self.motors.fire()

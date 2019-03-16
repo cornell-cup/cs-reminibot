@@ -140,6 +140,12 @@ class ClientHandler(tornado.web.RequestHandler):
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             bot = self.base_station.get_bot(bot_id)
             bot.sendKV("HEAD", str(power))
+        elif key == "GUN":
+            bot_name = data['bot_name']
+            bot_id = self.base_station.bot_name_to_bot_id(bot_name)
+            bot = self.base_station.get_bot(bot_id)
+            print("HERE IN LASER TAG")
+            bot.sendKV("GUN", "0")
         # elif key == "TAIL":
         #     # TODO finish this
         #     bot_name = data['bot_name']
