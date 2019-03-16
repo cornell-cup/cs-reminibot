@@ -154,6 +154,14 @@ def parse_command(cmd, bot, tcpInstance):
     elif key == "GUN":
         print("minibot copied fire command")
         bot.fire()
+    elif key == "AIM":
+        print("minibot copied aim command")
+        # aim left
+        if value == 0:
+            print("aim left")
+        # aim right
+        elif value == 1:
+            print("aim right")
 
 def process_string(value):
     cmds = value.splitlines()

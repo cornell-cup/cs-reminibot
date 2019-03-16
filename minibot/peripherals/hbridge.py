@@ -202,6 +202,7 @@ class HBridge():
         RGPIO.output(26, RGPIO.LOW)
         RGPIO.output(6, RGPIO.LOW)
         RGPIO.output(13, RGPIO.HIGH)
+
     def d_stop(self):
         print("d_stop")
         RGPIO.cleanup()

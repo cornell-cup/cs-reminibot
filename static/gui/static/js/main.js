@@ -1119,6 +1119,25 @@ class AddBotLaser extends React.Component {
         })
     }
 
+    buttonAimListener(value) {
+                const _this = this;
+        axios({
+            method:'POST',
+            url:'/start',
+            data: JSON.stringify({
+                key: "AIM",
+                bot_name: _this.state.selected_bot,
+                power: value,
+            })
+            })
+                .then(function(response) {
+            })
+                .catch(function (error) {
+                    console.log(error);
+        })
+    }
+
+
     getBotStatus() {
         let bot_name = this.state.selected_bot;
         let li = this.state.bot_list;
@@ -1212,6 +1231,8 @@ class AddBotLaser extends React.Component {
                                 <tr>
                                     <td></td>
                                     <td><button className="btn_btn-dir" onClick={() => this.buttonFireListener()}>fire</button></td>
+                                    <td><button className="btn_btn-dir" onClick={() => this.buttonAimListener(0)}>aim_left</button></td>
+                                    <td><button className="btn_btn-dir" onClick={() => this.buttonAimListener(1)}>aim_right</button></td>
                                     <td></td>
                                 </tr>
                             </tbody>
