@@ -158,50 +158,55 @@ class HBridge():
 
         RGPIO.setup(self.l_motor_f, RGPIO.OUT)
         RGPIO.setup(self.r_motor_f, RGPIO.OUT)
+        RGPIO.setup(self.l_motor_b, RGPIO.OUT)
+        RGPIO.setup(self.r_motor_b, RGPIO.OUT)
 
         RGPIO.output(self.r_motor_f, RGPIO.HIGH)
         RGPIO.output(self.l_motor_f, RGPIO.HIGH)
+        RGPIO.output(self.r_motor_b, RGPIO.LOW)
+        RGPIO.output(self.l_motor_b, RGPIO.LOW)
 
     def d_backward(self):
         RGPIO.cleanup()
         RGPIO.setmode(RGPIO.BCM)
 
-        RGPIO.setup(19, RGPIO.OUT)
-        RGPIO.setup(26, RGPIO.OUT)
-        RGPIO.setup(6, RGPIO.OUT)
-        RGPIO.setup(13, RGPIO.OUT)
-            
-        RGPIO.output(6, RGPIO.HIGH)
-        RGPIO.output(13, RGPIO.LOW)
-        RGPIO.output(19, RGPIO.HIGH)
-        RGPIO.output(26, RGPIO.LOW)
+        RGPIO.setup(self.l_motor_f, RGPIO.OUT)
+        RGPIO.setup(self.r_motor_f, RGPIO.OUT)
+        RGPIO.setup(self.l_motor_b, RGPIO.OUT)
+        RGPIO.setup(self.r_motor_b, RGPIO.OUT)
+
+        RGPIO.output(self.r_motor_f, RGPIO.LOW)
+        RGPIO.output(self.l_motor_f, RGPIO.LOW)
+        RGPIO.output(self.r_motor_b, RGPIO.HIGH)
+        RGPIO.output(self.l_motor_b, RGPIO.HIGH)
     
     def d_left(self):
         RGPIO.cleanup()
         RGPIO.setmode(RGPIO.BCM)
-        
-        RGPIO.setup(19, RGPIO.OUT)
-        RGPIO.setup(26, RGPIO.OUT)
-        RGPIO.setup(6, RGPIO.OUT)
-        RGPIO.setup(13, RGPIO.OUT)
 
-        RGPIO.output(19, RGPIO.LOW)
-        RGPIO.output(26, RGPIO.HIGH)
-        RGPIO.output(6, RGPIO.HIGH)
-        RGPIO.output(13, RGPIO.LOW)
+        RGPIO.setup(self.l_motor_f, RGPIO.OUT)
+        RGPIO.setup(self.r_motor_f, RGPIO.OUT)
+        RGPIO.setup(self.l_motor_b, RGPIO.OUT)
+        RGPIO.setup(self.r_motor_b, RGPIO.OUT)
+
+        RGPIO.output(self.r_motor_f, RGPIO.HIGH)
+        RGPIO.output(self.l_motor_b, RGPIO.HIGH)
+        RGPIO.output(self.l_motor_f, RGPIO.LOW)
+        RGPIO.output(self.r_motor_b, RGPIO.LOW)
 
     def d_right(self):
         RGPIO.cleanup()
         RGPIO.setmode(RGPIO.BCM)
-        RGPIO.setup(19, RGPIO.OUT)
-        RGPIO.setup(26, RGPIO.OUT)
-        RGPIO.setup(6, RGPIO.OUT)
-        RGPIO.setup(13, RGPIO.OUT)
 
-        RGPIO.output(19, RGPIO.HIGH)
-        RGPIO.output(26, RGPIO.LOW)
-        RGPIO.output(6, RGPIO.LOW)
-        RGPIO.output(13, RGPIO.HIGH)
+        RGPIO.setup(self.l_motor_f, RGPIO.OUT)
+        RGPIO.setup(self.r_motor_f, RGPIO.OUT)
+        RGPIO.setup(self.l_motor_b, RGPIO.OUT)
+        RGPIO.setup(self.r_motor_b, RGPIO.OUT)
+
+        RGPIO.output(self.r_motor_f, RGPIO.LOW)
+        RGPIO.output(self.l_motor_b, RGPIO.LOW)
+        RGPIO.output(self.l_motor_f, RGPIO.HIGH)
+        RGPIO.output(self.r_motor_b, RGPIO.HIGH)
 
     def d_stop(self):
         print("d_stop")
