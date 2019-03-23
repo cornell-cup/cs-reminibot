@@ -6,45 +6,7 @@ Minibot H-Bridge.
 """
 
 class HBridge():
-    ### Trigger and firing ###
-    # trigger
-    p_trigger = 19
-    trigger_reset_time = 0.25
-    trigger_check_time = 0.015
-    # IR emitter LED + laser
-    p_emitter = 23
-    emitter_freq = 36000
-    emitter_duration = 0.25
-    emitter_duty_cycle = 50
 
-    ### Hit detection and lives ###
-    # IR receivers
-    p_detection = 24
-    # hit display LEDs and piezo
-    p_hit = 26
-    hit_immunity_time = 1
-    hit_feedback_duration = 0.75
-    hit_check_time = 0.005
-    # life display LEDs
-    p_life = (16, 20, 21)
-    max_lives = 3
-
-    ### Feedback buzzer ###
-    p_buzzer = 4
-
-    ### Feedback vibrator ###
-    p_vibrator = 17
-
-    ### Reset and game controls ###
-    # reset button
-    p_reset = 13
-
-    ### Laser tag motors
-    l_motor_f = 27
-    l_motor_b = 25
-
-    r_motot_f = 6
-    r_motor_b = 12
 
     """
     Minibot H-Bridge class.
@@ -78,6 +40,47 @@ class HBridge():
 
         # for laser
         self.pwm_emitter = None
+
+        ### Trigger and firing ###
+        # trigger
+        self.p_trigger = 19
+        self.trigger_reset_time = 0.25
+        self.trigger_check_time = 0.015
+        # IR emitter LED + laser
+        self.p_emitter = 23
+        self.emitter_freq = 36000
+        self.emitter_duration = 0.25
+        self.emitter_duty_cycle = 50
+
+        ### Hit detection and lives ###
+        # IR receivers
+        self.p_detection = 24
+        # hit display LEDs and piezo
+        self.p_hit = 26
+        self.hit_immunity_time = 1
+        self.hit_feedback_duration = 0.75
+        self.hit_check_time = 0.005
+        # life display LEDs
+        self.p_life = (16, 20, 21)
+        self.max_lives = 3
+
+        ### Feedback buzzer ###
+        self.p_buzzer = 4
+
+        ### Feedback vibrator ###
+        self.p_vibrator = 17
+
+        ### Reset and game controls ###
+        # reset button
+        self.p_reset = 13
+
+        ### Laser tag motors
+        self.l_motor_f = 27
+        self.l_motor_b = 25
+
+        self.r_motot_f = 6
+        self.r_motor_b = 12
+
 
     def get_speed(self):
         """
