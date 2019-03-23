@@ -109,3 +109,9 @@ class Bot():
 
     def b_fire(self):
         self.motors.fire()
+
+    def l_aim(self):
+        self.motors.aim_left()
+
+    def r_aim(self):
+        self.motors.aim_right()

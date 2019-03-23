@@ -158,10 +158,10 @@ def parse_command(cmd, bot, tcpInstance):
         print("minibot copied aim command")
         # aim left
         if value == 0:
-            print("aim left")
+            bot.l_aim()
         # aim right
         elif value == 1:
-            print("aim right")
+            bot.r_aim()
 
 def process_string(value):
     cmds = value.splitlines()

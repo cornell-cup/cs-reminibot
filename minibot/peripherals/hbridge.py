@@ -420,3 +420,9 @@ class HBridge():
                 time.sleep(self.trigger_reset_time)
             else:
                 time.sleep(self.trigger_check_time)
+
+    def aim_left(self):
+        RGPIO.set(4, RGPIO.out)
+
+    def aim_right(self):
+        print('aim right')
