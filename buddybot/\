@@ -1,0 +1,34 @@
+import RPi.GPIO as RGPIO
+import time
+
+class Drive:
+    def __init__():
+        RGPIO.setmode(RGPIO.BCM)
+        RGPIO.setwarnings(False)
+
+        l_motor_f =27
+        r_motor_f=6
+        l_motor_b=25 # not working
+        r_motor_b=12
+
+        RGPIO.setup(l_motor_f, RGPIO.OUT)
+        RGPIO.setup(l_motor_b, RGPIO.OUT)
+        RGPIO.setup(r_motor_f, RGPIO.OUT)
+        RGPIO.setup(r_motor_b, RGPIO.OUT)
+    
+    def left(drive_time):
+        start_time = time.time()
+        while time.time() - start_time < drive_time:
+		RGPIO.output(l_motor_f, RGPIO.LOW)
+		RGPIO.output(l_motor_b, RGPIO.HIGH)
+		RGPIO.output(r_motor_f, RGPIO.HIGH)
+		RGPIO.output(r_motor_b, RGPIO.LOW)
+
+    def right(drive_time):
+        start_time = time.time()
+        while time.time() - start_time < drive_time:
+		RGPIO.output(l_motor_f, RGPIO.HIGH)
+		RGPIO.output(l_motor_b, RGPIO.LOW)
+		RGPIO.output(r_motor_f, RGPIO.LOW)
+		RGPIO.output(r_motor_b, RGPIO.HIGH)
+
