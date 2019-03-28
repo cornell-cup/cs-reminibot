@@ -1,6 +1,7 @@
-from flask import Flask
+from flask import Flask, render_template, Response, request
 from drive import Drive
 app = Flask(__name__)
+dr = Drive()
 
 @app.route("/move", methods=["POST"])
 def move():
@@ -9,9 +10,11 @@ def move():
     # drive_time = content['drive_time']
     drive_time = 1 # delete this after we add drive_time field to app post request
     if direction == 'forward':
-	Drive.forward(drive_time)
+        dr.forward()
     elif direction == 'backward':
-	Drive.backward(drive_time)
+        dr.backward(drive_time)
+    elif direction == 'stop':
+        dr.stop()
 	
     print(direction)
     return direction
