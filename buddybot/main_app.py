@@ -15,7 +15,7 @@ def move():
         dr.backward(drive_time)
     elif direction == 'stop':
         dr.stop()
-	
+
     print(direction)
     return direction
 

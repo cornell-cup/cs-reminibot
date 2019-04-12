@@ -16,7 +16,7 @@ class Drive:
         RGPIO.setup(self.r_motor_f, RGPIO.OUT)
         RGPIO.setup(self.r_motor_b, RGPIO.OUT)
         self.stop()
-    
+
     def left(self, drive_time):
         start_time = time.time()
         while time.time() - start_time < drive_time:
