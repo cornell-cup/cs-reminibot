@@ -15,25 +15,18 @@ class Drive:
         RGPIO.setup(self.l_motor_b, RGPIO.OUT)
         RGPIO.setup(self.r_motor_f, RGPIO.OUT)
         RGPIO.setup(self.r_motor_b, RGPIO.OUT)
-        self.stop()
 
-    def left(self, drive_time):
-        start_time = time.time()
-        while time.time() - start_time < drive_time:
-                RGPIO.output(self.l_motor_f, RGPIO.LOW)
-                RGPIO.output(self.l_motor_b, RGPIO.HIGH)
-                RGPIO.output(self.r_motor_f, RGPIO.HIGH)
-                RGPIO.output(self.r_motor_b, RGPIO.LOW)
-        self.stop()
+    def left(self):
+        RGPIO.output(self.l_motor_f, RGPIO.LOW)
+        RGPIO.output(self.l_motor_b, RGPIO.HIGH)
+        RGPIO.output(self.r_motor_f, RGPIO.HIGH)
+        RGPIO.output(self.r_motor_b, RGPIO.LOW)
 
-    def right(self, drive_time):
-        start_time = time.time()
-        while time.time() - start_time < drive_time:
-                RGPIO.output(self.l_motor_f, RGPIO.HIGH)
-                RGPIO.output(self.l_motor_b, RGPIO.LOW)
-                RGPIO.output(self.r_motor_f, RGPIO.LOW)
-                RGPIO.output(self.r_motor_b, RGPIO.HIGH)
-        self.stop()
+    def right(self):
+        RGPIO.output(self.l_motor_f, RGPIO.HIGH)
+        RGPIO.output(self.l_motor_b, RGPIO.LOW)
+        RGPIO.output(self.r_motor_f, RGPIO.LOW)
+        RGPIO.output(self.r_motor_b, RGPIO.HIGH)
 
     def forward(self):
         RGPIO.output(self.l_motor_f, RGPIO.HIGH)
@@ -41,14 +34,11 @@ class Drive:
         RGPIO.output(self.r_motor_f, RGPIO.HIGH)
         RGPIO.output(self.r_motor_b, RGPIO.LOW)
 
-    def backward(self, drive_time):
-        start_time = time.time()
-        while time.time() - start_time < drive_time:
-                RGPIO.output(self.l_motor_f, RGPIO.LOW)
-                RGPIO.output(self.l_motor_b, RGPIO.HIGH)
-                RGPIO.output(self.r_motor_f, RGPIO.LOW)
-                RGPIO.output(self.r_motor_b, RGPIO.HIGH)
-        self.stop()
+    def backward(self):
+        RGPIO.output(self.l_motor_f, RGPIO.LOW)
+        RGPIO.output(self.l_motor_b, RGPIO.HIGH)
+        RGPIO.output(self.r_motor_f, RGPIO.LOW)
+        RGPIO.output(self.r_motor_b, RGPIO.HIGH)
 
     def stop(self):
         RGPIO.output(self.l_motor_f, RGPIO.LOW)
