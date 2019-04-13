@@ -452,6 +452,7 @@ class HBridge():
         self.servop.ChangeDutyCycle(7.2)
         time.sleep(.1)
         self.servop.ChangeDutyCycle(0)
+        self.servop = None
 
     def aim_right(self):
         print('aim right')
@@ -468,6 +469,7 @@ class HBridge():
         self.servop.ChangeDutyCycle(1.8)
         time.sleep(.1)
         self.servop.ChangeDutyCycle(0)
+        self.servop = None
 
     def aim_straight(self):
         print("aim straight")
@@ -480,3 +482,4 @@ class HBridge():
         self.servop.ChangeDutyCycle(4.5)
         time.sleep(.1)
         self.servop.ChangeDutyCycle(0)
+        self.servop = None

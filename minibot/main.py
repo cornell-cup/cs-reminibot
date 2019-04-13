@@ -157,15 +157,15 @@ def parse_command(cmd, bot, tcpInstance):
     elif key == "AIM":
         print("minibot copied aim command")
         # aim left
-        if value == 0:
+        if value == "0":
             bot.l_aim()
         # aim right
-        elif value == 1:
+        elif value == "1":
             bot.r_aim()
-        elif value == 2:
+        elif value == "2":
             print("stop fire")
             bot.stop_fire()
-        elif value == 3:
+        elif value == "3":
             print("aim straight")
             bot.s_aim()
 
