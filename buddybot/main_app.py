@@ -11,15 +11,23 @@ def move():
     direction = content['direction']
     if direction == 'forward':
         dr.forward()
-        print("forward")
+        print('forward')
         update_response('forward')
     elif direction == 'backward':
         dr.backward()
-        print("backward")
+        print('backward')
         update_response('backward')
+    elif direction == 'left':
+        dr.left()
+        print('left')
+        update_response('left')
+    elif direction == 'right':
+        dr.right()
+        print('right')
+        update_response('right')
     elif direction == 'stop':
         dr.stop()
-        print("stop")
+        print('stop')
         update_response('stop')
 
     return direction
