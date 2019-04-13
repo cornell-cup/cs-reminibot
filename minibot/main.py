@@ -162,6 +162,8 @@ def parse_command(cmd, bot, tcpInstance):
         # aim right
         elif value == 1:
             bot.r_aim()
+        elif value == 2:
+            print("stop fire")
 
 def process_string(value):
     cmds = value.splitlines()

@@ -78,7 +78,7 @@ class HBridge():
         self.l_motor_f = 27
         self.l_motor_b = 25
 
-        self.r_motot_f = 6
+        self.r_motor_f = 6
         self.r_motor_b = 12
 
 
@@ -418,16 +418,22 @@ class HBridge():
     def isTrigger(self):
         return RGPIO.input(self.p_trigger)
 
+    def stop_fire(self):
+        raise ValueError('stop fire')
+
     def fire(self):
         print('fire   : starting')
-        while True:
-            if self.isTrigger():
-                print('fire   : firing')
-                self.pwm_emitter.start(self.emitter_duty_cycle)
-                Thread.Timer(self.emitter_duration, self.pwm_emitter.stop).start()
-                time.sleep(self.trigger_reset_time)
-            else:
-                time.sleep(self.trigger_check_time)
+        try:
+            while True:
+                if self.isTrigger():
+                    print('fire   : firing')
+                    self.pwm_emitter.start(self.emitter_duty_cycle)
+                    Thread.Timer(self.emitter_duration, self.pwm_emitter.stop).start()
+                    time.sleep(self.trigger_reset_time)
+                else:
+                    time.sleep(self.trigger_check_time)
+        except ValueError:
+            RGPIO.cleanup()
 
     def aim_left(self):
         RGPIO.set(4, RGPIO.out)
