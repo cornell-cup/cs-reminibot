@@ -115,3 +115,9 @@ class Bot():
 
     def r_aim(self):
         self.motors.aim_right()
+
+    def s_aim(self):
+        self.motors.aim_straight()
+
+    def stop_fire(self):
+        self.motors.stop_fire()

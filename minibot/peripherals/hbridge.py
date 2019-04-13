@@ -81,6 +81,8 @@ class HBridge():
         self.r_motor_f = 6
         self.r_motor_b = 12
 
+        self.servop = None
+
 
     def get_speed(self):
         """
@@ -436,7 +438,45 @@ class HBridge():
             RGPIO.cleanup()
 
     def aim_left(self):
-        RGPIO.set(4, RGPIO.out)
+        print('aim left')
+        RGPIO.cleanup()
+        RGPIO.setmode(RGPIO.BCM)
+        RGPIO.setup(4, RGPIO.OUT)
+        self.servop = RGPIO.PWM(4, 50)
+        self.servop.start(7.2)
+
+        self.servop.ChangeDutyCycle(4.5)
+        time.sleep(.1)
+        self.servop.ChangeDutyCycle(0)
+
+        self.servop.ChangeDutyCycle(7.2)
+        time.sleep(.1)
+        self.servop.ChangeDutyCycle(0)
 
     def aim_right(self):
         print('aim right')
+        RGPIO.cleanup()
+        RGPIO.setmode(RGPIO.BCM)
+        RGPIO.setup(4, RGPIO.OUT)
+        self.servop = RGPIO.PWM(4, 50)
+        self.servop.start(7.2)
+
+        self.servop.ChangeDutyCycle(4.5)
+        time.sleep(.1)
+        self.servop.ChangeDutyCycle(0)
+
+        self.servop.ChangeDutyCycle(1.8)
+        time.sleep(.1)
+        self.servop.ChangeDutyCycle(0)
+
+    def aim_straight(self):
+        print("aim straight")
+        RGPIO.cleanup()
+        RGPIO.setmode(RGPIO.BCM)
+        RGPIO.setup(4, RGPIO.OUT)
+        self.servop = RGPIO.PWM(4, 50)
+        self.servop.start(7.2)
+
+        self.servop.ChangeDutyCycle(4.5)
+        time.sleep(.1)
+        self.servop.ChangeDutyCycle(0)
