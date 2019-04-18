@@ -6,6 +6,7 @@ import GridView from './components/gridview.js';
 import Blockly from './components/blockly.js';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 
+
 /**
  * Component for the Navbar on top
  * Currently this does nothing except display some text and an image
@@ -497,6 +498,10 @@ class AddBot extends React.Component {
 
     }
 
+    renderRedirect() {
+        window.location = 'http://192.168.4.65:8080';
+    }
+
     render() {
         var styles = {
             Select: {
@@ -549,6 +554,11 @@ class AddBot extends React.Component {
                     Movement:
                     <table>
                         <tbody>
+                        <tr>
+                            <td></td>
+                            <td><button className="btn_btn-dir" onClick={() => this.renderRedirect()}>stream</button></td>
+                            <td></td>
+                        </tr>
                         <tr>
                             <td></td>
                             <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("forward")}>forward</button></td>
