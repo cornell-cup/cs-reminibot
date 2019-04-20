@@ -153,7 +153,7 @@ def parse_command(cmd, bot, tcpInstance):
         tcpInstance.send_to_basestation("BOTSTATUS", status)
     elif key == "GUN":
         print("minibot copied fire command")
-        bot.fire()
+        bot.b_fire()
     elif key == "AIM":
         print("minibot copied aim command")
         # aim left
