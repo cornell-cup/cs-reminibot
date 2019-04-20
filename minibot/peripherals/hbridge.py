@@ -39,7 +39,7 @@ class HBridge():
         right_pwm.set_frequency(100)
 
         # for laser
-        self.pwm_emitter = RGPIO.PWM(self.p_emitter, self.emitter_freq)
+        self.pwm_emitter = None
 
         ### Trigger and firing ###
         # trigger
@@ -423,9 +423,11 @@ class HBridge():
     def fire(self):
         print('fire   : starting')
         print('fire   : firing')
+        self.pwm_emitter = RGPIO.PWM(self.p_emitter, self.emitter_freq)
         self.pwm_emitter.start(self.emitter_duty_cycle)
         Thread.Timer(self.emitter_duration, self.pwm_emitter.stop).start()
         time.sleep(self.trigger_reset_time)
+        self.pwm_emitter = None
 
     def aim_left(self):
         print('aim left')
