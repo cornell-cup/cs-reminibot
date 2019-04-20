@@ -39,7 +39,7 @@ class HBridge():
         right_pwm.set_frequency(100)
 
         # for laser
-        self.pwm_emitter = None
+        self.pwm_emitter = RGPIO.PWM(self.p_emitter, self.emitter_freq)
 
         ### Trigger and firing ###
         # trigger
