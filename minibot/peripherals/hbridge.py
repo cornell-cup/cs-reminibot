@@ -421,8 +421,9 @@ class HBridge():
         raise ValueError('stop fire')
 
     def fire(self):
-        print('fire   : starting')
-        print('fire   : firing')
+        RGPIO.cleanup()
+        RGPIO.setmode(RGPIO.BCM)
+        RGPIO.setup(self.p_emitter, RGPIO.OUT)
         self.pwm_emitter = RGPIO.PWM(self.p_emitter, self.emitter_freq)
         self.pwm_emitter.start(self.emitter_duty_cycle)
         Thread.Timer(self.emitter_duration, self.pwm_emitter.stop).start()
