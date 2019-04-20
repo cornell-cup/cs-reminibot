@@ -417,25 +417,15 @@ class HBridge():
             print("flap down")
             time.sleep(1)
 
-    def isTrigger(self):
-        return RGPIO.input(self.p_trigger)
-
     def stop_fire(self):
         raise ValueError('stop fire')
 
     def fire(self):
         print('fire   : starting')
-        try:
-            while True:
-                if self.isTrigger():
-                    print('fire   : firing')
-                    self.pwm_emitter.start(self.emitter_duty_cycle)
-                    Thread.Timer(self.emitter_duration, self.pwm_emitter.stop).start()
-                    time.sleep(self.trigger_reset_time)
-                else:
-                    time.sleep(self.trigger_check_time)
-        except ValueError:
-            RGPIO.cleanup()
+        print('fire   : firing')
+        self.pwm_emitter.start(self.emitter_duty_cycle)
+        Thread.Timer(self.emitter_duration, self.pwm_emitter.stop).start()
+        time.sleep(self.trigger_reset_time)
 
     def aim_left(self):
         print('aim left')
