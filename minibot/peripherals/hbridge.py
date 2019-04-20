@@ -1,6 +1,6 @@
 from minibot.hardware.rpi.gpio import DigitalInput, DigitalOutput, PWM, RGPIO
 import time
-from threading import Thread
+import threading
 """
 Minibot H-Bridge.
 """
@@ -426,7 +426,7 @@ class HBridge():
         RGPIO.setup(self.p_emitter, RGPIO.OUT)
         self.pwm_emitter = RGPIO.PWM(self.p_emitter, self.emitter_freq)
         self.pwm_emitter.start(self.emitter_duty_cycle)
-        Thread.Timer(self.emitter_duration, self.pwm_emitter.stop).start()
+        threading.Timer(self.emitter_duration, self.pwm_emitter.stop).start()
         time.sleep(self.trigger_reset_time)
         self.pwm_emitter = None
 
