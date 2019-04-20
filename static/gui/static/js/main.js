@@ -345,7 +345,8 @@ class AddBot extends React.Component {
             bot_name: "",
             bot_list: [],
             selected_bot: "",
-            power: 50
+            power: 50,
+            input_ip: "192.168.4.65"
         };
 
         this.updateInputValue = this.updateInputValue.bind(this);
@@ -499,7 +500,11 @@ class AddBot extends React.Component {
     }
 
     renderRedirect() {
-        window.location = 'http://192.168.4.65:8080';
+        window.open('http://' + this.state.input_ip + ':8080');
+    }
+
+    handleChange(event) {
+        this.setState({input_ip: event.target.value});
     }
 
     render() {
@@ -550,15 +555,26 @@ class AddBot extends React.Component {
                         </tr>
                     </tbody>
                 </table>
+                Camera Stream:
+                <table>
+                    <tbody>
+                        <tr>
+                            <td>
+                            <form>
+                                <label>
+                                    Camera IP:
+                                    <input type="text" name="bot_ip" onChange={evt => this.handleChange(evt)}/>
+                                </label>
+                            </form>
+                            </td>
+                            <td><button style={styles.Button} onClick={() => this.renderRedirect()}>stream</button></td>
+                        </tr>
+                    </tbody>
+                </table>
                 <div className = "newDiv">
                     Movement:
                     <table>
                         <tbody>
-                        <tr>
-                            <td></td>
-                            <td><button className="btn_btn-dir" onClick={() => this.renderRedirect()}>stream</button></td>
-                            <td></td>
-                        </tr>
                         <tr>
                             <td></td>
                             <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("forward")}>forward</button></td>
