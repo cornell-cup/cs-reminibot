@@ -143,18 +143,19 @@ class HBridge():
             print("up")
 
     def h_nod(self):
-        RGPIO.cleanup()
-        RGPIO.setmode(RGPIO.BCM)
-        RGPIO.setup(23, RGPIO.OUT)
-        self.hNod = RGPIO.PWM(23, 50)
-        self.hNod.start(8.5)
-        while True:
-            self.hNod.ChangeDutyCycle(12.5)
-            time.sleep(1)
-            print("down")
-            self.hNod.ChangeDutyCycle(8.5)
-            time.sleep(1)
-            print("up")
+        print("dragon nod, deprecated")
+        # RGPIO.cleanup()
+        # RGPIO.setmode(RGPIO.BCM)
+        # RGPIO.setup(23, RGPIO.OUT)
+        # self.hNod = RGPIO.PWM(23, 50)
+        # self.hNod.start(8.5)
+        # while True:
+        #     self.hNod.ChangeDutyCycle(12.5)
+        #     time.sleep(1)
+        #     print("down")
+        #     self.hNod.ChangeDutyCycle(8.5)
+        #     time.sleep(1)
+        #     print("up")
 
     def d_forward(self):
         print("d_forward")
@@ -218,15 +219,15 @@ class HBridge():
         RGPIO.cleanup()
         RGPIO.setmode(RGPIO.BCM)
 
-        RGPIO.setup(6, RGPIO.OUT)
-        RGPIO.setup(13, RGPIO.OUT)
-        RGPIO.setup(19, RGPIO.OUT)
-        RGPIO.setup(26, RGPIO.OUT)
+        RGPIO.setup(self.l_motor_f, RGPIO.OUT)
+        RGPIO.setup(self.l_motor_b, RGPIO.OUT)
+        RGPIO.setup(self.r_motor_f, RGPIO.OUT)
+        RGPIO.setup(self.r_motor_b, RGPIO.OUT)
             
-        RGPIO.output(6, RGPIO.LOW)
-        RGPIO.output(13, RGPIO.LOW)
-        RGPIO.output(19, RGPIO.LOW)
-        RGPIO.output(26, RGPIO.LOW)
+        RGPIO.output(self.l_motor_f, RGPIO.LOW)
+        RGPIO.output(self.l_motor_b, RGPIO.LOW)
+        RGPIO.output(self.r_motor_f, RGPIO.LOW)
+        RGPIO.output(self.r_motor_b, RGPIO.LOW)
 
     def push_up(self):
         RGPIO.cleanup()
@@ -421,13 +422,14 @@ class HBridge():
         raise ValueError('stop fire')
 
     def fire(self):
+        print("BEFORE FIRING")
         RGPIO.cleanup()
         RGPIO.setmode(RGPIO.BCM)
         RGPIO.setup(self.p_emitter, RGPIO.OUT)
         self.pwm_emitter = RGPIO.PWM(self.p_emitter, self.emitter_freq)
         self.pwm_emitter.start(self.emitter_duty_cycle)
         threading.Timer(self.emitter_duration, self.pwm_emitter.stop).start()
-        time.sleep(self.trigger_reset_time)
+        # time.sleep(self.trigger_reset_time)
         self.pwm_emitter = None
 
     def aim_left(self):
