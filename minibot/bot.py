@@ -34,7 +34,8 @@ class Bot():
             self.sensors[name] = ColorSensor(self, name, pin)
 
     def stop(self):
-        self.motors.set_speed(0, 0)
+        # self.motors.set_speed(0, 0)
+        self.motors.stop()
 
     def move_forward(self, power):
         self.motors.set_speed(power, power)
@@ -61,4 +62,62 @@ class Bot():
             data[name] = sensor.get_color_name()
         return data
 
+    def both_wings_flap_and_extend(self):
+        self.motors.both_wings()
 
+    def left_wing(self):
+        self.motors.left_wing()
+
+    def left_extend(self):
+        self.motors.left_extend()
+
+    def left_flap(self):
+        self.motors.left_flap()
+
+    def right_wing(self):
+        self.motors.right_wing()
+
+    def right_extend(self):
+        self.motors.right_extend()
+
+    def right_flap(self):
+        self.motors.right_flap()
+
+    def push_up(self):
+        self.motors.push_up()
+
+    def head_nod(self):
+        self.motors.h_nod()
+
+    def head_turn(self):
+        self.motors.h_turn()
+
+    def d_forward(self):
+        self.motors.d_forward()
+
+    def d_backward(self):
+        self.motors.d_backward()
+
+    def d_stop(self):
+        self.motors.d_stop()
+
+    def d_left(self):
+        self.motors.d_left()
+ 
+    def d_right(self):
+        self.motors.d_right()
+
+    def b_fire(self):
+        self.motors.fire()
+
+    def l_aim(self):
+        self.motors.aim_left()
+
+    def r_aim(self):
+        self.motors.aim_right()
+
+    def s_aim(self):
+        self.motors.aim_straight()
+
+    def stop_fire(self):
+        self.motors.stop_fire()
