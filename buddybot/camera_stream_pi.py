@@ -10,7 +10,7 @@ def send_file():
 	#content = request.json
 	#file = content["file"]
         my_file = "pic.jpg"
-	return send_from_directory("/home/pi/tmp/stream", my_file)
+        return send_from_directory("/home/pi/tmp/stream", my_file)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0')

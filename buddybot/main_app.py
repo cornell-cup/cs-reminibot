@@ -1,5 +1,6 @@
-from flask import Flask, render_template, Response, request
+from flask import Flask, render_template, Response, request, send_from_directory
 from drive import Drive
+import subprocess
 import threading
 import time
 app = Flask(__name__)
@@ -33,6 +34,16 @@ def move():
     return direction
 
 
+@app.route('/take_pic', methods=['POST'])
+def take_pic():
+    return "Success"
+
+@app.route('/img', methods=['POST'])
+def send_file():
+    subprocess.call(["raspistill", "-t", "100", "-w", "640", "-h", "480", "-n", "-q", "5", "-o", "/home/pi/tmp/stream/pic.jpg", "-rot", "180"])
+    my_file = "pic.jpg"
+    return send_from_directory("/home/pi/tmp/stream", my_file)
+
 
 lock = threading.Lock()    
 response_str = 'stop'
@@ -65,4 +76,4 @@ def reset():
 if __name__ == '__main__':
     reset_thread = threading.Thread(target=reset)
     reset_thread.start()
-    app.run(host = '0.0.0.0')
+    app.run(host = '0.0.0.0', threaded=True)
