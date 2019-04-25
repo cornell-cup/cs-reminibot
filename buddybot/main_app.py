@@ -12,7 +12,7 @@ dr = Drive()
 
 @app.route('/check', methods=['GET'])
 def check():
-    """Verification method for the GUI app to ensure user have entered a valid IP"""
+    """Verification method for the GUI app to ensure user have entered a valid IP for the bot"""
     return "OK!"
 
 
