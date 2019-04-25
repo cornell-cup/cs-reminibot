@@ -1,8 +1,13 @@
+from minibot.hardware.rpi.gpio import DigitalInput, DigitalOutput, PWM, RGPIO
+import time
+import threading
 """
 Minibot H-Bridge.
 """
 
 class HBridge():
+
+
     """
     Minibot H-Bridge class.
     """
@@ -20,17 +25,70 @@ class HBridge():
         self.right_pin = right_pin
         self.right_pwm = right_pwm
 
+        self.lExtend = None
+        self.lFlap = None
+        self.rExtend = None
+        self.rFlap = None
+        self.hNod = None
+        self.hTurn = None
+
         self.left_speed = 0
         self.right_speed = 0
 
         left_pwm.set_frequency(100)
         right_pwm.set_frequency(100)
 
+        # for laser
+        self.pwm_emitter = None
+
+        ### Trigger and firing ###
+        # trigger
+        self.p_trigger = 19
+        self.trigger_reset_time = 0.25
+        self.trigger_check_time = 0.015
+        # IR emitter LED + laser
+        self.p_emitter = 23
+        self.emitter_freq = 36000
+        self.emitter_duration = 0.25
+        self.emitter_duty_cycle = 50
+
+        ### Hit detection and lives ###
+        # IR receivers
+        self.p_detection = 24
+        # hit display LEDs and piezo
+        self.p_hit = 26
+        self.hit_immunity_time = 1
+        self.hit_feedback_duration = 0.75
+        self.hit_check_time = 0.005
+        # life display LEDs
+        self.p_life = (16, 20, 21)
+        self.max_lives = 3
+
+        ### Feedback buzzer ###
+        self.p_buzzer = 4
+
+        ### Feedback vibrator ###
+        self.p_vibrator = 17
+
+        ### Reset and game controls ###
+        # reset button
+        self.p_reset = 13
+
+        ### Laser tag motors
+        self.l_motor_f = 27
+        self.l_motor_b = 25
+
+        self.r_motor_f = 6
+        self.r_motor_b = 12
+
+        self.servop = None
+
+
     def get_speed(self):
         """
         Returns the (left speed, right speed) tuple
         """
-        return (self.left_speed, self.right_speed)
+        return self.left_speed, self.right_speed
 
     def set_speed(self, left, right):
         """
@@ -60,3 +118,175 @@ class HBridge():
             self.right_pin.set_low()
             self.right_pwm.set_duty_cycle(1-abs(right))
 
+    def stop(self):
+        #self.set_speed(0, 0)
+        try:
+            self.lExtend.stop()
+            self.lFlap.stop()
+            self.rFlap.stop()
+            self.rExtend.stop()
+        except:
+            print("[ERROR] Not in dragon mode")
+
+    def h_turn(self):
+        print("dragon: deprecated")
+
+    def h_nod(self):
+        print("dragon: deprecated")
+
+    def d_forward(self):
+        print("d_forward")
+        RGPIO.cleanup()
+        RGPIO.setmode(RGPIO.BCM)
+
+        RGPIO.setup(self.l_motor_f, RGPIO.OUT)
+        RGPIO.setup(self.r_motor_f, RGPIO.OUT)
+        RGPIO.setup(self.l_motor_b, RGPIO.OUT)
+        RGPIO.setup(self.r_motor_b, RGPIO.OUT)
+
+        RGPIO.output(self.r_motor_f, RGPIO.HIGH)
+        RGPIO.output(self.l_motor_f, RGPIO.HIGH)
+        RGPIO.output(self.r_motor_b, RGPIO.LOW)
+        RGPIO.output(self.l_motor_b, RGPIO.LOW)
+
+    def d_backward(self):
+        RGPIO.cleanup()
+        RGPIO.setmode(RGPIO.BCM)
+
+        RGPIO.setup(self.l_motor_f, RGPIO.OUT)
+        RGPIO.setup(self.r_motor_f, RGPIO.OUT)
+        RGPIO.setup(self.l_motor_b, RGPIO.OUT)
+        RGPIO.setup(self.r_motor_b, RGPIO.OUT)
+
+        RGPIO.output(self.r_motor_f, RGPIO.LOW)
+        RGPIO.output(self.l_motor_f, RGPIO.LOW)
+        RGPIO.output(self.r_motor_b, RGPIO.HIGH)
+        RGPIO.output(self.l_motor_b, RGPIO.HIGH)
+    
+    def d_left(self):
+        RGPIO.cleanup()
+        RGPIO.setmode(RGPIO.BCM)
+
+        RGPIO.setup(self.l_motor_f, RGPIO.OUT)
+        RGPIO.setup(self.r_motor_f, RGPIO.OUT)
+        RGPIO.setup(self.l_motor_b, RGPIO.OUT)
+        RGPIO.setup(self.r_motor_b, RGPIO.OUT)
+
+        RGPIO.output(self.r_motor_f, RGPIO.HIGH)
+        RGPIO.output(self.l_motor_b, RGPIO.HIGH)
+        RGPIO.output(self.l_motor_f, RGPIO.LOW)
+        RGPIO.output(self.r_motor_b, RGPIO.LOW)
+
+    def d_right(self):
+        RGPIO.cleanup()
+        RGPIO.setmode(RGPIO.BCM)
+
+        RGPIO.setup(self.l_motor_f, RGPIO.OUT)
+        RGPIO.setup(self.r_motor_f, RGPIO.OUT)
+        RGPIO.setup(self.l_motor_b, RGPIO.OUT)
+        RGPIO.setup(self.r_motor_b, RGPIO.OUT)
+
+        RGPIO.output(self.r_motor_f, RGPIO.LOW)
+        RGPIO.output(self.l_motor_b, RGPIO.LOW)
+        RGPIO.output(self.l_motor_f, RGPIO.HIGH)
+        RGPIO.output(self.r_motor_b, RGPIO.HIGH)
+
+    def d_stop(self):
+        print("d_stop")
+        RGPIO.cleanup()
+        RGPIO.setmode(RGPIO.BCM)
+
+        RGPIO.setup(self.l_motor_f, RGPIO.OUT)
+        RGPIO.setup(self.l_motor_b, RGPIO.OUT)
+        RGPIO.setup(self.r_motor_f, RGPIO.OUT)
+        RGPIO.setup(self.r_motor_b, RGPIO.OUT)
+            
+        RGPIO.output(self.l_motor_f, RGPIO.LOW)
+        RGPIO.output(self.l_motor_b, RGPIO.LOW)
+        RGPIO.output(self.r_motor_f, RGPIO.LOW)
+        RGPIO.output(self.r_motor_b, RGPIO.LOW)
+
+    def push_up(self):
+        print("dragon: deprecated")
+
+    def both_wings(self):
+        print("dragon: deprecated")
+
+    def left_extend(self):
+        print("dragon: deprecated")
+
+    def left_flap(self):
+        print("dragon: deprecated")
+
+    def left_wing(self):
+        print("dragon: deprecated")
+
+    def right_extend(self):
+        print("dragon: deprecated")
+
+    def right_flap(self):
+        print("dragon: deprecated")
+
+    def right_wing(self):
+        print("dragon: deprecated")
+
+    def stop_fire(self):
+        print("TODO: get rid of this button!!!")
+
+    def fire(self):
+        print("BEFORE FIRING")
+        RGPIO.cleanup()
+        RGPIO.setmode(RGPIO.BCM)
+        RGPIO.setup(self.p_emitter, RGPIO.OUT)
+        self.pwm_emitter = RGPIO.PWM(self.p_emitter, self.emitter_freq)
+        self.pwm_emitter.start(self.emitter_duty_cycle)
+        threading.Timer(self.emitter_duration, self.pwm_emitter.stop).start()
+        # time.sleep(self.trigger_reset_time)
+        self.pwm_emitter = None
+
+    def aim_left(self):
+        print('aim left')
+        RGPIO.cleanup()
+        RGPIO.setmode(RGPIO.BCM)
+        RGPIO.setup(4, RGPIO.OUT)
+        self.servop = RGPIO.PWM(4, 50)
+        self.servop.start(7.2)
+
+        self.servop.ChangeDutyCycle(4.5)
+        time.sleep(.1)
+        self.servop.ChangeDutyCycle(0)
+
+        self.servop.ChangeDutyCycle(7.2)
+        time.sleep(.1)
+        self.servop.ChangeDutyCycle(0)
+        self.servop = None
+
+    def aim_right(self):
+        print('aim right')
+        RGPIO.cleanup()
+        RGPIO.setmode(RGPIO.BCM)
+        RGPIO.setup(4, RGPIO.OUT)
+        self.servop = RGPIO.PWM(4, 50)
+        self.servop.start(7.2)
+
+        self.servop.ChangeDutyCycle(4.5)
+        time.sleep(.1)
+        self.servop.ChangeDutyCycle(0)
+
+        self.servop.ChangeDutyCycle(1.8)
+        time.sleep(.1)
+        self.servop.ChangeDutyCycle(0)
+        self.servop = None
+
+    def aim_straight(self):
+        print("aim straight")
+        RGPIO.cleanup()
+        RGPIO.setmode(RGPIO.BCM)
+        RGPIO.setup(4, RGPIO.OUT)
+        self.servop = RGPIO.PWM(4, 50)
+        self.servop.start(7.2)
+
+        self.servop.ChangeDutyCycle(4.5)
+        time.sleep(.1)
+        self.servop.ChangeDutyCycle(0)
+        self.servop = None
