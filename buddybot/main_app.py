@@ -1,17 +1,13 @@
-<<<<<<< HEAD
 from flask import Flask, render_template, Response, request, send_from_directory
-from drive import Drive
+from laser_tag import LaserTag
 import subprocess
-"""App to run on the buddybot that processes move requests."""
-
-
 import threading
 import time
-from flask import Flask, request
-from drive import Drive
+"""App to run on the buddybot that processes move requests."""
 
 app = Flask(__name__)
-dr = Drive()
+lsr = LaserTag()
+lsr.aim_straight()
 
 
 @app.route('/check', methods=['GET'])
@@ -26,27 +22,49 @@ def move():
     content = request.json
     direction = content['direction']
     if direction == 'forward':
-        dr.forward()
+        lsr.forward()
         print('forward')
         update_response('forward')
     elif direction == 'backward':
-        dr.backward()
+        lsr.backward()
         print('backward')
         update_response('backward')
     elif direction == 'left':
-        dr.left()
+        lsr.left()
         print('left')
         update_response('left')
     elif direction == 'right':
-        dr.right()
+        lsr.right()
         print('right')
         update_response('right')
     elif direction == 'stop':
-        dr.stop()
+        lsr.stop()
         print('stop')
         update_response('stop')
 
     return direction
+
+@app.route('/aim', methods=['POST'])
+def aim():
+    """Moves the laser tag bot's turret"""
+    content = request.json
+    direction = content['aim_dir']
+    if direction == 'straight':
+        print('aim straight')
+        lsr.aim_straight()
+    elif direction == 'left':
+        lsr.aim_left()
+        print('aim_left')
+    elif direction == 'right':
+        lsr.aim_right()
+        print('aim_right')
+    return direction
+
+@app.route('/fire', methods=['POST'])
+def fire():
+    print("Firing")
+    lsr.fire()
+    return "Success"
 
 
 @app.route('/take_pic', methods=['POST'])
@@ -84,7 +102,7 @@ def reset():
         lock.acquire()
  #       print('Response String: {} Time since response: {}'.format(response_str, current_time-request_time))
         if response_str != 'stop' and current_time - request_time >= 0.20:
-            dr.stop()
+            lsr.stop()
             print('stop')
             response_str = 'stop'
         lock.release()
