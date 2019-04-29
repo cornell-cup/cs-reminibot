@@ -85,6 +85,7 @@ class HBridge():
         self.r_motor_b = 12
 
         self.servop = None
+        self.spi = spidev.SpiDev()
 
 
     def get_speed(self):
@@ -292,22 +293,21 @@ class HBridge():
         self.servop = None
 
     def setSlave(self, PiBus):
-        spi = spidev.SpiDev()
         device = 0
         bus = PiBus
-        spi.open(device, bus)
-        spi.mode = 0
-        spi.max_speed_hz = 115200
+        self.spi.open(device, bus)
+        self.spi.mode = 0
+        self.spi.max_speed_hz = 115200
 
     def transmit(self, message):
         try:
             while True:
-                tx = spi.writebytes([message])
+                tx = self.spi.writebytes([message])
                 time.sleep(10)
-                rx = spi.readbytes(2)
+                rx = self.spi.readbytes(2)
                 print('Read: 0x(0)'.format(binascii.hexlify(bytearray(rx))))
         finally:
-            spi.close()
+            self.spi.close()
 
     def buddy_left(self):
         print("buddy left")
