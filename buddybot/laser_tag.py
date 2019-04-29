@@ -29,7 +29,7 @@ class LaserTag():
         self.p_emitter = 23
         self.emitter_freq = 36000
         RGPIO.setup(self.p_emitter, RGPIO.OUT)
-        self.pwm_emitter = RGPIO.PWM(self.p_emitter, self.emitter_freq)
+#        self.pwm_emitter = RGPIO.PWM(self.p_emitter, self.emitter_freq)
 
     def left(self):
         RGPIO.output(self.l_motor_f, RGPIO.LOW)
@@ -61,14 +61,21 @@ class LaserTag():
         RGPIO.output(self.r_motor_f, RGPIO.LOW)
         RGPIO.output(self.r_motor_b, RGPIO.LOW)
 
-    def fire(self):
-        emitter_duty_cycle = 50
-        emitter_duration = 0.25
+    def reset_fire(self):
+        time.sleep(2)
+        RGPIO.output(self.p_emitter, RGPIO.LOW)
+        print("Firing has been reset, fire pin set to low")
 
-        print("BEFORE FIRING")
-        self.pwm_emitter.start(emitter_duty_cycle)
-        threading.Timer(emitter_duration, self.pwm_emitter.stop).start()
+    def fire(self):
+#        emitter_duty_cycle = 50
+#        emitter_duration = 0.25
+#
+#        print("BEFORE FIRING")
+#        self.pwm_emitter.start(emitter_duty_cycle)
+#        threading.Timer(emitter_duration, self.pwm_emitter.stop).start()
         # time.sleep(self.trigger_reset_time)
+        RGPIO.output(self.p_emitter, RGPIO.HIGH)
+        threading.Thread(target=self.reset_fire).start()
 
     def aim_left(self):
         print('aim left')
