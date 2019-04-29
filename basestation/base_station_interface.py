@@ -201,6 +201,18 @@ class ClientHandler(tornado.web.RequestHandler):
             if bot:
                 bot.sendKV("BOTSTATUS", '')
                 self.write(json.dumps(bot.tcp_listener_thread.status).encode())
+        elif key == "BWHEELS":
+            bot_name = data['bot_name']
+            power = str(data['power'])
+            bot_id = self.base_station.bot_name_to_bot_id(bot_name)
+            bot = self.base_station.get_bot(bot_id)
+            bot.sendKV("BWHEELS", str(power))
+        elif key == "ARM":
+            bot_name = data['bot_name']
+            power = str(data['power'])
+            bot_id = self.base_station.bot_name_to_bot_id(bot_name)
+            bot = self.base_station.get_bot(bot_id)
+            bot.sendKV("ARM", str(power))
 
 
 class VisionHandler(tornado.websocket.WebSocketHandler):
