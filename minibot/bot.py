@@ -119,5 +119,29 @@ class Bot():
     def s_aim(self):
         self.motors.aim_straight()
 
-    def stop_fire(self):
-        self.motors.stop_fire()
+    def buddy_left(self):
+        self.motors.buddy_left()
+
+    def buddy_right(self):
+        self.motors.buddy_right()
+
+    def buddy_f(self):
+        self.motors.buddy_f()
+
+    def buddy_b(self):
+        self.motors.buddy_b()
+
+    def buddy_stop(self):
+        self.motors.buddy_stop()
+
+    def buddy_left_arm(self):
+        self.motors.buddy_left_arm()
+
+    def buddy_right_arm(self):
+        self.motors.buddy_right_arm()
+
+    def buddy_right_shoulder(self):
+        self.motors.buddy_right_shoulder()
+
+    def buddy_claw(self):
+        self.motors.buddy_claw()

@@ -230,9 +230,6 @@ class HBridge():
     def right_wing(self):
         print("dragon: deprecated")
 
-    def stop_fire(self):
-        print("TODO: get rid of this button!!!")
-
     def fire(self):
         print("BEFORE FIRING")
         RGPIO.cleanup()
@@ -290,3 +287,30 @@ class HBridge():
         time.sleep(.1)
         self.servop.ChangeDutyCycle(0)
         self.servop = None
+
+    def buddy_left(self):
+        print("buddy left")
+
+    def buddy_right(self):
+        print("buddy right")
+
+    def buddy_stop(self):
+        print("buddy stop")
+
+    def buddy_f(self):
+        print("buddy forward")
+
+    def buddy_b(self):
+        print("buddy backward")
+
+    def buddy_left_arm(self):
+        print("buddy left arm")
+
+    def buddy_right_arm(self):
+        print("buddy right arm")
+
+    def buddy_right_shoulder(self):
+        print("buddy right shoulder")
+
+    def buddy_claw(self):
+        print("buddy claw")

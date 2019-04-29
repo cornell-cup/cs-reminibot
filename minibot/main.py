@@ -162,12 +162,31 @@ def parse_command(cmd, bot, tcpInstance):
         # aim right
         elif value == "1":
             bot.r_aim()
-        elif value == "2":
-            print("stop fire")
-            bot.stop_fire()
         elif value == "3":
             print("aim straight")
             bot.s_aim()
+    elif key == "BWHEELS":
+        print("buddybot copied wheels")
+        if value == "0":
+            bot.buddy_f()
+        elif value == "1":
+            bot.buddy_left()
+        elif value == "2":
+            bot.buddy_stop()
+        elif value == "3":
+            bot.buddy_right()
+        elif value == "4":
+            bot.buddy_b()
+    elif key == "ARM":
+        print("buddybot copied ARM command")
+        if value == "0":
+            bot.buddy_left_arm()
+        elif value == "1":
+            bot.buddy_right_arm()
+        elif value == "2":
+            bot.buddy_right_shoulder()
+        elif value == "3":
+            bot.buddy_claw()
 
 def process_string(value):
     cmds = value.splitlines()
