@@ -1,6 +1,9 @@
 from minibot.hardware.rpi.gpio import DigitalInput, DigitalOutput, PWM, RGPIO
 import time
 import threading
+
+import binascii
+import spidev
 """
 Minibot H-Bridge.
 """
@@ -288,29 +291,88 @@ class HBridge():
         self.servop.ChangeDutyCycle(0)
         self.servop = None
 
+    def setSlave(self, PiBus):
+        spi = spidev.SpiDev()
+        device = 0
+        bus = PiBus
+        spi.open(device, bus)
+        spi.mode = 0
+        spi.max_speed_hz = 115200
+
+    def transmit(self, message):
+        try:
+            while True:
+                tx = spi.writebytes([message])
+                time.sleep(10)
+                rx = spi.readbytes(2)
+                print('Read: 0x(0)'.format(binascii.hexlify(bytearray(rx))))
+        finally:
+            spi.close()
+
     def buddy_left(self):
         print("buddy left")
+        self.setSlave(0)
+        cmd = ord('L')
+        # print b
+        print(cmd)
+        self.transmit(cmd)
 
     def buddy_right(self):
         print("buddy right")
+        self.setSlave(0)
+        cmd = ord('R')
+        # print b
+        print(cmd)
+        self.transmit(cmd)
 
     def buddy_stop(self):
         print("buddy stop")
+        self.d_stop()
 
     def buddy_f(self):
         print("buddy forward")
+        self.setSlave(0)
+        cmd = ord('F')
+        # print b
+        print(cmd)
+        self.transmit(cmd)
 
     def buddy_b(self):
         print("buddy backward")
+        self.setSlave(0)
+        cmd = ord('B')
+        # print b
+        print(cmd)
+        self.transmit(cmd)
 
     def buddy_left_arm(self):
         print("buddy left arm")
+        self.setSlave(1)
+        cmd = ord('T')
+        # print b
+        print(cmd)
+        self.transmit(cmd)
 
     def buddy_right_arm(self):
         print("buddy right arm")
+        self.setSlave(1)
+        cmd = ord('O')
+        # print b
+        print(cmd)
+        self.transmit(cmd)
 
     def buddy_right_shoulder(self):
         print("buddy right shoulder")
+        self.setSlave(1)
+        cmd = ord('S')
+        # print b
+        print(cmd)
+        self.transmit(cmd)
 
     def buddy_claw(self):
         print("buddy claw")
+        self.setSlave(0)
+        cmd = ord('C')
+        # print b
+        print(cmd)
+        self.transmit(cmd)
