@@ -3,9 +3,11 @@
 #include <opencv2/opencv.hpp>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <vector>
 
 using namespace cv;
+using namespace std;
 using std::vector;
 
 int main(int argc, char** argv) {
@@ -23,8 +25,8 @@ int main(int argc, char** argv) {
     // Open video capture devices
     vector<VideoCapture> devices;
     vector<int> device_ids;
-    vector<vector<vector<Point2f>>> img_points;
-    vector<vector<vector<Point3f>>> obj_points;
+    vector<vector<vector<Point2f> > > img_points;
+    vector<vector<vector<Point3f> > > obj_points;
     for (int i = 4; i < argc; i++) {
         int id = atoi(argv[i]);
         VideoCapture device(id);
@@ -32,8 +34,8 @@ int main(int argc, char** argv) {
             device.set(CV_CAP_PROP_FRAME_WIDTH, 1280);
             device.set(CV_CAP_PROP_FRAME_HEIGHT, 720);
             device.set(CV_CAP_PROP_FPS, 30);
-            img_points.push_back(vector<vector<Point2f>>());
-            obj_points.push_back(vector<vector<Point3f>>());
+            img_points.push_back(vector<vector<Point2f> >());
+            obj_points.push_back(vector<vector<Point3f> >());
             devices.push_back(device);
             device_ids.push_back(id);
         }
@@ -61,9 +63,10 @@ int main(int argc, char** argv) {
             }
 
             devices[i] >> frame;
-
+            // TODO delete after
+            waitKey(1);
             // Detect checkerboards on spacebar
-            if (waitKey(1) == 32) {
+            if (waitKey(16) == 32) {
                 cvtColor(frame, gray, COLOR_BGR2GRAY);
                 bool found = findChessboardCorners(gray, checkerboard_size, corners,
                         CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE + CALIB_CB_FAST_CHECK);
@@ -80,8 +83,10 @@ int main(int argc, char** argv) {
             imshow(std::to_string(i), frame);
         }
 
-        key = waitKey(16);
-        if (key == 'w') { // Write calibration to text files
+            key = waitKey(16);
+            if (key == 'w')
+            { // Write calibration to text files
+                printf("%s", "writing1");
             Mat camera_matrix;
             Mat dist_coeffs;
             vector<Mat> rvecs;
@@ -98,15 +103,17 @@ int main(int argc, char** argv) {
                 // TODO Check if calibration already exists first
 
                 std::cout << "Calibrate camera " << device_ids[i] << std::endl;
+                printf("%s", "writing1");
                 calibrateCamera(obj_points[i], img_points[i], frame.size(), camera_matrix,
                         dist_coeffs, rvecs, tvecs);
-
+printf("%s", "writing2");
                 std::cout << "Write calibration" << std::endl;
                 std::ofstream fout;
                 fout.open(std::to_string(device_ids[i]) + ".calib");
                 fout << "camera_matrix =";
                 for (int r = 0; r < camera_matrix.rows; r++) {
                     for (int c = 0; c < camera_matrix.cols; c++) {
+                        printf("%s", "writing3");
                         fout << " " << camera_matrix.at<double>(r, c);
                     }
                 }
@@ -114,6 +121,7 @@ int main(int argc, char** argv) {
                 fout << "dist_coeffs =";
                 for (int r = 0; r < dist_coeffs.rows; r++) {
                     for (int c = 0; c < dist_coeffs.cols; c++) {
+                        printf("%s", "writing4");
                         fout << " " << dist_coeffs.at<double>(r, c);
                     }
                 }
@@ -121,7 +129,7 @@ int main(int argc, char** argv) {
                 fout.close();
 
                 std::cout << "Write calibration output to " << device_ids[i] << ".calib" << std:: endl;
-            }
+             }
         }
     }
 }
