@@ -8,6 +8,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
+#include <cmath>
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 using namespace cv;
 using std::vector;
@@ -16,19 +19,20 @@ using std::vector;
 
 int main(int argc, char** argv) {
     // Display usage
+    
     if (argc < 3) {
         printf("Usage: %s <basestation url> [cameras...]\n", argv[0]);
         return -1;
     }
-    // Parse arguments
-    CURL *curl;
-    curl = curl_easy_init();
-    if (!curl) {
-        std::cerr << "Failed to initialize curl" << std::endl;
-        return -1;
-    }
-    curl_easy_setopt(curl, CURLOPT_URL, argv[1]);
-    curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, 200L);
+    // // Parse arguments
+    // CURL *curl;
+    // curl = curl_easy_init();
+    // if (!curl) {
+    //     std::cerr << "Failed to initialize curl" << std::endl;
+    //     return -1;
+    // }
+    // curl_easy_setopt(curl, CURLOPT_URL, argv[1]);
+    // curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, 200L);
 
     vector<VideoCapture> devices;
     vector<int> device_ids;
@@ -125,7 +129,8 @@ int main(int argc, char** argv) {
     int key = 0;
     Mat frame, gray;
     char postDataBuffer[100];
-    while (key != 27) { // Quit on escape keypress
+    while (key != 27) { // Quit on escape keypres
+        // if(key == 'w'){
         for (size_t i = 0; i < devices.size(); i++) {
             if (!devices[i].isOpened()) {
                 continue;
@@ -146,7 +151,9 @@ int main(int argc, char** argv) {
             vector<Point3f> obj_points(4);
             Mat rvec(3, 1, CV_64FC1);
             Mat tvec(3, 1, CV_64FC1);
+            
             for (int j = 0; j < zarray_size(detections); j++) {
+
                 // Get the ith detection
                 apriltag_detection_t *det;
                 zarray_get(detections, j, &det);
@@ -209,24 +216,37 @@ int main(int argc, char** argv) {
 
                 Mat tag2orig = device_transform_matrix[i] * tag2cam;
                 Mat tagXYZS = tag2orig * genout;
-                printf("%zu :: %d :: % 3.3f % 3.3f % 3.3f\n",
-                        i, det->id,
-                        tagXYZS.at<double>(0), tagXYZS.at<double>(1), tagXYZS.at<double>(2));
 
+                char key;
+                std::cin >> key;
+                double sin = tag2orig.at<double>(0,1);
+                double cos = tag2orig.at<double>(0,0);
+                double angle = acos(cos);
+                if(sin < 0){
+                	angle = 2*M_PI- angle;
+                }
+                angle = angle * 180/M_PI;
+                if(key == 'w'){
+                    printf("%zu :: %d :: % 3.3f % 3.3f % 3.3f % 3.3f\n",
+                            i, det->id,
+                            tagXYZS.at<double>(0), tagXYZS.at<double>(1), tagXYZS.at<double>(2), angle);
+            
+                }
                 // Send data to basestation
                 sprintf(postDataBuffer, "{\"id\":%d,\"x\":%f,\"y\":%f,\"z\":%f}",
                         det->id, tagXYZS.at<double>(0), tagXYZS.at<double>(1), tagXYZS.at<double>(2));
-                curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postDataBuffer);
-                // TODO Check for error response
-                curl_easy_perform(curl);
+                // curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postDataBuffer);
+                // // TODO Check for error response
+                // curl_easy_perform(curl);
             }
 
             zarray_destroy(detections);
 
-            imshow(std::to_string(i), frame);
+            //imshow(std::to_string(i), frame);
         }
+    // }
 
         key = waitKey(16);
     }
-    curl_easy_cleanup(curl);
+    // curl_easy_cleanup(curl);
 }
