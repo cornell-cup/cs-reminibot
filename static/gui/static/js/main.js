@@ -1,6 +1,8 @@
-var React = require('react');
-var ReactDOM = require('react-dom');
-var axios = require('axios');
+/* ES6 */
+
+import React from 'react';
+import ReactDOM from 'react-dom';
+import axios from 'axios';
 
 import GridView from './components/gridview.js';
 import Blockly from './components/blockly.js';
@@ -202,7 +204,7 @@ class ControlTab extends React.Component {
     }
 }
 
-class Python extends React.Component{
+class Python extends React.Component {
     constructor(props){
         super(props);
 
@@ -219,7 +221,7 @@ class Python extends React.Component{
 
     }
 
-    handleFileNameChange(event){
+    handleFileNameChange(event) {
         this.setState({filename: event.target.value});
     }
 
@@ -227,7 +229,7 @@ class Python extends React.Component{
         this.setState({data: event.target.value});
     }
 
-    download(event){
+    download(event) {
         console.log("download listener");
         event.preventDefault();
         var element = document.createElement('a');
@@ -262,7 +264,7 @@ class Python extends React.Component{
         });
     }
 
-    save(event){
+    save(event) {
         axios({
             method:'POST',
             url:'/start',
@@ -281,7 +283,7 @@ class Python extends React.Component{
     }
 
 
-    render(){
+    render() {
         return(
             <div>
                 <div> File name:  <input type="text" name="filename" value={this.state.filename} onChange={this.handleFileNameChange}/> </div>
@@ -300,7 +302,7 @@ class Python extends React.Component{
 }
 
 class Scripts extends React.Component {
-    constructor(props){
+    constructor(props) {
         super(props);
         this.state = {
             bot_name: "",
@@ -311,7 +313,7 @@ class Scripts extends React.Component {
     }
 
     //data field is empty
-    getScripts(){
+    getScripts() {
          const _this = this;
          console.log(this.state.bot_name);
          axios({
@@ -331,7 +333,7 @@ class Scripts extends React.Component {
          });
     }
 
-    componentDidUpdate(){
+    componentDidUpdate() {
         if (this.props.bot_name != this.state.bot_name){
             const _this = this;
             _this.setState({ bot_name: this.props.bot_name }, () => {
@@ -375,7 +377,7 @@ class AddBot extends React.Component {
         this.buttonMapListener = this.buttonMapListener.bind(this);
     }
 
-    componentDidMount(){
+    componentDidMount() {
         setInterval(this.getBotStatus.bind(this), 500);
         setInterval(this.getVisionData.bind(this), 500);
     }
@@ -617,7 +619,7 @@ class AddBotDragon extends React.Component {
         this.buttonWingListener = this.buttonWingListener.bind(this);
     }
 
-    componentDidMount(){
+    componentDidMount() {
         setInterval(this.getBotStatus.bind(this), 500);
         setInterval(this.getVisionData.bind(this), 500);
     }
@@ -1000,7 +1002,7 @@ class AddBotBuddy extends React.Component {
         this.buttonMapListener = this.buttonMapListener.bind(this);
     }
 
-    componentDidMount(){
+    componentDidMount() {
         setInterval(this.getBotStatus.bind(this), 500);
         setInterval(this.getVisionData.bind(this), 500);
     }
@@ -1313,7 +1315,7 @@ class AddBotLaser extends React.Component {
         this.buttonMapListener = this.buttonMapListener.bind(this);
     }
 
-    componentDidMount(){
+    componentDidMount() {
         setInterval(this.getBotStatus.bind(this), 500);
         setInterval(this.getVisionData.bind(this), 500);
     }
@@ -1629,7 +1631,7 @@ class AddBotLaser extends React.Component {
     }
 }
 
-class ClientGUI extends React.Component{
+class ClientGUI extends React.Component {
     render() {
         return (
             <div>
