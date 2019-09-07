@@ -1,6 +1,8 @@
 import React from 'react';
 import axios from 'axios';
 
+import Python from './Python';
+
 export default class Scripts extends React.Component {
   constructor(props) {
       super(props);
