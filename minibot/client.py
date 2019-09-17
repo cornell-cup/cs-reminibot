@@ -1,3 +1,5 @@
+from hardware.communication.TCP import TCP
+
 from socket import *
 from threading import Thread
 import fcntl
@@ -34,7 +36,7 @@ try:
     server_ip = None
     while True:
         # Send data
-	print('sending: ' + message)
+        print('sending: ' + message)
 	sent = sock.sendto(message.encode(), server_address)
 
 	# Receive response
@@ -49,9 +51,13 @@ try:
 	    print('Verification failed')
 	    print('Trying again...')
 
-     base_station_thread = Thread(target = start_base_station_communication, args=(server_ip)) 
-     base_station_thread.start()
-     tcp_instance = TCP()
+    base_station_thread = Thread(target=start_base_station_communication, args=(server_ip,)) 
+    base_station_thread.start()
+    tcp_instance = TCP()
+    while True:
+        tcp_cmd = tcp_instance.get_command()
+        parse_command(tcp_cmd, bot, tcp_instance)
+        time.sleep(0.01)
 	
 	
 finally:	
