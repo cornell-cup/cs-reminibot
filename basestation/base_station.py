@@ -5,6 +5,8 @@ Base Station for the MiniBot.
 # external
 from random import choice
 from string import digits, ascii_lowercase, ascii_uppercase
+import socket 
+import sys
 import time
 import threading
 
@@ -26,7 +28,12 @@ class BaseStation:
         self.__udp_connection = UDPConnection()
         self.__udp_connection.start()
 
+        # Send a message on a specific port so that the minibots can discover the ip address 
+        # of the computer that the BaseStation is running on.  
+        self.broadcast_ip_thread = threading.Thread(target=self.broadcast_ip)
+
         self.bot_discover_thread = threading.Thread(target=self.discover_and_create_bots)
+        self.broadcast_ip_thread.start()
         self.bot_discover_thread.start()
         # self.connections = BaseConnection()
 
@@ -73,6 +80,38 @@ class BaseStation:
 
 
     # ==================== BOTS ====================
+    def broadcast_ip(self):
+        """ Broadcasts ip address of the computer that the BaseStation is running on
+        so that other minibots can connect to the BaseStation.
+        
+        Returns: None
+
+        Author: virenvshah (code taken from link below)
+            https://github.com/jholtmann/ip_discovery
+        """
+        print("IP broadcast starting")
+
+        # initialize the socket, AF_INET for IPv4 addresses,
+        # SOCK_DGRAM for UDP connections
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+        # empty string means 0.0.0.0, which is all IP address on the local 
+        # machine, because some machines can have multiple Network Interface
+        # Cards, and therefore will have multiple ip_addresses
+        server_address = ("", 9434)
+        sock.bind(server_address)
+
+        response = "i_am_the_base_station"
+        # a minibot should send this message in order to receive the ip_address
+        request_password = "i_am_a_minibot"
+
+        while True:
+            data, address = sock.recvfrom(4096)
+            data = str(data.decode('UTF-8'))
+    
+            if data == request_password:
+                sent = sock.sendto(response.encode(), address)
+
 
     def get_active_bots_names(self):
         """
@@ -90,6 +129,7 @@ class BaseStation:
         """
         while True:
             avaliable_bots = self.discover_bots()
+            print("Avaliable bots {}".format(avaliable_bots))
             added_bots_ip_dict = self.get_bots_ip_address()
             for ip in avaliable_bots:
                 if ip in added_bots_ip_dict:
