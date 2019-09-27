@@ -37,19 +37,18 @@ try:
     while True:
         # Send data
         print('sending: ' + message)
-	sent = sock.sendto(message.encode(), server_address)
-
-	# Receive response
-	print('waiting to receive')
-	data, server = sock.recvfrom(4096)
-	if data.decode('UTF-8') == 'i_am_the_base_station':
+        sent = sock.sendto(message.encode(), server_address)
+        # Receive response
+        print('waiting to receive')
+        data, server = sock.recvfrom(4096)
+        if data.decode('UTF-8') == 'i_am_the_base_station':
             print('Received confirmation')
             server_ip = str(server[0])
             print('Server ip: ' + server_ip)
             break
-	else:
-	    print('Verification failed')
-	    print('Trying again...')
+        else:
+	        print('Verification failed')
+	        print('Trying again...')
 
     base_station_thread = Thread(target=start_base_station_communication, args=(server_ip,)) 
     base_station_thread.start()

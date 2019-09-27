@@ -25,6 +25,7 @@ export default class AddBot extends React.Component {
 
   /*print statement for when active bots are discovered*/
   updateInputValue(event) {
+      console.log("UpdateInputValue");
       this.state.selected_bot = event.target.value;
       const _this = this;
       axios({

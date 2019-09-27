@@ -95,7 +95,7 @@ class BaseStation:
         # SOCK_DGRAM for UDP connections
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-        # empty string means 0.0.0.0, which is all IP address on the local 
+        # empty string means 0.0.0.0, which is all IP addresses on the local 
         # machine, because some machines can have multiple Network Interface
         # Cards, and therefore will have multiple ip_addresses
         server_address = ("", 9434)
@@ -110,6 +110,7 @@ class BaseStation:
             data = str(data.decode('UTF-8'))
     
             if data == request_password:
+                # Tell the minibot that you are the base station
                 sent = sock.sendto(response.encode(), address)
 
 

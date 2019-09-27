@@ -92,7 +92,7 @@ class ClientHandler(tornado.web.RequestHandler):
         if not self.get_secure_cookie("user_id"):
             new_id = self.base_station.add_session();
             self.set_secure_cookie("user_id", new_id)
-        
+            
         session_id = self.get_secure_cookie("user_id")
         if session_id:
             session_id = session_id.decode("utf-8") 
@@ -107,6 +107,7 @@ class ClientHandler(tornado.web.RequestHandler):
             session_id = session_id.decode("utf-8")
 
         if key == "CONNECTBOT":
+            print("connect_bot")
             bot_name = data['bot_name']
             print("bot " + str(bot_name))
             print("session " + str(session_id))
@@ -174,6 +175,7 @@ class ClientHandler(tornado.web.RequestHandler):
         #     bot_id = self.base_station.bot_name_to_bot_id(bot_name)
         #     self.base_station.move_body_bot(session_id, bot_id, direction, power)
         elif key == "DISCOVERBOTS":
+            print("discover_bots")
             self.write(json.dumps(self.base_station.get_active_bots_names()).encode())
         elif key == "SCRIPTS":
             value = data['value']
