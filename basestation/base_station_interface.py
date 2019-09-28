@@ -90,7 +90,7 @@ class ClientHandler(tornado.web.RequestHandler):
 
     def get(self):
         if not self.get_secure_cookie("user_id"):
-            new_id = self.base_station.add_session();
+            new_id = self.base_station.add_session()
             self.set_secure_cookie("user_id", new_id)
             
         session_id = self.get_secure_cookie("user_id")
@@ -179,7 +179,7 @@ class ClientHandler(tornado.web.RequestHandler):
         elif key == "SCRIPTS":
             value = data['value']
             bot_name = data['bot_name']
-            bot_id = self.base_station.bot_name_to_bot_id(bot_name);
+            bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             bot = self.base_station.get_bot(bot_id)
             if bot:
                 if len(value) == 0:
@@ -197,7 +197,7 @@ class ClientHandler(tornado.web.RequestHandler):
             self.base_station.remove_bot_from_session(session_id, bot_id)
         elif key == "BOTSTATUS":
             bot_name = data['bot_name']
-            bot_id = self.base_station.bot_name_to_bot_id(bot_name);
+            bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             bot = self.base_station.get_bot(bot_id)
             if bot:
                 bot.sendKV("BOTSTATUS", '')
