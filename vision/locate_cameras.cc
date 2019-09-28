@@ -203,7 +203,7 @@ int main(int argc, char** argv) {
             printf("%zu :: filler :: % 3.3f % 3.3f % 3.3f\n", i,
                     camcoords.at<double>(0,0), camcoords.at<double>(1,0), camcoords.at<double>(2,0));
 
-            if (key == 'w') {
+//            if (key == 'w') {
                 printf("written to camera %zu\n",i);
                 std::ofstream fout;
                 fout.open(std::to_string(device_ids[i]) + ".calib", std::ofstream::out);
@@ -229,7 +229,7 @@ int main(int argc, char** argv) {
                 }
                 fout << std::endl;
                 fout.close();
-            }
+  //          }
 
 
             zarray_destroy(detections);
@@ -239,3 +239,4 @@ int main(int argc, char** argv) {
 
         key = waitKey(16);
     }
+}

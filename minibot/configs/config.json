@@ -16,7 +16,7 @@
     {
       "name" :"rightMotor",
       "pinPWM": 13,
-      "pinHighLow": 20
+      "pinHighLow": 26
 
     }
   ],

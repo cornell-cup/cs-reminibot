@@ -92,7 +92,7 @@ class ClientHandler(tornado.web.RequestHandler):
         if not self.get_secure_cookie("user_id"):
             new_id = self.base_station.add_session();
             self.set_secure_cookie("user_id", new_id)
-        
+            
         session_id = self.get_secure_cookie("user_id")
         if session_id:
             session_id = session_id.decode("utf-8") 
@@ -117,7 +117,64 @@ class ClientHandler(tornado.web.RequestHandler):
             power = str(data['power'])
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             self.base_station.move_wheels_bot(session_id, bot_id, direction, power)
+        elif key == "WINGS":
+            bot_name = data['bot_name']
+            power = str(data['power'])
+            bot_id = self.base_station.bot_name_to_bot_id(bot_name)
+            bot = self.base_station.get_bot(bot_id)
+            bot.sendKV("WINGS", str(power))
+        elif key == "DWHEELS":
+            bot_name = data['bot_name']
+            power = str(data['power'])
+            bot_id = self.base_station.bot_name_to_bot_id(bot_name)
+            bot = self.base_station.get_bot(bot_id)
+            bot.sendKV("DWHEELS", str(power))
+        elif key == "BODY":
+            bot_name = data['bot_name']
+            bot_id = self.base_station.bot_name_to_bot_id(bot_name)
+            bot = self.base_station.get_bot(bot_id)
+            bot.sendKV("BODY", "0")
+        elif key == "HEAD":
+            bot_name = data['bot_name']
+            power = str(data['power'])
+            bot_id = self.base_station.bot_name_to_bot_id(bot_name)
+            bot = self.base_station.get_bot(bot_id)
+            bot.sendKV("HEAD", str(power))
+        elif key == "GUN":
+            bot_name = data['bot_name']
+            bot_id = self.base_station.bot_name_to_bot_id(bot_name)
+            bot = self.base_station.get_bot(bot_id)
+            print("HERE IN LASER TAG")
+            bot.sendKV("GUN", "0")
+        elif key == "AIM":
+            bot_name = data['bot_name']
+            power = str(data['power'])
+            bot_id = self.base_station.bot_name_to_bot_id(bot_name)
+            bot = self.base_station.get_bot(bot_id)
+            bot.sendKV("AIM", str(power))
+            print("HERE IN LASER TAG AIM")
+        # elif key == "TAIL":
+        #     # TODO finish this
+        #     bot_name = data['bot_name']
+        #     power = str(data['power'])
+        #     bot_id = self.base_station.bot_name_to_bot_id(bot_name)
+        #     self.base_station.move_wings_bot(session_id, bot_id, power)
+        # elif key == "JAW":
+        #     # TODO finish this
+        #     bot_name = data['bot_name']
+        #     direction = data['direction']
+        #     power = str(data['power'])
+        #     bot_id = self.base_station.bot_name_to_bot_id(bot_name)
+        #     self.base_station.move_jaw_bot(session_id, bot_id, direction, power)
+        # elif key == "BODY":
+        #     # TODO finish this
+        #     bot_name = data['bot_name']
+        #     direction = data['direction']
+        #     power = str(data['power'])
+        #     bot_id = self.base_station.bot_name_to_bot_id(bot_name)
+        #     self.base_station.move_body_bot(session_id, bot_id, direction, power)
         elif key == "DISCOVERBOTS":
+            print("discover_bots")
             self.write(json.dumps(self.base_station.get_active_bots_names()).encode())
         elif key == "SCRIPTS":
             value = data['value']
@@ -145,6 +202,18 @@ class ClientHandler(tornado.web.RequestHandler):
             if bot:
                 bot.sendKV("BOTSTATUS", '')
                 self.write(json.dumps(bot.tcp_listener_thread.status).encode())
+        elif key == "BWHEELS":
+            bot_name = data['bot_name']
+            power = str(data['power'])
+            bot_id = self.base_station.bot_name_to_bot_id(bot_name)
+            bot = self.base_station.get_bot(bot_id)
+            bot.sendKV("BWHEELS", str(power))
+        elif key == "ARM":
+            bot_name = data['bot_name']
+            power = str(data['power'])
+            bot_id = self.base_station.bot_name_to_bot_id(bot_name)
+            bot = self.base_station.get_bot(bot_id)
+            bot.sendKV("ARM", str(power))
 
 
 class VisionHandler(tornado.websocket.WebSocketHandler):

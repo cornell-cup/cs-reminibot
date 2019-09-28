@@ -54,6 +54,8 @@ def parse_command(cmd, bot, tcpInstance):
     end = cmd.find(">>>>")
     key = cmd[start + 4:comma]
     value = cmd[comma + 1:end]
+    if key != "":
+        print(key)
     if key == "WHEELS":
         try:
             values = value.split(",")
@@ -62,6 +64,65 @@ def parse_command(cmd, bot, tcpInstance):
         except Exception as e:
             print(e)
             pass
+    elif key == "WINGS":
+        try:
+            print("HERE")
+            if value == "0":
+                print("flap and extend left")
+                bot.left_wing()
+            elif value == "1":
+                print("flap left")
+                bot.left_flap()
+            elif value == "2":
+                print("flap right")
+                bot.right_flap()
+            elif value == "3":
+                print("flap and extend right")
+                bot.right_wing()
+            elif value == "4":
+                print("extend left")
+                bot.left_extend()
+            elif value == "5":
+                print("extend right")
+                bot.right_extend()
+            else:
+                print("flap and extend both")
+                bot.both_wings_flap_and_extend()
+        except Exception as e:
+            print(e)
+            pass
+    elif key == "DWHEELS":
+        try:
+            print("HERE")
+            if value == "0":
+                print("forward")
+                bot.d_forward()
+            elif value == "1":
+                print("left")
+                bot.d_left()
+            elif value == "2":
+                print("stop")
+                bot.d_stop()
+            elif value == "3":
+                print("right")
+                bot.d_right()
+            elif value == "4":
+                print("backward")
+                bot.d_backward()
+        except Exception as e:
+            print(e)
+            pass
+    elif key == "BODY":
+        print("PUSHUP")
+        bot.push_up()
+    elif key == "HEAD":
+        print("HEAD")
+        if value == "0":
+            print("nod")
+            bot.head_nod()
+        elif value == "1":
+            print("turn")
+            bot.head_turn()
     elif key == "SCRIPTS":
         values = value.split(",")
         if len(value) == 0:
@@ -90,6 +151,42 @@ def parse_command(cmd, bot, tcpInstance):
         
         status = str(status).replace("'", "\"")
         tcpInstance.send_to_basestation("BOTSTATUS", status)
+    elif key == "GUN":
+        print("minibot copied fire command")
+        bot.b_fire()
+    elif key == "AIM":
+        print("minibot copied aim command")
+        # aim left
+        if value == "0":
+            bot.l_aim()
+        # aim right
+        elif value == "1":
+            bot.r_aim()
+        elif value == "3":
+            print("aim straight")
+            bot.s_aim()
+    elif key == "BWHEELS":
+        print("buddybot copied wheels")
+        if value == "0":
+            bot.buddy_f()
+        elif value == "1":
+            bot.buddy_left()
+        elif value == "2":
+            bot.buddy_stop()
+        elif value == "3":
+            bot.buddy_right()
+        elif value == "4":
+            bot.buddy_b()
+    elif key == "ARM":
+        print("buddybot copied ARM command")
+        if value == "0":
+            bot.buddy_left_arm()
+        elif value == "1":
+            bot.buddy_right_arm()
+        elif value == "2":
+            bot.buddy_right_shoulder()
+        elif value == "3":
+            bot.buddy_claw()
 
 def process_string(value):
     cmds = value.splitlines()

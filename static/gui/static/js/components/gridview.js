@@ -1,5 +1,5 @@
-var React = require('react');
-var axios = require('axios');
+import React from 'react';
+import axios from 'axios';
 
 /**
  * Component for the grid view of the simulated bots.
@@ -52,7 +52,7 @@ export default class GridView extends React.Component {
                          .call(y_axis);
 
         d3.selectAll("rect").style('fill', 'white');
-       
+
         var view = this.svg.append("g").attr("class", "view");
         var transform = null;
         if (transform) view.attr("transform", transform);

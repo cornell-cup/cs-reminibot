@@ -1,12 +1,10 @@
-var React = require('react');
-var ReactDOM = require('react-dom');
+import React from 'react';
 
 /**
  * Component for the Blockly sandbox
- *
  */
 export default class MinibotBlockly extends React.Component {
-    constructor(props){
+    constructor(props) {
         super(props);
         this.scriptToCode = this.scriptToCode.bind(this);
         this.state = {
@@ -29,7 +27,7 @@ export default class MinibotBlockly extends React.Component {
     }
 
     /* Runs after component loads - this generates the blockly stuff */
-    componentDidMount(){
+    componentDidMount() {
         var _this = this;
         _this.workspace = window.Blockly.inject('blocklyDiv',
             {
@@ -63,7 +61,7 @@ export default class MinibotBlockly extends React.Component {
        Allows users to download raw code as a file. Users must
        manually input file name and file ext.
     */
-    download(event){
+    download(event) {
         event.preventDefault();
         var element = document.createElement('a');
         var xmlDom = Blockly.Xml.workspaceToDom(Blockly.getMainWorkspace());
@@ -80,7 +78,7 @@ export default class MinibotBlockly extends React.Component {
         document.body.removeChild(element);
     }
 
-    upload(event){
+    upload(event) {
         var _this = this;
         var file = event.target.files[0];
         var reader = new FileReader();
@@ -91,7 +89,7 @@ export default class MinibotBlockly extends React.Component {
         reader.readAsText(file);
     }
 
-    loadFileAsBlocks(event){
+    loadFileAsBlocks(event) {
   	    var xmlToLoad = document.getElementById("blockUpload").files[0];
  	    var xmlReader = new FileReader();
  	    xmlReader.onload = function(event){
@@ -105,7 +103,7 @@ export default class MinibotBlockly extends React.Component {
  	    xmlReader.readAsText(xmlToLoad, "UTF-8");
  	 }
 
-    render(){
+    render() {
         var blocklyStyle = {margin:'0', height: '67vh', width: '55vw'};
         return (
             <div id="blockly" className = "box">
