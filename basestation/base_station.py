@@ -130,7 +130,6 @@ class BaseStation:
         """
         while True:
             avaliable_bots = self.discover_bots()
-            print("Avaliable bots {}".format(avaliable_bots))
             added_bots_ip_dict = self.get_bots_ip_address()
             for ip in avaliable_bots:
                 if ip in added_bots_ip_dict:

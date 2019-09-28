@@ -107,7 +107,6 @@ class ClientHandler(tornado.web.RequestHandler):
             session_id = session_id.decode("utf-8")
 
         if key == "CONNECTBOT":
-            print("connect_bot")
             bot_name = data['bot_name']
             print("bot " + str(bot_name))
             print("session " + str(session_id))
