@@ -17,6 +17,7 @@ from bot.sim_bot import SimBot
 from session.session import Session
 from connection.udp_connection import UDPConnection
 
+MAX_VISION_LOG_LENGTH = 1000
 
 class BaseStation:
     def __init__(self):
@@ -121,7 +122,7 @@ class BaseStation:
         Returns:
             (list<str>): List of IDs of all active bots.
         """
-        return list([bot.get_name() for _, bot in self.active_bots.items()])
+        return list([bot.get_name() for _, bxot in self.active_bots.items()])
 
     def discover_and_create_bots(self):
         """
