@@ -1,11 +1,18 @@
 #!/usr/bin/python
 from socket import *
-import multiprocessing, time, signal, os, sys, threading, socket
+import multiprocessing
+import time
+import signal
+import os
+import sys
+import threading
+import socket
 from threading import Thread
 
 
 PORT = 10000
 IP = ""
+
 
 class TCP(object):
 
@@ -13,15 +20,16 @@ class TCP(object):
 
     def __init__(self):
         self.server_socket = socket.socket(AF_INET, SOCK_STREAM)
-        self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.server_socket.bind( (IP, PORT) )
+        self.server_socket.setsockopt(
+            socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.server_socket.bind((IP, PORT))
         self.server_socket.listen(1)
-        self.thread_tcp = Thread(target = self.run)
+        self.thread_tcp = Thread(target=self.run)
         self.thread_tcp.start()
         self.command = ""
         self.active = False
         TCP.tcp = self
-        
+
     def isConnected(self):
         """
         :return true if connection is active
@@ -55,9 +63,10 @@ class TCP(object):
         while True:
             print("Waiting for connection")
             self.connectionSocket, self.addr = self.server_socket.accept()
-            self.connectionSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            self.connectionSocket.setsockopt(
+                socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             print("Connection accepted")
-            self.active=True
+            self.active = True
             while self.active:
                 command = ""
                 while self.active:
