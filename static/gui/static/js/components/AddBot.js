@@ -6,6 +6,7 @@ export default class AddBot extends React.Component {
         super(props);
         this.state = {
             bot_name: "",
+            available_bots: [], // bots connected to Base Station but not GUI
             bot_list: [],
             selected_bot: "",
             power: 50,
@@ -25,8 +26,10 @@ export default class AddBot extends React.Component {
 
     /*print statement for when active bots are discovered*/
     updateInputValue(event) {
-        console.log("UpdateInputValue");
+
         this.state.selected_bot = event.target.value;
+        console.log("target")
+        console.log(event.target);
         const _this = this;
         axios({
             method: 'POST',
@@ -41,8 +44,44 @@ export default class AddBot extends React.Component {
             .catch(function (error) {
                 console.log(error);
             })
+
     }
 
+    refreshBots() {
+        axios({
+            method: 'POST',
+            url: '/start',
+            data: JSON.stringify({
+                key: "DISCOVERBOTS"
+            })
+        })
+            .then(function (response) {
+                console.log("Got response from DISCOVERBOTS");
+                console.log(response.data)
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+    }
+
+    //TODO: Get this function running
+    defaultBotName() {
+        this.state.selected_bot = null;
+        const _this = this;
+        axios({
+            method: 'POST',
+            url: '/start',
+            data: JSON.stringify({
+                key: "DISCOVERBOTS"
+            })
+        })
+            .then(function (response) {
+                return response.data;
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+    }
     /*update power value when bot moves*/
     updatePowerValue(event) {
         this.state.power = event.target.value;
@@ -63,6 +102,8 @@ export default class AddBot extends React.Component {
             })
         })
             .then(function (response) {
+                console.log("Trying to add bot to list")
+                console.log(response.data)
                 if (response.data && !li.includes(bot_name)) {
                     console.log("Yep u gud")
                     li.push(bot_name);
@@ -189,10 +230,23 @@ export default class AddBot extends React.Component {
                                     <label>
                                         Bot Name:
                                   <input type="text" name="bot_name" onChange={evt => this.updateInputValue(evt)} />
+                                        <select style={styles.Select}>
+                                            {
+                                                (this.state.available_bots.length === 0) ?
+                                                    <option> No new bots available</option>
+                                                    :
+                                                    this.state.available_bots.map((name) => <option>{name}</option>)
+                                            }
+                                        </select>
+                                    </label>
+                                    <label>
+                                        TODO: Default Bot Name:
+                                        <input type="text" id="default_bot" defaultValue={this.defaultBotName()} />
                                     </label>
                                 </form>
                             </td>
                             <td><button style={styles.Button} onClick={this.addBotListener}>Add Bot</button></td>
+                            <td><button style={styles.Button} onClick={this.refreshBots}>Refresh Active Bots</button></td>
                         </tr>
                         <tr>
                             <td>
