@@ -114,10 +114,13 @@ class ClientHandler(tornado.web.RequestHandler):
 
         if key == "CONNECTBOT":
             bot_name = data['bot_name']
-            print("bot " + str(bot_name))
-            print("session " + str(session_id))
-            self.write(json.dumps(self.base_station.add_bot_to_session(
-                session_id, bot_name)).encode())
+            if bot_name != None and bot_name != "":
+                print("Connecting bot " + str(bot_name))
+                print("session " + str(session_id))
+                self.write(json.dumps(self.base_station.add_bot_to_session(
+                    session_id, bot_name)).encode())
+            else:
+                print("No bot received, or bot name empty.")
         elif key == "WHEELS":
             bot_name = data['bot_name']
             direction = data['direction']

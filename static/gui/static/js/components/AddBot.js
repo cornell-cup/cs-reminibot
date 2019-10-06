@@ -48,6 +48,7 @@ export default class AddBot extends React.Component {
     }
 
     refreshBots() {
+        /*
         axios({
             method: 'POST',
             url: '/start',
@@ -62,6 +63,7 @@ export default class AddBot extends React.Component {
             .catch(function (error) {
                 console.log(error);
             })
+            */
     }
 
     //TODO: Get this function running
@@ -105,12 +107,12 @@ export default class AddBot extends React.Component {
                 console.log("Trying to add bot to list")
                 console.log(response.data)
                 if (response.data && !li.includes(bot_name)) {
-                    console.log("Yep u gud")
+                    console.log("Bot" + bot_name + " added successfully")
                     li.push(bot_name);
                     _this.props.updateBotName(bot_name);
                     _this.setState({ bot_list: li, selected_bot: bot_name });
                 } else {
-                    console.log("Nope")
+                    console.log("Failed to add " + bot_name)
                 }
             })
             .catch(function (error) {
