@@ -1,6 +1,34 @@
 import React from 'react';
 import axios from 'axios';
 
+class RefreshingList extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            available_bots: []
+        }
+
+        this.update = this.update.bind(this);
+    }
+
+    update(newbots) {
+        console.log("updating list with: " + newbots)
+        this.state.available_bots = newbots;
+        this.forceUpdate();
+    }
+
+    render() {
+        const _this = this;
+        if (_this.state.available_bots.length === 0) {
+            return <select><option>No bots available</option></select>
+        }
+        return <select>
+            {_this.state.available_bots.map(
+                (name) => <option>{name}</option>)}
+        </select>
+    }
+}
+
 export default class AddBot extends React.Component {
     constructor(props) {
         super(props);
@@ -8,10 +36,13 @@ export default class AddBot extends React.Component {
             bot_name: "",
             available_bots: [], // bots connected to Base Station but not GUI
             bot_list: [],
+            available_bots: [],
             selected_bot: "",
             power: 50,
             input_ip: "192.168.4.65"
         };
+
+        this.myRef = React.createRef();
 
         this.updateInputValue = this.updateInputValue.bind(this);
         this.addBotListener = this.addBotListener.bind(this);
@@ -22,6 +53,31 @@ export default class AddBot extends React.Component {
     componentDidMount() {
         setInterval(this.getBotStatus.bind(this), 500);
         setInterval(this.getVisionData.bind(this), 500);
+        setInterval(this.refreshAvailableBots.bind(this), 2000)
+    }
+
+    /*  refreshAvailableBots gets the available bots every 2 seconds. 
+     *  An "available" bot is connected to the base station, but
+     *  not necessarily connected to the client.
+     */
+    refreshAvailableBots() {
+        const _this = this;
+        axios({
+            method: 'POST',
+            url: '/start',
+            data: JSON.stringify({
+                key: "DISCOVERBOTS"
+            })
+        })
+            .then(function (response) {
+                console.log(response.data);
+                _this.state.available_bots = response.data
+                // TODO refresh the available bot box
+                _this.myRef.current.update(response.data)
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
     }
 
     /*print statement for when active bots are discovered*/
@@ -253,6 +309,14 @@ export default class AddBot extends React.Component {
                         <tr>
                             <td>
                                 <label>
+                                    Available Bots:
+                                    <RefreshingList ref={this.myRef}></RefreshingList>
+                                </label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label>
                                     Bot List:
                           <select style={styles.Select} onChange={this.selectBotListener}>
                                         {this.state.bot_list.map(function (bot_name, idx) {
@@ -268,6 +332,7 @@ export default class AddBot extends React.Component {
                             <td><button style={styles.Button} bot_list={this.state.bot_list}
                                 onClick={() => _this.deleteBotListener()}>Remove</button></td>
                         </tr>
+
                     </tbody>
                 </table>
                 <div className="newDiv">
