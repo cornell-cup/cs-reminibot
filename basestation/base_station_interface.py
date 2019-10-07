@@ -186,8 +186,6 @@ class ClientHandler(tornado.web.RequestHandler):
         #     self.base_station.move_body_bot(session_id, bot_id, direction, power)
         elif key == "DISCOVERBOTS":
             print("discover_bots")
-            # TODO Added to figure out what this returns
-            print(json.dumps(self.base_station.get_active_bots_names()).encode())
             self.write(json.dumps(
                 self.base_station.get_active_bots_names()).encode())
         elif key == "SCRIPTS":

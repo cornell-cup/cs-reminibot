@@ -14,7 +14,7 @@ class RefreshingList extends React.Component {
     update(newbots) {
         console.log("updating list with: " + newbots)
         this.state.available_bots = newbots;
-        this.forceUpdate();
+        this.setState({ state: this.state }) // forces re-render
     }
 
     render() {
@@ -103,26 +103,8 @@ export default class AddBot extends React.Component {
 
     }
 
-    refreshBots() {
-        /*
-        axios({
-            method: 'POST',
-            url: '/start',
-            data: JSON.stringify({
-                key: "DISCOVERBOTS"
-            })
-        })
-            .then(function (response) {
-                console.log("Got response from DISCOVERBOTS");
-                console.log(response.data)
-            })
-            .catch(function (error) {
-                console.log(error);
-            })
-            */
-    }
-
     //TODO: Get this function running
+    /*
     defaultBotName() {
         this.state.selected_bot = null;
         const _this = this;
@@ -140,6 +122,8 @@ export default class AddBot extends React.Component {
                 console.log(error);
             })
     }
+    */
+
     /*update power value when bot moves*/
     updatePowerValue(event) {
         this.state.power = event.target.value;
@@ -288,23 +272,10 @@ export default class AddBot extends React.Component {
                                     <label>
                                         Bot Name:
                                   <input type="text" name="bot_name" onChange={evt => this.updateInputValue(evt)} />
-                                        <select style={styles.Select}>
-                                            {
-                                                (this.state.available_bots.length === 0) ?
-                                                    <option> No new bots available</option>
-                                                    :
-                                                    this.state.available_bots.map((name) => <option>{name}</option>)
-                                            }
-                                        </select>
-                                    </label>
-                                    <label>
-                                        TODO: Default Bot Name:
-                                        <input type="text" id="default_bot" defaultValue={this.defaultBotName()} />
                                     </label>
                                 </form>
                             </td>
                             <td><button style={styles.Button} onClick={this.addBotListener}>Add Bot</button></td>
-                            <td><button style={styles.Button} onClick={this.refreshBots}>Refresh Active Bots</button></td>
                         </tr>
                         <tr>
                             <td>
