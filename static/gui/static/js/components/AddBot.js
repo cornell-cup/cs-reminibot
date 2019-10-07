@@ -1,6 +1,10 @@
 import React from 'react';
 import axios from 'axios';
 
+/*
+ *  A RefreshingList is a list designed to refresh when its update()
+ *  is called.
+ */
 class RefreshingList extends React.Component {
     constructor(props) {
         super(props);
@@ -15,6 +19,8 @@ class RefreshingList extends React.Component {
         console.log("updating list with: " + newbots)
         this.state.available_bots = newbots;
         this.setState({ state: this.state }) // forces re-render
+        // TODO make re-render smoother, this always causes warning:
+        // "each child in an array or iterator should have a unique key prop"
     }
 
     render() {
@@ -42,7 +48,9 @@ export default class AddBot extends React.Component {
             input_ip: "192.168.4.65"
         };
 
-        this.myRef = React.createRef();
+        // Needed to use a ref for react
+        // see https://reactjs.org/docs/refs-and-the-dom.html
+        this.refreshingBotListRef = React.createRef();
 
         this.updateInputValue = this.updateInputValue.bind(this);
         this.addBotListener = this.addBotListener.bind(this);
@@ -56,7 +64,8 @@ export default class AddBot extends React.Component {
         setInterval(this.refreshAvailableBots.bind(this), 2000)
     }
 
-    /*  refreshAvailableBots gets the available bots every 2 seconds. 
+    /*  
+     *  refreshAvailableBots gets the available bots every 2 seconds. 
      *  An "available" bot is connected to the base station, but
      *  not necessarily connected to the client.
      */
@@ -72,8 +81,7 @@ export default class AddBot extends React.Component {
             .then(function (response) {
                 console.log(response.data);
                 _this.state.available_bots = response.data
-                // TODO refresh the available bot box
-                _this.myRef.current.update(response.data)
+                _this.refreshingBotListRef.current.update(response.data)
             })
             .catch(function (error) {
                 console.log(error);
@@ -281,7 +289,7 @@ export default class AddBot extends React.Component {
                             <td>
                                 <label>
                                     Available Bots:
-                                    <RefreshingList ref={this.myRef}></RefreshingList>
+                                    <RefreshingList ref={this.refreshingBotListRef}></RefreshingList>
                                 </label>
                             </td>
                         </tr>
