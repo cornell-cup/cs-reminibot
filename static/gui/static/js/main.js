@@ -12,60 +12,75 @@ import AddBotBuddy from './components/AddBotBuddy';
 import AddBotLaser from './components/AddBotLaser';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 
-
 /**
  * Component for the Navbar on top
  * Currently this does nothing except display some text and an image
  */
 class Navbar extends React.Component {
-    render () {
-        return (
-            <div className="navbar">
-                <img className="logo" src = "./static/gui/static/img/logo.png"/><h1>ReMiniBot GUI</h1>
-            </div>
-        )
-    }
+  render() {
+    return (
+      <div className="navbar">
+        <img className="logo" src="./static/gui/static/img/logo.png" />
+        <h1>ReMiniBot GUI</h1>
+      </div>
+    );
+  }
 }
 
 /**
  * Top Level component for the GUI, includes two tabs
  */
 class Platform extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            bot_name: ""
-        }
+  constructor(props) {
+    super(props);
+    this.state = {
+      bot_name: '',
+      blockly_xml: null
+    };
 
-        this.updateBotName = this.updateBotName.bind(this);
-    }
+    this.updateBotName = this.updateBotName.bind(this);
+    this.setBlockly = this.setBlockly.bind(this);
+  }
 
-    updateBotName(value) {
-        const _this = this;
-        _this.setState({ bot_name: value }, () => {
-          console.log("updated bot name to: " + this.state.bot_name);
-        });
-    }
+  updateBotName(value) {
+    const _this = this;
+    _this.setState({ bot_name: value }, () => {
+      console.log('updated bot name to: ' + this.state.bot_name);
+    });
+  }
 
-    render() {
-        return (
-            <div id='platform'>
-                <Tabs>
-                    <TabList>
-                        <Tab>Setup</Tab>
-                        <Tab>Coding/Control</Tab>
-                    </TabList>
+  setBlockly(xmltext) {
+    const _this = this;
+    _this.setState({ blockly_xml: xmltext });
+  }
 
-                    <TabPanel>
-                        <SetupTab updateBotName={this.updateBotName} bot_name={this.state.bot_name}/>
-                    </TabPanel>
-                    <TabPanel>
-                        <ControlTab updateBotName={this.updateBotName} bot_name={this.state.bot_name}/>
-                    </TabPanel>
-                </Tabs>
-            </div>
-        )
-    }
+  render() {
+    return (
+      <div id="platform">
+        <Tabs>
+          <TabList>
+            <Tab>Setup</Tab>
+            <Tab>Coding/Control</Tab>
+          </TabList>
+
+          <TabPanel>
+            <SetupTab
+              updateBotName={this.updateBotName}
+              bot_name={this.state.bot_name}
+            />
+          </TabPanel>
+          <TabPanel>
+            <ControlTab
+              updateBotName={this.updateBotName}
+              bot_name={this.state.bot_name}
+              blockly_xml={this.state.blockly_xml}
+              setBlockly={this.setBlockly}
+            />
+          </TabPanel>
+        </Tabs>
+      </div>
+    );
+  }
 }
 
 /**
@@ -75,119 +90,127 @@ class Platform extends React.Component {
  * addBot, gridView
  */
 class SetupTab extends React.Component {
-    render() {
-        return (
-            <div id ="tab_setup">
-                <div className="row">
-                    <div className="col-md-6">
-                    <div>
-                        <Tabs>
-                            <TabList>
-                                <Tab>Normal</Tab>
-                                <Tab>Dragon</Tab>
-                                <Tab>Laser</Tab>
-                                <Tab>Buddy</Tab>
-                            </TabList>
-                            <TabPanel>
-                            <NormalTab updateBotName={this.props.updateBotName} bot_name={this.props.bot_name}/>
-                            </TabPanel>
-                            <TabPanel>
-                            <DragonTab updateBotName={this.props.updateBotName} bot_name={this.props.bot_name}/>
-                            </TabPanel>
-                            <TabPanel>
-                            <LaserTab updateBotName={this.props.updateBotName} bot_name={this.props.bot_name}/>
-                            </TabPanel>
-                            <TabPanel>
-                            <BuddyTab updateBotName={this.props.updateBotName} bot_name={this.props.bot_name}/>
-                            </TabPanel>
-                        </Tabs>
-                    </div>
-                    </div>
-                </div>
+  render() {
+    return (
+      <div id="tab_setup">
+        <div className="row">
+          <div className="col-md-6">
+            <div>
+              <Tabs>
+                <TabList>
+                  <Tab>Normal</Tab>
+                  <Tab>Dragon</Tab>
+                  <Tab>Laser</Tab>
+                  <Tab>Buddy</Tab>
+                </TabList>
+                <TabPanel>
+                  <NormalTab
+                    updateBotName={this.props.updateBotName}
+                    bot_name={this.props.bot_name}
+                  />
+                </TabPanel>
+                <TabPanel>
+                  <DragonTab
+                    updateBotName={this.props.updateBotName}
+                    bot_name={this.props.bot_name}
+                  />
+                </TabPanel>
+                <TabPanel>
+                  <LaserTab
+                    updateBotName={this.props.updateBotName}
+                    bot_name={this.props.bot_name}
+                  />
+                </TabPanel>
+                <TabPanel>
+                  <BuddyTab
+                    updateBotName={this.props.updateBotName}
+                    bot_name={this.props.bot_name}
+                  />
+                </TabPanel>
+              </Tabs>
             </div>
-        )
-    }
+          </div>
+        </div>
+      </div>
+    );
+  }
 }
 
 class NormalTab extends React.Component {
-    render() {
-        return (
-            <div id ="tab_normal">
-                <div className="row">
-                    <div className="col-md-6">
-                        <AddBot updateBotName={this.props.updateBotName} />
-                        <Scripts bot_name={this.props.bot_name} />
-                        <GridView/>
-                    </div>
-                </div>
-            </div>
-        )
-    }
+  render() {
+    return (
+      <div id="tab_normal">
+        <div className="row">
+          <div className="col-md-6">
+            <AddBot updateBotName={this.props.updateBotName} />
+            <Scripts bot_name={this.props.bot_name} />
+            <GridView />
+          </div>
+        </div>
+      </div>
+    );
+  }
 }
 
 class DragonTab extends React.Component {
-    render() {
-        return (
-            <div id ="tab_dragon">
-                <div className="row">
-                    <div className="col-md-6">
-                        <AddBotDragon updateBotName={this.props.updateBotName} />
-                        <Scripts bot_name={this.props.bot_name} />
-                        <GridView/>
-                    </div>
-                </div>
-            </div>
-        )
-    }
+  render() {
+    return (
+      <div id="tab_dragon">
+        <div className="row">
+          <div className="col-md-6">
+            <AddBotDragon updateBotName={this.props.updateBotName} />
+            <Scripts bot_name={this.props.bot_name} />
+            <GridView />
+          </div>
+        </div>
+      </div>
+    );
+  }
 }
 
 class LaserTab extends React.Component {
-    render() {
-        return (
-            <div id ="tab_laser">
-                <div className="row">
-                    <div className="col-md-6">
-                        <AddBotLaser updateBotName={this.props.updateBotName} />
-                        <Scripts bot_name={this.props.bot_name} />
-                        <GridView/>
-                    </div>
-                </div>
-            </div>
-        )
-    }
+  render() {
+    return (
+      <div id="tab_laser">
+        <div className="row">
+          <div className="col-md-6">
+            <AddBotLaser updateBotName={this.props.updateBotName} />
+            <Scripts bot_name={this.props.bot_name} />
+            <GridView />
+          </div>
+        </div>
+      </div>
+    );
+  }
 }
 
 class BuddyTab extends React.Component {
-    render() {
-        return (
-            <div id ="tab_laser">
-                <div className="row">
-                    <div className="col-md-6">
-                        <AddBotBuddy updateBotName={this.props.updateBotName} />
-                        <Scripts bot_name={this.props.bot_name} />
-                        <GridView/>
-                    </div>
-                </div>
-            </div>
-        )
-    }
+  render() {
+    return (
+      <div id="tab_laser">
+        <div className="row">
+          <div className="col-md-6">
+            <AddBotBuddy updateBotName={this.props.updateBotName} />
+            <Scripts bot_name={this.props.bot_name} />
+            <GridView />
+          </div>
+        </div>
+      </div>
+    );
+  }
 }
 
-
-
 class ClientGUI extends React.Component {
-    render() {
-        return (
-            <div>
-                <div> Welcome to Client GUI : </div>
-                <Navbar/>
-                <Platform/>
-            </div>
-        )
-    }
+  render() {
+    return (
+      <div>
+        <div> Welcome to Client GUI : </div>
+        <Navbar />
+        <Platform />
+      </div>
+    );
+  }
 }
 
 let root = document.getElementById('root');
-ReactDOM.render(
-    <ClientGUI />, root
-);
+ReactDOM.render(<ClientGUI />, root);
