@@ -8,12 +8,13 @@ from minibot.peripherals.colorsensor import ColorSensor
 from minibot.peripherals.hbridge import HBridge
 import time
 
+
 class Bot():
     def __init__(self, config):
         self.name = config['name']
         self.sensors = {}
         self.actuators = {}
-        self.motors = None;
+        self.motors = None
         self.__parse_config(config)
 
     def __parse_config(self, config):
@@ -21,7 +22,8 @@ class Bot():
         self.actuators["right"] = config["actuators"][1]
         self.motors = HBridge(DigitalOutput(self.actuators["left"]["pinHighLow"]),
                               PWM(self.actuators["left"]["pinPWM"]),
-                              DigitalOutput(self.actuators["right"]["pinHighLow"]),
+                              DigitalOutput(
+                                  self.actuators["right"]["pinHighLow"]),
                               PWM(self.actuators["right"]["pinPWM"]))
         self.stop()
 
@@ -103,7 +105,7 @@ class Bot():
 
     def d_left(self):
         self.motors.d_left()
- 
+
     def d_right(self):
         self.motors.d_right()
 

@@ -7,6 +7,7 @@ import struct
 import sys
 import time
 import importlib
+import ast
 
 # Create a UDP socket
 sock = socket(AF_INET, SOCK_DGRAM)
@@ -45,6 +46,14 @@ def parse_command(cmd, tcpInstance):
         except Exception as e:
             print(e)
             pass
+    elif key == "SCRIPTS":
+        if len(value) > 0:
+            try:
+                ast.literal_eval(value)
+            except Exception as e:
+                print("Exception occured")  # TODO check if this works
+                print(e)
+                pass
 
 
 def start_base_station_heartbeat(ip_address):

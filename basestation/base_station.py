@@ -236,7 +236,8 @@ class BaseStation:
             value = ",".join([power, neg_power, power, neg_power])
         else:
             value = "0,0,0,0"
-
+        # TODO remove print
+        print("Active bot " + str(type(self.active_bots[bot_id])))
         self.active_bots[bot_id].sendKV("WHEELS", value)
         return True
 

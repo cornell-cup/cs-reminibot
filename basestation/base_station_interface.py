@@ -10,6 +10,7 @@ import json
 import logging
 import sys
 import time
+import re  # regex import
 
 # Minibot imports.
 from base_station import BaseStation
@@ -193,9 +194,12 @@ class ClientHandler(tornado.web.RequestHandler):
             print(value)
             bot_name = data['bot_name']
             print("This is the script for bot named " + bot_name)
+            bot_name = 'minibot28'  # TODO remove hardcode
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             bot = self.base_station.get_bot(bot_id)
             if bot:
+                print("Code len = " + str(len(value)))
+                print(type(bot))
                 if len(value) == 0:
                     print("GETTING SCRIPTS")
                     bot.sendKV("SCRIPTS", '')
@@ -205,6 +209,12 @@ class ClientHandler(tornado.web.RequestHandler):
                 elif len(value) == 2:
                     print("SAVING SCRIPTS")
                     bot.sendKV("SCRIPTS", ",".join(value))
+                else:
+                    # TODO check if this is the expected behavior
+                    print("RUNNING SCRIPT")
+                    print(value)
+                    self.send_program(bot, value)
+
         elif key == "DISCONNECTBOT":
             bot_name = data['bot']
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
@@ -228,6 +238,37 @@ class ClientHandler(tornado.web.RequestHandler):
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             bot = self.base_station.get_bot(bot_id)
             bot.sendKV("ARM", str(power))
+
+    def send_program(self, bot, program):
+
+        function_map = {
+            "move_forward": "fwd",
+            "move_backward": "back",
+            "wait": "wait",
+            "stop": "stop",
+            "set_wheel_power": "ECE_wheel_pwr",
+            "turn_clockwise": "ECE_turn_CW",
+            "turn_counter_clockwise": "ECE_turn_CCW"
+        }
+
+        pattern = "bot.(\w*)\((.*)\)"
+        regex = re.compile(pattern)
+
+        # TODO what to do after a function bound to a wait is done?
+        # Do we do whatever we did before? Do we stop?
+
+        program_lines = program.split('\n')
+        parsed_program = []
+        for line in program_lines:
+            match = regex.match(line)
+            if match == None:
+                # This is normal python
+                parsed_program.append(line)
+            else:
+                func = function_map[match.group(1)]
+                args = match.group(2)
+                parsed_program.append(func + "(" + args + ")")
+        print(parsed_program)
 
 
 class VisionHandler(tornado.websocket.WebSocketHandler):
