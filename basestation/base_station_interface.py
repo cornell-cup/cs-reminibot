@@ -210,7 +210,8 @@ class ClientHandler(tornado.web.RequestHandler):
                     print("SAVING SCRIPTS")
                     bot.sendKV("SCRIPTS", ",".join(value))
                 else:
-                    # TODO check if this is the expected behavior
+                    # TODO check if a "long enough" program
+                    # is supposed to be sent over
                     print("RUNNING SCRIPT")
                     print(value)
                     self.send_program(bot, value)
@@ -240,7 +241,21 @@ class ClientHandler(tornado.web.RequestHandler):
             bot.sendKV("ARM", str(power))
 
     def send_program(self, bot, program):
+        """
+        Sends the program received from Blockly to the bot, translated
+        into ECE-supplied functions.
 
+        NOTE: This currently DOES NOT send to the bot, but produces
+        a program the bot can understand.
+
+        Args: 
+            bot: The pi_bot to send to
+            program: The string containing the python code generated
+            from blockly
+
+        """
+
+        # function_map : Blockly functions -> ECE functions
         function_map = {
             "move_forward": "fwd",
             "move_backward": "back",
@@ -251,6 +266,8 @@ class ClientHandler(tornado.web.RequestHandler):
             "turn_counter_clockwise": "ECE_turn_CCW"
         }
 
+        # Regex is for bot-specific functions (move forward, stop, etc)
+        # 1st group is the function name, 2nd group is for args
         pattern = "bot.(\w*)\((.*)\)"
         regex = re.compile(pattern)
 
@@ -262,13 +279,14 @@ class ClientHandler(tornado.web.RequestHandler):
         for line in program_lines:
             match = regex.match(line)
             if match == None:
-                # This is normal python
-                parsed_program.append(line)
+                parsed_program.append(line + '\n')  # "normal" python
             else:
                 func = function_map[match.group(1)]
                 args = match.group(2)
-                parsed_program.append(func + "(" + args + ")")
-        print(parsed_program)
+                parsed_program.append(func + "(" + args + ")\n")
+
+        parsed_program_string = "".join(parsed_program)
+        print(parsed_program_string)
 
 
 class VisionHandler(tornado.websocket.WebSocketHandler):
