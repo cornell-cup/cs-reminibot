@@ -92,10 +92,10 @@ class ClientHandler(tornado.web.RequestHandler):
         if not self.get_secure_cookie("user_id"):
             new_id = self.base_station.add_session();
             self.set_secure_cookie("user_id", new_id)
-            
+
         session_id = self.get_secure_cookie("user_id")
         if session_id:
-            session_id = session_id.decode("utf-8") 
+            session_id = session_id.decode("utf-8")
         self.render("../static/gui/index.html", title = "Client")
 
     def post(self):
@@ -178,6 +178,7 @@ class ClientHandler(tornado.web.RequestHandler):
             self.write(json.dumps(self.base_station.get_active_bots_names()).encode())
         elif key == "SCRIPTS":
             value = data['value']
+            print(value)
             bot_name = data['bot_name']
             bot_id = self.base_station.bot_name_to_bot_id(bot_name);
             bot = self.base_station.get_bot(bot_id)
