@@ -24,12 +24,8 @@ export default class ControlTab extends React.Component {
   render() {
       return (
           <div id ="tab_control">
-              <div className="row">
-                  <div className="col-md-7">
-                      <Blockly/>
-                  </div>
-                  <div className="col-md-5">
-                  </div>
+              <div>
+                    <Blockly/>                 
               </div>
           </div>
       )

@@ -53,8 +53,7 @@ export default class MinibotBlockly extends React.Component {
 
     /* Helper for realtime code generation (Blockly => Python) */
     scriptToCode() {
-        console.log("scriptToCode");
-        document.getElementById('data').value = window.Blockly.Python.workspaceToCode(this.workspace);
+        document.getElementById('data').innerText = window.Blockly.Python.workspaceToCode(this.workspace);
     }
 
      /* DOWNLOAD FUNCTION
@@ -104,9 +103,10 @@ export default class MinibotBlockly extends React.Component {
  	 }
 
     render() {
-        var blocklyStyle = {margin:'0', height: '67vh', width: '55vw'};
+        var blocklyStyle = {margin:'0', height: '67vh'};
         return (
-            <div id="blockly" className = "box">
+            <div id="blocklyContainer" class="row">
+            <div id="blockly" className = "box" class="col-md-7">
                 <div id ="blocklyDiv" style={blocklyStyle}>Blockly</div><br/>
                 Blockly File Name: <input type="text" name="blockly_filename" value={this.state.blockly_filename} onChange={this.handleInputChange}/>
                 <button id="blocklySubmit" onClick={this.download}>Download</button>
@@ -120,6 +120,10 @@ export default class MinibotBlockly extends React.Component {
                     />
                 </form>
             </div>
+            <div id="data" class="col-md-5">
+
+            </div>
+        </div>
         )
     }
 }
