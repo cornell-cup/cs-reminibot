@@ -16,7 +16,7 @@ class RefreshingList extends React.Component {
     }
 
     update(newbots) {
-        console.log("updating list with: " + newbots)
+        // console.log("updating list with: " + newbots)
         this.state.available_bots = newbots;
         this.setState({ state: this.state }) // forces re-render
         // TODO make re-render smoother, this always causes warning:
@@ -79,9 +79,13 @@ export default class AddBot extends React.Component {
             })
         })
             .then(function (response) {
-                console.log(response.data);
+                // console.log(response.data);
                 _this.state.available_bots = response.data
-                _this.refreshingBotListRef.current.update(response.data)
+                let refreshingBotList = _this.refreshingBotListRef.current
+                if (refreshingBotList !== null) {
+                    _this.refreshingBotListRef.current.update(response.data)
+                }
+
             })
             .catch(function (error) {
                 console.log(error);
