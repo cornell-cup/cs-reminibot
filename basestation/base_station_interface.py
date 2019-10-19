@@ -190,6 +190,7 @@ class ClientHandler(tornado.web.RequestHandler):
                 self.base_station.get_active_bots_names()).encode())
         elif key == "SCRIPTS":
             value = data['value']
+            print(value)
             bot_name = data['bot_name']
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             bot = self.base_station.get_bot(bot_id)

@@ -31,7 +31,7 @@ export default class Python extends React.Component {
       event.preventDefault();
       var element = document.createElement('a');
       var filename = this.state.filename;
-      if(filename.substring(filename.length-4)!=".xml"){
+      if(filename.substring(filename.length-3)!=".py"){
           filename += ".py";
       }
       element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(this.state.data));
@@ -54,6 +54,7 @@ export default class Python extends React.Component {
           }),
       })
       .then(function(response) {
+          console.log(axois.data.value);
           console.log('sent script');
       })
       .catch(function (error) {

@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from 'axios';
 
 /**
  * Component for the Blockly sandbox
@@ -56,8 +57,8 @@ export default class MinibotBlockly extends React.Component {
     }
   }
 
-  /* Helper for realtime code generation (Blockly => Python) 
-  Stores blockly state in parent component so it can load the previous state after switching react tabs 
+  /* Helper for realtime code generation (Blockly => Python)
+  Stores blockly state in parent component so it can load the previous state after switching react tabs
   https://developers.google.com/blockly/guides/get-started/web
   */
   scriptToCode() {
@@ -66,9 +67,9 @@ export default class MinibotBlockly extends React.Component {
     var xml_text = Blockly.Xml.domToText(xml);
     this.props.setBlockly(xml_text);
 
-    document.getElementById(
-      'blockly'
-    ).value = window.Blockly.Python.workspaceToCode(this.workspace);
+    document.getElementById('blockly').value = window.Blockly.Python.workspaceToCode(this.workspace);
+
+    console.log(blockly.value);
   }
 
   /* DOWNLOAD FUNCTION
@@ -106,6 +107,26 @@ export default class MinibotBlockly extends React.Component {
     reader.readAsText(file);
   }
 
+  run(event){
+    console.log(name);
+    axios({
+        method:'POST',
+        url:'/start',
+        data: JSON.stringify({
+            key: 'SCRIPTS',
+            value: blockly.value,
+            bot_name: name
+        }),
+    })
+    .then(function(response) {
+        console.log(blockly.value);
+        console.log('sent script');
+    })
+    .catch(function (error) {
+        console.warn(error);
+    });
+  }
+
   loadFileAsBlocks(event) {
     var xmlToLoad = document.getElementById('blockUpload').files[0];
     var xmlReader = new FileReader();
@@ -137,6 +158,9 @@ export default class MinibotBlockly extends React.Component {
         />
         <button id="blocklySubmit" onClick={this.download}>
           Download
+        </button>&nbsp;&nbsp;
+        <button id="blockyRun" onClick={this.run}>
+          Run
         </button>
         <form>
           <input
