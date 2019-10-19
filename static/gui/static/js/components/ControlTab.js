@@ -12,27 +12,23 @@ export default class ControlTab extends React.Component {
     this.state = {
       currentBot: ''
     };
-    this.setCurrentBot = this.setCurrentBot.bind(this);
+    // this.setCurrentBot = this.setCurrentBot.bind(this);
   }
 
-  setCurrentBot(botName) {
-    this.setState({
-      currentBot: botName
-    });
-  }
+  // setCurrentBot(botName) {
+  //   this.setState({
+  //     currentBot: botName
+  //   });
+  // }
 
   render() {
     return (
       <div id="tab_control">
-        <div className="row">
-          <div className="col-md-7">
             <Blockly
               blockly_xml={this.props.blockly_xml}
               setBlockly={this.props.setBlockly}
+              bot_name={this.props.bot_name}
             />
-          </div>
-          <div className="col-md-5"></div>
-        </div>
       </div>
     );
   }

@@ -15,6 +15,7 @@ export default class MinibotBlockly extends React.Component {
     this.handleInputChange = this.handleInputChange.bind(this);
     this.download = this.download.bind(this);
     this.upload = this.upload.bind(this);
+    this.run = this.run.bind(this);
   }
 
   /* handles input change for file name and coding textboxes */
@@ -62,12 +63,12 @@ export default class MinibotBlockly extends React.Component {
   https://developers.google.com/blockly/guides/get-started/web
   */
   scriptToCode() {
-    console.log('scriptToCode');
     var xml = Blockly.Xml.workspaceToDom(this.workspace);
     var xml_text = Blockly.Xml.domToText(xml);
     this.props.setBlockly(xml_text);
 
-    document.getElementById('blockly').value = window.Blockly.Python.workspaceToCode(this.workspace);
+    document.getElementById('data').innerText = window.Blockly.Python.workspaceToCode(this.workspace);
+    //document.getElementById('blockly').value = window.Blockly.Python.workspaceToCode(this.workspace);
 
     console.log(blockly.value);
   }
@@ -107,19 +108,21 @@ export default class MinibotBlockly extends React.Component {
     reader.readAsText(file);
   }
 
-  run(event){
-    console.log(name);
+  run(event) {
+    // console.log(name);
+    // var _this = this;
+    // console.log(this.props.bot_name, "BOT NAME IN BLOCKLY");
     axios({
         method:'POST',
         url:'/start',
         data: JSON.stringify({
             key: 'SCRIPTS',
-            value: blockly.value,
-            bot_name: name
-        }),
+            value: data.innerText,
+            bot_name: this.props.bot_name
+        })
     })
     .then(function(response) {
-        console.log(blockly.value);
+        console.log(this.state.data);
         console.log('sent script');
     })
     .catch(function (error) {
@@ -142,10 +145,11 @@ export default class MinibotBlockly extends React.Component {
   }
 
   render() {
-    var blocklyStyle = { margin: '0', height: '67vh', width: '55vw' };
+    var blocklyStyle = { margin: '0', height: '67vh'};
     return (
-      <div id="blockly" className="box">
-        <div id="blocklyDiv" style={blocklyStyle}>
+      <div id="blockyContainer" class="row">
+      <div id="blockly" className="box" class="col-md-7">
+        <div id="blocklyDiv" style={blocklyStyle} align="left">
           Blockly
         </div>
         <br />
@@ -171,6 +175,10 @@ export default class MinibotBlockly extends React.Component {
             onChange={this.loadFileAsBlocks}
           />
         </form>
+        <br />
+      </div>
+      <div id="data" class="col-md-5">
+      </div>
       </div>
     );
   }
