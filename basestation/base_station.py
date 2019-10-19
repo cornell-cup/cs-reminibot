@@ -5,7 +5,7 @@ Base Station for the MiniBot.
 # external
 from random import choice
 from string import digits, ascii_lowercase, ascii_uppercase
-import socket 
+import socket
 import sys
 import time
 import threading
@@ -16,6 +16,8 @@ from bot.pi_bot import PiBot
 from bot.sim_bot import SimBot
 from session.session import Session
 from connection.udp_connection import UDPConnection
+
+MAX_VISION_LOG_LENGTH = 1000
 
 
 class BaseStation:
@@ -28,11 +30,12 @@ class BaseStation:
         self.__udp_connection = UDPConnection()
         self.__udp_connection.start()
 
-        # Send a message on a specific port so that the minibots can discover the ip address 
-        # of the computer that the BaseStation is running on.  
+        # Send a message on a specific port so that the minibots can discover the ip address
+        # of the computer that the BaseStation is running on.
         self.broadcast_ip_thread = threading.Thread(target=self.broadcast_ip)
 
-        self.bot_discover_thread = threading.Thread(target=self.discover_and_create_bots)
+        self.bot_discover_thread = threading.Thread(
+            target=self.discover_and_create_bots)
         self.broadcast_ip_thread.start()
         self.bot_discover_thread.start()
         # self.connections = BaseConnection()
@@ -57,7 +60,8 @@ class BaseStation:
         Args:
             values (dict): dictionary containing positions 
         """
-        locations = {'id': value['id'], 'x': value['x'], 'y': value['y'], 'z': value['z']}
+        locations = {'id': value['id'], 'x': value['x'],
+                     'y': value['y'], 'z': value['z']}
         # print("Received1 vision info: ", locations)
         self.vision_log.append(locations)
         if len(self.vision_log) > MAX_VISION_LOG_LENGTH:
@@ -78,12 +82,12 @@ class BaseStation:
         """
         return self.vision_log
 
-
     # ==================== BOTS ====================
+
     def broadcast_ip(self):
         """ Broadcasts ip address of the computer that the BaseStation is running on
         so that other minibots can connect to the BaseStation.
-        
+
         Returns: None
 
         Author: virenvshah (code taken from link below)
@@ -95,7 +99,7 @@ class BaseStation:
         # SOCK_DGRAM for UDP connections
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-        # empty string means 0.0.0.0, which is all IP addresses on the local 
+        # empty string means 0.0.0.0, which is all IP addresses on the local
         # machine, because some machines can have multiple Network Interface
         # Cards, and therefore will have multiple ip_addresses
         server_address = ("", 9434)
@@ -108,11 +112,10 @@ class BaseStation:
         while True:
             data, address = sock.recvfrom(4096)
             data = str(data.decode('UTF-8'))
-    
+
             if data == request_password:
                 # Tell the minibot that you are the base station
                 sent = sock.sendto(response.encode(), address)
-
 
     def get_active_bots_names(self):
         """
@@ -156,7 +159,7 @@ class BaseStation:
             id of newly added bot
         """
         bot_id = self.generate_id()
-        if not bot_name: 
+        if not bot_name:
             bot_name = "minibot" + ip[len(ip)-3:].replace('.', '')
 
         if type == "PIBOT":
@@ -216,7 +219,7 @@ class BaseStation:
         """
         if not session_id or not bot_id:
             return False
-            
+
         session = self.active_sessions[session_id]
         if not session or not session.has_bot(bot_id):
             return False
@@ -285,10 +288,10 @@ class BaseStation:
             bot_id:
         """
         if bot_id in self.active_bots:
-            return self.active_bots[bot_id]  
-        else:      
+            return self.active_bots[bot_id]
+        else:
             return None
-            
+
     def discover_bots(self):
         """
         Returns a list of the names of PiBots, which are detectable
@@ -300,7 +303,7 @@ class BaseStation:
         """
         Returns a list of the ip addresses of all active bots.
         """
-        return {bot.get_ip() : bot.get_id() for _, bot in self.active_bots.items()}
+        return {bot.get_ip(): bot.get_id() for _, bot in self.active_bots.items()}
 
     def get_bot_sessions(self, bot_id):
         """
@@ -409,7 +412,8 @@ class BaseStation:
             return False
 
         if not self.active_sessions[session_id].has_bot(bot_id):
-            print("session " + str(session_id) + " does not own " + str(bot_id))
+            print("session " + str(session_id) +
+                  " does not own " + str(bot_id))
             return False
 
         bot = self.active_bots[bot_id]
@@ -434,14 +438,13 @@ class BaseStation:
             # "^" used for split function on frontend
             sessions = []
             for session_id in self.get_bot_sessions(bot_id):
-                sessions.append((session_id, "Connected " + \
-                    self.active_sessions[session_id].get_time_connected_to_bot_id(bot_id)))
+                sessions.append((session_id, "Connected " +
+                                 self.active_sessions[session_id].get_time_connected_to_bot_id(bot_id)))
 
             bot_info = bot_info + "Name:^ " + str(bot.get_name()) + "\n" \
-                       + "Id:^ " + str(bot.get_id()) + "\n" \
-                       + "Private?:^ " + str(bot.get_is_private()) + "\n" \
-                       + "IP:^ " + str(bot.get_ip()) + "\n" \
-                       + "Port:^ " + str(bot.get_port()) + "\n" \
-                       + "Sessions:^ " + str(sessions) + "\n" + "\n"
+                + "Id:^ " + str(bot.get_id()) + "\n" \
+                + "Private?:^ " + str(bot.get_is_private()) + "\n" \
+                + "IP:^ " + str(bot.get_ip()) + "\n" \
+                + "Port:^ " + str(bot.get_port()) + "\n" \
+                + "Sessions:^ " + str(sessions) + "\n" + "\n"
         return bot_info
-
