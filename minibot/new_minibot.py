@@ -8,6 +8,8 @@ import sys
 import time
 import importlib
 import ast
+import os
+import ece_dummy_ops  # pseudo-ECE ops
 
 # Create a UDP socket
 sock = socket(AF_INET, SOCK_DGRAM)
@@ -49,11 +51,59 @@ def parse_command(cmd, tcpInstance):
     elif key == "SCRIPTS":
         if len(value) > 0:
             try:
-                ast.literal_eval(value)
+                # TODO test if this actually executes anything
+                # No way to really test unless we have a pi
+                script_name = "script0001.py"  # TODO what to name it?
+                program = process_string(value)
+                print(os.getcwd())
+                # TODO modularize scripts
+                file = open(
+                    os.getcwd() + "/" + script_name, 'w')
+                file.write(program)
+                file.close()
+                p = spawn_script_process(script_name)
             except Exception as e:
-                print("Exception occured")  # TODO check if this works
+                print("Exception occured")
                 print(e)
                 pass
+
+
+def process_string(value):
+    """
+    Function from /minibot/main.py. Encases programs in a function
+    called run(), which can later be ran when imported via the
+    import library.
+    """
+    cmds = value.splitlines()
+    program = "from ece_dummy_ops import *\n"
+    program += "def run():\n"
+    for i in range(len(cmds)):
+        program += "    " + cmds[i] + "\n"
+    print(program)
+    return program
+
+
+def spawn_script_process(scriptname):
+    """
+    Function from /minibot/main.py. Creates a new thread to run
+    the script process on.
+    TODO what is p?
+    """
+    time.sleep(0.1)
+    #p = Thread(target=run_script, args=[scriptname], daemon=True)
+    # p.start()
+    # return p
+    Thread(target=run_script, args=[scriptname], daemon=True).start()
+
+
+def run_script(scriptname):
+    """
+    Function from /minibot/main.py. Tells a bot to run a script.
+    """
+    index = scriptname.find(".")
+    # TODO after modularizing, change import module
+    script = importlib.import_module(scriptname[0: index])
+    script.run()
 
 
 def start_base_station_heartbeat(ip_address):

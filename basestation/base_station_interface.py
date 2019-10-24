@@ -194,7 +194,7 @@ class ClientHandler(tornado.web.RequestHandler):
             print(value)
             bot_name = data['bot_name']
             print("This is the script for bot named " + bot_name)
-            bot_name = 'minibot28'  # TODO remove hardcode
+            bot_name = 'minibot157'  # TODO remove hardcode
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             bot = self.base_station.get_bot(bot_id)
             if bot:
@@ -267,8 +267,9 @@ class ClientHandler(tornado.web.RequestHandler):
         }
 
         # Regex is for bot-specific functions (move forward, stop, etc)
-        # 1st group is the function name, 2nd group is for args
-        pattern = "bot.(\w*)\((.*)\)"
+        # 1st group is the whitespace (useful for def, for, etc),
+        # 2nd group is for func name, 3rd group is for args.
+        pattern = "(\s)*bot.(\w*)\((.*)\)"
         regex = re.compile(pattern)
 
         # TODO what to do after a function bound to a wait is done?
@@ -281,12 +282,18 @@ class ClientHandler(tornado.web.RequestHandler):
             if match == None:
                 parsed_program.append(line + '\n')  # "normal" python
             else:
-                func = function_map[match.group(1)]
-                args = match.group(2)
-                parsed_program.append(func + "(" + args + ")\n")
+                func = function_map[match.group(2)]
+                args = match.group(3)
+                whitespace = match.group(1)
+                if whitespace == None:
+                    whitespace = ""
+                parsed_program.append(whitespace + func + "(" + args + ")\n")
 
         parsed_program_string = "".join(parsed_program)
         print(parsed_program_string)
+
+        # Now actually send to the bot
+        bot.sendKV("SCRIPTS", parsed_program_string)
 
 
 class VisionHandler(tornado.websocket.WebSocketHandler):
