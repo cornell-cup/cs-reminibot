@@ -9,13 +9,18 @@ export default class MinibotBlockly extends React.Component {
     super(props);
     this.scriptToCode = this.scriptToCode.bind(this);
     this.state = {
-      blockly_filename: 'myXmlBlocklyCode.xml'
+      blockly_filename: 'myXmlBlocklyCode.xml',
+      data: "",
+      filename: "myPythonCode.py"
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
+    this.handleScriptChange = this.handleScriptChange.bind(this);
     this.download = this.download.bind(this);
+    this.run_blockly = this.run_blockly.bind(this);
+    this.run_script = this.run_script.bind(this);
+    this.copy = this.copy.bind(this);
     this.upload = this.upload.bind(this);
-    this.run = this.run.bind(this);
   }
 
   /* handles input change for file name and coding textboxes */
@@ -26,6 +31,12 @@ export default class MinibotBlockly extends React.Component {
     this.setState({
       [name]: value
     });
+  }
+
+  handleScriptChange(event) {
+    console.log("WORKED!!!")
+    this.setState({data: event.target.value});
+    console.log(this.state.data);
   }
 
   /* Runs after component loads - this generates the blockly stuff */
@@ -68,6 +79,7 @@ export default class MinibotBlockly extends React.Component {
     this.props.setBlockly(xml_text);
 
     document.getElementById('data').innerText = window.Blockly.Python.workspaceToCode(this.workspace);
+    document.getElementById('blockly').value = window.Blockly.Python.workspaceToCode(this.workspace);
     //document.getElementById('blockly').value = window.Blockly.Python.workspaceToCode(this.workspace);
 
     console.log(blockly.value);
@@ -108,26 +120,50 @@ export default class MinibotBlockly extends React.Component {
     reader.readAsText(file);
   }
 
-  run(event) {
-    // console.log(name);
-    // var _this = this;
-    // console.log(this.props.bot_name, "BOT NAME IN BLOCKLY");
+  run_blockly(event){
+    console.log(name);
     axios({
         method:'POST',
         url:'/start',
         data: JSON.stringify({
             key: 'SCRIPTS',
-            value: data.innerText,
-            bot_name: this.props.bot_name
-        })
+            value: blockly.value,
+            bot_name: name
+            // bot_name: "Hi"
+        }),
     })
     .then(function(response) {
-        console.log(this.state.data);
+        console.log(blockly.value);
         console.log('sent script');
     })
     .catch(function (error) {
         console.warn(error);
     });
+  }
+
+  run_script(event){
+    console.log(name);
+    axios({
+        method:'POST',
+        url:'/start',
+        data: JSON.stringify({
+            key: 'SCRIPTS',
+            value: this.state.data,
+            bot_name: name
+        }),
+    })
+    .then(function(response) {
+        console.log(axois.data.value);
+        console.log('sent script');
+    })
+    .catch(function (error) {
+        console.warn(error);
+    });
+}
+
+  copy(event){
+    document.getElementById("textarea").value = blockly.value;
+    this.setState({data: blockly.value});
   }
 
   loadFileAsBlocks(event) {
@@ -163,7 +199,7 @@ export default class MinibotBlockly extends React.Component {
         <button id="blocklySubmit" onClick={this.download}>
           Download
         </button>&nbsp;&nbsp;
-        <button id="blockyRun" onClick={this.run}>
+        <button id="blockyRun" onClick={this.run_blockly}>
           Run
         </button>
         <form>
@@ -176,9 +212,23 @@ export default class MinibotBlockly extends React.Component {
           />
         </form>
         <br />
+
+        <div id="Python">
+      Python
+      <div> File name:  <input type="text" name="filename" value={this.state.filename} onChange={this.handleFileNameChange}/> </div>
+      <div> <textarea id = "textarea" onChange={this.handleScriptChange} /></div>
+      <button id="submit" onClick={this.download}>Download</button>
+      <button id="run" onClick={this.run_script}>Run Code</button>
+      <button id="save" onClick={this.save}>Save Code</button>
+      <button id="copy" onClick={this.copy}>Copy Code</button>
+      <div>{this.state.data}</div>
+      <div>{this.state.filename}</div>
+      </div>
+
       </div>
       <div id="data" class="col-md-5">
       </div>
+
       </div>
     );
   }
