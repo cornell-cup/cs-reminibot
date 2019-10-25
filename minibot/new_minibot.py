@@ -23,9 +23,10 @@ sock.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
 server_address = ('255.255.255.255', 9434)
 message = 'i_am_a_minibot'
 
+script_num = 0  # TODO make scripts not generate all the time
+
 
 def parse_command(cmd, tcpInstance):
-    # Former code was: def parse_command(cmd, bot, tcpInstance):
     """
     Parses command sent by SendKV via TCP to the bot.
     Sent from BaseStation.
@@ -33,6 +34,7 @@ def parse_command(cmd, tcpInstance):
          cmd (:obj:`str`): The command name.
          tcpInstance (:obj:`str`): Payload or contents of command.
     """
+    global script_num
     comma = cmd.find(",")
     start = cmd.find("<<<<")
     end = cmd.find(">>>>")
@@ -51,14 +53,14 @@ def parse_command(cmd, tcpInstance):
     elif key == "SCRIPTS":
         if len(value) > 0:
             try:
-                # TODO test if this actually executes anything
-                # No way to really test unless we have a pi
-                script_name = "script0001.py"  # TODO what to name it?
+                # TODO replace script_num
+                script_name = "script" + str(script_num) + ".py"
+                script_num += 1
                 program = process_string(value)
                 print(os.getcwd())
                 # TODO modularize scripts
                 file = open(
-                    os.getcwd() + "/" + script_name, 'w')
+                    os.getcwd() + "/" + script_name, 'w+')
                 file.write(program)
                 file.close()
                 p = spawn_script_process(script_name)
@@ -87,12 +89,8 @@ def spawn_script_process(scriptname):
     """
     Function from /minibot/main.py. Creates a new thread to run
     the script process on.
-    TODO what is p?
     """
     time.sleep(0.1)
-    #p = Thread(target=run_script, args=[scriptname], daemon=True)
-    # p.start()
-    # return p
     Thread(target=run_script, args=[scriptname], daemon=True).start()
 
 

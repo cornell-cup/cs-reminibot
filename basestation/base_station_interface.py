@@ -194,7 +194,7 @@ class ClientHandler(tornado.web.RequestHandler):
             print(value)
             bot_name = data['bot_name']
             print("This is the script for bot named " + bot_name)
-            bot_name = 'minibot157'  # TODO remove hardcode
+            bot_name = 'minibot185'  # TODO remove hardcode
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             bot = self.base_station.get_bot(bot_id)
             if bot:
@@ -269,7 +269,7 @@ class ClientHandler(tornado.web.RequestHandler):
         # Regex is for bot-specific functions (move forward, stop, etc)
         # 1st group is the whitespace (useful for def, for, etc),
         # 2nd group is for func name, 3rd group is for args.
-        pattern = "(\s)*bot.(\w*)\((.*)\)"
+        pattern = "(\s*)bot.(\w*)\((.*)\)"
         regex = re.compile(pattern)
 
         # TODO what to do after a function bound to a wait is done?
