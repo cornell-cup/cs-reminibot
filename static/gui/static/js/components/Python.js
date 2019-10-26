@@ -83,6 +83,7 @@ export default class Python extends React.Component {
   render() {
     return (
       <div>
+      {/*
         <div> File name:  <input type="text" name="filename" value={this.state.filename} onChange={this.handleFileNameChange}/> </div>
         <div> <textarea onChange={this.handleInputChange} /></div>
         <button id="submit" onClick={this.download}>Download</button>
@@ -90,6 +91,7 @@ export default class Python extends React.Component {
         <button id="save" onClick={this.save}>Save Code</button>
         <div>{this.state.data}</div>
         <div>{this.state.filename}</div>
+        */}
       </div>
     )
   }

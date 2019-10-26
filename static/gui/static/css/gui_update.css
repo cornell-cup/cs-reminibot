@@ -3,6 +3,7 @@
     margin: 1vh;
     background:lightgrey;
     padding: 1vh;
+    width: 540px;
 }
 
 .slightly_larger_text{
@@ -31,6 +32,11 @@
 
 .newDiv {
     padding-top: 15px;
+}
+
+.button-wrapper{
+    padding-top:10px;
+    padding-bottom:10px;
 }
 
 input[type="text"] {
@@ -91,7 +97,7 @@ table{
     font-family:Consolas, monospace;
     padding:10px;
     font-size:12px;
-    width:100%;
+    width: 30px;
     height:60vh;
 }
 
@@ -151,4 +157,8 @@ table{
 
 .btn_btn-dir {
     background: #f37aff;
+}
+
+#title{
+  font-size: 40px;
 }

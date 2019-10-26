@@ -12,6 +12,7 @@ export default class Scripts extends React.Component {
       }
 
       this.getScripts = this.getScripts.bind(this);
+
   }
 
   //data field is empty
@@ -49,13 +50,15 @@ export default class Scripts extends React.Component {
   render() {
       return (
           <div>
-              <div> Scripts For:  {this.props.bot_name} </div>
-              <div>
-                  <div>Select Script</div>
-              </div>
-              <div> Run Script </div>
-              <div> <Python bot_name={this.state.bot_name}/> </div>
-              <div> Save Script </div>
+          {/*
+            <div> Scripts For:  {this.props.bot_name} </div>
+            <div>
+                <div>Select Script</div>
+            </div>
+            <div> Run Script </div>
+            <div> <Python bot_name={this.state.bot_name}/> </div>
+            <div> Save Script </div>
+          */}
           </div>
       )
   }
