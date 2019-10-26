@@ -39,6 +39,12 @@
     padding-bottom:10px;
 }
 
+.divider{
+    width:100px;
+    height:auto;
+    display:inline-block;
+}
+
 input[type="text"] {
     margin-left: 10px;
 }
@@ -97,7 +103,7 @@ table{
     font-family:Consolas, monospace;
     padding:10px;
     font-size:12px;
-    width: 30px;
+    width: 10vh;
     height:60vh;
 }
 
@@ -156,9 +162,25 @@ table{
 }
 
 .btn_btn-dir {
-    background: #f37aff;
+    background:#d1150c;
+    color: white;
+    border-radius: 15px;
+    height: 40px;
+    /* width: 120px; */
+    font-weight: 650;
+    letter-spacing: 0.11em;
+}
+
+.btn_btn-dir_movement {
+    background:#d1150c;
+    color: white;
+    border-radius: 15px;
+    height: 40px;
+    width: 120px;
+    font-weight: 650;
+    letter-spacing: 0.11em;
 }
 
 #title{
-  font-size: 40px;
+    font-size: 40px;
 }

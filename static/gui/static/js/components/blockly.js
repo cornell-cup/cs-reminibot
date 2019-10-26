@@ -122,19 +122,17 @@ export default class MinibotBlockly extends React.Component {
     };
     reader.readAsText(file);
   }
-
   /* Target function for the button "Run". Send python code
      corresponding to blockly to backend. */
   run_blockly(event) {
-    console.log(name);
+    console.log(this.props.bot_name, "run_blockly");
     axios({
       method: 'POST',
       url: '/start',
       data: JSON.stringify({
         key: 'SCRIPTS',
         value: blockly.value,
-        bot_name: name
-        // bot_name: "Hi"
+        bot_name: this.props.bot_name
       }),
     })
       .then(function (response) {
@@ -150,14 +148,14 @@ export default class MinibotBlockly extends React.Component {
   /* Target function for the button "Run Code". Send python code
      in the editing box to backend. */
   run_script(event) {
-    console.log(name);
+    console.log(this.props.bot_name, "run_script");
     axios({
       method: 'POST',
       url: '/start',
       data: JSON.stringify({
         key: 'SCRIPTS',
         value: this.state.data,
-        bot_name: name
+        bot_name: this.props.bot_name
       }),
     })
       .then(function (response) {
@@ -194,7 +192,6 @@ export default class MinibotBlockly extends React.Component {
     var blocklyStyle = { height: '67vh' };
     var marginStyle = { marginLeft: '10px' };
     var dataStyle = { align: 'right' };
-
     return (
       <div id="blockyContainer" style={marginStyle} className="row">
         <div id="blockly" className="box" className="col-md-7">

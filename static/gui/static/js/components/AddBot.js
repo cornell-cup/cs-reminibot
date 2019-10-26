@@ -262,15 +262,15 @@ export default class AddBot extends React.Component {
             method: 'POST',
             url: '', //url to backend endpoint
             data: JSON.stringify({
-               //add data to send here
+                //add data to send here
             })
         })
-        .then(function (response){
-            //do stuff after success
-        })
-        .catch(function (error) {
-            //handle errors
-        });
+            .then(function (response) {
+                //do stuff after success
+            })
+            .catch(function (error) {
+                //handle errors
+            });
     }
 
     objectDetectionOnClick() {
@@ -278,16 +278,17 @@ export default class AddBot extends React.Component {
             method: 'POST',
             url: '', //url to backend endpoint
             data: JSON.stringify({
-               //add data to send here
+                //add data to send here
             })
         })
-        .then(function (response){
-            //do stuff after success
-        })
-        .catch(function (error) {
-            //handle errors
-        });
+            .then(function (response) {
+                //do stuff after success
+            })
+            .catch(function (error) {
+                //handle errors
+            });
     }
+
 
     render() {
         var styles = {
@@ -352,17 +353,17 @@ export default class AddBot extends React.Component {
                         <tbody>
                             <tr>
                                 <td></td>
-                                <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("forward")}>forward</button></td>
+                                <td><button className="btn_btn-dir_movement" onClick={() => this.buttonMapListener("forward")}>forward</button></td>
                                 <td></td>
                             </tr>
                             <tr>
-                                <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("left")}>left</button></td>
-                                <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("stop")}>stop</button></td>
-                                <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("right")}>right</button></td>
+                                <td><button className="btn_btn-dir_movement" onClick={() => this.buttonMapListener("left")}>left</button></td>
+                                <td><button className="btn_btn-dir_movement" onClick={() => this.buttonMapListener("stop")}>stop</button></td>
+                                <td><button className="btn_btn-dir_movement" onClick={() => this.buttonMapListener("right")}>right</button></td>
                             </tr>
                             <tr>
                                 <td></td>
-                                <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("backward")}>backward</button></td>
+                                <td><button className="btn_btn-dir_movement" onClick={() => this.buttonMapListener("backward")}>backward</button></td>
                                 <td></td>
                             </tr>
                         </tbody>
@@ -378,10 +379,11 @@ export default class AddBot extends React.Component {
                     the rest is bootstrap css */}
                 <div className="row button-wrapper">
                     <div className="col-md-3">
-                    <button type="button" className="btn btn-primary" onClick={() => this.lineFollowOnClick()}>Line Follow</button>                 
+                        <button type="button" className="btn btn-primary" onClick={() => this.lineFollowOnClick()}>Line Follow</button>
                     </div>
+                    <div class="divider" />
                     <div className="col-md-3">
-                    <button type="button" className="btn btn-success" onClick={() => this.objectDetectionOnClick()}>Object Detection</button>
+                        <button type="button" className="btn btn-success" onClick={() => this.objectDetectionOnClick()}>Object Detection</button>
                     </div>
                     <div className="col-md-6">
 
