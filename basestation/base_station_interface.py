@@ -14,11 +14,13 @@ import time
 # Minibot imports.
 from base_station import BaseStation
 
+
 class BaseInterface:
     """
     Class which contains the base station and necessary functions for running the
     base station GUI.
     """
+
     def __init__(self, port):
         """
         Initializes base station
@@ -36,7 +38,8 @@ class BaseInterface:
             "cookie_secret": str(self.base_station.add_session())
         }
         self.handlers = [
-            ("/" + self.base_station_key, BaseStationHandler, dict(base_station=self.base_station)),
+            ("/" + self.base_station_key, BaseStationHandler,
+             dict(base_station=self.base_station)),
             ("/start", ClientHandler, dict(base_station=self.base_station)),
             ("/vision", VisionHandler, dict(base_station=self.base_station))
         ]
@@ -60,6 +63,7 @@ class BaseStationHandler(tornado.web.RequestHandler):
     """
     Displays the Base Station GUI.
     """
+
     def initialize(self, base_station):
         self.base_station = base_station
 
@@ -67,7 +71,8 @@ class BaseStationHandler(tornado.web.RequestHandler):
         session_id = self.get_secure_cookie("user_id")
         if session_id:
             session_id = session_id.decode("utf-8")
-        self.render("../static/basestation_gui/index.html", title = "Base Station")
+        self.render("../static/basestation_gui/index.html",
+                    title="Base Station")
 
     def post(self):
         data = json.loads(self.request.body.decode())
@@ -85,18 +90,19 @@ class ClientHandler(tornado.web.RequestHandler):
     """
     Displays the Client GUI.
     """
+
     def initialize(self, base_station):
         self.base_station = base_station
 
     def get(self):
         if not self.get_secure_cookie("user_id"):
-            new_id = self.base_station.add_session();
+            new_id = self.base_station.add_session()
             self.set_secure_cookie("user_id", new_id)
 
         session_id = self.get_secure_cookie("user_id")
         if session_id:
             session_id = session_id.decode("utf-8")
-        self.render("../static/gui/index.html", title = "Client")
+        self.render("../static/gui/index.html", title="Client")
 
     def post(self):
         data = json.loads(self.request.body.decode())
@@ -108,15 +114,20 @@ class ClientHandler(tornado.web.RequestHandler):
 
         if key == "CONNECTBOT":
             bot_name = data['bot_name']
-            print("bot " + str(bot_name))
-            print("session " + str(session_id))
-            self.write(json.dumps(self.base_station.add_bot_to_session(session_id, bot_name)).encode())
+            if bot_name != None and bot_name != "":
+                print("Connecting bot " + str(bot_name))
+                print("session " + str(session_id))
+                self.write(json.dumps(self.base_station.add_bot_to_session(
+                    session_id, bot_name)).encode())
+            else:
+                print("No bot received, or bot name empty.")
         elif key == "WHEELS":
             bot_name = data['bot_name']
             direction = data['direction']
             power = str(data['power'])
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
-            self.base_station.move_wheels_bot(session_id, bot_id, direction, power)
+            self.base_station.move_wheels_bot(
+                session_id, bot_id, direction, power)
         elif key == "WINGS":
             bot_name = data['bot_name']
             power = str(data['power'])
@@ -175,7 +186,8 @@ class ClientHandler(tornado.web.RequestHandler):
         #     self.base_station.move_body_bot(session_id, bot_id, direction, power)
         elif key == "DISCOVERBOTS":
             print("discover_bots")
-            self.write(json.dumps(self.base_station.get_active_bots_names()).encode())
+            self.write(json.dumps(
+                self.base_station.get_active_bots_names()).encode())
         elif key == "SCRIPTS":
             value = data['value']
             print(value)
@@ -199,7 +211,7 @@ class ClientHandler(tornado.web.RequestHandler):
             self.base_station.remove_bot_from_session(session_id, bot_id)
         elif key == "BOTSTATUS":
             bot_name = data['bot_name']
-            bot_id = self.base_station.bot_name_to_bot_id(bot_name);
+            bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             bot = self.base_station.get_bot(bot_id)
             if bot:
                 bot.sendKV("BOTSTATUS", '')
@@ -219,7 +231,7 @@ class ClientHandler(tornado.web.RequestHandler):
 
 
 class VisionHandler(tornado.websocket.WebSocketHandler):
-    #this is NOT an example implementation of websockets in Tornado
+    # this is NOT an example implementation of websockets in Tornado
 
     def initialize(self, base_station):
         self.base_station = base_station
