@@ -9,11 +9,18 @@ export default class MinibotBlockly extends React.Component {
     super(props);
     this.scriptToCode = this.scriptToCode.bind(this);
     this.state = {
-      blockly_filename: 'myXmlBlocklyCode.xml'
+      blockly_filename: 'myXmlBlocklyCode.xml',
+      data: "",
+      filename: "myPythonCode.py"
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
+    this.handleScriptChange = this.handleScriptChange.bind(this);
+    this.handleFileNameChange = this.handleFileNameChange.bind(this);
     this.download = this.download.bind(this);
+    this.run_blockly = this.run_blockly.bind(this);
+    this.run_script = this.run_script.bind(this);
+    this.copy = this.copy.bind(this);
     this.upload = this.upload.bind(this);
   }
 
@@ -25,6 +32,18 @@ export default class MinibotBlockly extends React.Component {
     this.setState({
       [name]: value
     });
+  }
+
+  /* Target function for detected text changes in the editing box.
+     Update this.state with the current text. */
+  handleScriptChange(event) {
+    console.log("WORKED!!!")
+    this.setState({data: event.target.value});
+    console.log(this.state.data);
+  }
+
+  handleFileNameChange(event) {
+    this.setState({filename: event.target.value});
   }
 
   /* Runs after component loads - this generates the blockly stuff */
@@ -62,12 +81,13 @@ export default class MinibotBlockly extends React.Component {
   https://developers.google.com/blockly/guides/get-started/web
   */
   scriptToCode() {
-    console.log('scriptToCode');
     var xml = Blockly.Xml.workspaceToDom(this.workspace);
     var xml_text = Blockly.Xml.domToText(xml);
     this.props.setBlockly(xml_text);
 
+    document.getElementById('data').innerText = window.Blockly.Python.workspaceToCode(this.workspace);
     document.getElementById('blockly').value = window.Blockly.Python.workspaceToCode(this.workspace);
+    //document.getElementById('blockly').value = window.Blockly.Python.workspaceToCode(this.workspace);
 
     console.log(blockly.value);
   }
@@ -107,7 +127,9 @@ export default class MinibotBlockly extends React.Component {
     reader.readAsText(file);
   }
 
-  run(event){
+  /* Target function for the button "Run". Send python code
+     corresponding to blockly to backend. */
+  run_blockly(event){
     console.log(name);
     axios({
         method:'POST',
@@ -116,6 +138,7 @@ export default class MinibotBlockly extends React.Component {
             key: 'SCRIPTS',
             value: blockly.value,
             bot_name: name
+            // bot_name: "Hi"
         }),
     })
     .then(function(response) {
@@ -125,6 +148,36 @@ export default class MinibotBlockly extends React.Component {
     .catch(function (error) {
         console.warn(error);
     });
+  }
+
+
+  /* Target function for the button "Run Code". Send python code
+     in the editing box to backend. */
+  run_script(event){
+    console.log(name);
+    axios({
+        method:'POST',
+        url:'/start',
+        data: JSON.stringify({
+            key: 'SCRIPTS',
+            value: this.state.data,
+            bot_name: name
+        }),
+    })
+    .then(function(response) {
+        // console.log(axois.data.value);
+        console.log('sent script');
+    })
+    .catch(function (error) {
+        console.warn(error);
+    });
+}
+
+  /* Target function for the button "Cope Code". Set the text
+     in the editing box according to blockly. */
+  copy(event){
+    document.getElementById("textarea").value = data.innerText;
+    this.setState({data: data.innerText});
   }
 
   loadFileAsBlocks(event) {
@@ -142,10 +195,11 @@ export default class MinibotBlockly extends React.Component {
   }
 
   render() {
-    var blocklyStyle = { margin: '0', height: '67vh', width: '55vw' };
+    var blocklyStyle = { margin: '0', height: '67vh'};
     return (
-      <div id="blockly" className="box">
-        <div id="blocklyDiv" style={blocklyStyle}>
+      <div id="blockyContainer" className="row">
+      <div id="blockly" className="box" className="col-md-7">
+        <div id="blocklyDiv" style={blocklyStyle} align="left">
           Blockly
         </div>
         <br />
@@ -159,7 +213,7 @@ export default class MinibotBlockly extends React.Component {
         <button id="blocklySubmit" onClick={this.download}>
           Download
         </button>&nbsp;&nbsp;
-        <button id="blockyRun" onClick={this.run}>
+        <button id="blockyRun" onClick={this.run_blockly}>
           Run
         </button>
         <form>
@@ -171,6 +225,24 @@ export default class MinibotBlockly extends React.Component {
             onChange={this.loadFileAsBlocks}
           />
         </form>
+        <br />
+
+        <div id="Python">
+      Python
+      <div> File name:  <input type="text" name="filename" value={this.state.filename} onChange={this.handleFileNameChange}/> </div>
+      <div> <textarea id = "textarea" onChange={this.handleScriptChange} /></div>
+      <button id="submit" onClick={this.download}>Download</button>
+      <button id="run" onClick={this.run_script}>Run Code</button>
+      <button id="save" onClick={this.save}>Save Code</button>
+      <button id="copy" onClick={this.copy}>Copy Code</button>
+      <div>{this.state.data}</div>
+      <div>{this.state.filename}</div>
+      </div>
+
+      </div>
+      <div id="data" className="col-md-5">
+      </div>
+
       </div>
     );
   }
