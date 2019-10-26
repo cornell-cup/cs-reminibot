@@ -137,7 +137,7 @@ int main(int argc, char** argv) {
     while (key != 27) { // Quit on escape keypres
         // if(key == 'w'){
 	//std::cout <<"for loop 2 start";
-	std::cout << "Print numbr of devices: " << devices.size() << "\n" ;
+	//std::cout << "Print numbr of devices: " << devices.size() << "\n" ;
         for (size_t i = 0; i < devices.size(); i++) {
             if (!devices[i].isOpened()) {
                 std::cout << "Not opened\n";
@@ -159,10 +159,10 @@ int main(int argc, char** argv) {
             vector<Point3f> obj_points(4);
             Mat rvec(3, 1, CV_64FC1);
             Mat tvec(3, 1, CV_64FC1);
-            std::cout << "for loop 3 start\n";
-	    std::cout << "Size of detections: " << zarray_size(detections) << "\n";
+            //std::cout << "for loop 3 start\n";
+	   // std::cout << "Size of detections: " << zarray_size(detections) << "\n";
             for (int j = 0; j < zarray_size(detections); j++) {
-                std::cout <<"J is " << j << "\n";
+               // std::cout <<"J is " << j << "\n";
                 // Get the ith detection
                 apriltag_detection_t *det;
                 zarray_get(detections, j, &det);
@@ -235,7 +235,7 @@ int main(int argc, char** argv) {
                 	angle = 2*M_PI- angle;
                 }
                 angle = angle * 180/M_PI;
-		std::cout << "w if sTART";
+		//std::cout << "w if sTART";
 
                 printf("%zu :: %d :: % 3.3f % 3.3f % 3.3f % 3.3f\n",
                             i, det->id,
