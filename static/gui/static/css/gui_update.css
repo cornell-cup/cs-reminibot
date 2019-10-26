@@ -3,6 +3,7 @@
     margin: 1vh;
     background:lightgrey;
     padding: 1vh;
+    width: 540px;
 }
 
 .slightly_larger_text{
@@ -96,7 +97,7 @@ table{
     font-family:Consolas, monospace;
     padding:10px;
     font-size:12px;
-    width: 10vh;
+    width: 30px;
     height:60vh;
 }
 
@@ -158,8 +159,6 @@ table{
     background: #f37aff;
 }
 
-/* Coding/Control tab style */
-#blocklyDiv{
-  margin-left: 30px;
-
+#title{
+  font-size: 40px;
 }
