@@ -50,16 +50,19 @@ def parse_command(cmd, tcpInstance):
             print(e)
             pass
     elif key == "SCRIPTS":
+        # The script is always named bot_script.py.
         if len(value) > 0:
             try:
                 script_name = "bot_script.py"
                 program = process_string(value)
-                print(os.getcwd())
+
+                # file_dir is the path to folder this file is in
+                file_dir = os.path.dirname(os.path.realpath(__file__))
                 file = open(
-                    os.getcwd() + "/scripts/" + script_name, 'w+')
+                    file_dir + "/scripts/" + script_name, 'w+')
                 file.write(program)
                 file.close()
-                p = spawn_script_process(script_name)
+                spawn_script_process(script_name)
             except Exception as e:
                 print("Exception occured")
                 print(e)
@@ -73,6 +76,7 @@ def process_string(value):
     import library.
     """
     cmds = value.splitlines()
+    # Import modules needed for calling ECE functions
     program = "from scripts." + BOT_LIB_FUNCS + " import *\n"
     program += "import time\n"
     program += "def run():\n"
@@ -95,6 +99,9 @@ def run_script(scriptname):
     """
     Function from /minibot/main.py. Tells a bot to run a script.
     """
+
+    # Cache invalidation and module refreshes are needed to ensure
+    # the most recent script is executed
     index = scriptname.find(".")
     importlib.invalidate_caches()
     script_name = "scripts." + scriptname[0: index]
