@@ -9,7 +9,6 @@ import time
 import importlib
 import ast
 import os
-import ece_dummy_ops  # pseudo-ECE ops
 
 # Create a UDP socket
 sock = socket(AF_INET, SOCK_DGRAM)
@@ -23,9 +22,8 @@ sock.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
 server_address = ('255.255.255.255', 9434)
 message = 'i_am_a_minibot'
 
-script_num = 0  # TODO make scripts not generate all the time
-
-BOT_LIB_FUNCS = "ece_dummy_ops"  # Bot library function names
+# Bot library function names
+BOT_LIB_FUNCS = "ece_dummy_ops"
 
 
 def parse_command(cmd, tcpInstance):
@@ -36,7 +34,6 @@ def parse_command(cmd, tcpInstance):
          cmd (:obj:`str`): The command name.
          tcpInstance (:obj:`str`): Payload or contents of command.
     """
-    global script_num
     comma = cmd.find(",")
     start = cmd.find("<<<<")
     end = cmd.find(">>>>")
@@ -55,14 +52,11 @@ def parse_command(cmd, tcpInstance):
     elif key == "SCRIPTS":
         if len(value) > 0:
             try:
-                # TODO replace script_num
-                script_name = "script" + str(script_num) + ".py"
-                script_num += 1
+                script_name = "bot_script.py"
                 program = process_string(value)
                 print(os.getcwd())
-                # TODO modularize scripts
                 file = open(
-                    os.getcwd() + "/" + script_name, 'w+')
+                    os.getcwd() + "/scripts/" + script_name, 'w+')
                 file.write(program)
                 file.close()
                 p = spawn_script_process(script_name)
@@ -79,8 +73,8 @@ def process_string(value):
     import library.
     """
     cmds = value.splitlines()
-    program = "from " + BOT_LIB_FUNCS + " import *\n"
-    program = "import time\n"
+    program = "from scripts." + BOT_LIB_FUNCS + " import *\n"
+    program += "import time\n"
     program += "def run():\n"
     for i in range(len(cmds)):
         program += "    " + cmds[i] + "\n"
@@ -102,8 +96,10 @@ def run_script(scriptname):
     Function from /minibot/main.py. Tells a bot to run a script.
     """
     index = scriptname.find(".")
-    # TODO after modularizing, change import module
-    script = importlib.import_module(scriptname[0: index])
+    importlib.invalidate_caches()
+    script_name = "scripts." + scriptname[0: index]
+    script = importlib.import_module(script_name)
+    importlib.reload(script)
     script.run()
 
 
