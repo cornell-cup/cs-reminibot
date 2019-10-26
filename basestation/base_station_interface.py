@@ -193,8 +193,8 @@ class ClientHandler(tornado.web.RequestHandler):
             value = data['value']
             print(value)
             bot_name = data['bot_name']
-            print("This is the script for bot named " + bot_name)
-            bot_name = 'minibot185'  # TODO remove hardcode
+            bot_name = "minibot67"  # TODO remove hardcode
+            print("Bot name is " + bot_name)
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             bot = self.base_station.get_bot(bot_id)
             if bot:
