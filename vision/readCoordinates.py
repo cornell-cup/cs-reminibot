@@ -1,95 +1,96 @@
-from subprocess import Popen, PIPE, STDOUT
-from flask import Flask, render_template, Response, request
-app = Flask(__name__)
-import signal
 import sys
+import signal
+import json
+import requests
+from subprocess import Popen, PIPE, STDOUT
+
 
 args = str(sys.argv)
+# getting arguments from command line
+# type(sys.argv) = list of strings
 
-c = '';
-for i in range(0, len(sys.argv)):
-	c = c + "w"
-
-current = [0,0]
-p = Popen(['./locate_tags.x', 'www.google.com', '0.calib'], stdout=PIPE, stdin=PIPE, stderr=PIPE, universal_newlines=True)
-
-
-@app.route('/check', methods=['GET'])
-def check():
-	"""Verification method for the GUI app to ensure user has entered a valid IP for vision station"""
-	return "OK!"
+# p is a process i.e. the coordinates sent out by the locate tags file
+p = Popen(['./locate_tags.o', 'www.google.com', '1.calib'],
+          stdout=PIPE, stdin=PIPE, stderr=PIPE, universal_newlines=True)
 
 
-@app.route('/coordinates')
 def getCoords():
-	# global prevx
-	# global prevy
-	# global prevcam
-		#print("got request")
-		# try:
-		locationstring = p.stdin.write(c)
-		p.stdin.flush()
-		locations = []
-		for i in range(0, len(sys.argv)-1):
-			locations.append(p.stdout.readline())
-		# while(True):
-		# 	locationstring = []
-		# 	out = p.stdin.write(b'w')
-		# 	locationstring.append(out)
-		# print("hey")
-		result = ['', '']
-		for i in range(0, len(locations)):
-			
-			stringarr = locations[i].split()
-			tagid = stringarr[2]
-			avgx = float(stringarr[4]) * 2/3
-			avgy = float(stringarr[5]) * 2/3
-			if avgx > 20:
-				avgx = 20
-			if avgy > 20:
-				avgy = 20
-			if avgx < -20:
-				avgx = -20
-			if avgy < -20:
-				avgy = -20
-			result[int(tagid)] = str(avgx) + " " + str(avgy) + " " + stringarr[7]
+    p.stdin.flush()
+    locations = []
+    result = []
 
-		return result[0] + ';' + result[1]
-		
+    """
+    The two arguments in sys.argv is the file name - readCoordinates.py and 
+    the integer number A of april tags in view. Hence the loop below runs A times.
+    """
 
-		#currcam = stringarr[0]
+    for i in range(0, int(sys.argv[1])):
+        locations.append(p.stdout.readline())
 
-		# if (prevcam >= currcam and len(prevx) != 0):
-		# 	prevx = list(map(float, prevx))
-		# 	prevy = list(map(float, prevy))
-		# 	avgx = sum(prevx)/(len(prevx)) * 2/3
-		# 	avgy = sum(prevy)/(len(prevy)) * 2/3
-		# 	if avgx > 20:
-		# 		avgx = 20
-		# 	if avgy > 20:
-		# 		avgy = 20
-		# 	if avgx < -20:
-		# 		avgx = -20
-		# 	if avgy < -20:
-		# 		avgy = -20
-		# 	current = [avgx, avgy]
-		# 	print(current)
-		# 	prevx = []
-		# 	prevy = []
-		# prevx = prevx + [currx]
-		# prevy = prevy + [curry]
-		# prevcam = currcam
+    for i in range(0, len(locations)):
+        """
+        locations[i] is the coordinates of the ith april tag. (The output of 
+        locate_tags for that april tag)
+
+        You split it on whitespaces so the list stores elements as follows:
+        0 - camera id
+        1 - ::
+        2 - tag id
+        3 - ::
+        4 - x
+        5 - y
+        6 - z
+        7 - orientation angle
+
+        We want x and z so 4 and 6. y is the distance to the camera.
+
+        We make result as a list of dictionaries, with each dictionary storing id,
+        x, y, and orientation of each tag.
+        """
+        stringarr = locations[i].split()
+        tagid = stringarr[2]
+        avgx = float(stringarr[4]) * 2/3
+        avgy = float(stringarr[6]) * 2/3
+
+        if avgx > 20:
+            avgx = 20
+        if avgy > 20:
+            avgy = 20
+        if avgx < -20:
+            avgx = -20
+        if avgy < -20:
+            avgy = -20
+
+        result.append({'id': str(int(tagid)), 'x': str(avgx),
+                       'y': str(avgy), 'orientation': stringarr[7]})
+
+    return result
+
 
 """ gracefully exits if sent a control+C """
+
+
 def sigint_handler(signal, frame):
-	global p
-	print("\n\nBuddybot coordinate program is exiting and terminating locate_tags, goodbye!!!!")
-	p.terminate()
-	sys.exit(0)
+    global p
+    print("\n\nBuddybot coordinate program is exiting and terminating locate_tags, goodbye!!!!")
+    p.terminate()
+    sys.exit(0)
 
 
 if __name__ == '__main__':
-	# gracefully exit with CTRL+C
-	signal.signal(signal.SIGINT, sigint_handler)
-	app.run(host = '0.0.0.0')
+    """
+    So in the infinite loop, we constatly run getCoords and post to the server the dictionary fo each april tag
+    """
+    while(True):
+        data = getCoords()
 
+        # gracefully exit with CTRL+C
+        signal.signal(signal.SIGINT, sigint_handler)
+
+        for i in range(len(data)):
+            # js = json.dumps(data[i]) would give a string
+            r = requests.post(
+                url='http://192.168.4.123:8080/vision', json=data[i])
+            # to check what was posted use
+            # pastebin_url = r.text
+            # print("The pastebin URL is:%s"%pastebin_url)
