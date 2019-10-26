@@ -195,7 +195,8 @@ export default class MinibotBlockly extends React.Component {
   }
 
   render() {
-    var blocklyStyle = { margin: '0', height: '67vh'};
+    var blocklyStyle = { marginLeft: '30px', height: '67vh'};
+    var pythonStyle = {marginLeft: '30px'};
     return (
       <div id="blockyContainer" className="row">
       <div id="blockly" className="box" className="col-md-7">
@@ -227,7 +228,7 @@ export default class MinibotBlockly extends React.Component {
         </form>
         <br />
 
-        <div id="Python">
+      <div id="Python">
       Python
       <div> File name:  <input type="text" name="filename" value={this.state.filename} onChange={this.handleFileNameChange}/> </div>
       <div> <textarea id = "textarea" onChange={this.handleScriptChange} /></div>
