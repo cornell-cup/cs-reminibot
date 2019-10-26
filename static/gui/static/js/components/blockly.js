@@ -232,7 +232,7 @@ export default class MinibotBlockly extends React.Component {
         <br />
 
       <div id="Python">
-      Python
+      <b>Python</b>
       <div> File name:  <input type="text" name="filename" value={this.state.filename} onChange={this.handleFileNameChange}/> </div>
       <div> <textarea id = "textarea" onChange={this.handleScriptChange} /></div>
       <button id="submit" onClick={this.download}>Download</button>
