@@ -33,6 +33,11 @@
     padding-top: 15px;
 }
 
+.button-wrapper{
+    padding-top:10px;
+    padding-bottom:10px;
+}
+
 input[type="text"] {
     margin-left: 10px;
 }
