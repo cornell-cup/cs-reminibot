@@ -245,9 +245,6 @@ class ClientHandler(tornado.web.RequestHandler):
         Sends the program received from Blockly to the bot, translated
         into ECE-supplied functions.
 
-        NOTE: This currently DOES NOT send to the bot, but produces
-        a program the bot can understand.
-
         Args: 
             bot: The pi_bot to send to
             program: The string containing the python code generated
@@ -259,7 +256,7 @@ class ClientHandler(tornado.web.RequestHandler):
         function_map = {
             "move_forward": "fwd",
             "move_backward": "back",
-            "wait": "wait",
+            "wait": "time.sleep",
             "stop": "stop",
             "set_wheel_power": "ECE_wheel_pwr",
             "turn_clockwise": "ECE_turn_CW",

@@ -25,6 +25,8 @@ message = 'i_am_a_minibot'
 
 script_num = 0  # TODO make scripts not generate all the time
 
+BOT_LIB_FUNCS = "ece_dummy_ops"  # Bot library function names
+
 
 def parse_command(cmd, tcpInstance):
     """
@@ -77,7 +79,8 @@ def process_string(value):
     import library.
     """
     cmds = value.splitlines()
-    program = "from ece_dummy_ops import *\n"
+    program = "from " + BOT_LIB_FUNCS + " import *\n"
+    program = "import time\n"
     program += "def run():\n"
     for i in range(len(cmds)):
         program += "    " + cmds[i] + "\n"
