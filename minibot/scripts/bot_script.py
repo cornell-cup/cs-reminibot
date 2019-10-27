@@ -1,5 +1,6 @@
 from scripts.ece_dummy_ops import *
 import time
 def run():
-    fwd(5)
+    for count in range(10):
+      stop()
     

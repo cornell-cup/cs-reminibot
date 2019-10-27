@@ -32,10 +32,13 @@ class BaseStation:
 
         # Send a message on a specific port so that the minibots can discover the ip address
         # of the computer that the BaseStation is running on.
-        self.broadcast_ip_thread = threading.Thread(target=self.broadcast_ip)
+        self.broadcast_ip_thread = threading.Thread(
+            target=self.broadcast_ip, daemon=True
+        )
 
         self.bot_discover_thread = threading.Thread(
-            target=self.discover_and_create_bots)
+            target=self.discover_and_create_bots, daemon=True
+        )
         self.broadcast_ip_thread.start()
         self.bot_discover_thread.start()
         # self.connections = BaseConnection()
@@ -225,20 +228,20 @@ class BaseStation:
             return False
 
         direction = direction.lower()
-        neg_power = "-" + power
-        if direction == "forward" or direction == "fw":
-            value = ",".join([power, power, power, power])
-        elif direction == "backward" or direction == "bw":
-            value = ",".join([neg_power, neg_power, neg_power, neg_power])
-        elif direction == "left" or direction == "lt":
-            value = ",".join([neg_power, power, neg_power, power])
-        elif direction == "right" or direction == "rt":
-            value = ",".join([power, neg_power, power, neg_power])
-        else:
-            value = "0,0,0,0"
+        # neg_power = "-" + power
+        # if direction == "forward" or direction == "fw":
+        #     value = ",".join([power, power, power, power])
+        # elif direction == "backward" or direction == "bw":
+        #     value = ",".join([neg_power, neg_power, neg_power, neg_power])
+        # elif direction == "left" or direction == "lt":
+        #     value = ",".join([neg_power, power, neg_power, power])
+        # elif direction == "right" or direction == "rt":
+        #     value = ",".join([power, neg_power, power, neg_power])
+        # else:
+        #     value = "0,0,0,0"
         # TODO remove print
         print("Active bot " + str(type(self.active_bots[bot_id])))
-        self.active_bots[bot_id].sendKV("WHEELS", value)
+        self.active_bots[bot_id].sendKV("WHEELS", direction)
         return True
 
     # def move_wings_bot(self, session_id, bot_id, power):

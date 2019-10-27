@@ -9,6 +9,7 @@ import time
 import importlib
 import ast
 import os
+import scripts.PiArduino as ece
 
 # Create a UDP socket
 sock = socket(AF_INET, SOCK_DGRAM)
@@ -41,14 +42,18 @@ def parse_command(cmd, tcpInstance):
     value = cmd[comma + 1:end]
     if key == "WHEELS":
         try:
-            values = value.split(",")
-            print(key)
-            print(values)
-            # TODO: Replace code below with new set_wheel_power function
-            # bot.set_wheel_power(int(values[0]), int(values[1]))
+            if value == "forward":
+                ece.fwd()
+            elif value == "backward":
+                ece.back()
+            elif value == "left":
+                ece.left()
+            elif value == "right":
+                ece.right()
+                # TODO: Replace code below with new set_wheel_power function
+                # bot.set_wheel_power(int(values[0]), int(values[1]))
         except Exception as e:
             print(e)
-            pass
     elif key == "SCRIPTS":
         # The script is always named bot_script.py.
         if len(value) > 0:
@@ -66,7 +71,6 @@ def parse_command(cmd, tcpInstance):
             except Exception as e:
                 print("Exception occured")
                 print(e)
-                pass
 
 
 def process_string(value):
@@ -107,6 +111,7 @@ def run_script(scriptname):
     script_name = "scripts." + scriptname[0: index]
     script = importlib.import_module(script_name)
     importlib.reload(script)
+    print("Reached here")
     script.run()
 
 
@@ -147,7 +152,8 @@ try:
             print('Trying again...')
 
     base_station_thread = Thread(
-        target=start_base_station_heartbeat, args=(server_ip,))
+        target=start_base_station_heartbeat, args=(server_ip,), daemon=True
+    )
     base_station_thread.start()
     tcp_instance = TCP()
     while True:

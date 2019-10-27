@@ -1,3 +1,5 @@
+import time
+
 """
 ECE dummy functions for testing
 """
