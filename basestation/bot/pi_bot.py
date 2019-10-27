@@ -7,6 +7,7 @@ import threading
 from util.exception_handling import *
 from bot.base_station_bot import BaseStationBot
 
+
 class PiBot(BaseStationBot, object):
     def __init__(self, bot_id, bot_name, isPrivate, ip, port=10000):
         super(PiBot, self).__init__(bot_id, bot_name, isPrivate)
@@ -61,7 +62,7 @@ class PiBot(BaseStationBot, object):
                             self.tcp_parse_incoming(msg)
             except RuntimeError as e:
                 msg = "TCP receive failed"
-                log_exn_info(e, msg = msg)
+                log_exn_info(e, msg=msg)
 
         def tcp_parse_incoming(self, data):
             """
