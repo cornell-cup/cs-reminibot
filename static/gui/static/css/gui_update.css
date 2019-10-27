@@ -3,6 +3,7 @@
     margin: 1vh;
     background:lightgrey;
     padding: 1vh;
+    width: 540px;
 }
 
 .slightly_larger_text{
@@ -31,6 +32,17 @@
 
 .newDiv {
     padding-top: 15px;
+}
+
+.button-wrapper{
+    padding-top:10px;
+    padding-bottom:10px;
+}
+
+.divider{
+    width:100px;
+    height:auto;
+    display:inline-block;
 }
 
 input[type="text"] {
@@ -91,7 +103,7 @@ table{
     font-family:Consolas, monospace;
     padding:10px;
     font-size:12px;
-    width:100%;
+    width: 10vh;
     height:60vh;
 }
 
@@ -150,5 +162,25 @@ table{
 }
 
 .btn_btn-dir {
-    background: #f37aff;
+    background:#d1150c;
+    color: white;
+    border-radius: 15px;
+    height: 40px;
+    /* width: 120px; */
+    font-weight: 650;
+    letter-spacing: 0.11em;
+}
+
+.btn_btn-dir_movement {
+    background:#d1150c;
+    color: white;
+    border-radius: 15px;
+    height: 40px;
+    width: 120px;
+    font-weight: 650;
+    letter-spacing: 0.11em;
+}
+
+#title{
+    font-size: 40px;
 }
