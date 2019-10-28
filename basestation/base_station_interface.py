@@ -123,11 +123,13 @@ class ClientHandler(tornado.web.RequestHandler):
             else:
                 print("No bot received, or bot name empty.")
         if key == "MODE":
+            print("Reached MODE")
             bot_name = data['bot_name']
             mode_type = data['value']
+            print("here!")
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             bot = self.base_station.get_bot(bot_id)
-            bot.sendKV(key, mode_type)
+            bot.sendKV(key, str(mode_type))
         elif key == "WHEELS":
             bot_name = data['bot_name']
             direction = data['direction']
@@ -192,7 +194,6 @@ class ClientHandler(tornado.web.RequestHandler):
         #     bot_id = self.base_station.bot_name_to_bot_id(bot_name)
         #     self.base_station.move_body_bot(session_id, bot_id, direction, power)
         elif key == "DISCOVERBOTS":
-            print("discover_bots")
             self.write(json.dumps(
                 self.base_station.get_active_bots_names()).encode())
         elif key == "SCRIPTS":
@@ -263,8 +264,8 @@ class ClientHandler(tornado.web.RequestHandler):
             "wait": "time.sleep",
             "stop": "stop",
             "set_wheel_power": "ECE_wheel_pwr",
-            "turn_clockwise": "ECE_turn_CW",
-            "turn_counter_clockwise": "ECE_turn_CCW"
+            "turn_clockwise": "right",
+            "turn_counter_clockwise": "left"
         }
 
         # Regex is for bot-specific functions (move forward, stop, etc)

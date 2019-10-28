@@ -277,6 +277,7 @@ export default class AddBot extends React.Component {
     }
 
     lineFollowOnClick() {
+        const _this = this;
         axios({
             method: 'POST',
             url: '/start', //url to backend endpoint
@@ -295,6 +296,8 @@ export default class AddBot extends React.Component {
     }
 
     objectDetectionOnClick() {
+        const _this = this;
+        console.log("Object Detection")
         axios({
             method: 'POST',
             url: '/start', //url to backend endpoint
