@@ -256,6 +256,8 @@ int main(int argc, char **argv)
                 }
                 angle = angle * 180 / M_PI;
                 //std::cout << "w if sTART";
+		char keypress;
+		std::cin >> keypress;
 
                 printf("%zu :: %d :: % 3.3f % 3.3f % 3.3f % 3.3f\n",
                        i, det->id,
