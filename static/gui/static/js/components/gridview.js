@@ -1,6 +1,5 @@
 import React from 'react';
 import axios from 'axios';
-
 /**
  * Component for the grid view of the simulated bots.
  */
@@ -10,12 +9,19 @@ export default class GridView extends React.Component {
 
         this.state = {
             width: 520,
-            height: 520
+            height: 520,
+            xcor: 0,
+            ycor: 0,
+            count: 0,
         };
 
         this.svg = null;
+        this.svgbot = null;
 
         this.drawGrid = this.drawGrid.bind(this);
+        this.drawBot = this.drawBot.bind(this);
+        this.getVisionData = this.getVisionData.bind(this);
+        this.displayRobot = this.displayRobot.bind(this);
     }
 
     drawGrid() {
@@ -36,12 +42,12 @@ export default class GridView extends React.Component {
                        .tickSize(this.state.width);
 
         this.svg.attr("width", this.state.width + 60)
-                .attr("height", this.state.height + 60)
-                .append("g").attr("transform", "translate(" + 80 + "," + 20 + ")");
+                 .attr("height", this.state.height + 60)
+                 .append("g").attr("transform", "translate(" + 80 + "," + 20 + ")");
 
         this.svg.append("rect")
-                .attr("width", this.state.width)
-                .attr("height", this.state.height);
+                 .attr("width", this.state.width)
+                 .attr("height", this.state.height);
 
         var gX = this.svg.append("g")
                          .attr("class", "x-axis")
@@ -57,10 +63,11 @@ export default class GridView extends React.Component {
         var transform = null;
         if (transform) view.attr("transform", transform);
 
+
         var zoom = d3.zoom()
-            .scaleExtent([0.5, 5])
-            .translateExtent([[-2 * this.state.width, -2* this.state.height], [this.state.width * 2, this.state.height * 2]])
-            .on("zoom", zoomed);
+            // .scaleExtent([0.5, 5])
+            // .translateExtent([[-2 * this.state.width, -2* this.state.height], [this.state.width * 2, this.state.height * 2]])
+            // .on("zoom", zoomed);
 
         function zoomed() {
             transform = d3.event.transform;
@@ -85,6 +92,16 @@ export default class GridView extends React.Component {
 
         this.svg.call(zoom);
      }
+
+    drawBot(x,y,z) {
+        this.svg.selectAll("circle").remove();
+        console.log("drawBot")
+        var circle = this.svg.append("circle")
+                                .attr("cx", this.state.width/2+x)
+                                .attr("cy", this.state.height/2-y)
+                                .attr("r", 10)
+                                .style('fill', z);
+    }
 
     /**
      * Executes after the component gets rendered.
@@ -115,10 +132,36 @@ export default class GridView extends React.Component {
         this.drawGrid();
     }
 
+    getVisionData() {
+        const _this = this;
+        var pos = [];
+        axios.get('/vision')
+        .then(function(response) {
+            console.log(response.data);
+            pos.push(response.data);
+            _this.state.xcor=parseInt(pos[0]['x']);
+            _this.state.ycor=parseInt(pos[0]['y']);
+            _this.drawBot(_this.state.xcor,_this.state.ycor,'red');
+        })
+        .catch(function (error) {
+        // console.log(error);
+        })
+    }
+
+    displayRobot(){
+        // this.state.count++;
+        // console.log(this.state.count);
+        // while(this.state.count%2==1){
+        //     this.getVisionData();
+        //     this.drawBot(this.state.xcor,this.state.ycor,'transparent');
+        // }
+        this.getVisionData();
+    }
+
     render() {
         return(
             <div id ="component_view" className = "box">
-            <button id="grid_recenter" onClick={this.centerRobot}>Find Bot</button>
+            <button id="grid_recenter" onClick={this.displayRobot}>Display Bot</button>
                 <div id ="view"></div>
             </div>
         );
