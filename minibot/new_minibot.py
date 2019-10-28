@@ -24,7 +24,7 @@ server_address = ('255.255.255.255', 9434)
 message = 'i_am_a_minibot'
 
 # Bot library function names
-BOT_LIB_FUNCS = "ece_dummy_ops"
+BOT_LIB_FUNCS = "PiArduino"
 
 
 def parse_command(cmd, tcpInstance):
@@ -42,17 +42,21 @@ def parse_command(cmd, tcpInstance):
     value = cmd[comma + 1:end]
     if key == "WHEELS":
         if value == "forward":
-            ece.fwd()
+            ece.fwd(50)
         elif value == "backward":
-            ece.back()
+            ece.back(50)
         elif value == "left":
-            ece.left()
+            ece.left(50)
         elif value == "right":
-            ece.right()
+            ece.right(50)
+        else:
+            ece.stop()
     elif key == "MODE":
         if value == "object_detection":
+            print("Object Detection")	
             ece.ObjectDetection()
         elif value == "line_follow":
+            print("Line Follow")	
             ece.LineFollow()
     elif key == "SCRIPTS":
         # The script is always named bot_script.py.
