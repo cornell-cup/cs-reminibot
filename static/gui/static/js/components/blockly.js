@@ -85,9 +85,12 @@ export default class MinibotBlockly extends React.Component {
     var xml_text = Blockly.Xml.domToText(xml);
     this.props.setBlockly(xml_text);
 
-    document.getElementById('data').innerText = window.Blockly.Python.workspaceToCode(this.workspace);
-    document.getElementById('blockly').value = window.Blockly.Python.workspaceToCode(this.workspace);
+    var code = window.Blockly.Python.workspaceToCode(this.workspace);
+    code = code.replace(/\n/g, '<br>');
+    code = code.replace(/ /g, '&nbsp;');
+    document.getElementById('data').innerHTML = code;
     //document.getElementById('blockly').value = window.Blockly.Python.workspaceToCode(this.workspace);
+    document.getElementById('blockly').value = window.Blockly.Python.workspaceToCode(this.workspace);
 
     console.log(blockly.value);
   }
