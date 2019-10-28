@@ -20,16 +20,17 @@ def getCoords():
     result = []
 
     """
-    The two arguments in sys.argv is the file name - readCoordinates.py and 
+    The two arguments in sys.argv is the file name - readCoordinates.py and
     the integer number A of april tags in view. Hence the loop below runs A times.
     """
-
+    print(sys.argv)
     for i in range(0, int(sys.argv[1])):
+        print(p.stdout.readline())
         locations.append(p.stdout.readline())
 
     for i in range(0, len(locations)):
         """
-        locations[i] is the coordinates of the ith april tag. (The output of 
+        locations[i] is the coordinates of the ith april tag. (The output of
         locate_tags for that april tag)
 
         You split it on whitespaces so the list stores elements as follows:
@@ -46,6 +47,13 @@ def getCoords():
 
         We make result as a list of dictionaries, with each dictionary storing id,
         x, y, and orientation of each tag.
+
+        Update: If the wooden piece is attached to a wall and the camera is set
+        up inside facing downwards with the side circle on the right. We are 
+        standing with the wall besides the camera, the postive x and positve y
+        are in the direction of front right.
+        argx is actually negative z.
+        argy is actually x.
         """
         stringarr = locations[i].split()
         tagid = stringarr[2]
@@ -60,9 +68,11 @@ def getCoords():
             avgx = -20
         if avgy < -20:
             avgy = -20
+        result.append({'id': str(int(tagid)), 'x': str(-avgy),
+                       'y': str(avgx), 'orientation': stringarr[7]})
 
-        result.append({'id': str(int(tagid)), 'x': str(avgx),
-                       'y': str(avgy), 'orientation': stringarr[7]})
+        # result.append({'id': str(int(tagid)), 'x': str(avgx),
+        #                'y': str(avgy), 'orientation': stringarr[7]})
 
     return result
 
@@ -83,12 +93,13 @@ if __name__ == '__main__':
     """
     while(True):
         data = getCoords()
-
+        print(data)
         # gracefully exit with CTRL+C
         signal.signal(signal.SIGINT, sigint_handler)
 
         for i in range(len(data)):
             # js = json.dumps(data[i]) would give a string
+            print(data[i])
             r = requests.post(
                 url='http://192.168.4.123:8080/vision', json=data[i])
             # to check what was posted use
