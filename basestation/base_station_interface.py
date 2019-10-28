@@ -122,6 +122,12 @@ class ClientHandler(tornado.web.RequestHandler):
                     session_id, bot_name)).encode())
             else:
                 print("No bot received, or bot name empty.")
+        if key == "MODE":
+            bot_name = data['bot_name']
+            mode_type = data['value']
+            bot_id = self.base_station.bot_name_to_bot_id(bot_name)
+            bot = self.base_station.get_bot(bot_id)
+            bot.sendKV(key, mode_type)
         elif key == "WHEELS":
             bot_name = data['bot_name']
             direction = data['direction']

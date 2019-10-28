@@ -279,9 +279,11 @@ export default class AddBot extends React.Component {
     lineFollowOnClick() {
         axios({
             method: 'POST',
-            url: '', //url to backend endpoint
+            url: '/start', //url to backend endpoint
             data: JSON.stringify({
-                //add data to send here
+                key: "MODE",
+                bot_name: _this.state.selected_bot,
+                value: "line_follow",
             })
         })
             .then(function (response) {
@@ -295,9 +297,11 @@ export default class AddBot extends React.Component {
     objectDetectionOnClick() {
         axios({
             method: 'POST',
-            url: '', //url to backend endpoint
+            url: '/start', //url to backend endpoint
             data: JSON.stringify({
-                //add data to send here
+                key: "MODE",
+                bot_name: _this.state.selected_bot,
+                value: "object_detection",
             })
         })
             .then(function (response) {

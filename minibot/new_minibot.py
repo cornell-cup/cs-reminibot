@@ -41,19 +41,19 @@ def parse_command(cmd, tcpInstance):
     key = cmd[start + 4:comma]
     value = cmd[comma + 1:end]
     if key == "WHEELS":
-        try:
-            if value == "forward":
-                ece.fwd()
-            elif value == "backward":
-                ece.back()
-            elif value == "left":
-                ece.left()
-            elif value == "right":
-                ece.right()
-                # TODO: Replace code below with new set_wheel_power function
-                # bot.set_wheel_power(int(values[0]), int(values[1]))
-        except Exception as e:
-            print(e)
+        if value == "forward":
+            ece.fwd()
+        elif value == "backward":
+            ece.back()
+        elif value == "left":
+            ece.left()
+        elif value == "right":
+            ece.right()
+    elif key == "MODE":
+        if value == "object_detection":
+            ece.ObjectDetection()
+        elif value == "line_follow":
+            ece.LineFollow()
     elif key == "SCRIPTS":
         # The script is always named bot_script.py.
         if len(value) > 0:
