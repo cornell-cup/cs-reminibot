@@ -18,6 +18,7 @@ export default class MinibotBlockly extends React.Component {
     this.handleScriptChange = this.handleScriptChange.bind(this);
     this.handleFileNameChange = this.handleFileNameChange.bind(this);
     this.download = this.download.bind(this);
+    this.download_python = this.download_python.bind(this);
     this.run_blockly = this.run_blockly.bind(this);
     this.run_script = this.run_script.bind(this);
     this.copy = this.copy.bind(this);
@@ -114,6 +115,22 @@ export default class MinibotBlockly extends React.Component {
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);
+  }
+
+  download_python(event) {
+      console.log("download listener");
+      event.preventDefault();
+      var element = document.createElement('a');
+      var filename = this.state.filename;
+      if(filename.substring(filename.length-3)!=".py"){
+          filename += ".py";
+      }
+      element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(this.state.data));
+      element.setAttribute('download', filename);
+      element.style.display = 'none';
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
   }
 
   upload(event) {
@@ -235,9 +252,16 @@ export default class MinibotBlockly extends React.Component {
 
       <div id="Python">
       <p id ="title"> <b>Python </b> </p>
-      <div> File name:  <input type="text" name="filename" value={this.state.filename} onChange={this.handleFileNameChange}/> </div>
+      <div> File name:
+      <input
+        type="text"
+        name="filename"
+        value={this.state.filename}
+        onChange={this.handleFileNameChange}
+        />
+      </div>
       <div> <textarea id = "textarea" onChange={this.handleScriptChange} /></div>
-      <button id="submit" onClick={this.download}>Download</button>
+      <button id="submit" onClick={this.download_python}>Download</button>
       <button id="run" onClick={this.run_script}>Run Code</button>
       <button id="save" onClick={this.save}>Save Code</button>
       <button id="copy" onClick={this.copy}>Copy Code</button>
