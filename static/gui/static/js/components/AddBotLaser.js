@@ -293,10 +293,10 @@ export default class AddBotLaser extends React.Component {
                           <tbody>
                               <tr>
                                   <td></td>
-                                  <td><button className="btn_btn-dir" onClick={() => this.buttonFireListener()}>fire</button></td>
-                                  <td><button className="btn_btn-dir" onClick={() => this.buttonAimListener(0)}>aim_left</button></td>
-                                  <td><button className="btn_btn-dir" onClick={() => this.buttonAimListener(1)}>aim_right</button></td>
-                                  <td><button className="btn_btn-dir" onClick={() => this.buttonAimListener(3)}>aim_straight</button></td>
+                                  <td><button className="btn_btn-dir_movement" onClick={() => this.buttonFireListener()}>fire</button></td>
+                                  <td><button className="btn_btn-dir_movement" onClick={() => this.buttonAimListener(0)}>aim_left</button></td>
+                                  <td><button className="btn_btn-dir_movement" onClick={() => this.buttonAimListener(1)}>aim_right</button></td>
+                                  <td><button className="btn_btn-dir_movement" onClick={() => this.buttonAimListener(3)}>aim_straight</button></td>
                                   <td></td>
                               </tr>
                           </tbody>

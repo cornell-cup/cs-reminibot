@@ -24,7 +24,7 @@ class TCP(object):
             socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.server_socket.bind((IP, PORT))
         self.server_socket.listen(1)
-        self.thread_tcp = Thread(target=self.run)
+        self.thread_tcp = Thread(target=self.run, daemon=True)
         self.thread_tcp.start()
         self.command = ""
         self.active = False
@@ -69,22 +69,21 @@ class TCP(object):
             self.active = True
             while self.active:
                 command = ""
-                while self.active:
-                    try:
-                        lastLen = len(command)
-                        command += self.connectionSocket.recv(1024).decode()
-                        if lastLen == len(command):
-                            print("Connection Lost")
-                            self.active = False
-                            lastLen = -1
-                            break
-                    except socket.error as e:
+                try:
+                    lastLen = len(command)
+                    command += self.connectionSocket.recv(1024).decode()
+                    if lastLen == len(command):
                         print("Connection Lost")
                         self.active = False
+                        lastLen = -1
                         break
+                except socket.error:
+                    print("Connection Lost")
+                    self.active = False
+                    break
+                end_index = command.find(">>>>")
+                # In case of command overload
+                while end_index > 0:
+                    self.set_command(command[0:end_index+4])
+                    command = command[end_index+4:]
                     end_index = command.find(">>>>")
-                    # In case of command overload
-                    while end_index > 0:
-                        self.set_command(command[0:end_index+4])
-                        command = command[end_index+4:]
-                        end_index = command.find(">>>>")

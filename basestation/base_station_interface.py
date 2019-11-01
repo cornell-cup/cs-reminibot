@@ -10,6 +10,7 @@ import json
 import logging
 import sys
 import time
+import re  # regex import
 
 # Minibot imports.
 from base_station import BaseStation
@@ -121,6 +122,14 @@ class ClientHandler(tornado.web.RequestHandler):
                     session_id, bot_name)).encode())
             else:
                 print("No bot received, or bot name empty.")
+        if key == "MODE":
+            print("Reached MODE")
+            bot_name = data['bot_name']
+            mode_type = data['value']
+            print("here!")
+            bot_id = self.base_station.bot_name_to_bot_id(bot_name)
+            bot = self.base_station.get_bot(bot_id)
+            bot.sendKV(key, str(mode_type))
         elif key == "WHEELS":
             bot_name = data['bot_name']
             direction = data['direction']
@@ -185,17 +194,17 @@ class ClientHandler(tornado.web.RequestHandler):
         #     bot_id = self.base_station.bot_name_to_bot_id(bot_name)
         #     self.base_station.move_body_bot(session_id, bot_id, direction, power)
         elif key == "DISCOVERBOTS":
-            print("discover_bots")
             self.write(json.dumps(
                 self.base_station.get_active_bots_names()).encode())
         elif key == "SCRIPTS":
             value = data['value']
             print(value)
             bot_name = data['bot_name']
-            print(bot_name)
-            bot_id = self.base_station.bot_name_to_bot_id(bot_name);
+            bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             bot = self.base_station.get_bot(bot_id)
             if bot:
+                print("Code len = " + str(len(value)))
+                print(type(bot))
                 if len(value) == 0:
                     print("GETTING SCRIPTS")
                     bot.sendKV("SCRIPTS", '')
@@ -205,6 +214,13 @@ class ClientHandler(tornado.web.RequestHandler):
                 elif len(value) == 2:
                     print("SAVING SCRIPTS")
                     bot.sendKV("SCRIPTS", ",".join(value))
+                else:
+                    # TODO check if a "long enough" program
+                    # is supposed to be sent over
+                    print("RUNNING SCRIPT")
+                    print(value)
+                    self.send_program(bot, value)
+
         elif key == "DISCONNECTBOT":
             bot_name = data['bot']
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
@@ -228,6 +244,58 @@ class ClientHandler(tornado.web.RequestHandler):
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             bot = self.base_station.get_bot(bot_id)
             bot.sendKV("ARM", str(power))
+
+    def send_program(self, bot, program):
+        """
+        Sends the program received from Blockly to the bot, translated
+        into ECE-supplied functions.
+
+        Args: 
+            bot: The pi_bot to send to
+            program: The string containing the python code generated
+            from blockly
+
+        """
+
+        # function_map : Blockly functions -> ECE functions
+        function_map = {
+            "move_forward": "fwd",
+            "move_backward": "back",
+            "wait": "time.sleep",
+            "stop": "stop",
+            "set_wheel_power": "ECE_wheel_pwr",
+            "turn_clockwise": "right",
+            "turn_counter_clockwise": "left"
+        }
+
+        # Regex is for bot-specific functions (move forward, stop, etc)
+        # 1st group is the whitespace (useful for def, for, etc),
+        # 2nd group is for func name, 3rd group is for args.
+        pattern = "(\s*)bot.(\w*)\((.*)\)"
+        regex = re.compile(pattern)
+
+        # TODO what to do after a function bound to a wait is done?
+        # Do we do whatever we did before? Do we stop?
+
+        program_lines = program.split('\n')
+        parsed_program = []
+        for line in program_lines:
+            match = regex.match(line)
+            if match == None:
+                parsed_program.append(line + '\n')  # "normal" python
+            else:
+                func = function_map[match.group(2)]
+                args = match.group(3)
+                whitespace = match.group(1)
+                if whitespace == None:
+                    whitespace = ""
+                parsed_program.append(whitespace + func + "(" + args + ")\n")
+
+        parsed_program_string = "".join(parsed_program)
+        print(parsed_program_string)
+
+        # Now actually send to the bot
+        bot.sendKV("SCRIPTS", parsed_program_string)
 
 
 class VisionHandler(tornado.websocket.WebSocketHandler):
