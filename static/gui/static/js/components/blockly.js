@@ -249,18 +249,17 @@ export default class MinibotBlockly extends React.Component {
 
       <div id="Python">
       <p id ="title"> <b>Python </b> </p>
-      <div> File name:
+      <div> <textarea id = "textarea" rows="10" cols="98" onChange={this.handleScriptChange} /></div>
+      Python File Name:
       <input
         type="text"
         name="filename"
         value={this.state.filename}
         onChange={this.handleFileNameChange}
-        />
-      </div>
-      <div> <textarea id = "textarea" onChange={this.handleScriptChange} /></div>
+        />&nbsp;&nbsp;
       <button id="submit" onClick={this.download_python}>Download</button>&nbsp;&nbsp;
-      <button id="run" onClick={this.run_script}>Run Code</button>&nbsp;&nbsp;
-      <button id="copy" onClick={this.copy}>Copy Code</button>&nbsp;&nbsp;
+      <button id="run" onClick={this.run_script}>Run</button>&nbsp;&nbsp;
+      <button id="copy" onClick={this.copy}>Copy Code From Blockly</button>
       <br />
       <form>
         <input
@@ -271,11 +270,7 @@ export default class MinibotBlockly extends React.Component {
           onChange={this.upload}
         />
       </form>
-
-      <div>{this.state.data}</div>
-      <div>{this.state.filename}</div>
       </div>
-
         </div>
         <div id="data" style={dataStyle} className="col-md-5"></div>
       </div>
