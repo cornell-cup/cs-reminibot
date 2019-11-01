@@ -270,6 +270,8 @@ export default class MinibotBlockly extends React.Component {
           onChange={this.upload}
         />
       </form>
+      <br />
+      <br />
       </div>
         </div>
         <div id="data" style={dataStyle} className="col-md-5"></div>
