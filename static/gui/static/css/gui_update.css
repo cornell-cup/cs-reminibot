@@ -185,3 +185,8 @@ table{
 #title{
     font-size: 40px;
 }
+
+#small_title{
+    font-size: 30px;
+    font-weight: bold;
+}

@@ -331,6 +331,7 @@ export default class AddBot extends React.Component {
         var _this = this;
         return (
             <div className="control">
+                <p id="small_title">Minibot Setup </p>
                 <table>
                     <tbody>
                         <tr>
@@ -374,8 +375,8 @@ export default class AddBot extends React.Component {
                     </tbody>
                 </table>
                 <div className="newDiv">
-                    Movement:
-                  <table>
+                    <p id="small_title">Movement </p>
+                    <table>
                         <tbody>
                             <tr>
                                 <td></td>
