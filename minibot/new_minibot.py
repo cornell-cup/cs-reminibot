@@ -9,8 +9,8 @@ import time
 import importlib
 import ast
 import os
-#import scripts.PiArduino as ece
-import scripts.ece_dummy_ops as ece
+import scripts.PiArduino as ece
+# import scripts.ece_dummy_ops as ece
 
 # Create a UDP socket
 sock = socket(AF_INET, SOCK_DGRAM)
@@ -25,7 +25,7 @@ server_address = ('255.255.255.255', 9434)
 message = 'i_am_a_minibot'
 
 # Bot library function names
-BOT_LIB_FUNCS = "ece_dummy_ops"  # "PiArduino"
+BOT_LIB_FUNCS = "PiArduino"  # "ece_dummy_ops"
 
 
 def parse_command(cmd, tcpInstance):
@@ -43,15 +43,15 @@ def parse_command(cmd, tcpInstance):
     value = cmd[comma + 1:end]
     if key == "WHEELS":
         if value == "forward":
-            ece.fwd(50)
+            Thread(target=ece.fwd, args=[50]).start()
         elif value == "backward":
-            ece.back(50)
+            Thread(target=ece.back, args=[50]).start()
         elif value == "left":
-            ece.left(50)
+            Thread(target=ece.left, args=[50]).start()
         elif value == "right":
-            ece.right(50)
+            Thread(target=ece.right, args=[50]).start()
         else:
-            ece.stop()
+            Thread(target=ece.stop).start()
     elif key == "MODE":
         if value == "object_detection":
             print("Object Detection")

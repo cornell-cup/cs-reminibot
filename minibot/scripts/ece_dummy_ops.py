@@ -97,7 +97,7 @@ def stop():
         i = 0
         while i < 10:
             print(cmd)
-            # time.sleep([0.1])
+            time.sleep(0.1)
             i += 1
         tlock.end_transmit()
     finally:
