@@ -289,7 +289,14 @@ class ClientHandler(tornado.web.RequestHandler):
                 whitespace = match.group(1)
                 if whitespace == None:
                     whitespace = ""
-                parsed_program.append(whitespace + func + "(" + args + ")\n")
+                # parsed_program.append(whitespace + func + "(" + args + ")\n")
+                parsed_line = whitespace
+                if func != "time.sleep":
+                    parsed_line += "Thread(target={}, args=[{}]).start()\n".format(
+                        func, args)
+                else:
+                    parsed_line += func + "(" + args + ")\n"
+                parsed_program.append(parsed_line)
 
         parsed_program_string = "".join(parsed_program)
         print(parsed_program_string)
