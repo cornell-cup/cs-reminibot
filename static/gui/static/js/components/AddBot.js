@@ -407,7 +407,7 @@ export default class AddBot extends React.Component {
                     <div className="col-md-3">
                         <button type="button" className="btn btn-primary" onClick={() => this.lineFollowOnClick()}>Line Follow</button>
                     </div>
-                    <div class="divider" />
+                    <div className="divider" />
                     <div className="col-md-3">
                         <button type="button" className="btn btn-success" onClick={() => this.objectDetectionOnClick()}>Object Detection</button>
                     </div>
