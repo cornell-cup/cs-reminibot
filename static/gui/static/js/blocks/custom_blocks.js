@@ -5,6 +5,14 @@
 var BOT_HEADER = "bot.";
 var FCN_ENDING = "\n";
 
+/**
+ * Generate a wait command, including its stop function
+ * @param time The time (in seconds)to wait for
+ */
+function generateWait(time) {
+  return BOT_HEADER + "wait(" + time + ")" + FCN_ENDING + BOT_HEADER + "stop()" + FCN_ENDING
+}
+
 // ================ MOVE BLOCK ================ //
 Blockly.Blocks['move'] = {
   init: function () {
@@ -79,7 +87,7 @@ Blockly.Blocks['wait'] = {
 };
 Blockly.Python['wait'] = function (block) {
   var time = Blockly.Python.valueToCode(block, 'time', Blockly.Python.ORDER_ATOMIC) || 0;
-  var code = BOT_HEADER + 'wait(' + time + ')';
+  var code = generateWait(time)
   return [code, Blockly.Python.ORDER_NONE];
 };
 
@@ -133,9 +141,7 @@ Blockly.Python['move_power_time'] = function (block) {
     bk: "move_backward("
   }[dropdown_direction];
 
-  var wait_cmd = "wait(" + number_seconds + ")";
-
-  return BOT_HEADER + fcn + number_speed + ")\n" + BOT_HEADER + wait_cmd + FCN_ENDING;
+  return BOT_HEADER + fcn + number_speed + ")\n" + generateWait(number_seconds);
 };
 
 Blockly.Blocks['stop_moving'] = {
@@ -201,9 +207,7 @@ Blockly.Python['turn_power_time'] = function (block) {
     turn_counter_clockwise: "turn_counter_clockwise("
   }[dropdown_direction];
 
-  var wait_cmd = "wait(" + number_seconds + ")";
-
-  return BOT_HEADER + fcn + number_percent + ")\n" + BOT_HEADER + wait_cmd + FCN_ENDING;
+  return BOT_HEADER + fcn + number_percent + ")\n" + generateWait(number_seconds);
 };
 
 // ================ WAIT BLOCK ================ //
@@ -216,9 +220,7 @@ Blockly.Blocks['wait_seconds'] = {
 
 Blockly.Python['wait_seconds'] = function (block) {
   var number_seconds = block.getFieldValue('seconds');
-
-  var wait_cmd = "wait(" + number_seconds + ")";
-  return BOT_HEADER + wait_cmd + FCN_ENDING;
+  return generateWait(number_seconds)
 };
 
 // ================ COMMUNICATION BLOCKS ================ //
