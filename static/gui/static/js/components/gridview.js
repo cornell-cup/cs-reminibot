@@ -27,36 +27,36 @@ export default class GridView extends React.Component {
 
     drawGrid() {
         var x_axis_scale = d3.scaleLinear()
-                             .domain([-this.state.width/2, this.state.width/2])
-                             .range([0, this.state.width]);
+            .domain([-this.state.width / 2, this.state.width / 2])
+            .range([0, this.state.width]);
 
         var y_axis_scale = d3.scaleLinear()
-                             .domain([-this.state.height/2, this.state.height/2])
-                             .range([this.state.height, 0]);
+            .domain([-this.state.height / 2, this.state.height / 2])
+            .range([this.state.height, 0]);
 
         var x_axis = d3.axisBottom(x_axis_scale)
-                       .ticks(10)
-                       .tickSize(this.state.height);
+            .ticks(10)
+            .tickSize(this.state.height);
 
         var y_axis = d3.axisRight(y_axis_scale)
-                       .ticks(10)
-                       .tickSize(this.state.width);
+            .ticks(10)
+            .tickSize(this.state.width);
 
         this.svg.attr("width", this.state.width + 60)
-                 .attr("height", this.state.height + 60)
-                 .append("g").attr("transform", "translate(" + 80 + "," + 20 + ")");
+            .attr("height", this.state.height + 60)
+            .append("g").attr("transform", "translate(" + 80 + "," + 20 + ")");
 
         this.svg.append("rect")
-                 .attr("width", this.state.width)
-                 .attr("height", this.state.height);
+            .attr("width", this.state.width)
+            .attr("height", this.state.height);
 
         var gX = this.svg.append("g")
-                         .attr("class", "x-axis")
-                         .call(x_axis);
+            .attr("class", "x-axis")
+            .call(x_axis);
 
         var gY = this.svg.append("g")
-                         .attr("class", "y-axis")
-                         .call(y_axis);
+            .attr("class", "y-axis")
+            .call(y_axis);
 
         d3.selectAll("rect").style('fill', 'white');
 
@@ -66,9 +66,9 @@ export default class GridView extends React.Component {
 
 
         var zoom = d3.zoom()
-            // .scaleExtent([0.5, 5])
-            // .translateExtent([[-2 * this.state.width, -2* this.state.height], [this.state.width * 2, this.state.height * 2]])
-            // .on("zoom", zoomed);
+        // .scaleExtent([0.5, 5])
+        // .translateExtent([[-2 * this.state.width, -2* this.state.height], [this.state.width * 2, this.state.height * 2]])
+        // .on("zoom", zoomed);
 
         function zoomed() {
             transform = d3.event.transform;
@@ -92,9 +92,9 @@ export default class GridView extends React.Component {
         }*/
 
         this.svg.call(zoom);
-     }
+    }
 
-    drawBot(x,y,z) {
+    drawBot(x, y, z) {
         this.svg.selectAll("circle").remove();
         this.svg.selectAll("image").remove();
         console.log("drawBot")
@@ -144,19 +144,19 @@ export default class GridView extends React.Component {
         const _this = this;
         var pos = [];
         axios.get('/vision')
-        .then(function(response) {
-            console.log(response.data);
-            pos.push(response.data);
-            _this.state.xcor=parseInt(pos[0]['x']);
-            _this.state.ycor=parseInt(pos[0]['y']);
-            _this.drawBot(_this.state.xcor,_this.state.ycor,'red');
-        })
-        .catch(function (error) {
-        // console.log(error);
-        })
+            .then(function (response) {
+                console.log(response.data);
+                pos.push(response.data);
+                _this.state.xcor = parseInt(pos[0]['x']) * 20;
+                _this.state.ycor = parseInt(pos[0]['y']) * 20;
+                _this.drawBot(_this.state.xcor, _this.state.ycor, 'red');
+            })
+            .catch(function (error) {
+                // console.log(error);
+            })
     }
 
-    displayRobot(){
+    displayRobot() {
         // this.state.count++;
         // console.log(this.state.count);
         // while(this.state.count%2==1){
@@ -174,10 +174,10 @@ export default class GridView extends React.Component {
     }
 
     render() {
-        return(
-            <div id ="component_view" className = "box">
-            <button id="grid_recenter" onClick={this.displayRobot}>Display Bot</button>
-                <div id ="view"></div>
+        return (
+            <div id="component_view" className="box">
+                <button id="grid_recenter" onClick={this.displayRobot}>Display Bot</button>
+                <div id="view"></div>
             </div>
         );
     }
