@@ -3,7 +3,7 @@
     margin: 1vh;
     background:lightgrey;
     padding: 1vh;
-    width: 540px;
+    width: 560px;
 }
 
 .slightly_larger_text{
@@ -64,7 +64,7 @@ table{
 }
 
 #view {
-    min-height: 40vw;
+    min-height: 0;
 }
 
 .gridControlTable{
@@ -76,7 +76,7 @@ table{
 }
 
 #component_view{
-    min-height: 55vw;
+    min-height: 0;
 }
 
 /*CONTROL TAB*/
