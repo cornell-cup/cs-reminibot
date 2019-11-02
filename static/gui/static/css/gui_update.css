@@ -45,6 +45,7 @@
     display:inline-block;
 }
 
+
 input[type="text"] {
     margin-left: 10px;
 }
@@ -82,7 +83,6 @@ table{
 #controltab {
 
 }
-
 #controlpanel {
 
 }
@@ -101,10 +101,11 @@ table{
     border: 1px solid gray;
     overflow:scroll;
     font-family:Consolas, monospace;
+    font-size: 17px;
     padding:10px;
-    font-size:12px;
-    width: 10vh;
-    height:60vh;
+    max-width: 39vw;
+    max-height: 67vh;
+
 }
 
 /* REACT TABS */
