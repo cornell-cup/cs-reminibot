@@ -64,7 +64,7 @@ class BaseStation:
             values (dict): dictionary containing positions 
         """
         locations = {'id': value['id'], 'x': value['x'],
-                     'y': value['y'], 'z': value['z']}
+                     'y': value['y'], 'orientation': value['orientation']}
         # print("Received1 vision info: ", locations)
         self.vision_log.append(locations)
         if len(self.vision_log) > MAX_VISION_LOG_LENGTH:

@@ -73,7 +73,6 @@ export default class AddBot extends React.Component {
 
     componentDidMount() {
         setInterval(this.getBotStatus.bind(this), 500);
-        setInterval(this.getVisionData.bind(this), 500);
         setInterval(this.refreshAvailableBots.bind(this), 2000)
     }
 
