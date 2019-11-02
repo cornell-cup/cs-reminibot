@@ -212,7 +212,7 @@ export default class MinibotBlockly extends React.Component {
   render() {
     var blocklyStyle = { height: '67vh' };
     var marginStyle = { marginLeft: '10px' };
-    var dataStyle = { align: 'right', margin: '70px 0 0 0'};
+    var dataStyle = { align: 'right', margin: '75px 0 0 0'};
     return (
       <div id="blockyContainer" style={marginStyle} className="row">
         <div id="blockly" className="box" className="col-md-7">
