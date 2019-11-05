@@ -97,18 +97,19 @@ export default class GridView extends React.Component {
     drawBot(x, y, z) {
         this.svg.selectAll("circle").remove();
         this.svg.selectAll("image").remove();
-        console.log("drawBot")
+        console.log("drawBot");
         var circle = this.svg.append("circle")
-                                .attr("cx", this.state.width/2+x)
-                                .attr("cy", this.state.height/2-y)
-                                .attr("r", 10)
-                                .style('fill', z);
+            .attr("cx", this.state.width / 2 + x)
+            .attr("cy", this.state.height / 2 - y)
+            .attr("r", 10)
+            .style('fill', z);
+        console.log("Drew Circle");
         var image = this.svg.append('image')
-                                .attr('xlink:href', 'https://media.licdn.com/dms/image/C510BAQGykNIrqhEdwA/company-logo_200_200/0?e=2159024400&v=beta&t=a_p2RqS1wnk78rvFhlKl2ivlm4eaqeB2eu5lrIhGROo')
-                                .attr('x', this.state.width/2-10+x)
-                                .attr("y", this.state.height/2-10-y)
-                                .attr('width', 20)
-                                .attr('height', 20)
+            .attr('xlink:href', 'https://media.licdn.com/dms/image/C510BAQGykNIrqhEdwA/company-logo_200_200/0?e=2159024400&v=beta&t=a_p2RqS1wnk78rvFhlKl2ivlm4eaqeB2eu5lrIhGROo')
+            .attr('x', this.state.width / 2 - 10 + x)
+            .attr("y", this.state.height / 2 - 10 - y)
+            .attr('width', 20)
+            .attr('height', 20);
     }
 
     /**
@@ -163,12 +164,12 @@ export default class GridView extends React.Component {
         //     this.getVisionData();
         //     this.drawBot(this.state.xcor,this.state.ycor,'transparent');
         // }
-        this.state.count=this.state.count+1
-        if(this.state.count%2==0){
+        this.state.count = this.state.count + 1
+        if (this.state.count % 2 == 0) {
             console.log(this.state.count);
-            clearInterval(this.find); 
+            clearInterval(this.find);
         }
-        else{
+        else {
             this.find = setInterval(this.getVisionData.bind(this), 10);
         }
     }
