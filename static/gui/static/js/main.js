@@ -99,9 +99,6 @@ class SetupTab extends React.Component {
               <Tabs>
                 <TabList>
                   <Tab>Normal</Tab>
-                  <Tab>Dragon</Tab>
-                  <Tab>Laser</Tab>
-                  <Tab>Buddy</Tab>
                 </TabList>
                 <TabPanel>
                   <NormalTab

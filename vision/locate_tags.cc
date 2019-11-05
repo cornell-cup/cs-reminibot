@@ -262,14 +262,12 @@ int main(int argc, char **argv)
                 printf("%zu :: %d :: % 3.3f % 3.3f % 3.3f % 3.3f\n",
                        i, det->id,
                        tagXYZS.at<double>(0), tagXYZS.at<double>(1), tagXYZS.at<double>(2), angle);
-
                 //if (key == 'w')
                 //{
                 //    printf("%zu :: %d :: % 3.3f % 3.3f % 3.3f % 3.3f\n",
                 //           i, det->id,
                 //           tagXYZS.at<double>(0), tagXYZS.at<double>(1), tagXYZS.at<double>(2), angle);
                 //}
-
                 // Send data to basestation
                 sprintf(postDataBuffer, "{\"id\":%d,\"x\":%f,\"y\":%f,\"z\":%f}",
                         det->id, tagXYZS.at<double>(0), tagXYZS.at<double>(1), tagXYZS.at<double>(2));

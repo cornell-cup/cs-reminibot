@@ -330,6 +330,7 @@ export default class AddBot extends React.Component {
         var _this = this;
         return (
             <div className="control">
+                <p id="small_title">Minibot Setup </p>
                 <table>
                     <tbody>
                         <tr>
@@ -373,8 +374,8 @@ export default class AddBot extends React.Component {
                     </tbody>
                 </table>
                 <div className="newDiv">
-                    Movement:
-                  <table>
+                    <p id="small_title">Movement </p>
+                    <table>
                         <tbody>
                             <tr>
                                 <td></td>
@@ -406,7 +407,7 @@ export default class AddBot extends React.Component {
                     <div className="col-md-3">
                         <button type="button" className="btn btn-primary" onClick={() => this.lineFollowOnClick()}>Line Follow</button>
                     </div>
-                    <div class="divider" />
+                    <div className="divider" />
                     <div className="col-md-3">
                         <button type="button" className="btn btn-success" onClick={() => this.objectDetectionOnClick()}>Object Detection</button>
                     </div>

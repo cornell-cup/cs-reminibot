@@ -175,7 +175,9 @@ export default class GridView extends React.Component {
 
     render() {
         return (
+
             <div id="component_view" className="box">
+                <p id="small_title">Vision </p>
                 <button id="grid_recenter" onClick={this.displayRobot}>Display Bot</button>
                 <div id="view"></div>
             </div>
