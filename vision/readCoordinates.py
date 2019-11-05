@@ -57,19 +57,21 @@ def getCoords():
         """
         stringarr = locations[i].split()
         tagid = stringarr[2]
-        avgx = float(stringarr[4]) * 2/3
-        avgy = float(stringarr[6]) * 2/3
+        avgx = float(stringarr[4])
+        avgy = float(stringarr[5])
 
-        if avgx > 20:
-            avgx = 20
-        if avgy > 20:
-            avgy = 20
-        if avgx < -20:
-            avgx = -20
-        if avgy < -20:
-            avgy = -20
-        result.append({'id': str(int(tagid)), 'x': str(-avgy),
-                       'y': str(-avgx), 'orientation': stringarr[7]})
+        if avgx > 50:
+            avgx = 50
+        if avgy > 50:
+            avgy = 50
+        if avgx < -50:
+            avgx = -50
+        if avgy < -50:
+            avgy = -50
+        avgx = avgx * 5
+        avgy = avgy * 5
+        result.append({'id': str(int(tagid)), 'x': str(avgx),
+                       'y': str(avgy), 'orientation': stringarr[7]})
 
         # result.append({'id': str(int(tagid)), 'x': str(avgx),
         #                'y': str(avgy), 'orientation': stringarr[7]})
