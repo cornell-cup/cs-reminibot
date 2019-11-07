@@ -7,6 +7,10 @@ import struct
 import sys
 import time
 import importlib
+import ast
+import os
+import scripts.PiArduino as ece
+# import scripts.ece_dummy_ops as ece
 
 # Create a UDP socket
 sock = socket(AF_INET, SOCK_DGRAM)
@@ -20,9 +24,11 @@ sock.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
 server_address = ('255.255.255.255', 9434)
 message = 'i_am_a_minibot'
 
+# Bot library function names
+BOT_LIB_FUNCS = "PiArduino"  # "ece_dummy_ops"
+
 
 def parse_command(cmd, tcpInstance):
-    # Former code was: def parse_command(cmd, bot, tcpInstance):
     """
     Parses command sent by SendKV via TCP to the bot.
     Sent from BaseStation.
@@ -36,15 +42,83 @@ def parse_command(cmd, tcpInstance):
     key = cmd[start + 4:comma]
     value = cmd[comma + 1:end]
     if key == "WHEELS":
-        try:
-            values = value.split(",")
-            print(key)
-            print(values)
-            # TODO: Replace code below with new set_wheel_power function
-            # bot.set_wheel_power(int(values[0]), int(values[1]))
-        except Exception as e:
-            print(e)
-            pass
+        if value == "forward":
+            Thread(target=ece.fwd, args=[50]).start()
+        elif value == "backward":
+            Thread(target=ece.back, args=[50]).start()
+        elif value == "left":
+            Thread(target=ece.left, args=[50]).start()
+        elif value == "right":
+            Thread(target=ece.right, args=[50]).start()
+        else:
+            Thread(target=ece.stop).start()
+    elif key == "MODE":
+        if value == "object_detection":
+            print("Object Detection")
+            Thread(target=ece.ObjectDetection()).start()
+        elif value == "line_follow":
+            print("Line Follow")
+            Thread(target=ece.LineFollow()).start()
+    elif key == "SCRIPTS":
+        # The script is always named bot_script.py.
+        if len(value) > 0:
+            try:
+                script_name = "bot_script.py"
+                program = process_string(value)
+
+                # file_dir is the path to folder this file is in
+                file_dir = os.path.dirname(os.path.realpath(__file__))
+                file = open(
+                    file_dir + "/scripts/" + script_name, 'w+')
+                file.write(program)
+                file.close()
+                spawn_script_process(script_name)
+            except Exception as e:
+                print("Exception occured")
+                print(e)
+
+
+def process_string(value):
+    """
+    Function from /minibot/main.py. Encases programs in a function
+    called run(), which can later be ran when imported via the
+    import library.
+    """
+    cmds = value.splitlines()
+    # Import modules needed for calling ECE functions
+    program = "from scripts." + BOT_LIB_FUNCS + " import *\n"
+    program += "import time\n"
+    program += "from threading import *\n"
+    program += "def run():\n"
+    for i in range(len(cmds)):
+        program += "    " + cmds[i] + "\n"
+    print(program)
+    return program
+
+
+def spawn_script_process(scriptname):
+    """
+    Function from /minibot/main.py. Creates a new thread to run
+    the script process on.
+    """
+    time.sleep(0.1)
+    Thread(target=run_script, args=[scriptname], daemon=True).start()
+
+
+def run_script(scriptname):
+    """
+    Function from /minibot/main.py. Tells a bot to run a script.
+    """
+
+    # Cache invalidation and module refreshes are needed to ensure
+    # the most recent script is executed
+    index = scriptname.find(".")
+    importlib.invalidate_caches()
+    script_name = "scripts." + scriptname[0: index]
+    script = importlib.import_module(script_name)
+    importlib.reload(script)
+    print("Reached here")
+    script.run()
 
 
 def start_base_station_heartbeat(ip_address):
@@ -84,7 +158,8 @@ try:
             print('Trying again...')
 
     base_station_thread = Thread(
-        target=start_base_station_heartbeat, args=(server_ip,))
+        target=start_base_station_heartbeat, args=(server_ip,), daemon=True
+    )
     base_station_thread.start()
     tcp_instance = TCP()
     while True:

@@ -274,10 +274,10 @@ export default class AddBotBuddy extends React.Component {
                           <tbody>
                               <tr>
                                   <td></td>
-                                  <td><button className="btn_btn-dir" onClick={() => this.buttonArmListener(0)}>left_arm</button></td>
-                                  <td><button className="btn_btn-dir" onClick={() => this.buttonArmListener(1)}>right_arm</button></td>
-                                  <td><button className="btn_btn-dir" onClick={() => this.buttonArmListener(2)}>right_shoulder</button></td>
-                                  <td><button className="btn_btn-dir" onClick={() => this.buttonArmListener(3)}>claw</button></td>
+                                  <td><button className="btn_btn-dir_movement" onClick={() => this.buttonArmListener(0)}>left_arm</button></td>
+                                  <td><button className="btn_btn-dir_movement" onClick={() => this.buttonArmListener(1)}>right_arm</button></td>
+                                  <td><button className="btn_btn-dir_movement" onClick={() => this.buttonArmListener(2)}>right_shoulder</button></td>
+                                  <td><button className="btn_btn-dir_movement" onClick={() => this.buttonArmListener(3)}>claw</button></td>
                                   <td></td>
                               </tr>
                           </tbody>

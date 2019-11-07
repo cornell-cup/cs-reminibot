@@ -3,6 +3,7 @@
     margin: 1vh;
     background:lightgrey;
     padding: 1vh;
+    width: 560px;
 }
 
 .slightly_larger_text{
@@ -33,6 +34,17 @@
     padding-top: 15px;
 }
 
+.button-wrapper{
+    padding-top:10px;
+    padding-bottom:10px;
+}
+
+.divider{
+    width:100px;
+    height:auto;
+    display:inline-block;
+}
+
 input[type="text"] {
     margin-left: 10px;
 }
@@ -51,7 +63,7 @@ table{
 }
 
 #view {
-    min-height: 40vw;
+    min-height: 0;
 }
 
 .gridControlTable{
@@ -63,14 +75,13 @@ table{
 }
 
 #component_view{
-    min-height: 55vw;
+    min-height: 0;
 }
 
 /*CONTROL TAB*/
 #controltab {
 
 }
-
 #controlpanel {
 
 }
@@ -89,10 +100,10 @@ table{
     border: 1px solid gray;
     overflow:scroll;
     font-family:Consolas, monospace;
+    font-size: 17px;
     padding:10px;
-    font-size:12px;
-    width:100%;
-    height:60vh;
+    max-width: 39vw;
+    max-height: 67vh;
 }
 
 /* REACT TABS */
@@ -150,5 +161,30 @@ table{
 }
 
 .btn_btn-dir {
-    background: #f37aff;
+    background:#d1150c;
+    color: white;
+    border-radius: 15px;
+    height: 40px;
+    /* width: 120px; */
+    font-weight: 650;
+    letter-spacing: 0.11em;
+}
+
+.btn_btn-dir_movement {
+    background:#d1150c;
+    color: white;
+    border-radius: 15px;
+    height: 40px;
+    width: 120px;
+    font-weight: 650;
+    letter-spacing: 0.11em;
+}
+
+#title{
+    font-size: 40px;
+}
+
+#small_title{
+    font-size: 30px;
+    font-weight: bold;
 }

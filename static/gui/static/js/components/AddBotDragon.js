@@ -289,17 +289,17 @@ export default class AddBotDragon extends React.Component {
                       <tbody>
                       <tr>
                           <td></td>
-                          <td><button className="btn_btn-dir" onClick={() => this.buttonWheelsListener(0)}>forward</button></td>
+                          <td><button className="btn_btn-dir_movement" onClick={() => this.buttonWheelsListener(0)}>forward</button></td>
                           <td></td>
                       </tr>
                       <tr>
-                          <td><button className="btn_btn-dir" onClick={() => this.buttonWheelsListener(1)}>left</button></td>
-                          <td><button className="btn_btn-dir" onClick={() => this.buttonWheelsListener(2)}>stop</button></td>
-                          <td><button className="btn_btn-dir" onClick={() => this.buttonWheelsListener(3)}>right</button></td>
+                          <td><button className="btn_btn-dir_movement" onClick={() => this.buttonWheelsListener(1)}>left</button></td>
+                          <td><button className="btn_btn-dir_movement" onClick={() => this.buttonWheelsListener(2)}>stop</button></td>
+                          <td><button className="btn_btn-dir_movement" onClick={() => this.buttonWheelsListener(3)}>right</button></td>
                       </tr>
                       <tr>
                           <td></td>
-                          <td><button className="btn_btn-dir" onClick={() => this.buttonWheelsListener(4)}>backward</button></td>
+                          <td><button className="btn_btn-dir_movement" onClick={() => this.buttonWheelsListener(4)}>backward</button></td>
                           <td></td>
                       </tr>
                       </tbody>

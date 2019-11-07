@@ -9,26 +9,39 @@ class RefreshingList extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            available_bots: []
+            available_bots: [],
+            current_bot: ""
         }
 
         this.update = this.update.bind(this);
+        this.updateCurrentBot = this.updateCurrentBot.bind(this);
     }
 
     update(newbots) {
-        console.log("updating list with: " + newbots)
         this.state.available_bots = newbots;
+        console.log("Current bot: " + this.state.current_bot)
         this.setState({ state: this.state }) // forces re-render
         // TODO make re-render smoother, this always causes warning:
         // "each child in an array or iterator should have a unique key prop"
     }
 
+    updateCurrentBot(event) {
+        const _this = this;
+        let newBotName = event.target.value;
+        this.state.current_bot = newBotName;
+    }
+
     render() {
         const _this = this;
         if (_this.state.available_bots.length === 0) {
+            _this.state.current_bot = "";
             return <select><option>No bots available</option></select>
         }
-        return <select>
+        if (_this.state.current_bot === "") {
+            _this.state.current_bot = _this.state.available_bots[0]
+        }
+
+        return <select onChange={(e) => this.updateCurrentBot(e)}>
             {_this.state.available_bots.map(
                 (name) => <option>{name}</option>)}
         </select>
@@ -60,7 +73,6 @@ export default class AddBot extends React.Component {
 
     componentDidMount() {
         setInterval(this.getBotStatus.bind(this), 500);
-        setInterval(this.getVisionData.bind(this), 500);
         setInterval(this.refreshAvailableBots.bind(this), 2000)
     }
 
@@ -79,9 +91,13 @@ export default class AddBot extends React.Component {
             })
         })
             .then(function (response) {
-                console.log(response.data);
+                // console.log(response.data);
                 _this.state.available_bots = response.data
-                _this.refreshingBotListRef.current.update(response.data)
+                let refreshingBotList = _this.refreshingBotListRef.current
+                if (refreshingBotList !== null) {
+                    _this.refreshingBotListRef.current.update(response.data)
+                }
+
             })
             .catch(function (error) {
                 console.log(error);
@@ -140,7 +156,9 @@ export default class AddBot extends React.Component {
     /*adds bot name to list*/
     addBotListener(event) {
         let li = this.state.bot_list;
-        let bot_name = this.state.selected_bot;
+        let bot_name = (this.refreshingBotListRef.current == null) ?
+            "" : this.refreshingBotListRef.current.state.current_bot;
+        this.state.selected_bot = bot_name; // TODO check
 
         const _this = this;
         axios({
@@ -257,6 +275,46 @@ export default class AddBot extends React.Component {
 
     }
 
+    lineFollowOnClick() {
+        const _this = this;
+        axios({
+            method: 'POST',
+            url: '/start', //url to backend endpoint
+            data: JSON.stringify({
+                key: "MODE",
+                bot_name: _this.state.selected_bot,
+                value: "line_follow",
+            })
+        })
+            .then(function (response) {
+                //do stuff after success
+            })
+            .catch(function (error) {
+                //handle errors
+            });
+    }
+
+    objectDetectionOnClick() {
+        const _this = this;
+        console.log("Object Detection")
+        axios({
+            method: 'POST',
+            url: '/start', //url to backend endpoint
+            data: JSON.stringify({
+                key: "MODE",
+                bot_name: _this.state.selected_bot,
+                value: "object_detection",
+            })
+        })
+            .then(function (response) {
+                //do stuff after success
+            })
+            .catch(function (error) {
+                //handle errors
+            });
+    }
+
+
     render() {
         var styles = {
             Select: {
@@ -272,6 +330,7 @@ export default class AddBot extends React.Component {
         var _this = this;
         return (
             <div className="control">
+                <p id="small_title">Minibot Setup </p>
                 <table>
                     <tbody>
                         <tr>
@@ -315,22 +374,22 @@ export default class AddBot extends React.Component {
                     </tbody>
                 </table>
                 <div className="newDiv">
-                    Movement:
-                  <table>
+                    <p id="small_title">Movement </p>
+                    <table>
                         <tbody>
                             <tr>
                                 <td></td>
-                                <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("forward")}>forward</button></td>
+                                <td><button className="btn_btn-dir_movement" onClick={() => this.buttonMapListener("forward")}>forward</button></td>
                                 <td></td>
                             </tr>
                             <tr>
-                                <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("left")}>left</button></td>
-                                <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("stop")}>stop</button></td>
-                                <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("right")}>right</button></td>
+                                <td><button className="btn_btn-dir_movement" onClick={() => this.buttonMapListener("left")}>left</button></td>
+                                <td><button className="btn_btn-dir_movement" onClick={() => this.buttonMapListener("stop")}>stop</button></td>
+                                <td><button className="btn_btn-dir_movement" onClick={() => this.buttonMapListener("right")}>right</button></td>
                             </tr>
                             <tr>
                                 <td></td>
-                                <td><button className="btn_btn-dir" onClick={() => this.buttonMapListener("backward")}>backward</button></td>
+                                <td><button className="btn_btn-dir_movement" onClick={() => this.buttonMapListener("backward")}>backward</button></td>
                                 <td></td>
                             </tr>
                         </tbody>
@@ -341,6 +400,20 @@ export default class AddBot extends React.Component {
                           <input type="text" defaultValue="50" name="wheel_power" onChange={evt => this.updatePowerValue(evt)} />
                         </label>
                     </form>
+                </div>
+                {/* button-wrapper is a custom class to add padding
+                    the rest is bootstrap css */}
+                <div className="row button-wrapper">
+                    <div className="col-md-3">
+                        <button type="button" className="btn btn-primary" onClick={() => this.lineFollowOnClick()}>Line Follow</button>
+                    </div>
+                    <div className="divider" />
+                    <div className="col-md-3">
+                        <button type="button" className="btn btn-success" onClick={() => this.objectDetectionOnClick()}>Object Detection</button>
+                    </div>
+                    <div className="col-md-6">
+
+                    </div>
                 </div>
             </div>
         );
