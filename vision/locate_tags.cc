@@ -26,15 +26,15 @@ int main(int argc, char **argv)
         printf("Usage: %s <basestation url> [cameras...]\n", argv[0]);
         return -1;
     }
-    // // Parse arguments
-    // CURL *curl;
-    // curl = curl_easy_init();
-    // if (!curl) {
-    //     std::cerr << "Failed to initialize curl" << std::endl;
-    //     return -1;
-    // }
-    // curl_easy_setopt(curl, CURLOPT_URL, argv[1]);
-    // curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, 200L);
+    // Parse arguments
+    CURL *curl;
+    curl = curl_easy_init();
+    if (!curl) {
+        std::cerr << "Failed to initialize curl" << std::endl;
+        return -1;
+    }
+    curl_easy_setopt(curl, CURLOPT_URL, argv[1]);
+    curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, 200L);
 
     vector<VideoCapture> devices;
     vector<int> device_ids;
@@ -257,7 +257,7 @@ int main(int argc, char **argv)
                 angle = angle * 180 / M_PI;
                 //std::cout << "w if sTART";
                 char keypress;
-                std::cin >> keypress;
+                //std::cin >> keypress;
 
                 printf("%zu :: %d :: % 3.3f % 3.3f % 3.3f % 3.3f\n",
                        i, det->id,
@@ -269,11 +269,12 @@ int main(int argc, char **argv)
                 //           tagXYZS.at<double>(0), tagXYZS.at<double>(1), tagXYZS.at<double>(2), angle);
                 //}
                 // Send data to basestation
-                sprintf(postDataBuffer, "{\"id\":%d,\"x\":%f,\"y\":%f,\"z\":%f}",
-                        det->id, tagXYZS.at<double>(0), tagXYZS.at<double>(1), tagXYZS.at<double>(2));
-                // curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postDataBuffer);
+	        int mult_factor = 5;
+                sprintf(postDataBuffer, "{\"id\":%d,\"x\":%f,\"y\":%f,\"orientation\":%f}",
+                        det->id, mult_factor * tagXYZS.at<double>(0), mult_factor * tagXYZS.at<double>(1), angle);
+                curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postDataBuffer);
                 // // TODO Check for error response
-                // curl_easy_perform(curl);
+                curl_easy_perform(curl);
             }
             // std::cout << "For loop 3 closed";
 
@@ -287,5 +288,5 @@ int main(int argc, char **argv)
         key = waitKey(16);
     }
     // std::cout <<"while loop 2 closed";
-    // curl_easy_cleanup(curl);
+    curl_easy_cleanup(curl);
 }

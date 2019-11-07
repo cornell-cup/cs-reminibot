@@ -140,7 +140,7 @@ def transmit(message):
         while tlock.can_transmit():
             print(message)
             tx = spi.writebytes([message])
-            #time.sleep(0.1)
+            # time.sleep(0.1)
         tlock.end_transmit()
     finally:
         tx = spi.writebytes([ord('S')])
@@ -200,14 +200,17 @@ def stop():
         while i < 10:
             print(cmd)
             tx = spi.writebytes([cmd])
-            #time.sleep(0.1)
+            # time.sleep(0.1)
             i += 1
         tlock.end_transmit()
     finally:
         tx = spi.writebytes([ord('S')])
         spi.close()
 
+
 def LineFollow():
+    while not tlock.start_transmit():
+        time.sleep(0.1)
     setSlave(1)
     cmd = ord('T')  # for tape follow
     # print b
@@ -216,6 +219,8 @@ def LineFollow():
 
 
 def ObjectDetection():
+    while not tlock.start_transmit():
+        time.sleep(0.1)
     setSlave(0)
     cmd = ord('O')
     # print b
