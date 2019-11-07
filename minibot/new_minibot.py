@@ -9,8 +9,9 @@ import time
 import importlib
 import ast
 import os
-import scripts.PiArduino as ece
+# mport scripts.PiArduino as ece
 # import scripts.ece_dummy_ops as ece
+
 
 # Create a UDP socket
 sock = socket(AF_INET, SOCK_DGRAM)
@@ -26,6 +27,14 @@ message = 'i_am_a_minibot'
 
 # Bot library function names
 BOT_LIB_FUNCS = "PiArduino"  # "ece_dummy_ops"
+
+# SETUP testing mode / normal mode
+if (len(sys.argv) == 2) and (sys.argv[1] == "-t"):
+    import scripts.ece_dummy_ops as ece
+    BOT_LIB_FUNCS = "ece_dummy_ops"
+else:
+    import scripts.PiArduino as ece
+    BOT_LIB_FUNCS = "PiArduino"
 
 
 def parse_command(cmd, tcpInstance):
