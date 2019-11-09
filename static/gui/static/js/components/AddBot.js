@@ -19,10 +19,8 @@ class RefreshingList extends React.Component {
 
     update(newbots) {
         this.state.available_bots = newbots;
-        console.log("Current bot: " + this.state.current_bot)
+        // console.log("Current bot: " + this.state.current_bot)
         this.setState({ state: this.state }) // forces re-render
-        // TODO make re-render smoother, this always causes warning:
-        // "each child in an array or iterator should have a unique key prop"
     }
 
     updateCurrentBot(event) {
@@ -43,7 +41,7 @@ class RefreshingList extends React.Component {
 
         return <select onChange={(e) => this.updateCurrentBot(e)}>
             {_this.state.available_bots.map(
-                (name) => <option>{name}</option>)}
+                (name, idx) => <option key={idx}> {name} </option>)}
         </select>
     }
 }
@@ -57,7 +55,7 @@ export default class AddBot extends React.Component {
             bot_list: [],
             available_bots: [],
             selected_bot: "",
-            power: 100,
+            power: 50,
             input_ip: "192.168.4.65"
         };
 
@@ -136,8 +134,7 @@ export default class AddBot extends React.Component {
         let li = this.state.bot_list;
         let bot_name = (this.refreshingBotListRef.current == null) ?
             "" : this.refreshingBotListRef.current.state.current_bot;
-        this.state.selected_bot = bot_name; // TODO check
-
+        this.state.selected_bot = bot_name;
         const _this = this;
         axios({
             method: 'POST',
@@ -228,7 +225,7 @@ export default class AddBot extends React.Component {
                 })
             })
                 .then(function (response) {
-                    console.log(response.data);
+                    //console.log(response.data);
                 })
                 .catch(function (error) {
                     // console.log(error);
@@ -365,7 +362,7 @@ export default class AddBot extends React.Component {
                     <form className="newDiv">
                         <label>
                             Power:
-                          <input type="text" defaultValue="100" name="wheel_power" onChange={evt => this.updatePowerValue(evt)} />
+                          <input type="text" defaultValue="50" name="wheel_power" onChange={evt => this.updatePowerValue(evt)} />
                         </label>
                     </form>
                 </div>
