@@ -5,11 +5,7 @@ import ReactDOM from 'react-dom';
 
 import GridView from './components/gridview.js';
 import ControlTab from './components/ControlTab';
-import Scripts from './components/Scripts';
 import AddBot from './components/AddBot';
-import AddBotDragon from './components/AddBotDragon';
-import AddBotBuddy from './components/AddBotBuddy';
-import AddBotLaser from './components/AddBotLaser';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 
 /**
@@ -106,24 +102,6 @@ class SetupTab extends React.Component {
                     bot_name={this.props.bot_name}
                   />
                 </TabPanel>
-                <TabPanel>
-                  <DragonTab
-                    updateBotName={this.props.updateBotName}
-                    bot_name={this.props.bot_name}
-                  />
-                </TabPanel>
-                <TabPanel>
-                  <LaserTab
-                    updateBotName={this.props.updateBotName}
-                    bot_name={this.props.bot_name}
-                  />
-                </TabPanel>
-                <TabPanel>
-                  <BuddyTab
-                    updateBotName={this.props.updateBotName}
-                    bot_name={this.props.bot_name}
-                  />
-                </TabPanel>
               </Tabs>
             </div>
           </div>
@@ -140,55 +118,7 @@ class NormalTab extends React.Component {
         <div className="row">
           <div className="col-md-6">
             <AddBot updateBotName={this.props.updateBotName} />
-            <Scripts bot_name={this.props.bot_name} />
-            <GridView />
-          </div>
-        </div>
-      </div>
-    );
-  }
-}
-
-class DragonTab extends React.Component {
-  render() {
-    return (
-      <div id="tab_dragon">
-        <div className="row">
-          <div className="col-md-6">
-            <AddBotDragon updateBotName={this.props.updateBotName} />
-            <Scripts bot_name={this.props.bot_name} />
-            <GridView />
-          </div>
-        </div>
-      </div>
-    );
-  }
-}
-
-class LaserTab extends React.Component {
-  render() {
-    return (
-      <div id="tab_laser">
-        <div className="row">
-          <div className="col-md-6">
-            <AddBotLaser updateBotName={this.props.updateBotName} />
-            <Scripts bot_name={this.props.bot_name} />
-            <GridView />
-          </div>
-        </div>
-      </div>
-    );
-  }
-}
-
-class BuddyTab extends React.Component {
-  render() {
-    return (
-      <div id="tab_laser">
-        <div className="row">
-          <div className="col-md-6">
-            <AddBotBuddy updateBotName={this.props.updateBotName} />
-            <Scripts bot_name={this.props.bot_name} />
+          
             <GridView />
           </div>
         </div>
