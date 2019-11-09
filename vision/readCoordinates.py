@@ -8,14 +8,14 @@ from subprocess import Popen, PIPE, STDOUT
 args = str(sys.argv)
 # getting arguments from command line
 # type(sys.argv) = list of strings
-
 # p is a process i.e. the coordinates sent out by the locate tags file
 p = Popen(['./locate_tags.o', 'www.google.com', '1.calib'],
           stdout=PIPE, stdin=PIPE, stderr=PIPE, universal_newlines=True)
 
+c = "w"
+
 
 def getCoords():
-    p.stdin.flush()
     locations = []
     result = []
 
@@ -23,9 +23,9 @@ def getCoords():
     The two arguments in sys.argv is the file name - readCoordinates.py and
     the integer number A of april tags in view. Hence the loop below runs A times.
     """
-    print(sys.argv)
     for i in range(0, int(sys.argv[1])):
-        print(p.stdout.readline())
+        p.stdin.write(c)
+        p.stdin.flush()
         locations.append(p.stdout.readline())
 
     for i in range(0, len(locations)):
@@ -57,19 +57,21 @@ def getCoords():
         """
         stringarr = locations[i].split()
         tagid = stringarr[2]
-        avgx = float(stringarr[4]) * 2/3
-        avgy = float(stringarr[6]) * 2/3
+        avgx = float(stringarr[4])
+        avgy = float(stringarr[5])
 
-        if avgx > 20:
-            avgx = 20
-        if avgy > 20:
-            avgy = 20
-        if avgx < -20:
-            avgx = -20
-        if avgy < -20:
-            avgy = -20
-        result.append({'id': str(int(tagid)), 'x': str(-avgy),
-                       'y': str(avgx), 'orientation': stringarr[7]})
+        if avgx > 50:
+            avgx = 50
+        if avgy > 50:
+            avgy = 50
+        if avgx < -50:
+            avgx = -50
+        if avgy < -50:
+            avgy = -50
+        avgx = avgx * 5
+        avgy = avgy * 5
+        result.append({'id': str(int(tagid)), 'x': str(avgx),
+                       'y': str(avgy), 'orientation': stringarr[7]})
 
         # result.append({'id': str(int(tagid)), 'x': str(avgx),
         #                'y': str(avgy), 'orientation': stringarr[7]})
@@ -91,17 +93,14 @@ if __name__ == '__main__':
     """
     So in the infinite loop, we constatly run getCoords and post to the server the dictionary fo each april tag
     """
+    # gracefully exit with CTRL+C
+    signal.signal(signal.SIGINT, sigint_handler)
     while(True):
+        print("Getting coordinates")
         data = getCoords()
-        print(data)
-        # gracefully exit with CTRL+C
-        signal.signal(signal.SIGINT, sigint_handler)
+        print("Sending coordinates")
 
         for i in range(len(data)):
-            # js = json.dumps(data[i]) would give a string
             print(data[i])
             r = requests.post(
-                url='http://192.168.4.123:8080/vision', json=data[i])
-            # to check what was posted use
-            # pastebin_url = r.text
-            # print("The pastebin URL is:%s"%pastebin_url)
+                url='http://localhost:8080/vision', json=data[i])

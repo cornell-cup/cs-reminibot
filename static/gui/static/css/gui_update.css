@@ -3,7 +3,7 @@
     margin: 1vh;
     background:lightgrey;
     padding: 1vh;
-    width: 540px;
+    width: 560px;
 }
 
 .slightly_larger_text{
@@ -63,7 +63,7 @@ table{
 }
 
 #view {
-    min-height: 40vw;
+    min-height: 0;
 }
 
 .gridControlTable{
@@ -75,14 +75,13 @@ table{
 }
 
 #component_view{
-    min-height: 55vw;
+    min-height: 0;
 }
 
 /*CONTROL TAB*/
 #controltab {
 
 }
-
 #controlpanel {
 
 }
@@ -101,10 +100,10 @@ table{
     border: 1px solid gray;
     overflow:scroll;
     font-family:Consolas, monospace;
+    font-size: 17px;
     padding:10px;
-    font-size:12px;
-    width: 10vh;
-    height:60vh;
+    max-width: 39vw;
+    max-height: 67vh;
 }
 
 /* REACT TABS */
@@ -183,4 +182,9 @@ table{
 
 #title{
     font-size: 40px;
+}
+
+#small_title{
+    font-size: 30px;
+    font-weight: bold;
 }

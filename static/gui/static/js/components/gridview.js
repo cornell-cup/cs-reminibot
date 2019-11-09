@@ -166,6 +166,7 @@ export default class GridView extends React.Component {
         .catch(function (error) {
         // console.log(error);
         })
+
     }
 
     displayRobot() {

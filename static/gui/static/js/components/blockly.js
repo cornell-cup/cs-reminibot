@@ -18,6 +18,7 @@ export default class MinibotBlockly extends React.Component {
     this.handleScriptChange = this.handleScriptChange.bind(this);
     this.handleFileNameChange = this.handleFileNameChange.bind(this);
     this.download = this.download.bind(this);
+    this.download_python = this.download_python.bind(this);
     this.run_blockly = this.run_blockly.bind(this);
     this.run_script = this.run_script.bind(this);
     this.copy = this.copy.bind(this);
@@ -115,14 +116,31 @@ export default class MinibotBlockly extends React.Component {
     document.body.removeChild(element);
   }
 
+  download_python(event) {
+      console.log("download listener");
+      event.preventDefault();
+      var element = document.createElement('a');
+      var filename = this.state.filename;
+      if(filename.substring(filename.length-3)!=".py"){
+          filename += ".py";
+      }
+      element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(this.state.data));
+      element.setAttribute('download', filename);
+      element.style.display = 'none';
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+  }
+
   upload(event) {
     var _this = this;
     var file = event.target.files[0];
     var reader = new FileReader();
     reader.onload = function (event) {
       _this.state.data = event.target.result;
-      document.getElementById('data').value = event.target.result;
+      document.getElementById("textarea").value = event.target.result;
     };
+    this.setState({ data: data.innerText });
     reader.readAsText(file);
   }
   /* Target function for the button "Run". Send python code
@@ -194,7 +212,7 @@ export default class MinibotBlockly extends React.Component {
   render() {
     var blocklyStyle = { height: '67vh' };
     var marginStyle = { marginLeft: '10px' };
-    var dataStyle = { align: 'right' };
+    var dataStyle = { align: 'right', margin: '75px 0 0 0'};
     return (
       <div id="blockyContainer" style={marginStyle} className="row">
         <div id="blockly" className="box" className="col-md-7">
@@ -211,36 +229,50 @@ export default class MinibotBlockly extends React.Component {
             name="blockly_filename"
             value={this.state.blockly_filename}
             onChange={this.handleInputChange}
-          />
+          />&nbsp;&nbsp;
           <button id="blocklySubmit" onClick={this.download}>
             Download
         </button>&nbsp;&nbsp;
         <button id="blockyRun" onClick={this.run_blockly}>
             Run
         </button>
-          <form>
-            <input
-              type="file"
-              id="blockUpload"
-              multiplesize="1"
-              accept=".xml"
-              onChange={this.loadFileAsBlocks}
-            />
-          </form>
-          <br />
+        <form>
+          <input
+            type="file"
+            id="blockUpload"
+            multiplesize="1"
+            accept=".xml"
+            onChange={this.loadFileAsBlocks}
+          />
+        </form>
+        <br />
 
-          <div id="Python">
-            <p id="title"> <b>Python </b> </p>
-            <div> File name:  <input type="text" name="filename" value={this.state.filename} onChange={this.handleFileNameChange} /> </div>
-            <div> <textarea id="textarea" onChange={this.handleScriptChange} /></div>
-            <button id="submit" onClick={this.download}>Download</button>
-            <button id="run" onClick={this.run_script}>Run Code</button>
-            <button id="save" onClick={this.save}>Save Code</button>
-            <button id="copy" onClick={this.copy}>Copy Code</button>
-            <div>{this.state.data}</div>
-            <div>{this.state.filename}</div>
-          </div>
-
+      <div id="Python">
+      <p id ="title"> <b>Python </b> </p>
+      <div> <textarea id = "textarea" rows="10" cols="98" onChange={this.handleScriptChange} /></div>
+      Python File Name:
+      <input
+        type="text"
+        name="filename"
+        value={this.state.filename}
+        onChange={this.handleFileNameChange}
+        />&nbsp;&nbsp;
+      <button id="submit" onClick={this.download_python}>Download</button>&nbsp;&nbsp;
+      <button id="run" onClick={this.run_script}>Run</button>&nbsp;&nbsp;
+      <button id="copy" onClick={this.copy}>Copy Code From Blockly</button>
+      <br />
+      <form>
+        <input
+          type="file"
+          id="upload"
+          multiplesize="1"
+          accept=".py"
+          onChange={this.upload}
+        />
+      </form>
+      <br />
+      <br />
+      </div>
         </div>
         <div id="data" style={dataStyle} className="col-md-5"></div>
       </div>
