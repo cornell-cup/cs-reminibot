@@ -63,35 +63,35 @@ def transmit(message):
 def fwd(power):
     while not tlock.start_transmit():
         time.sleep(0.1)
-    cmd = 'F'
+    cmd = 'Forward'
     transmit(cmd)
 
 
 def back(power):
     while not tlock.start_transmit():
         time.sleep(0.1)
-    cmd = 'B'
+    cmd = 'Back'
     transmit(cmd)
 
 
 def left(power):
     while not tlock.start_transmit():
         time.sleep(0.1)
-    cmd = 'L'
+    cmd = 'Left'
     transmit(cmd)
 
 
 def right(power):
     while not tlock.start_transmit():
         time.sleep(0.1)
-    cmd = 'R'
+    cmd = 'Right'
     transmit(cmd)
 
 
 def stop():
     while not tlock.start_transmit():
         time.sleep(0.1)
-    cmd = 'S'
+    cmd = 'Stop'
     # print b
     try:
         i = 0
@@ -105,12 +105,12 @@ def stop():
 
 
 def LineFollow():
-    cmd = 'T'  # "T" = "Tape follow"
+    cmd = 'Tape follow'  # "T" = "Tape follow"
     transmit(cmd)
 
 
 def ObjectDetection():
-    cmd = 'O'
+    cmd = 'Object detect'
     transmit(cmd)
 
 
