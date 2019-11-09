@@ -165,6 +165,25 @@ export default class MinibotBlockly extends React.Component {
       });
   }
 
+  stop_blockly() {
+    console.log(this.props.bot_name, "stop_blockly");
+        axios({
+            method: 'POST',
+            url: '/start',
+            data: JSON.stringify({
+                key: "WHEELS",
+                bot_name: this.props.bot_name,
+                direction: "stop",
+                power: 0,
+            })
+        })
+            .then(function (response) {
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+  }
+
 
   /* Target function for the button "Run Code". Send python code
      in the editing box to backend. */
@@ -233,9 +252,13 @@ export default class MinibotBlockly extends React.Component {
           <button id="blocklySubmit" onClick={this.download}>
             Download
         </button>&nbsp;&nbsp;
-        <button id="blockyRun" onClick={this.run_blockly}>
+        <button id="blocklyRun" onClick={this.run_blockly}>
             Run
         </button>
+        &nbsp;&nbsp;
+        {<button id="blocklyStop" onClick={() => this.stop_blockly()}>
+            Stop
+        </button> }
         <form>
           <input
             type="file"
