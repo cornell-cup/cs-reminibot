@@ -106,24 +106,6 @@ class SetupTab extends React.Component {
                     bot_name={this.props.bot_name}
                   />
                 </TabPanel>
-                <TabPanel>
-                  <DragonTab
-                    updateBotName={this.props.updateBotName}
-                    bot_name={this.props.bot_name}
-                  />
-                </TabPanel>
-                <TabPanel>
-                  <LaserTab
-                    updateBotName={this.props.updateBotName}
-                    bot_name={this.props.bot_name}
-                  />
-                </TabPanel>
-                <TabPanel>
-                  <BuddyTab
-                    updateBotName={this.props.updateBotName}
-                    bot_name={this.props.bot_name}
-                  />
-                </TabPanel>
               </Tabs>
             </div>
           </div>
