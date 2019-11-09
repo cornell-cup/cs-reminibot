@@ -19,7 +19,6 @@ from connection.udp_connection import UDPConnection
 
 MAX_VISION_LOG_LENGTH = 1000
 
-
 class BaseStation:
     def __init__(self):
         self.active_bots = {}
@@ -39,8 +38,14 @@ class BaseStation:
         self.bot_discover_thread = threading.Thread(
             target=self.discover_and_create_bots, daemon=True
         )
+
+        self.vision_monitior_thread = threading.Thread(
+            target=self.vision_monitior, daemon=True
+        )
+
         self.broadcast_ip_thread.start()
         self.bot_discover_thread.start()
+        self.vision_monitior_thread.start()
         # self.connections = BaseConnection()
 
         self.basestation_key = ""
@@ -69,6 +74,7 @@ class BaseStation:
         self.vision_log.append(locations)
         if len(self.vision_log) > MAX_VISION_LOG_LENGTH:
             self.vision_log.pop(0)
+            self.vision_log.pop(0)
 
     def get_vision_data(self):
         """
@@ -78,6 +84,19 @@ class BaseStation:
             return self.vision_log[-1]
         else:
             return None
+
+    def vision_monitior(self):
+        """
+        Checks if the len of the vision log is growing.
+        """
+        locations = {'id': '', 'x': '',
+                     'y': '', 'orientation': ''}
+        while True:
+            if self.vision_log:
+                count=len(self.vision_log)
+                time.sleep(1)
+                if len(self.vision_log)==count and self.vision_log[-1]['x']!='':
+                    self.vision_log.append(locations)
 
     def get_vision_log(self):
         """

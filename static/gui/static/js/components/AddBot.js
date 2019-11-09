@@ -106,7 +106,6 @@ export default class AddBot extends React.Component {
 
     /*print statement for when active bots are discovered*/
     updateInputValue(event) {
-
         this.state.selected_bot = event.target.value;
         console.log("target")
         console.log(event.target);
@@ -126,27 +125,6 @@ export default class AddBot extends React.Component {
             })
 
     }
-
-    //TODO: Get this function running
-    /*
-    defaultBotName() {
-        this.state.selected_bot = null;
-        const _this = this;
-        axios({
-            method: 'POST',
-            url: '/start',
-            data: JSON.stringify({
-                key: "DISCOVERBOTS"
-            })
-        })
-            .then(function (response) {
-                return response.data;
-            })
-            .catch(function (error) {
-                console.log(error);
-            })
-    }
-    */
 
     /*update power value when bot moves*/
     updatePowerValue(event) {
