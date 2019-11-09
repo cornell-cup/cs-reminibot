@@ -76,8 +76,8 @@ export default class AddBot extends React.Component {
         setInterval(this.refreshAvailableBots.bind(this), 2000)
     }
 
-    /*  
-     *  refreshAvailableBots gets the available bots every 2 seconds. 
+    /*
+     *  refreshAvailableBots gets the available bots every 2 seconds.
      *  An "available" bot is connected to the base station, but
      *  not necessarily connected to the client.
      */
@@ -313,22 +313,12 @@ export default class AddBot extends React.Component {
                     <tbody>
                         <tr>
                             <td>
-                                <form>
-                                    <label>
-                                        Bot Name:
-                                  <input type="text" name="bot_name" onChange={evt => this.updateInputValue(evt)} />
-                                    </label>
-                                </form>
-                            </td>
-                            <td><button style={styles.Button} onClick={this.addBotListener}>Add Bot</button></td>
-                        </tr>
-                        <tr>
-                            <td>
                                 <label>
                                     Available Bots:
                                     <RefreshingList ref={this.refreshingBotListRef}></RefreshingList>
                                 </label>
                             </td>
+                            <td><button style={styles.Button} onClick={this.addBotListener}>Add Bot</button></td>
                         </tr>
                         <tr>
                             <td>
