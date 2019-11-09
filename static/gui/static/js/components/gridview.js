@@ -17,9 +17,11 @@ export default class GridView extends React.Component {
 
         this.svg = null;
         this.svgbot = null;
+        this.find = null;
 
         this.drawGrid = this.drawGrid.bind(this);
         this.drawBot = this.drawBot.bind(this);
+        this.deleteBot = this.deleteBot.bind(this);
         this.getVisionData = this.getVisionData.bind(this);
         this.displayRobot = this.displayRobot.bind(this);
     }
@@ -95,12 +97,25 @@ export default class GridView extends React.Component {
 
     drawBot(x, y, z) {
         this.svg.selectAll("circle").remove();
-        console.log("drawBot")
+        this.svg.selectAll("image").remove();
+        console.log("drawBot");
         var circle = this.svg.append("circle")
             .attr("cx", this.state.width / 2 + x)
             .attr("cy", this.state.height / 2 - y)
             .attr("r", 10)
             .style('fill', z);
+        console.log("Drew Circle");
+        var image = this.svg.append('image')
+            .attr('xlink:href', 'https://media.licdn.com/dms/image/C510BAQGykNIrqhEdwA/company-logo_200_200/0?e=2159024400&v=beta&t=a_p2RqS1wnk78rvFhlKl2ivlm4eaqeB2eu5lrIhGROo')
+            .attr('x', this.state.width / 2 - 10 + x)
+            .attr("y", this.state.height / 2 - 10 - y)
+            .attr('width', 20)
+            .attr('height', 20);
+    }
+
+    deleteBot(){
+        this.svg.selectAll("circle").remove();
+        this.svg.selectAll("image").remove();
     }
 
     /**
@@ -136,16 +151,22 @@ export default class GridView extends React.Component {
         const _this = this;
         var pos = [];
         axios.get('/vision')
-            .then(function (response) {
-                console.log(response.data);
-                pos.push(response.data);
-                _this.state.xcor = parseInt(pos[0]['x']) * 20;
-                _this.state.ycor = parseInt(pos[0]['y']) * 20;
-                _this.drawBot(_this.state.xcor, _this.state.ycor, 'red');
-            })
-            .catch(function (error) {
-                // console.log(error);
-            })
+        .then(function(response) {
+            console.log(response.data);
+            pos.push(response.data);
+            if(pos[0]['x']===''){
+                _this.deleteBot();
+            }
+            else{
+                _this.state.xcor=parseInt(pos[0]['x']);
+                _this.state.ycor=parseInt(pos[0]['y']);
+                _this.drawBot(_this.state.xcor,_this.state.ycor,'red');
+            }
+        })
+        .catch(function (error) {
+        // console.log(error);
+        })
+
     }
 
     displayRobot() {
@@ -155,7 +176,13 @@ export default class GridView extends React.Component {
         //     this.getVisionData();
         //     this.drawBot(this.state.xcor,this.state.ycor,'transparent');
         // }
-        this.getVisionData();
+        this.state.count=this.state.count+1
+        if(this.state.count%2==0){
+            clearInterval(this.find); 
+        }
+        else {
+            this.find = setInterval(this.getVisionData.bind(this), 10);
+        }
     }
 
     render() {

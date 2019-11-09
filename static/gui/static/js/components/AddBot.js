@@ -73,12 +73,11 @@ export default class AddBot extends React.Component {
 
     componentDidMount() {
         setInterval(this.getBotStatus.bind(this), 500);
-        setInterval(this.getVisionData.bind(this), 500);
         setInterval(this.refreshAvailableBots.bind(this), 2000)
     }
 
-    /*  
-     *  refreshAvailableBots gets the available bots every 2 seconds. 
+    /*
+     *  refreshAvailableBots gets the available bots every 2 seconds.
      *  An "available" bot is connected to the base station, but
      *  not necessarily connected to the client.
      */
@@ -107,7 +106,6 @@ export default class AddBot extends React.Component {
 
     /*print statement for when active bots are discovered*/
     updateInputValue(event) {
-
         this.state.selected_bot = event.target.value;
         console.log("target")
         console.log(event.target);
@@ -127,27 +125,6 @@ export default class AddBot extends React.Component {
             })
 
     }
-
-    //TODO: Get this function running
-    /*
-    defaultBotName() {
-        this.state.selected_bot = null;
-        const _this = this;
-        axios({
-            method: 'POST',
-            url: '/start',
-            data: JSON.stringify({
-                key: "DISCOVERBOTS"
-            })
-        })
-            .then(function (response) {
-                return response.data;
-            })
-            .catch(function (error) {
-                console.log(error);
-            })
-    }
-    */
 
     /*update power value when bot moves*/
     updatePowerValue(event) {
@@ -336,22 +313,12 @@ export default class AddBot extends React.Component {
                     <tbody>
                         <tr>
                             <td>
-                                <form>
-                                    <label>
-                                        Bot Name:
-                                  <input type="text" name="bot_name" onChange={evt => this.updateInputValue(evt)} />
-                                    </label>
-                                </form>
-                            </td>
-                            <td><button style={styles.Button} onClick={this.addBotListener}>Add Bot</button></td>
-                        </tr>
-                        <tr>
-                            <td>
                                 <label>
                                     Available Bots:
                                     <RefreshingList ref={this.refreshingBotListRef}></RefreshingList>
                                 </label>
                             </td>
+                            <td><button style={styles.Button} onClick={this.addBotListener}>Add Bot</button></td>
                         </tr>
                         <tr>
                             <td>

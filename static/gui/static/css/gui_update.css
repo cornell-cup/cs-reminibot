@@ -45,7 +45,6 @@
     display:inline-block;
 }
 
-
 input[type="text"] {
     margin-left: 10px;
 }
@@ -105,7 +104,6 @@ table{
     padding:10px;
     max-width: 39vw;
     max-height: 67vh;
-
 }
 
 /* REACT TABS */

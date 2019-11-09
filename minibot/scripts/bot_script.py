@@ -1,12 +1,8 @@
-from scripts.PiArduino import *
+from scripts.ece_dummy_ops import *
 import time
+from threading import *
 def run():
-    for count in range(2):
-      fwd(0)
-      time.sleep(1)
-      right(0)
-      time.sleep(1)
-      left(0)
-      time.sleep(1)
-    stop()
+    Thread(target=fwd, args=[10]).start()
+    time.sleep(1)
+    Thread(target=stop, args=[]).start()
     
