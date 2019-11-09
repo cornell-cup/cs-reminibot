@@ -21,6 +21,7 @@ export default class GridView extends React.Component {
 
         this.drawGrid = this.drawGrid.bind(this);
         this.drawBot = this.drawBot.bind(this);
+        this.deleteBot = this.deleteBot.bind(this);
         this.getVisionData = this.getVisionData.bind(this);
         this.displayRobot = this.displayRobot.bind(this);
     }
@@ -112,6 +113,11 @@ export default class GridView extends React.Component {
             .attr('height', 20);
     }
 
+    deleteBot(){
+        this.svg.selectAll("circle").remove();
+        this.svg.selectAll("image").remove();
+    }
+
     /**
      * Executes after the component gets rendered.
      **/
@@ -145,16 +151,22 @@ export default class GridView extends React.Component {
         const _this = this;
         var pos = [];
         axios.get('/vision')
-            .then(function (response) {
-                console.log(response.data);
-                pos.push(response.data);
-                _this.state.xcor = parseInt(pos[0]['x']) * 20;
-                _this.state.ycor = parseInt(pos[0]['y']) * 20;
-                _this.drawBot(_this.state.xcor, _this.state.ycor, 'red');
-            })
-            .catch(function (error) {
-                // console.log(error);
-            })
+        .then(function(response) {
+            console.log(response.data);
+            pos.push(response.data);
+            if(pos[0]['x']===''){
+                _this.deleteBot();
+            }
+            else{
+                _this.state.xcor=parseInt(pos[0]['x']);
+                _this.state.ycor=parseInt(pos[0]['y']);
+                _this.drawBot(_this.state.xcor,_this.state.ycor,'red');
+            }
+        })
+        .catch(function (error) {
+        // console.log(error);
+        })
+
     }
 
     displayRobot() {
@@ -164,10 +176,9 @@ export default class GridView extends React.Component {
         //     this.getVisionData();
         //     this.drawBot(this.state.xcor,this.state.ycor,'transparent');
         // }
-        this.state.count = this.state.count + 1
-        if (this.state.count % 2 == 0) {
-            console.log(this.state.count);
-            clearInterval(this.find);
+        this.state.count=this.state.count+1
+        if(this.state.count%2==0){
+            clearInterval(this.find); 
         }
         else {
             this.find = setInterval(this.getVisionData.bind(this), 10);
