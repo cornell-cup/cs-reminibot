@@ -136,7 +136,7 @@ def start_base_station_heartbeat(ip_address):
     heartbeat_message = 'Hello, I am a minibot!'
 
     # Send message and resend every 9 seconds
-    while True:
+    while True: 
         try:
             # Send data
             print('sending broadcast: "%s"' % heartbeat_message)
@@ -150,13 +150,22 @@ try:
     server_ip = None
 
     # continuously try to connect to the base station
+    isTimeOut = True
     while True:
-        # Send data
-        print('sending: ' + message)
-        sent = sock.sendto(message.encode(), server_address)
-        # Receive response
-        print('waiting to receive')
-        data, server = sock.recvfrom(4096)
+        # try connecting to the basestation every sec until connection is made
+        sock.settimeout(1.0)
+        while (isTimeOut):
+            try: 
+                # Send data
+                print('sending: ' + message)
+                sent = sock.sendto(message.encode(), server_address)
+                # Receive response
+                print('waiting to receive')
+                data, server = sock.recvfrom(4096)
+                isTimeOut = False
+            except Exception as err:
+                print(err)
+
         if data.decode('UTF-8') == 'i_am_the_base_station':
             print('Received confirmation')
             server_ip = str(server[0])
