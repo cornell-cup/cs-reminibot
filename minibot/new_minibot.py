@@ -2,7 +2,6 @@ from hardware.communication.TCP import TCP
 
 from socket import *
 from threading import Thread
-import fcntl
 import struct
 import sys
 import time
