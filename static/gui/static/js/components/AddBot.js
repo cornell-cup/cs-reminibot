@@ -57,7 +57,7 @@ export default class AddBot extends React.Component {
             bot_list: [],
             available_bots: [],
             selected_bot: "",
-            power: 50,
+            power: 100,
             input_ip: "192.168.4.65"
         };
 
@@ -365,7 +365,7 @@ export default class AddBot extends React.Component {
                     <form className="newDiv">
                         <label>
                             Power:
-                          <input type="text" defaultValue="50" name="wheel_power" onChange={evt => this.updatePowerValue(evt)} />
+                          <input type="text" defaultValue="100" name="wheel_power" onChange={evt => this.updatePowerValue(evt)} />
                         </label>
                     </form>
                 </div>
