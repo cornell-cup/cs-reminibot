@@ -273,7 +273,7 @@ int main(int argc, char **argv)
                 sprintf(postDataBuffer, "{\"id\":%d,\"x\":%f,\"y\":%f,\"orientation\":%f}",
                         det->id, mult_factor * tagXYZS.at<double>(0), mult_factor * tagXYZS.at<double>(1), angle);
                 curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postDataBuffer);
-                // // TODO Check for error response
+                 // TODO Check for error response
                 curl_easy_perform(curl);
             }
             // std::cout << "For loop 3 closed";
