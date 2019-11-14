@@ -63,10 +63,10 @@ def parse_command(cmd, tcpInstance):
     elif key == "MODE":
         if value == "object_detection":
             print("Object Detection")
-            Thread(target=ece.ObjectDetection()).start()
+            Thread(target=ece.ObjectDetection).start()
         elif value == "line_follow":
             print("Line Follow")
-            Thread(target=ece.LineFollow()).start()
+            Thread(target=ece.LineFollow).start()
     elif key == "SCRIPTS":
         # The script is always named bot_script.py.
         if len(value) > 0:
