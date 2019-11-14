@@ -134,6 +134,13 @@ export default class AddBot extends React.Component {
 
     /*adds bot name to list*/
     addBotListener(event) {
+        document.getElementById('led-red').style.animation = "blinkRed 2s 1";
+        var delayInMilliseconds = 2000; //1 second
+
+        setTimeout(function() {
+          document.getElementById('led-red').style.animation = "none";
+        }, delayInMilliseconds);
+
         // let li = this.state.bot_list;
         let li = this.props.bot_list;
         let bot_name = (this.refreshingBotListRef.current == null) ?
@@ -329,6 +336,9 @@ export default class AddBot extends React.Component {
                                 </label>
                             </td>
                             <td><button style={styles.Button} onClick={this.addBotListener}>Add Bot</button></td>
+                            <div class="led-box">&nbsp;&nbsp;
+                              <div id="led-red"></div>
+                            </div>
                         </tr>
                         <tr>
                             <td>
