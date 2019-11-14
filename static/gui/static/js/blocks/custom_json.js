@@ -157,7 +157,7 @@ var miniblocks = {
       {
         type: "field_number",
         name: "speed",
-        value: 0,
+        value: 100,
         min: 0,
         max: 100
       }
@@ -180,7 +180,7 @@ var miniblocks = {
       {
         type: "field_number",
         name: "speed",
-        value: 0,
+        value: 100,
         min: 0,
         max: 100
       },
@@ -213,7 +213,7 @@ var miniblocks = {
       {
         type: "field_number",
         name: "left_speed",
-        value: 0,
+        value: 100,
         min: 0,
         max: 100
       },
@@ -223,7 +223,7 @@ var miniblocks = {
       {
         type: "field_number",
         name: "right_speed",
-        value: 0,
+        value: 100,
         min: 0,
         max: 100
       }
@@ -249,7 +249,7 @@ var miniblocks = {
       {
         type: "field_number",
         name: "percent",
-        value: 0,
+        value: 100,
         min: 0,
         max: 100
       }
@@ -275,7 +275,7 @@ var miniblocks = {
       {
         type: "field_number",
         name: "percent",
-        value: 0,
+        value: 100,
         min: 0,
         max: 100
       },
