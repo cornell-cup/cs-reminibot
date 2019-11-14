@@ -95,7 +95,7 @@ export default class GridView extends React.Component {
         this.svg.call(zoom);
     }
 
-    drawBot(x, y, z) {
+    drawBot(x, y, z, o) {
         this.svg.selectAll("circle").remove();
         this.svg.selectAll("image").remove();
         console.log("drawBot");
@@ -110,7 +110,8 @@ export default class GridView extends React.Component {
             .attr('x', this.state.width / 2 - 10 + x)
             .attr("y", this.state.height / 2 - 10 - y)
             .attr('width', 20)
-            .attr('height', 20);
+            .attr('height', 20)
+            .attr('transform', `rotate(${o}, ${this.state.width / 2 + x}, ${this.state.height / 2 - y})`)
     }
 
     deleteBot(){
@@ -160,7 +161,7 @@ export default class GridView extends React.Component {
             else{
                 _this.state.xcor=parseInt(pos[0]['x']);
                 _this.state.ycor=parseInt(pos[0]['y']);
-                _this.drawBot(_this.state.xcor,_this.state.ycor,'red');
+                _this.drawBot(_this.state.xcor,_this.state.ycor,'red',parseInt(pos[0]['orientation']));
             }
         })
         .catch(function (error) {
