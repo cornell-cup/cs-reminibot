@@ -1,9 +1,5 @@
-#import binascii
-#import spidev
 import time
 import threading
-
-spi = spidev.SpiDev()
 
 
 class TransmitLock():
@@ -60,11 +56,7 @@ def setSlave(PiBus):
     """ 
     set which arduino to talk to. slave(0) for arduino 1 and slave(1) for arduino 2
     """
-    device = 0
-    bus = PiBus
-    spi.open(device, bus)
-    spi.mode = 0
-    spi.max_speed_hz = 115200
+    print("Slave Set")
 
 
 def transmit(message):
@@ -77,7 +69,6 @@ def transmit(message):
     finally:
         #tx = spi.writebytes([ord('S')])
         print(message)
-        spi.close()
 
 
 def fwd(power):
@@ -135,12 +126,12 @@ def stop():
     # print b
     try:
         print(cmd)
-        for i in range(5):
-            tx = spi.writebytes([cmd])
+        for _ in range(5):
+            print(cmd)
         # time.sleep(0.1)
         tlock.end_transmit()
     finally:
-        spi.close()
+        print("close")
 
 
 def LineFollow():

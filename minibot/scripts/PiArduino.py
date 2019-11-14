@@ -133,7 +133,7 @@ def stop():
     # print b
     try:
         print(cmd)
-        for i in range(5):
+        for i in range(15):
             tx = spi.writebytes([cmd])
         # time.sleep(0.1)
         tlock.end_transmit()
