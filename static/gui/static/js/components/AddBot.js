@@ -56,13 +56,8 @@ export default class AddBot extends React.Component {
             available_bots: [], // bots connected to Base Station but not GUI
             // bot_list: [],
             available_bots: [],
-<<<<<<< HEAD
-            selected_bot: "",
-            power: 100,
-=======
             // selected_bot: "",
             power: 50,
->>>>>>> a0045ae68cb01dc8b111b7b07d80c49b94e3cc15
             input_ip: "192.168.4.65"
         };
 
@@ -111,7 +106,7 @@ export default class AddBot extends React.Component {
 
     /*print statement for when active bots are discovered*/
     updateInputValue(event) {
-      this.props.setSelectedBot(event.target.value)
+        this.props.setSelectedBot(event.target.value)
         // this.state.selected_bot = event.target.value;
         console.log("target")
         console.log(event.target);
@@ -142,8 +137,8 @@ export default class AddBot extends React.Component {
         document.getElementById('led-red').style.animation = "blinkRed 2s 1";
         var delayInMilliseconds = 2000; //1 second
 
-        setTimeout(function() {
-          document.getElementById('led-red').style.animation = "none";
+        setTimeout(function () {
+            document.getElementById('led-red').style.animation = "none";
         }, delayInMilliseconds);
 
         // let li = this.state.bot_list;
