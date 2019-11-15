@@ -31,11 +31,15 @@ class Platform extends React.Component {
     super(props);
     this.state = {
       bot_name: '',
-      blockly_xml: null
+      blockly_xml: null,
+      bot_list: [],
+      selected_bot: ''
     };
 
     this.updateBotName = this.updateBotName.bind(this);
     this.setBlockly = this.setBlockly.bind(this);
+    this.setBotList = this.setBotList.bind(this);
+    this.setSelectedBot = this.setSelectedBot.bind(this);
   }
 
   updateBotName(value) {
@@ -48,6 +52,14 @@ class Platform extends React.Component {
   setBlockly(xmltext) {
     const _this = this;
     _this.setState({ blockly_xml: xmltext });
+  }
+
+  setBotList(botList) {
+    this.setState({ bot_list: botList });
+  }
+
+  setSelectedBot(bot) {
+    this.setState({ selected_bot: bot });
   }
 
   render() {
@@ -63,6 +75,10 @@ class Platform extends React.Component {
             <SetupTab
               updateBotName={this.updateBotName}
               bot_name={this.state.bot_name}
+              setBotList={this.setBotList}
+              bot_list={this.state.bot_list}
+              setSelectedBot={this.setSelectedBot}
+              selected_bot={this.state.selected_bot}
             />
           </TabPanel>
           <TabPanel>
@@ -100,6 +116,10 @@ class SetupTab extends React.Component {
                   <NormalTab
                     updateBotName={this.props.updateBotName}
                     bot_name={this.props.bot_name}
+                    setBotList={this.props.setBotList}
+                    bot_list={this.props.bot_list}
+                    setSelectedBot={this.props.setSelectedBot}
+                    selected_bot={this.props.selected_bot}
                   />
                 </TabPanel>
               </Tabs>
@@ -117,8 +137,62 @@ class NormalTab extends React.Component {
       <div id="tab_normal">
         <div className="row">
           <div className="col-md-6">
-            <AddBot updateBotName={this.props.updateBotName} />
-          
+            <AddBot
+              updateBotName={this.props.updateBotName}
+              setBotList={this.props.setBotList}
+              bot_list={this.props.bot_list}
+              setSelectedBot={this.props.setSelectedBot}
+              selected_bot={this.props.selected_bot}
+            />
+            <Scripts bot_name={this.props.bot_name} />
+            <GridView />
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
+class DragonTab extends React.Component {
+  render() {
+    return (
+      <div id="tab_dragon">
+        <div className="row">
+          <div className="col-md-6">
+            <AddBotDragon updateBotName={this.props.updateBotName} />
+            <Scripts bot_name={this.props.bot_name} />
+            <GridView />
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
+class LaserTab extends React.Component {
+  render() {
+    return (
+      <div id="tab_laser">
+        <div className="row">
+          <div className="col-md-6">
+            <AddBotLaser updateBotName={this.props.updateBotName} />
+            <Scripts bot_name={this.props.bot_name} />
+            <GridView />
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
+class BuddyTab extends React.Component {
+  render() {
+    return (
+      <div id="tab_laser">
+        <div className="row">
+          <div className="col-md-6">
+            <AddBotBuddy updateBotName={this.props.updateBotName} />
+            <Scripts bot_name={this.props.bot_name} />
             <GridView />
           </div>
         </div>

@@ -54,10 +54,15 @@ export default class AddBot extends React.Component {
         this.state = {
             bot_name: "",
             available_bots: [], // bots connected to Base Station but not GUI
-            bot_list: [],
+            // bot_list: [],
             available_bots: [],
+<<<<<<< HEAD
             selected_bot: "",
             power: 100,
+=======
+            // selected_bot: "",
+            power: 50,
+>>>>>>> a0045ae68cb01dc8b111b7b07d80c49b94e3cc15
             input_ip: "192.168.4.65"
         };
 
@@ -106,7 +111,8 @@ export default class AddBot extends React.Component {
 
     /*print statement for when active bots are discovered*/
     updateInputValue(event) {
-        this.state.selected_bot = event.target.value;
+      this.props.setSelectedBot(event.target.value)
+        // this.state.selected_bot = event.target.value;
         console.log("target")
         console.log(event.target);
         const _this = this;
@@ -133,10 +139,19 @@ export default class AddBot extends React.Component {
 
     /*adds bot name to list*/
     addBotListener(event) {
-        let li = this.state.bot_list;
+        document.getElementById('led-red').style.animation = "blinkRed 2s 1";
+        var delayInMilliseconds = 2000; //1 second
+
+        setTimeout(function() {
+          document.getElementById('led-red').style.animation = "none";
+        }, delayInMilliseconds);
+
+        // let li = this.state.bot_list;
+        let li = this.props.bot_list;
         let bot_name = (this.refreshingBotListRef.current == null) ?
             "" : this.refreshingBotListRef.current.state.current_bot;
-        this.state.selected_bot = bot_name; // TODO check
+        this.props.setSelectedBot(bot_name);
+        // this.state.selected_bot = bot_name; // TODO check
 
         const _this = this;
         axios({
@@ -144,7 +159,7 @@ export default class AddBot extends React.Component {
             url: '/start',
             data: JSON.stringify({
                 key: "CONNECTBOT",
-                bot_name: this.state.selected_bot
+                bot_name: _this.props.selected_bot
             })
         })
             .then(function (response) {
@@ -154,7 +169,10 @@ export default class AddBot extends React.Component {
                     console.log("Bot" + bot_name + " added successfully")
                     li.push(bot_name);
                     _this.props.updateBotName(bot_name);
-                    _this.setState({ bot_list: li, selected_bot: bot_name });
+                    // _this.setState({ bot_list: li, selected_bot: bot_name });
+                    _this.props.setBotList(li);
+                    _this.props.setSelectedBot(bot_name)
+                    // _this.setState({ selected_bot: bot_name });
                 } else {
                     console.log("Failed to add " + bot_name)
                 }
@@ -167,7 +185,8 @@ export default class AddBot extends React.Component {
     /*listener for dropdown menu*/
     selectBotListener(event) {
         let bot_name = event.target.value;
-        this.setState({ selected_bot: bot_name });
+        this.props.setSelectedBot(bot_name)
+        // this.setState({ selected_bot: bot_name });
     }
 
     /*listener for direction buttons*/
@@ -178,7 +197,7 @@ export default class AddBot extends React.Component {
             url: '/start',
             data: JSON.stringify({
                 key: "WHEELS",
-                bot_name: _this.state.selected_bot,
+                bot_name: _this.props.selected_bot,
                 direction: value,
                 power: _this.state.power,
             })
@@ -192,10 +211,12 @@ export default class AddBot extends React.Component {
 
     /* removes selected object from list*/
     deleteBotListener(event) {
-        var li = this.state.bot_list;
-        li.pop(this.state.selected_bot);
-        this.setState({ bot_list: li });
-        this.set
+        // var li = this.state.bot_list;
+        var li = this.props.bot_list;
+        li.pop(this.props.selected_bot);
+        // this.setState({ bot_list: li });
+        // this.set
+        this.props.setBotList(li)
 
         axios({
             method: 'POST',
@@ -203,7 +224,7 @@ export default class AddBot extends React.Component {
             data: JSON.stringify(
                 {
                     key: "DISCONNECTBOT",
-                    bot: this.state.selected_bot
+                    bot: this.props.selected_bot
                 }),
         })
             .then(function (response) {
@@ -215,8 +236,9 @@ export default class AddBot extends React.Component {
     }
 
     getBotStatus() {
-        let bot_name = this.state.selected_bot;
-        let li = this.state.bot_list;
+        let bot_name = this.props.selected_bot;
+        // let li = this.state.bot_list;
+        let li = this.props.bot_list;
         const _this = this;
         if (li.includes(bot_name)) {
             axios({
@@ -224,7 +246,7 @@ export default class AddBot extends React.Component {
                 url: '/start',
                 data: JSON.stringify({
                     key: "BOTSTATUS",
-                    bot_name: this.state.selected_bot
+                    bot_name: this.props.selected_bot
                 })
             })
                 .then(function (response) {
@@ -260,7 +282,7 @@ export default class AddBot extends React.Component {
             url: '/start', //url to backend endpoint
             data: JSON.stringify({
                 key: "MODE",
-                bot_name: _this.state.selected_bot,
+                bot_name: _this.props.selected_bot,
                 value: "line_follow",
             })
         })
@@ -280,7 +302,7 @@ export default class AddBot extends React.Component {
             url: '/start', //url to backend endpoint
             data: JSON.stringify({
                 key: "MODE",
-                bot_name: _this.state.selected_bot,
+                bot_name: _this.props.selected_bot,
                 value: "object_detection",
             })
         })
@@ -319,13 +341,16 @@ export default class AddBot extends React.Component {
                                 </label>
                             </td>
                             <td><button style={styles.Button} onClick={this.addBotListener}>Add Bot</button></td>
+                            <div class="led-box">&nbsp;&nbsp;
+                              <div id="led-red"></div>
+                            </div>
                         </tr>
                         <tr>
                             <td>
                                 <label>
                                     Bot List:
                           <select style={styles.Select} onChange={this.selectBotListener}>
-                                        {this.state.bot_list.map(function (bot_name, idx) {
+                                        {this.props.bot_list.map(function (bot_name, idx) {
                                             return <option
                                                 key={idx}
                                                 value={bot_name}>
@@ -335,7 +360,7 @@ export default class AddBot extends React.Component {
                                     </select>
                                 </label>
                             </td>
-                            <td><button style={styles.Button} bot_list={this.state.bot_list}
+                            <td><button style={styles.Button} bot_list={this.props.bot_list}
                                 onClick={() => _this.deleteBotListener()}>Remove</button></td>
                         </tr>
 
