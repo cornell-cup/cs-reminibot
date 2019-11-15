@@ -73,7 +73,8 @@ export default class AddBot extends React.Component {
 
     componentDidMount() {
         setInterval(this.getBotStatus.bind(this), 500);
-        setInterval(this.refreshAvailableBots.bind(this), 2000)
+        setInterval(this.refreshAvailableBots.bind(this), 2000);
+        setInterval(this.pulseHeartBeat.bind(this), 500);
     }
 
     /*
@@ -132,15 +133,27 @@ export default class AddBot extends React.Component {
         this.state.power = event.target.value;
     }
 
+    pulseHeartBeat() {
+        const _this = this;
+        axios.get('/heartbeat')
+            .then(function (response) {
+                console.log(response.data);
+                if (response.data["is_heartbeat"]) {
+                    document.getElementById('led-red').style.animation = "blinkRed 2s 1";
+                    var delayInMilliseconds = 2000; //1 second
+
+                    setTimeout(function () {
+                        document.getElementById('led-red').style.animation = "none";
+                    }, delayInMilliseconds);
+                }
+            })
+            .catch(function (error) {
+                // console.log(error);
+            });
+    }
+
     /*adds bot name to list*/
     addBotListener(event) {
-        document.getElementById('led-red').style.animation = "blinkRed 2s 1";
-        var delayInMilliseconds = 2000; //1 second
-
-        setTimeout(function () {
-            document.getElementById('led-red').style.animation = "none";
-        }, delayInMilliseconds);
-
         // let li = this.state.bot_list;
         let li = this.props.bot_list;
         let bot_name = (this.refreshingBotListRef.current == null) ?

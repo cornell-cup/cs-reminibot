@@ -144,55 +144,6 @@ class NormalTab extends React.Component {
               setSelectedBot={this.props.setSelectedBot}
               selected_bot={this.props.selected_bot}
             />
-            <Scripts bot_name={this.props.bot_name} />
-            <GridView />
-          </div>
-        </div>
-      </div>
-    );
-  }
-}
-
-class DragonTab extends React.Component {
-  render() {
-    return (
-      <div id="tab_dragon">
-        <div className="row">
-          <div className="col-md-6">
-            <AddBotDragon updateBotName={this.props.updateBotName} />
-            <Scripts bot_name={this.props.bot_name} />
-            <GridView />
-          </div>
-        </div>
-      </div>
-    );
-  }
-}
-
-class LaserTab extends React.Component {
-  render() {
-    return (
-      <div id="tab_laser">
-        <div className="row">
-          <div className="col-md-6">
-            <AddBotLaser updateBotName={this.props.updateBotName} />
-            <Scripts bot_name={this.props.bot_name} />
-            <GridView />
-          </div>
-        </div>
-      </div>
-    );
-  }
-}
-
-class BuddyTab extends React.Component {
-  render() {
-    return (
-      <div id="tab_laser">
-        <div className="row">
-          <div className="col-md-6">
-            <AddBotBuddy updateBotName={this.props.updateBotName} />
-            <Scripts bot_name={this.props.bot_name} />
             <GridView />
           </div>
         </div>
