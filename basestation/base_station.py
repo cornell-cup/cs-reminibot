@@ -19,6 +19,7 @@ from connection.udp_connection import UDPConnection
 
 MAX_VISION_LOG_LENGTH = 1000
 
+
 class BaseStation:
     def __init__(self):
         self.active_bots = {}
@@ -93,9 +94,9 @@ class BaseStation:
                      'y': '', 'orientation': ''}
         while True:
             if self.vision_log:
-                count=len(self.vision_log)
+                count = len(self.vision_log)
                 time.sleep(1)
-                if len(self.vision_log)==count and self.vision_log[-1]['x']!='':
+                if len(self.vision_log) == count and self.vision_log[-1]['x'] != '':
                     self.vision_log.append(locations)
 
     def get_vision_log(self):
@@ -166,6 +167,11 @@ class BaseStation:
                     if self.__udp_connection.is_address_active(ip):
                         self.add_bot(port=10000, type="PIBOT", ip=ip)
             time.sleep(1)
+
+    def is_heartbeat_recent(self, time_interval):
+        curr_time = time.time()
+        last_heartbeat_time = self.__udp_connection.get_last_heartbeat_time()
+        return curr_time - last_heartbeat_time <= time_interval
 
     def add_bot(self, port, type, ip=None, bot_name=None):
         """
