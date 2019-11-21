@@ -63,10 +63,10 @@ def parse_command(cmd, tcpInstance):
     elif key == "MODE":
         if value == "object_detection":
             print("Object Detection")
-            Thread(target=ece.ObjectDetection()).start()
+            Thread(target=ece.ObjectDetection).start()
         elif value == "line_follow":
             print("Line Follow")
-            Thread(target=ece.LineFollow()).start()
+            Thread(target=ece.LineFollow).start()
     elif key == "SCRIPTS":
         # The script is always named bot_script.py.
         if len(value) > 0:
@@ -99,6 +99,7 @@ def process_string(value):
     program += "from threading import *\n"
     program += "def run():\n"
     for i in range(len(cmds)):
+        cmds[i] = cmds[i].replace(u'\xa0', u' ')
         program += "    " + cmds[i] + "\n"
     print(program)
     return program
@@ -135,7 +136,7 @@ def start_base_station_heartbeat(ip_address):
     heartbeat_message = 'Hello, I am a minibot!'
 
     # Send message and resend every 9 seconds
-    while True: 
+    while True:
         try:
             # Send data
             print('sending broadcast: "%s"' % heartbeat_message)
@@ -154,7 +155,7 @@ try:
         # try connecting to the basestation every sec until connection is made
         sock.settimeout(1.0)
         while (isTimeOut):
-            try: 
+            try:
                 # Send data
                 print('sending: ' + message)
                 sent = sock.sendto(message.encode(), server_address)

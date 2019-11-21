@@ -24,6 +24,7 @@ class UDPConnection(threading.Thread):
         self.__listener_socket = socket.socket(socket.AF_INET,
                                                socket.SOCK_DGRAM)
         self.__listener_socket.bind(("", self.__port))
+        self.__last_heartbeat_time = 0
         return
 
     def get_addresses(self) -> list:
@@ -36,11 +37,14 @@ class UDPConnection(threading.Thread):
         self.__clean_addresses()
         return sorted(self.__IP_list.keys())
 
+    def get_last_heartbeat_time(self):
+        return self.__last_heartbeat_time
+
     def set_address_inactive(self, ip):
         """
         Sets address to be active True or False
         """
-        last_updated_time, active =  self.__IP_list[ip]
+        last_updated_time, active = self.__IP_list[ip]
         self.__IP_list[ip] = (last_updated_time, False)
 
     def is_address_active(self, ip):
@@ -60,7 +64,9 @@ class UDPConnection(threading.Thread):
             while True:
                 data = self.__listener_socket.recvfrom(512)
                 device_address = data[1][0]
-                self.__IP_list[device_address] = (self.__get_current_time(), True)
+                self.__last_heartbeat_time = self.__get_current_time()
+                self.__IP_list[device_address] = (
+                    self.__get_current_time(), True)
 
         except socket.error as e:
             msg = "Unable to receive broadcasts sent to the port " + \
