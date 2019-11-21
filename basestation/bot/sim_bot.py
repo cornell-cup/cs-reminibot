@@ -3,8 +3,8 @@ Object to represent Simulated Minibot.
 Extends Bot class.
 """
 
-from basestation.bot.bot import Bot
+from bot.base_station_bot import BaseStationBot
 
-class SimBot(Bot):
-    def __init__(self):
-        super(self).__init__()
+class SimBot(BaseStationBot):
+    def __init__(self, bot_id, bot_name, isPrivate):
+        super(SimBot, self).__init__(bot_id, bot_name, isPrivate)

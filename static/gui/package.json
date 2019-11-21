@@ -1,0 +1,54 @@
+{
+  "name": "cs-minibot-platform",
+  "version": "1.0.0",
+  "description": "The shared software for the MiniBot platform. Includes a web server running over the base station and python scripts to run on the minibot.",
+  "main": "index.js",
+  "dependencies": {
+    "axios": "^0.16.2",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "react": "^16.0.0",
+    "react-dom": "^16.0.0",
+    "react-tabs": "^2.0.0"
+  },
+  "babel": {
+    "presets": [
+      "react",
+      "es2015"
+    ]
+  },
+  "devDependencies": {
+    "babel": "^6.23.0",
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-eslint": "^8.0.1",
+    "babel-loader": "^7.1.2",
+    "babel-preset-env": "^1.6.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "eslint": "^4.9.0",
+    "eslint-config-google": "^0.9.1",
+    "eslint-loader": "^1.9.0",
+    "webpack": "^3.11.0",
+    "webpack-cli": "^3.3.7"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "babel src -d lib",
+    "webpack": "webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cornell-cup/cs-minibot-platform.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cornell-cup/cs-minibot-platform/issues"
+  },
+  "homepage": "https://github.com/cornell-cup/cs-minibot-platform#readme",
+  "eslintConfig": {
+    "extends": "google",
+    "rules": {}
+  }
+}

@@ -1,0 +1,3 @@
+/home/cornellcup/cs-reminibot/vision/Test/CMakeFiles/edit_cache.dir
+/home/cornellcup/cs-reminibot/vision/Test/CMakeFiles/rebuild_cache.dir
+/home/cornellcup/cs-reminibot/vision/Test/CMakeFiles/Test.dir

@@ -1,0 +1,218 @@
+/* GlOBAL */
+.box{
+    margin: 1vh;
+    background:lightgrey;
+    padding: 1vh;
+    width: 560px;
+}
+
+.slightly_larger_text{
+    size: 5em;
+}
+
+/* NAVBAR */
+.navbar {
+    width: 100vw;
+    height: 8vh;
+    size: 5em;
+    background: #323232;
+    color: white;
+}
+.logo {
+    height: 7vh;
+    width: 7vh;
+    padding:0.5vh;
+    text-align: right;
+}
+
+.control {
+    padding-left: 15px;
+    padding-top: 15px;
+}
+
+.newDiv {
+    padding-top: 15px;
+}
+
+.button-wrapper{
+    padding-top:10px;
+    padding-bottom:10px;
+}
+
+.divider{
+    width:100px;
+    height:auto;
+    display:inline-block;
+}
+
+input[type="text"] {
+    margin-left: 10px;
+}
+
+table{
+    text-align:center;
+}
+
+table{
+    text-align:center;
+}
+
+/*SETUP TAB*/
+#setuptab {
+
+}
+
+#view {
+    min-height: 0;
+}
+
+.gridControlTable{
+    width: 40%;
+}
+
+.gridControl{
+    width: 200%;
+}
+
+#component_view{
+    min-height: 0;
+}
+
+/*CONTROL TAB*/
+#controltab {
+
+}
+#controlpanel {
+
+}
+
+#blockly{
+    height: 80vh;
+}
+
+.controlgrid{
+    padding:10px;
+}
+
+#data{
+    background: #000000;
+    color: white;
+    border: 1px solid gray;
+    overflow:scroll;
+    font-family:Consolas, monospace;
+    font-size: 17px;
+    padding:10px;
+    max-width: 39vw;
+    max-height: 67vh;
+}
+
+/* REACT TABS */
+.react-tabs__tab-list {
+    border-bottom: 1px solid #aaa;
+    margin: 0 0 10px;
+    padding: 0;
+}
+
+.react-tabs__tab {
+    display: inline-block;
+    border: 1px solid transparent;
+    border-bottom: none;
+    bottom: -1px;
+    position: relative;
+    list-style: none;
+    padding: 6px 12px;
+    cursor: pointer;
+}
+
+.react-tabs__tab--selected {
+    background: #fff;
+    border-color: #aaa;
+    color: black;
+    border-radius: 5px 5px 0 0;
+}
+
+.react-tabs__tab-panel {
+    display: none;
+}
+
+.react-tabs__tab-panel--selected {
+    display: block;
+}
+
+.react-tabs__tab--disabled {
+    color: GrayText;
+    cursor: default;
+}
+
+.react-tabs__tab:focus {
+    box-shadow: 0 0 5px hsl(208, 99%, 50%);
+    border-color: hsl(208, 99%, 50%);
+    outline: none;
+}
+
+.react-tabs__tab:focus:after {
+    content: "";
+    position: absolute;
+    height: 5px;
+    left: -4px;
+    right: -4px;
+    bottom: -5px;
+    background: #fff;
+}
+
+.btn_btn-dir {
+    background:#d1150c;
+    color: white;
+    border-radius: 15px;
+    height: 40px;
+    /* width: 120px; */
+    font-weight: 650;
+    letter-spacing: 0.11em;
+}
+
+.btn_btn-dir_movement {
+    background:#d1150c;
+    color: white;
+    border-radius: 15px;
+    height: 40px;
+    width: 120px;
+    font-weight: 650;
+    letter-spacing: 0.11em;
+}
+
+#title{
+    font-size: 40px;
+}
+
+#small_title{
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.led-box {
+  height: 30px;
+  width: 25%;
+  margin: 10px 0;
+  float: left;
+}
+
+.led-box p {
+  font-size: 12px;
+  text-align: center;
+  margin: 1em;
+}
+
+#led-red {
+  margin: 0 auto;
+  width: 24px;
+  height: 24px;
+  background-color: #A00;
+  border-radius: 50%;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px, rgba(255, 0, 0, 0.5) 0 2px 12px;
+}
+
+@keyframes blinkRed {
+    from { background-color: #A00; }
+    50% { background-color: rgb(255, 102, 0); box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px, rgba(255, 0, 0, 0.5) 0 2px 0;}
+    to { background-color: #A00; }
+}
