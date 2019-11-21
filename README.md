@@ -1,12 +1,4 @@
-Not all heroes wear capes.
-
-Pray for us.
-
 # MiniBot Platform
-
-This repo is a test python implementation of MiniBot. Original repo can be found
-[here](http://github.com/cornell-cup/cs-minibot). This is a refactored
-version.
 
 Minibot is a modular robotics kit meant for children and students from age 6 - 18,
 developed in partnership with DaVinci Robotics. This repository contains sample
@@ -21,7 +13,7 @@ Software resources:
  - Adafruit RPi libraries (TCS34725)
  
 ## Installing Dependencies 
-Navigate to the gui directory in static/gui and basestation/gui and run 
+Navigate to the gui directory in static/gui and run 
 ```
 npm install
 ```
