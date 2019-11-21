@@ -4,7 +4,7 @@
   "description": "The shared software for the MiniBot platform. Includes a web server running over the base station and python scripts to run on the minibot.",
   "main": "index.js",
   "dependencies": {
-    "axios": "^0.16.2",
+    "axios": "^0.18.1",
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
     "react": "^16.0.0",
