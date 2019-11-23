@@ -133,6 +133,11 @@ class ClientHandler(tornado.web.RequestHandler):
             x = requests.post(url, json=params)
             print(x.json)
 
+            print('database test')
+            url2 = 'http://127.0.0.1:5000/program/'
+            x = requests.get(url2)
+            print(x.json)
+
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             bot = self.base_station.get_bot(bot_id)
             if bot:
