@@ -1,7 +1,11 @@
 from __future__ import print_function
 import numpy as np
 import cv2
+from cv2 import *
+from cv2 import VideoCapture
 import argparse
+import time
+import numpy as np
 
 
 def main():
@@ -124,6 +128,11 @@ def main():
 
 
 def main_with_video():
+
+    # Parse args
+    # USAGE:
+    # python3 calibrate_camera.py <rows> <cols> <size>
+
     parser = argparse.ArgumentParser(
         description='calibrate camera intrinsics using OpenCV')
 
@@ -140,7 +149,103 @@ def main_with_video():
 
     # TODO add multiple camera support - currently assuming ONE camera only.
 
+    # Capture vars
+    cameras = []
+    camera_ids = []
+    NUM_CAMERAS = 1
+    img_points = []
+    obj_points = []
+
+    for i in range(NUM_CAMERAS):
+        camera = VideoCapture(i)
+        if (VideoCapture.isOpened()):
+            camera.set(cv2.CV_CAP_PROP_FRAME_WIDTH, 1280)
+            camera.set(cv2.CV_CAP_PROP_FRAME_HEIGHT, 720)
+            camera.set(cv2.CV_CAP_PROP_FPS, 30)
+            # TODO need push-backs? seems to append empty arrays
+            cameras.append(camera)
+            camera_ids.append(i)
+            pass
+        else:
+            print("Failed to open video capture device")
+            quit()
+
     options = parser.parse_args()
+    args = vars(options)  # get dict of args parsed
+
+    # Make checkerboard points "Calibration variables"
+    checkerboard_size = {args['rows'], args['cols']}
+    checkerboard_points = []
+    for j in range(args['cols']):
+        for i in range(args['rows']):
+            checkerboard_points.append(i * args['size'], j * args['size'], 0.0)
+
+    key = 0
+    frame = None
+    gray = None
+    corners = []
+
+    # find the checkerboard
+    # TODO implement key press controls
+    while key != 27:
+        for i in range(len(cameras)):
+            if cameras[i].isOpened():
+                continue
+            # TODO see if this is eq to devices[i] >> frame
+            cameras[i].read(frame)
+            time.sleep(0.1)  # sleep instead of spacebar spam
+            cvtColor(frame, gray, COLOR_BGR2GRAY)
+            found = findChessboardCorners(
+                gray, checkerboard_size, corners, CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE + CALIB_CB_FAST_CHECK)
+            if found:
+                print("Found checkerboard on " + str(i))
+                img_points[i].append(corners)
+                obj_points[i].append(checkerboard_points)
+                # TODO TERM_CRITERIA_ITER used in C++, using
+                # MAX_ITER OK?
+                criteria = (TERM_CRITERIA_EPS +
+                            TERM_CRITERIA_MAX_ITER, 30, 0.1)
+                cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
+            drawChessboardCorners(frame, checkerboard_size, corners, found)
+        imshow(i, frame)
+
+    # Write .calib file when 'w' is pressed
+    while key == 'w':
+        print("Beginning calibration file creation process")
+        camera_matrix = []
+        dist_coeffs = []
+        rvecs = []
+        tvecs = []
+        for i in len(cameras):
+            if not cameras[i].isOpened():
+                continue
+            if len(obj_points[i]) == 0:
+                print("No checkerboards detected on camera" + str(i))
+                continue
+
+            # TODO check if calib exists first
+            print("Calibrating camera " + str(camera_ids[i]))
+            print("Writing 1")
+            calibrateCamera(obj_points[i], img_points[i], np.size(
+                frame), camera_matrix, dist_coeffs, rvecs, tvecs)
+            print("Writing 2")
+            print("Writing calibration file")
+            calib_file = open(str(camera_ids[i]) + ".calib", "w+")
+            calib_file.write("camera_matrix =")
+            write_matrix_to_file(camera_matrix, calib_file)
+            calib_file.write("dist_coeffs =")
+            write_matrix_to_file(dist_coeffs, calib_file)
+            calib_file.close()
+            print("Calibration file written to " +
+                  str(camera_ids[i]) + ".calib")
+
+
+def write_matrix_to_file(matrix, file):
+    np_matrix = np.array(matrix)
+    num_rows, num_cols = np_matrix.shape
+    for r in range(num_rows):
+        for c in range(num_cols):
+            file.write(" " + np_matrix[r][c])
 
 
 if __name__ == '__main__':
