@@ -158,10 +158,10 @@ def main_with_video():
 
     for i in range(NUM_CAMERAS):
         camera = VideoCapture(i)
-        if (VideoCapture.isOpened()):
-            camera.set(cv2.CV_CAP_PROP_FRAME_WIDTH, 1280)
-            camera.set(cv2.CV_CAP_PROP_FRAME_HEIGHT, 720)
-            camera.set(cv2.CV_CAP_PROP_FPS, 30)
+        if (VideoCapture.isOpened(camera)):
+            camera.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+            camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+            camera.set(cv2.CAP_PROP_FPS, 30)
             # TODO need push-backs? seems to append empty arrays
             cameras.append(camera)
             camera_ids.append(i)
@@ -178,10 +178,11 @@ def main_with_video():
     checkerboard_points = []
     for j in range(args['cols']):
         for i in range(args['rows']):
-            checkerboard_points.append(i * args['size'], j * args['size'], 0.0)
+            point = (i * args['size'], j * args['size'], 0.0)
+            checkerboard_points.append(point)
 
     key = 0
-    frame = None
+    frame = []
     gray = None
     corners = []
 
@@ -189,25 +190,42 @@ def main_with_video():
     # TODO implement key press controls
     while key != 27:
         for i in range(len(cameras)):
-            if cameras[i].isOpened():
-                continue
-            # TODO see if this is eq to devices[i] >> frame
-            cameras[i].read(frame)
-            time.sleep(0.1)  # sleep instead of spacebar spam
-            cvtColor(frame, gray, COLOR_BGR2GRAY)
-            found = findChessboardCorners(
-                gray, checkerboard_size, corners, CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE + CALIB_CB_FAST_CHECK)
-            if found:
+            # Open the camera
+            while not cameras[i].isOpened():
+                cameras[i].open()
+                time.sleep(0.1)
+
+            # take a snapshot & convert to gray
+            while len(frame) == 0:
+                read_ok, f_ret = cameras[i].read()
+                if read_ok:
+                    frame = f_ret
+                time.sleep(0.1)
+            gray = cvtColor(frame, COLOR_BGR2GRAY)
+
+            # Find the checkerboard
+            flags = CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE + CALIB_CB_FAST_CHECK
+            ret = None
+            while corners == []:
+                # TODO fix args with constants here
+                ret, corners = findChessboardCorners(
+                    gray, checkerboard_size, corners, flags)
+                time.sleep(0.1)  # sleep instead of spacebar spam
+
+            if corners != []:
                 print("Found checkerboard on " + str(i))
                 img_points[i].append(corners)
                 obj_points[i].append(checkerboard_points)
                 # TODO TERM_CRITERIA_ITER used in C++, using
                 # MAX_ITER OK?
+                win_size = (11, 11)
+                zero_zone = (-1, -1)
                 criteria = (TERM_CRITERIA_EPS +
                             TERM_CRITERIA_MAX_ITER, 30, 0.1)
-                cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
-            drawChessboardCorners(frame, checkerboard_size, corners, found)
-        imshow(i, frame)
+                cornerSubPix(gray, corners, win_size, zero_zone, criteria)
+            drawChessboardCorners(frame, checkerboard_size, corners, ret)
+        assert(frame != None)
+        imshow(str(i), frame)
 
     # Write .calib file when 'w' is pressed
     while key == 'w':
