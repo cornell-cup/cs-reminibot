@@ -11,6 +11,7 @@ import logging
 import sys
 import time
 import re  # regex import
+import requests
 
 # Minibot imports.
 from base_station import BaseStation
@@ -126,6 +127,17 @@ class ClientHandler(tornado.web.RequestHandler):
             print(value)
             bot_name = data['bot_name']
             print(bot_name)
+
+            params = {'bot_name': bot_name, 'value': value}
+            url = 'http://127.0.0.1:5000/code/'
+            x = requests.post(url, json=params)
+            print(x.json)
+
+            print('database test')
+            url2 = 'http://127.0.0.1:5000/program/'
+            x = requests.get(url2)
+            print(x.json)
+
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             bot = self.base_station.get_bot(bot_id)
             if bot:
