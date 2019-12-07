@@ -46,6 +46,7 @@ class BaseStation:
 
         self.broadcast_ip_thread.start()
         self.bot_discover_thread.start()
+        # checks if vision can see april tag by checking lenth of vision_log
         self.vision_monitior_thread.start()
         # self.connections = BaseConnection()
 
@@ -89,6 +90,7 @@ class BaseStation:
     def vision_monitior(self):
         """
         Checks if the len of the vision log is growing.
+        If not growing return empty string for x coordinate.
         """
         locations = {'id': '', 'x': '',
                      'y': '', 'orientation': ''}
