@@ -21,6 +21,7 @@ export default class MinibotBlockly extends React.Component {
     this.download_python = this.download_python.bind(this);
     this.run_blockly = this.run_blockly.bind(this);
     this.run_script = this.run_script.bind(this);
+    this.view_history = this.view_history.bind(this);
     this.copy = this.copy.bind(this);
     this.upload = this.upload.bind(this);
   }
@@ -188,6 +189,10 @@ export default class MinibotBlockly extends React.Component {
       });
   }
 
+  view_history(event) {
+    window.open("http://127.0.0.1:5000/program/")
+  }
+
   /* Target function for the button "Cope Code". Set the text
      in the editing box according to blockly. */
   copy(event) {
@@ -259,6 +264,7 @@ export default class MinibotBlockly extends React.Component {
         />&nbsp;&nbsp;
       <button id="submit" onClick={this.download_python}>Download</button>&nbsp;&nbsp;
       <button id="run" onClick={this.run_script}>Run</button>&nbsp;&nbsp;
+      <button id="history" onClick={this.view_history}>View History</button>&nbsp;&nbsp;
       <button id="copy" onClick={this.copy}>Copy Code From Blockly</button>
       <br />
       <form>
