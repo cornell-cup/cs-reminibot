@@ -22,7 +22,7 @@ def get_program():
     programs = Program.query.all()
     for program in programs:
         print(program.serialize())
-    return json.dumps({'data': program.serialize() for program in programs})
+    return json.dumps({'data': [program.serialize() for program in programs]})
 
 @app.route("/code/", methods=['POST'])
 def post_code():
