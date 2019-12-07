@@ -1,3 +1,34 @@
+/*Specifications:
+    This is Step 1 in initializing the vision system. After you cd into the
+    folder with the calibrate_cameras, locate_cameras, and locate_tags scripts.
+    We first need to compile the .cc file using a command like below:
+
+    g++ -std=c++11 calibrate_cameras.cc -I/home/virsain/cs-reminibot/vision
+    `pkg-config --libs --cflags opencv` -l apriltag -o calibrate_cameras.o
+
+    (Here --cflags are what you got while installing the opencv system)
+
+    Once you have the calibrate_cameras.o file, you run
+
+    ./calibrate_cameras.x  (inner row of checkerboard)
+    (inner columns of checkerboard) (size of checkerboard square) (camera indices)
+    An example input would be:
+
+    ./calibrate_camera.x 7 9 1 0
+    Once the camera window opens up, bring the checkerboard in the camera frame
+    and make sure you click on the camera window (not the terminal window)
+    and SPAM SPACE BAR
+    One you get a notification “found checkerboard on cam 0” on terminal,
+    change the angle or position of checkerboard and SPAM THE BAR AGAIN
+    Once you are convinced that your calibration is good,
+    make sure to click on the camera window and press w until it says wrote
+    calibration to 0.
+    (To make calibration robust, make sure you keep changing orientation of checkerbaord
+    however the more times you hit the Space bar longer it takes to write the calibration)
+
+    N.B: Make sure to delete any previous calibrations before you hit w
+
+    */
 #include <iostream>
 #include <fstream>
 #include <opencv2/opencv.hpp>
@@ -7,17 +38,31 @@
 #include <vector>
 
 using namespace cv;
+//Namespace is used to create a specific region to enforce the scope of certain
+//variables
 using namespace std;
 using std::vector;
+// vector is C++ is like a dynamic array. It takes up more space than the static
+//array as space is allocated for future potential growth. Like an arraylist in
+// java
 
 int main(int argc, char** argv) {
-    // Display usage
+    //main fucntion takes in two parameters:
+    // 1. agrc (int) : the number of arguments passed to the program. Always
+    // be atleast one as name of program is already one parameter.
+
+    // 2. argv: vector containing the arguments. argv[0] is always the name or
+    // path of the function used for this execution
+
+    //Display Usage
     if (argc < 5) {
         printf("Usage: %s <rows> <cols> <size> [cameras...]\n", argv[0]);
         return -1;
     }
-
     // Parse arguments
+    // the atoi function reads in a string to an int. atoi stops reading the
+    // input string as soon as a non-numerical character is passed
+
     int rows = atoi(argv[1]);
     int cols = atoi(argv[2]);
     float size = atof(argv[3]);
@@ -31,6 +76,7 @@ int main(int argc, char** argv) {
         int id = atoi(argv[i]);
         VideoCapture device(id);
         if (device.isOpened()) {
+            //The three lines below are specifying settings of the camera
             device.set(CV_CAP_PROP_FRAME_WIDTH, 1280);
             device.set(CV_CAP_PROP_FRAME_HEIGHT, 720);
             device.set(CV_CAP_PROP_FPS, 30);
