@@ -3,7 +3,7 @@
     folder with the calibrate_cameras, locate_cameras, and locate_tags scripts.
     We first need to compile the .cc file using a command like below:
 
-    g++ -std=c++11 calibrate_cameras.cc -I/home/virsain/cs-reminibot/vision
+    g++ -std=c++11 calibrate_cameras.cc (PATH TO)/cs-reminibot/vision
     `pkg-config --libs --cflags opencv` -l apriltag -o calibrate_cameras.o
 
     (Here --cflags are what you got while installing the opencv system)

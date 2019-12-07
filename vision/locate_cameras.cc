@@ -2,7 +2,7 @@
     This is Step 2 in initializing the vision system. Compile the locate_cameras.cc
     file by the following command
 
-    g++ -std=c++11 locate_cameras.cc -I/home/virsain/cs-reminibot/vision
+    g++ -std=c++11 locate_cameras.cc (PATH TO)/cs-reminibot/vision
     `pkg-config --libs --cflags opencv` -l apriltag -o locate_cameras.o
 
     (Here --cflags are what you got while installing the opencv system)
@@ -11,7 +11,8 @@
 
 
     ./locate_camera.x 0.calib
-    
+
+
     Once the camera window opens up, make sure to have the april tags placed within the frame
     all side by side in the following order: ID 0 (top left), ID 1 (top right), ID 2 (bottom left)
     and ID 3 (bottom right). This makes the center of the tags the origin of the coordinate system.
