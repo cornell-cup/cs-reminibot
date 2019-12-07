@@ -9,6 +9,7 @@ export default class MinibotBlockly extends React.Component {
     super(props);
     this.scriptToCode = this.scriptToCode.bind(this);
     this.state = {
+      user_name: null,
       blockly_filename: 'myXmlBlocklyCode.xml',
       data: "",
       filename: "myPythonCode.py"
@@ -148,22 +149,31 @@ export default class MinibotBlockly extends React.Component {
      corresponding to blockly to backend. */
   run_blockly(event) {
     console.log(this.props.bot_name, "run_blockly");
-    axios({
-      method: 'POST',
-      url: '/start',
-      data: JSON.stringify({
-        key: 'SCRIPTS',
-        value: blockly.value,
-        bot_name: this.props.bot_name
-      }),
-    })
-      .then(function (response) {
-        console.log(blockly.value);
-        console.log('sent script');
+    if (this.state.user_name == null) {
+      var user_name = prompt("You haven't sign-in/sign-up yet. Please enter your user id:", "");
+      var user_password = prompt("Please enter your password:", "");
+      if (user_name != null && user_name != "" & user_password != null && user_password != "") {
+        this.setState({ user_name: user_name});
+      }
+    }
+    else {
+      axios({
+        method: 'POST',
+        url: '/start',
+        data: JSON.stringify({
+          key: 'SCRIPTS',
+          value: blockly.value,
+          bot_name: this.props.bot_name
+        }),
       })
-      .catch(function (error) {
-        console.warn(error);
-      });
+        .then(function (response) {
+          console.log(blockly.value);
+          console.log('sent script');
+        })
+        .catch(function (error) {
+          console.warn(error);
+        });
+    }
   }
 
 
@@ -171,22 +181,31 @@ export default class MinibotBlockly extends React.Component {
      in the editing box to backend. */
   run_script(event) {
     console.log(this.props.bot_name, "run_script");
-    axios({
-      method: 'POST',
-      url: '/start',
-      data: JSON.stringify({
-        key: 'SCRIPTS',
-        value: this.state.data,
-        bot_name: this.props.bot_name
-      }),
-    })
-      .then(function (response) {
-        // console.log(axois.data.value);
-        console.log('sent script');
+    if (this.state.user_name == null) {
+      var user_name = prompt("You haven't sign-in/sign-up yet. Please enter your user id:", "");
+      var user_password = prompt("Please enter your password:", "");
+      if (user_name != null && user_name != "" & user_password != null && user_password != "") {
+        this.setState({ user_name: user_name});
+      }
+    }
+    else {
+      axios({
+        method: 'POST',
+        url: '/start',
+        data: JSON.stringify({
+          key: 'SCRIPTS',
+          value: blockly.value,
+          bot_name: this.props.bot_name
+        }),
       })
-      .catch(function (error) {
-        console.warn(error);
-      });
+        .then(function (response) {
+          console.log(blockly.value);
+          console.log('sent script');
+        })
+        .catch(function (error) {
+          console.warn(error);
+        });
+    }
   }
 
   view_history(event) {
@@ -212,7 +231,7 @@ export default class MinibotBlockly extends React.Component {
     };
 
     xmlReader.readAsText(xmlToLoad, 'UTF-8');
-  }
+  }      
 
   render() {
     var blocklyStyle = { height: '67vh' };
