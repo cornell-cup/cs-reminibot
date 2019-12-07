@@ -77,6 +77,25 @@ class BaseStation:
         # machine, because some machines can have multiple Network Interface
         # Cards, and therefore will have multiple ip_addresses
         server_address = ("0.0.0.0", 5001)
+        # Send a message on a specific port so that the minibots can discover the ip address
+        # of the computer that the BaseStation is running on.
+        self.broadcast_ip_thread = threading.Thread(
+            target=self.broadcast_ip, daemon=True
+        )
+
+        self.bot_discover_thread = threading.Thread(
+            target=self.discover_and_create_bots, daemon=True
+        )
+
+        self.vision_monitior_thread = threading.Thread(
+            target=self.vision_monitior, daemon=True
+        )
+
+        self.broadcast_ip_thread.start()
+        self.bot_discover_thread.start()
+        # checks if vision can see april tag by checking lenth of vision_log
+        self.vision_monitior_thread.start()
+        # self.connections = BaseConnection()
 
         # only bind in debug mode if you are the debug server, if you are the
         # monitoring program which restarts the debug server, do not bind,
@@ -104,6 +123,26 @@ class BaseStation:
     def get_vision_data(self):
         """ Returns most recent vision data """
         return self.vision_log[-1] if self.vision_log else None
+
+    def vision_monitior(self):
+        """
+        Checks if the len of the vision log is growing.
+        If not growing return empty string for x coordinate.
+        """
+        locations = {'id': '', 'x': '',
+                     'y': '', 'orientation': ''}
+        while True:
+            if self.vision_log:
+                count = len(self.vision_log)
+                time.sleep(1)
+                if len(self.vision_log) == count and self.vision_log[-1]['x'] != '':
+                    self.vision_log.append(locations)
+
+    def get_vision_log(self):
+        """
+        Returns entire vision log.
+        """
+        return self.vision_log
 
     # ==================== BOTS ====================
 

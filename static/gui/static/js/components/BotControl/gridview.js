@@ -75,9 +75,6 @@ export default class GridView extends React.Component {
 
 
         var zoom = d3.zoom()
-        // .scaleExtent([0.5, 5])
-        // .translateExtent([[-2 * this.state.width, -2* this.state.height], [this.state.width * 2, this.state.height * 2]])
-        // .on("zoom", zoomed);
 
         function zoomed() {
             transform = d3.event.transform;
@@ -87,32 +84,22 @@ export default class GridView extends React.Component {
             //slider.property("value", d3.event.scale);
         }
 
-        /*var slider = d3.select("#view").append("input")
-        .datum({})
-        .attr("type", "range")
-        .attr("value", 1)
-        .attr("min", zoom.scaleExtent()[0])
-        .attr("max", zoom.scaleExtent()[1])
-        .attr("step", (zoom.scaleExtent()[1] - zoom.scaleExtent()[0]) / 100)
-        .on("input", slided);
-
-        function slided(d) {
-            zoom.scaleTo(this.svg, d3.select(this).property("value"));
-        }*/
-
         this.svg.call(zoom);
     }
 
-    drawBot(x, y, z, o) {
+    drawBot(x, y, c, o) {
+        // remove old circle/logo
         this.svg.selectAll("circle").remove();
         this.svg.selectAll("image").remove();
         console.log("drawBot");
+        // draws circle at the x,y coordinate of the april tage with given color
         var circle = this.svg.append("circle")
             .attr("cx", this.state.width / 2 + x)
             .attr("cy", this.state.height / 2 - y)
             .attr("r", 10)
-            .style('fill', z);
+            .style('fill', c);
         console.log("Drew Circle");
+        // draws cornell cup logo on top of circle
         var image = this.svg.append('image')
             .attr('xlink:href', 'https://media.licdn.com/dms/image/C510BAQGykNIrqhEdwA/company-logo_200_200/0?e=2159024400&v=beta&t=a_p2RqS1wnk78rvFhlKl2ivlm4eaqeB2eu5lrIhGROo')
             .attr('x', this.state.width / 2 - 10 + x)
@@ -133,22 +120,6 @@ export default class GridView extends React.Component {
     componentDidMount() {
         // TODO (#73): Implement background image loading.
         this.svg = d3.select("#view").append("svg");
-
-        /* temporarily disabled background image loading */
-        // try {
-        //     var loadUrl = 'static/img/line.png';
-        //     var imageLoader = this.state.imageLoader;
-        //     imageLoader.add('background', loadUrl);
-        //     imageLoader.once("complete", ()=>{this.imageLoaded();});
-        //     imageLoader.load();
-        // }
-        // catch (err) {
-        //     console.log("background failed to load! using white background");
-        //     var background = PIXI.Texture.WHITE;
-        //     background.width = 1300;
-        //     background.height = 1300;
-        //     this.setup(background);
-        // }
         this.setup();
     }
 
@@ -157,6 +128,7 @@ export default class GridView extends React.Component {
     }
 
     getVisionData() {
+        // allows you to call global attributes in axios
         const _this = this;
         var pos = [];
         axios.get('/vision')
