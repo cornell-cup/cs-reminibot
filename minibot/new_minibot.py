@@ -47,6 +47,10 @@ def parse_command(cmd, tcpInstance):
     end = cmd.find(">>>>")
     key = cmd[start + 4:comma]
     value = cmd[comma + 1:end]
+
+    # All ECE commands need to be called under separate threads because each
+    # ECE function contains an infinite loop.  If we did not have the threads,
+    # our code execution pointer would get stuck in the infinite loop.
     if key == "WHEELS":
         if value == "forward":
             Thread(target=ece.fwd, args=[50]).start()
@@ -153,42 +157,52 @@ def start_base_station_heartbeat(ip_address):
         time.sleep(9)
 
 
-try:
-    server_ip = None
+def main():
+    try:
+        server_ip = None
 
-    # continuously try to connect to the base station
-    isTimeOut = True
-    while True:
-        # try connecting to the basestation every sec until connection is made
-        sock.settimeout(1.0)
-        while (isTimeOut):
-            try:
-                # Send data
-                print('sending: ' + message)
-                sent = sock.sendto(message.encode(), server_address)
-                # Receive response
-                print('waiting to receive')
-                data, server = sock.recvfrom(4096)
-                isTimeOut = False
-            except Exception as err:
-                print(err)
+        # continuously try to connect to the base station
+        isTimeOut = True
+        while True:
+            # try connecting to the basestation every sec until connection is made
+            sock.settimeout(1.0)
 
-        if data.decode('UTF-8') == 'i_am_the_base_station':
-            print('Received confirmation')
-            server_ip = str(server[0])
-            print('Server ip: ' + server_ip)
-            break
-        else:
-            print('Verification failed')
-            print('Trying again...')
+            # keep trying to connect even if the connection is timing out.
+            # isTimeOut only becomes False if the connection is successfully
+            # established.
+            while (isTimeOut):
+                try:
+                    # Send data
+                    print('sending: ' + message)
+                    sent = sock.sendto(message.encode(), server_address)
+                    # Receive response
+                    print('waiting to receive')
+                    data, server = sock.recvfrom(4096)
+                    isTimeOut = False
+                except Exception as err:
+                    print(err)
 
-    base_station_thread = Thread(
-        target=start_base_station_heartbeat, args=(server_ip,), daemon=True
-    )
-    base_station_thread.start()
-    tcp_instance = TCP()
-    while True:
-        time.sleep(0.01)
-        parse_command(tcp_instance.get_command(), tcp_instance)
-finally:
-    sock.close()
+            if data.decode('UTF-8') == 'i_am_the_base_station':
+                print('Received confirmation')
+                server_ip = str(server[0])
+                print('Server ip: ' + server_ip)
+                break
+            else:
+                print('Verification failed')
+                print('Trying again...')
+
+        base_station_thread = Thread(
+            target=start_base_station_heartbeat, args=(server_ip,), daemon=True
+        )
+        base_station_thread.start()
+        tcp_instance = TCP()
+        while True:
+            time.sleep(0.01)
+            parse_command(tcp_instance.get_command(), tcp_instance)
+
+    finally:
+        sock.close()
+
+
+if __name__ == "__main__":
+    main()
