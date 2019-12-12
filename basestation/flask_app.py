@@ -1,3 +1,4 @@
+import time
 import json
 from flask import Flask, request
 from flask_db import db, Program
@@ -22,20 +23,18 @@ def get_program():
     programs = Program.query.all()
     for program in programs:
         print(program.serialize())
-    return json.dumps({'data': program.serialize() for program in programs})
+    return json.dumps({'data': [program.serialize() for program in programs]})
 
 @app.route("/code/", methods=['POST'])
 def post_code():
-    # data = request.get_json(silent=True)
-    # print(data)
-    # return data
-    # value = {'key': data.get('key'), 'value': data.get(
-    #     'value'), 'bot_name': data.get('bot_name')}
-    # return json.dumps(value)
     data = request.get_json()
+    t = time.localtime()
+    current_time = time.strftime("%H:%M:%S", t)
     print(data)
+    print(current_time)
     program = Program(
-        code = data.get('value')
+        code = data.get('value'),
+        time = current_time
     )
     db.session.add(program)
     db.session.commit()
