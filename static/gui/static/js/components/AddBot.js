@@ -137,7 +137,7 @@ export default class AddBot extends React.Component {
             .then(function (response) {
                 console.log(response.data);
                 if (response.data["is_heartbeat"]) {
-                    document.getElementById('led-red').style.animation = "blinkRed 2s 1";
+                    document.getElementById('led-red').style.animation = "blinkRed 4s 2";
                     var delayInMilliseconds = 2000; //1 second
 
                     setTimeout(function () {

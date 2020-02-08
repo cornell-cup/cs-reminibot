@@ -11,6 +11,7 @@ import logging
 import sys
 import time
 import re  # regex import
+import requests
 
 # Minibot imports.
 from base_station import BaseStation
@@ -22,7 +23,7 @@ class BaseInterface:
     base station GUI.
     """
 
-    def __init__(self, port):
+    def __init__(self, port, send_blockly_remote_server=False):
         """
         Initializes base station
         :param port: Port number from which basestation runs (usually 8080)
@@ -45,7 +46,10 @@ class BaseInterface:
         # To add more handlers, pair the route ("/<whatever>" to a Route Handler
         # eg. ClientHandler)
         self.handlers = [
-            ("/start", ClientHandler, dict(base_station=self.base_station)),
+            ("/start", ClientHandler, dict(
+                base_station=self.base_station,
+                send_blockly_remote_server=send_blockly_remote_server,
+            )),
             ("/vision", VisionHandler, dict(base_station=self.base_station)),
             ("/heartbeat", HeartbeatHandler, dict(base_station=self.base_station))
         ]
@@ -71,8 +75,9 @@ class ClientHandler(tornado.web.RequestHandler):
     Handler for /start
     """
 
-    def initialize(self, base_station):
+    def initialize(self, base_station, send_blockly_remote_server):
         self.base_station = base_station
+        self.send_blockly_remote_server = send_blockly_remote_server
 
     def get(self):
         if not self.get_secure_cookie("user_id"):
@@ -126,6 +131,19 @@ class ClientHandler(tornado.web.RequestHandler):
             print(value)
             bot_name = data['bot_name']
             print(bot_name)
+
+            params = {'bot_name': bot_name, 'value': value}
+
+            if self.send_blockly_remote_server:
+                url = 'http://127.0.0.1:5000/code/'
+                x = requests.post(url, json=params)
+                print(x.json)
+
+                print('database test')
+                url2 = 'http://127.0.0.1:5000/program/'
+                x = requests.get(url2)
+                print(x.json)
+
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             bot = self.base_station.get_bot(bot_id)
             if bot:
@@ -248,5 +266,8 @@ if __name__ == "__main__":
     """
     Main method for running base station Server.
     """
-    base_station = BaseInterface(8080)
+    if len(sys.argv) == 2:
+        base_station = BaseInterface(8080, send_blockly_remote_server=True)
+    else:
+        base_station = BaseInterface(8080)
     base_station.start()

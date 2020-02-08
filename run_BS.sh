@@ -9,4 +9,10 @@ cd ..
 cd ..
 cd basestation
 echo "=========== STARTING BASESTATION ==============="
-python3 base_station_interface.py
+if [ $# -eq 1 ]
+then
+    send_blockly_remove_server=$1
+    python3 base_station_interface.py $send_blockly_remove_server
+else
+    python3 base_station_interface.py
+fi
