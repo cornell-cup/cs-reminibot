@@ -185,7 +185,7 @@ export default class MinibotBlockly extends React.Component {
       var user_name = prompt("You haven't sign-in/sign-up yet. Please enter your user id:", "");
       var user_password = prompt("Please enter your password:", "");
       if (user_name != null && user_name != "" & user_password != null && user_password != "") {
-        this.setState({ user_name: user_name});
+        this.setState({ user_name: "Richie"});
       }
     }
     else {
@@ -194,7 +194,7 @@ export default class MinibotBlockly extends React.Component {
         url: '/start',
         data: JSON.stringify({
           key: 'SCRIPTS',
-          value: blockly.value,
+          value: this.state.data,
           bot_name: this.props.bot_name
         }),
       })
