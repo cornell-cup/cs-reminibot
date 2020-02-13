@@ -119,19 +119,19 @@ export default class MinibotBlockly extends React.Component {
   }
 
   download_python(event) {
-      console.log("download listener");
-      event.preventDefault();
-      var element = document.createElement('a');
-      var filename = this.state.filename;
-      if(filename.substring(filename.length-3)!=".py"){
-          filename += ".py";
-      }
-      element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(this.state.data));
-      element.setAttribute('download', filename);
-      element.style.display = 'none';
-      document.body.appendChild(element);
-      element.click();
-      document.body.removeChild(element);
+    console.log("download listener");
+    event.preventDefault();
+    var element = document.createElement('a');
+    var filename = this.state.filename;
+    if (filename.substring(filename.length - 3) != ".py") {
+      filename += ".py";
+    }
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(this.state.data));
+    element.setAttribute('download', filename);
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
   }
 
   upload(event) {
@@ -236,7 +236,7 @@ export default class MinibotBlockly extends React.Component {
   render() {
     var blocklyStyle = { height: '67vh' };
     var marginStyle = { marginLeft: '10px' };
-    var dataStyle = { align: 'right', margin: '75px 0 0 0'};
+    var dataStyle = { align: 'right', margin: '75px 0 0 0' };
     return (
       <div id="blockyContainer" style={marginStyle} className="row">
         <div id="blockly" className="box" className="col-md-7">
@@ -260,44 +260,44 @@ export default class MinibotBlockly extends React.Component {
         <button id="blockyRun" onClick={this.run_blockly}>
             Run
         </button>
-        <form>
-          <input
-            type="file"
-            id="blockUpload"
-            multiplesize="1"
-            accept=".xml"
-            onChange={this.loadFileAsBlocks}
-          />
-        </form>
-        <br />
+          <form>
+            <input
+              type="file"
+              id="blockUpload"
+              multiplesize="1"
+              accept=".xml"
+              onChange={this.loadFileAsBlocks}
+            />
+          </form>
+          <br />
 
-      <div id="Python">
-      <p id ="title"> <b>Python </b> </p>
-      <div> <textarea id = "textarea" rows="10" cols="98" onChange={this.handleScriptChange} /></div>
-      Python File Name:
+          <div id="Python">
+            <p id="title"> <b>Python </b> </p>
+            <div> <textarea id="textarea" rows="10" cols="98" onChange={this.handleScriptChange} /></div>
+            Python File Name:
       <input
-        type="text"
-        name="filename"
-        value={this.state.filename}
-        onChange={this.handleFileNameChange}
-        />&nbsp;&nbsp;
+              type="text"
+              name="filename"
+              value={this.state.filename}
+              onChange={this.handleFileNameChange}
+            />&nbsp;&nbsp;
       <button id="submit" onClick={this.download_python}>Download</button>&nbsp;&nbsp;
       <button id="run" onClick={this.run_script}>Run</button>&nbsp;&nbsp;
       <button id="history" onClick={this.view_history}>View History</button>&nbsp;&nbsp;
       <button id="copy" onClick={this.copy}>Copy Code From Blockly</button>
-      <br />
-      <form>
-        <input
-          type="file"
-          id="upload"
-          multiplesize="1"
-          accept=".py"
-          onChange={this.upload}
-        />
-      </form>
-      <br />
-      <br />
-      </div>
+            <br />
+            <form>
+              <input
+                type="file"
+                id="upload"
+                multiplesize="1"
+                accept=".py"
+                onChange={this.upload}
+              />
+            </form>
+            <br />
+            <br />
+          </div>
         </div>
         <div id="data" style={dataStyle} className="col-md-5"></div>
       </div>
