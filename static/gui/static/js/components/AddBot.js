@@ -205,6 +205,9 @@ export default class AddBot extends React.Component {
                 bot_name: _this.props.selected_bot,
                 direction: value,
                 power: _this.state.power,
+                //send left and right motor, hard coded right now
+                leftmotor: 1,
+                rightmotor: 2,
             })
         })
             .then(function (response) {

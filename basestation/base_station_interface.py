@@ -120,7 +120,7 @@ class ClientHandler(tornado.web.RequestHandler):
             power = str(data['power'])
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             self.base_station.move_wheels_bot(
-                session_id, bot_id, direction, power)
+                session_id, bot_id, direction, power, leftmotor, rightmotor)
         # Looks for bots on the local network to connect to.
         elif key == "DISCOVERBOTS":
             self.write(json.dumps(

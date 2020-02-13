@@ -231,7 +231,7 @@ class BaseStation:
                 return bot_id
         return None
 
-    def move_wheels_bot(self, session_id, bot_id, direction, power):
+    def move_wheels_bot(self, session_id, bot_id, direction, power, leftmotor, rightmotor):
         """
         Gives wheels power based on user input
 
@@ -240,6 +240,8 @@ class BaseStation:
             bot_id:
             direction:
             power:
+            leftmotor:
+            rightmotor:
 
         Return:
             True if bot successfully received direction
