@@ -148,6 +148,7 @@ def start_base_station_heartbeat(ip_address):
         time.sleep(9)
 
 
+<<<<<<< HEAD
 def main():
     try:
         server_ip = None
@@ -197,3 +198,44 @@ def main():
 
 if __name__ == "__main__":
     main()
+=======
+try:
+    server_ip = None
+
+    # continuously try to connect to the base station
+    isTimeOut = True
+    while True:
+        # try connecting to the basestation every sec until connection is made
+        sock.settimeout(1.0)
+        while (isTimeOut):
+            try:
+                # Send data
+                print('sending: ' + message)
+                sent = sock.sendto(message.encode(), server_address)
+                # Receive response
+                print('waiting to receive')
+                data, server = sock.recvfrom(4096)
+                isTimeOut = False
+            except Exception as err:
+                print(err)
+
+        if data.decode('UTF-8') == 'i_am_the_base_station':
+            print('Received confirmation')
+            server_ip = str(server[0])
+            print('Server ip: ' + server_ip)
+            break
+        else:
+            print('Verification failed')
+            print('Trying again...')
+
+    base_station_thread = Thread(
+        target=start_base_station_heartbeat, args=(server_ip,), daemon=True
+    )
+    base_station_thread.start()
+    tcp_instance = TCP()
+    while True:
+        time.sleep(0.01)
+        parse_command(tcp_instance.get_command(), tcp_instance)
+finally:
+    sock.close()
+>>>>>>> 38f1f40cf09b4634749dffba707d1c14adac8bc1

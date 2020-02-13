@@ -70,6 +70,7 @@ def setSlave(PiBus):
 def transmit(message):
     try:
         while tlock.can_transmit():
+            print(message)
             tx = spi.writebytes([message])
             # time.sleep(0.1)
         tlock.end_transmit()
@@ -81,7 +82,7 @@ def transmit(message):
 def fwd(power):
     priority = time.time()
     while not tlock.start_transmit(priority):
-        time.sleep(0.1)
+        time.sleep(0.01)
     setSlave(1)
     cmd = ord('F')
     # print b
@@ -94,7 +95,7 @@ def fwd(power):
 def back(power):
     priority = time.time()
     while not tlock.start_transmit(priority):
-        time.sleep(0.1)
+        time.sleep(0.01)
     setSlave(1)
     cmd = ord('B')
     # print b
@@ -105,7 +106,7 @@ def back(power):
 def left(power):
     priority = time.time()
     while not tlock.start_transmit(priority):
-        time.sleep(0.1)
+        time.sleep(0.01)
     setSlave(1)
     cmd = ord('L')
     # print b
@@ -116,7 +117,7 @@ def left(power):
 def right(power):
     priority = time.time()
     while not tlock.start_transmit(priority):
-        time.sleep(0.1)
+        time.sleep(0.01)
     setSlave(1)
     cmd = ord('R')
     # print b
@@ -127,15 +128,15 @@ def right(power):
 def stop():
     priority = time.time()
     while not tlock.start_transmit(priority):
-        time.sleep(0.1)
+        time.sleep(0.01)
     setSlave(1)
     cmd = ord('S')
     # print b
     try:
         print(cmd)
-        for i in range(5):
+        for i in range(500):
+            print(cmd)
             tx = spi.writebytes([cmd])
-        # time.sleep(0.1)
         tlock.end_transmit()
     finally:
         spi.close()
@@ -144,7 +145,7 @@ def stop():
 def LineFollow():
     priority = time.time()
     while not tlock.start_transmit(priority):
-        time.sleep(0.1)
+        time.sleep(0.01)
     setSlave(1)
     cmd = ord('T')  # for tape follow
     # print b
@@ -155,7 +156,7 @@ def LineFollow():
 def ObjectDetection():
     priority = time.time()
     while not tlock.start_transmit(priority):
-        time.sleep(0.1)
+        time.sleep(0.01)
     setSlave(0)
     cmd = ord('O')
     # print b
