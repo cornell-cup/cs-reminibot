@@ -158,6 +158,8 @@ def main_with_video():
 
     for i in range(NUM_CAMERAS):
         camera = VideoCapture(i)
+        img_points.insert(i, [])
+        obj_points.insert(i, [])
         if (VideoCapture.isOpened(camera)):
             camera.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
             camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
@@ -174,7 +176,7 @@ def main_with_video():
     args = vars(options)  # get dict of args parsed
 
     # Make checkerboard points "Calibration variables"
-    checkerboard_size = {args['rows'], args['cols']}
+    checkerboard_size = (args['rows'], args['cols'])
     checkerboard_points = []
     for j in range(args['cols']):
         for i in range(args['rows']):
@@ -188,7 +190,8 @@ def main_with_video():
 
     # find the checkerboard
     # TODO implement key press controls
-    while key != 27:
+    # while key != 27:
+    while True:
         for i in range(len(cameras)):
             # Open the camera
             while not cameras[i].isOpened():
@@ -201,18 +204,18 @@ def main_with_video():
                 if read_ok:
                     frame = f_ret
                 time.sleep(0.1)
-            gray = cvtColor(frame, COLOR_BGR2GRAY)
-
+            gray = cv2.cvtColor(frame, COLOR_BGR2GRAY)
             # Find the checkerboard
             flags = CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE + CALIB_CB_FAST_CHECK
             ret = None
-            while corners == []:
-                # TODO fix args with constants here
-                ret, corners = findChessboardCorners(
-                    gray, checkerboard_size, corners, flags)
+            while len(corners) == 0 and ret == None:
+                print("Executing find corners")
+                retval, corners = cv2.findChessboardCorners(
+                    gray, checkerboard_size, tuple(corners), flags)
                 time.sleep(0.1)  # sleep instead of spacebar spam
-
-            if corners != []:
+            # print(corners)
+            print(ret)
+            if len(corners) != 0:
                 print("Found checkerboard on " + str(i))
                 img_points[i].append(corners)
                 obj_points[i].append(checkerboard_points)
@@ -222,19 +225,26 @@ def main_with_video():
                 zero_zone = (-1, -1)
                 criteria = (TERM_CRITERIA_EPS +
                             TERM_CRITERIA_MAX_ITER, 30, 0.1)
-                cornerSubPix(gray, corners, win_size, zero_zone, criteria)
+                corners = cornerSubPix(
+                    gray, corners, win_size, zero_zone, criteria)
+            assert (frame.any() != None)
+            assert (corners.any() != None)
+            ret = True
             drawChessboardCorners(frame, checkerboard_size, corners, ret)
-        assert(frame != None)
+        assert(len(frame) != 0)
         imshow(str(i), frame)
+        cv2.waitKey(0)
+        break
 
     # Write .calib file when 'w' is pressed
-    while key == 'w':
+    # while key == 'w':
+    if True:
         print("Beginning calibration file creation process")
         camera_matrix = []
         dist_coeffs = []
         rvecs = []
         tvecs = []
-        for i in len(cameras):
+        for i in range(len(cameras)):
             if not cameras[i].isOpened():
                 continue
             if len(obj_points[i]) == 0:
@@ -244,6 +254,9 @@ def main_with_video():
             # TODO check if calib exists first
             print("Calibrating camera " + str(camera_ids[i]))
             print("Writing 1")
+            obj_points[i] = np.asarray(obj_points[i])
+            print(obj_points[i])
+            print(type(obj_points[i]))
             calibrateCamera(obj_points[i], img_points[i], np.size(
                 frame), camera_matrix, dist_coeffs, rvecs, tvecs)
             print("Writing 2")
