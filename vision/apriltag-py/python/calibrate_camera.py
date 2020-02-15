@@ -232,8 +232,9 @@ def main_with_video():
             ret = True
             drawChessboardCorners(frame, checkerboard_size, corners, ret)
         assert(len(frame) != 0)
-        imshow(str(i), frame)
-        cv2.waitKey(0)
+        # TODO re-enable this for demos
+        # imshow(str(i), frame)
+        # cv2.waitKey(0)
         break
 
     # Write .calib file when 'w' is pressed
@@ -254,11 +255,15 @@ def main_with_video():
             # TODO check if calib exists first
             print("Calibrating camera " + str(camera_ids[i]))
             print("Writing 1")
-            obj_points[i] = np.asarray(obj_points[i])
+            obj_points[i] = np.asarray(obj_points[i][0])
+            print(frame.shape[0:2])
+            # TODO debug this line
+            # np.size(frame)
             print(obj_points[i])
-            print(type(obj_points[i]))
-            calibrateCamera(obj_points[i], img_points[i], np.size(
-                frame), camera_matrix, dist_coeffs, rvecs, tvecs)
+            ret_r, mtx_r, dist_r, rvecs_r, tvecs_r = cv2.calibrateCamera(
+                obj_points[i], img_points[i], frame.shape[0:2], None, None)
+            # calibrateCamera(
+            # obj_points[i], img_points[i], frame.shape, camera_matrix, dist_coeffs)
             print("Writing 2")
             print("Writing calibration file")
             calib_file = open(str(camera_ids[i]) + ".calib", "w+")
