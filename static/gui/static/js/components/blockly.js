@@ -12,7 +12,8 @@ export default class MinibotBlockly extends React.Component {
       user_name: null,
       blockly_filename: 'myXmlBlocklyCode.xml',
       data: "",
-      filename: "myPythonCode.py"
+      filename: "myPythonCode.py",
+      showPopup: false
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -26,6 +27,7 @@ export default class MinibotBlockly extends React.Component {
     this.copy = this.copy.bind(this);
     this.upload = this.upload.bind(this);
   }
+
 
   /* handles input change for file name and coding textboxes */
   handleInputChange(event) {
@@ -153,7 +155,7 @@ export default class MinibotBlockly extends React.Component {
       var user_name = prompt("You haven't sign-in/sign-up yet. Please enter your user id:", "");
       var user_password = prompt("Please enter your password:", "");
       if (user_name != null && user_name != "" & user_password != null && user_password != "") {
-        this.setState({ user_name: user_name});
+        this.setState({ user_name: user_name });
       }
     }
     else {
@@ -185,7 +187,8 @@ export default class MinibotBlockly extends React.Component {
       var user_name = prompt("You haven't sign-in/sign-up yet. Please enter your user id:", "");
       var user_password = prompt("Please enter your password:", "");
       if (user_name != null && user_name != "" & user_password != null && user_password != "") {
-        this.setState({ user_name: "Richie"});
+        this.setState({ user_name: "Richie" });
+
       }
     }
     else {
@@ -212,6 +215,24 @@ export default class MinibotBlockly extends React.Component {
     window.open("http://127.0.0.1:5000/program/")
   }
 
+  login(event) {
+    const modal = document.querySelector(".modal")
+    const closeBtn = document.querySelector(".close")
+    modal.style.display = "block";
+    closeBtn.addEventListener("click", () => {
+      modal.style.display = "none";
+    })
+  }
+
+  register(event) {
+    const modal = document.querySelector(".register_modal")
+    const closeBtn = document.querySelector(".close")
+    modal.style.display = "block";
+    closeBtn.addEventListener("click", () => {
+      modal.style.display = "none";
+    })
+  }
+
   /* Target function for the button "Cope Code". Set the text
      in the editing box according to blockly. */
   copy(event) {
@@ -231,7 +252,7 @@ export default class MinibotBlockly extends React.Component {
     };
 
     xmlReader.readAsText(xmlToLoad, 'UTF-8');
-  }      
+  }
 
   render() {
     var blocklyStyle = { height: '67vh' };
@@ -242,6 +263,36 @@ export default class MinibotBlockly extends React.Component {
         <div id="blockly" className="box" className="col-md-7">
           <div id="blocklyDiv" style={blocklyStyle} align="left">
             <p id="title"><b>Blockly </b> </p>
+
+            <button id="register" onClick={this.register}>Register</button>&nbsp;&nbsp;
+            <button id="login" onClick={this.login}>Login</button>&nbsp;&nbsp;
+
+            <div class="register_modal">
+              <div class="modal_content">
+                <span class="close">&times;</span>
+                <p>Register Window</p>
+                <form action="http://127.0.0.1:5000/register/" method="post">
+                  <input type="text" placeholder="Email" name="email" ></input>
+                  <input type="password" placeholder="Password" name="password" ></input>
+                  <input class="btn btn-default" type="submit" value="Register"></input>
+                </form>
+              </div>
+            </div>
+
+            <div class="modal">
+              <div class="modal_content">
+                <span class="close">&times;</span>
+                <p>Login Window</p>
+                <form action="http://127.0.0.1:5000/login/" method="post">
+                  <input type="text" placeholder="Email" name="email" ></input>
+                  <input type="password" placeholder="Password" name="password" ></input>
+                  <input class="btn btn-default" type="submit" value="Login"></input>
+                </form>
+
+              </div>
+            </div>
+
+
           </div>
           <br />
           <br />

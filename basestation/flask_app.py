@@ -1,6 +1,6 @@
 import time
 import json
-from flask import Flask, request
+from flask import Flask, request, redirect
 from flask_db import db, Program, User
 
 app = Flask(__name__)
@@ -106,46 +106,48 @@ def post_code():
 
 @app.route('/register/', methods=['POST'])
 def register_account():
-    post_body = json.loads(request.data)
-    email = post_body.get('email')
-    password = post_body.get('password')
+    email = request.form['email']
+    password = request.form['password']
 
     if email is None or password is None:
-        return json.dumps({'error': 'Invalid email or password'})
+        print("error: Invalid email or password")
+        return redirect("http://localhost:8080/start")
 
     created, user = create_user(email, password)
 
     if not created:
-        return json.dumps({'error': 'User already exists'})
+        print("error: User already exists")
+        return redirect("http://localhost:8080/start")
 
-    return json.dumps({
-        'session_token': user.session_token,
-        'session_expiration': str(user.session_expiration),
-        'update_token': user.update_token,
-        'user_id': user.id
-    })
+    print("session_token: " + user.session_token)
+    print("session_expiration" + str(user.session_expiration))
+    print("update_token" + user.update_token)
+    print("user_id" + str(user.id))
+
+    return redirect("http://localhost:8080/start")
 
 
 @app.route('/login/', methods=['POST'])
 def login():
-    post_body = json.loads(request.data)
-    email = post_body.get('email')
-    password = post_body.get('password')
+    email = request.form['email']
+    password = request.form['password']
 
     if email is None or password is None:
-        return json.dumps({'error': 'Invalid email or password'}), 404
+        print("error: Invalid email or password")
+        return redirect("http://localhost:8080/start")
 
     success, user = verify_credentials(email, password)
 
     if not success:
-        return json.dumps({'error': 'Incorrect email or password'}), 404
+        print("error: Incorrect email or password'")
+        return redirect("http://localhost:8080/start")
 
-    return json.dumps({
-        'session_token': user.session_token,
-        'session_expiration': str(user.session_expiration),
-        'update_token': user.update_token,
-        'user_id': user.id
-    })
+    print("session_token: " + user.session_token)
+    print("session_expiration" + str(user.session_expiration))
+    print("update_token" + user.update_token)
+    print("user_id" + str(user.id))
+
+    return redirect("http://localhost:8080/start")
 
 
 @app.route('/session/', methods=['POST'])
