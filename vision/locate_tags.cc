@@ -1,6 +1,34 @@
+/*Specifications:
+
+    This is Step 3 in initializing the vision system. After you cd into the
+    folder with the calibrate_cameras, locate_cameras, and locate_tags scripts.
+    We first need to compile the .cc file using a command like below:
+
+    g++ -std=c++11 locate_tags.cc (PATH TO)/cs-reminibot/vision
+    `pkg-config --libs --cflags opencv` -l apriltag -o locate_tags.o
+
+    (Here --cflags are what you got while installing the opencv system)
+    Once you have the calibrate_cameras.o file, you run
+
+    ./locate_tags.o <url> 0.calib
+
+    An example input would be:
+    ./locate_tags.o http://localhost:8080/vision 0.calib (FOR THE GUI)
+
+    To test or see output on the terminal you could even do something Like
+    ./locate_tags.o www.google.com 0.calib (and have print statements in)
+
+    devices (vector) : list of devices that are connected to the vision system
+    current implementation just has one camera. Will be useful when trying to
+    increase number of cameras
+
+*/
+
+//ensure you have these dependencies downloaded
 #include <apriltag/apriltag.h>
 #include <apriltag/tag36h11.h>
 #include <apriltag/tag36artoolkit.h>
+
 #include <curl/curl.h>
 #include <iostream>
 #include <fstream>
@@ -41,7 +69,7 @@ int main(int argc, char **argv)
     vector<Mat> device_camera_matrix;
     vector<Mat> device_dist_coeffs;
     vector<Mat> device_transform_matrix;
-    //std::cout << "Loop 1 Start";
+
     for (int i = 2; i < argc; i++)
     {
         int id = atoi(argv[i]);
@@ -61,7 +89,7 @@ int main(int argc, char **argv)
         Mat camera_matrix, dist_coeffs, transform_matrix;
         std::string line;
         // TODO Error checking
-        //std::cout << "Inner while loop start";
+
         while (std::getline(fin, line))
         {
             std::stringstream line_stream(line);
@@ -105,7 +133,7 @@ int main(int argc, char **argv)
                 std::cerr << "Unrecognized key '" << key << "' in file " << argv[i] << std::endl;
             }
         }
-        //std::cout <<"inner while loop end";
+
         if (camera_matrix.rows != 3 || camera_matrix.cols != 3)
         {
             std::cerr << "Error reading camera_matrix in file " << argv[i] << std::endl;
@@ -133,7 +161,7 @@ int main(int argc, char **argv)
         device_dist_coeffs.push_back(dist_coeffs);
         device_transform_matrix.push_back(transform_matrix);
     }
-    //std::cout <<"for loop 1 closed";
+
     // Initialize detector
     apriltag_family_t *tf = tag36h11_create();
     tf->black_border = 1;
@@ -149,11 +177,11 @@ int main(int argc, char **argv)
     int key = 0;
     Mat frame, gray;
     char postDataBuffer[100];
-    //std::cout<< "while loop 2 start";
+
     while (key != 27)
     { // Quit on escape keypres
         // if(key == 'w'){
-        //std::cout <<"for loop 2 start";
+
         //std::cout << "Print numbr of devices: " << devices.size() << "\n" ;
         for (size_t i = 0; i < devices.size(); i++)
         {
@@ -177,11 +205,11 @@ int main(int argc, char **argv)
             vector<Point3f> obj_points(4);
             Mat rvec(3, 1, CV_64FC1);
             Mat tvec(3, 1, CV_64FC1);
-            //std::cout << "for loop 3 start\n";
+
             // std::cout << "Size of detections: " << zarray_size(detections) << "\n";
             for (int j = 0; j < zarray_size(detections); j++)
             {
-                // std::cout <<"J is " << j << "\n";
+
                 // Get the ith detection
                 apriltag_detection_t *det;
                 zarray_get(detections, j, &det);
@@ -255,10 +283,11 @@ int main(int argc, char **argv)
                     angle = 2 * M_PI - angle;
                 }
                 angle = angle * 180 / M_PI;
-                //std::cout << "w if sTART";
+
                 char keypress;
                 //std::cin >> keypress;
 
+                // main print for terminal
                 printf("%zu :: %d :: % 3.3f % 3.3f % 3.3f % 3.3f\n",
                        i, det->id,
                        tagXYZS.at<double>(0), tagXYZS.at<double>(1), tagXYZS.at<double>(2), angle);
@@ -276,17 +305,17 @@ int main(int argc, char **argv)
                  // TODO Check for error response
                 curl_easy_perform(curl);
             }
-            // std::cout << "For loop 3 closed";
+
 
             zarray_destroy(detections);
 
             //imshow(std::to_string(i), frame);
         }
-        // std::cout <<"for loop 2 closed";
+
         // }
 
         key = waitKey(16);
     }
-    // std::cout <<"while loop 2 closed";
+
     curl_easy_cleanup(curl);
 }
