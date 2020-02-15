@@ -26,6 +26,8 @@ export default class MinibotBlockly extends React.Component {
     this.view_history = this.view_history.bind(this);
     this.copy = this.copy.bind(this);
     this.upload = this.upload.bind(this);
+    this.login = this.login.bind(this);
+    this.register = this.register.bind(this);
   }
 
 
@@ -151,64 +153,46 @@ export default class MinibotBlockly extends React.Component {
      corresponding to blockly to backend. */
   run_blockly(event) {
     console.log(this.props.bot_name, "run_blockly");
-    if (this.state.user_name == null) {
-      var user_name = prompt("You haven't sign-in/sign-up yet. Please enter your user id:", "");
-      var user_password = prompt("Please enter your password:", "");
-      if (user_name != null && user_name != "" & user_password != null && user_password != "") {
-        this.setState({ user_name: user_name });
-      }
-    }
-    else {
-      axios({
-        method: 'POST',
-        url: '/start',
-        data: JSON.stringify({
-          key: 'SCRIPTS',
-          value: blockly.value,
-          bot_name: this.props.bot_name
-        }),
+    axios({
+      method: 'POST',
+      url: '/start',
+      data: JSON.stringify({
+        key: 'SCRIPTS',
+        value: blockly.value,
+        bot_name: this.props.bot_name
+      }),
+    })
+      .then(function (response) {
+        console.log(blockly.value);
+        console.log('sent script');
       })
-        .then(function (response) {
-          console.log(blockly.value);
-          console.log('sent script');
-        })
-        .catch(function (error) {
-          console.warn(error);
-        });
-    }
+      .catch(function (error) {
+        console.warn(error);
+      });
+
   }
 
 
   /* Target function for the button "Run Code". Send python code
      in the editing box to backend. */
   run_script(event) {
-    console.log(this.props.bot_name, "run_script");
-    if (this.state.user_name == null) {
-      var user_name = prompt("You haven't sign-in/sign-up yet. Please enter your user id:", "");
-      var user_password = prompt("Please enter your password:", "");
-      if (user_name != null && user_name != "" & user_password != null && user_password != "") {
-        this.setState({ user_name: "Richie" });
-
-      }
-    }
-    else {
-      axios({
-        method: 'POST',
-        url: '/start',
-        data: JSON.stringify({
-          key: 'SCRIPTS',
-          value: this.state.data,
-          bot_name: this.props.bot_name
-        }),
+    axios({
+      method: 'POST',
+      url: '/start',
+      data: JSON.stringify({
+        key: 'SCRIPTS',
+        value: this.state.data,
+        bot_name: this.props.bot_name
+      }),
+    })
+      .then(function (response) {
+        console.log(blockly.value);
+        console.log('sent script');
       })
-        .then(function (response) {
-          console.log(blockly.value);
-          console.log('sent script');
-        })
-        .catch(function (error) {
-          console.warn(error);
-        });
-    }
+      .catch(function (error) {
+        console.warn(error);
+      });
+
   }
 
   view_history(event) {
@@ -225,11 +209,11 @@ export default class MinibotBlockly extends React.Component {
   }
 
   register(event) {
-    const modal = document.querySelector(".register_modal")
-    const closeBtn = document.querySelector(".close")
-    modal.style.display = "block";
+    const register_modal = document.querySelector(".register_modal")
+    const closeBtn = document.querySelector(".register_close")
+    register_modal.style.display = "block";
     closeBtn.addEventListener("click", () => {
-      modal.style.display = "none";
+      register_modal.style.display = "none";
     })
   }
 
@@ -262,35 +246,36 @@ export default class MinibotBlockly extends React.Component {
       <div id="blockyContainer" style={marginStyle} className="row">
         <div id="blockly" className="box" className="col-md-7">
           <div id="blocklyDiv" style={blocklyStyle} align="left">
-            <p id="title"><b>Blockly </b> </p>
+            <div id="login and register">
+              <button id="register" onClick={this.register}>Register</button>
+              <button id="login" onClick={this.login}>Login</button>
 
-            <button id="register" onClick={this.register}>Register</button>&nbsp;&nbsp;
-            <button id="login" onClick={this.login}>Login</button>&nbsp;&nbsp;
-
-            <div class="register_modal">
-              <div class="modal_content">
-                <span class="close">&times;</span>
+              <div class="register_modal">
+                {/* <div class="modal_content"> */}
+                <span class="register_close">&times;</span>
                 <p>Register Window</p>
                 <form action="http://127.0.0.1:5000/register/" method="post">
                   <input type="text" placeholder="Email" name="email" ></input>
                   <input type="password" placeholder="Password" name="password" ></input>
-                  <input class="btn btn-default" type="submit" value="Register"></input>
+                  <input class="btn_btn-dir" type="submit" value="Register"></input>
                 </form>
+                {/* </div> */}
               </div>
-            </div>
 
-            <div class="modal">
-              <div class="modal_content">
+              <div class="modal">
+                {/* <div class="modal_content"> */}
                 <span class="close">&times;</span>
                 <p>Login Window</p>
                 <form action="http://127.0.0.1:5000/login/" method="post">
                   <input type="text" placeholder="Email" name="email" ></input>
                   <input type="password" placeholder="Password" name="password" ></input>
-                  <input class="btn btn-default" type="submit" value="Login"></input>
+                  <input class="btn_btn-dir" type="submit" value="Login"></input>
                 </form>
-
               </div>
+              {/* </div> */}
             </div>
+
+            <p id="title"><b>Blockly </b> </p>
 
 
           </div>

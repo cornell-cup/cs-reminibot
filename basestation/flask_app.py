@@ -14,6 +14,9 @@ db.init_app(app)
 with app.app_context():
     db.create_all()
 
+login_yet = False
+login_email = ""
+
 
 def get_user_by_email(email):
     return User.query.filter(User.email == email).first()
@@ -90,6 +93,8 @@ def get_program():
 
 @app.route("/code/", methods=['POST'])
 def post_code():
+    print("can you see me")
+    print(login_email)
     data = request.get_json()
     t = time.localtime()
     current_time = time.strftime("%H:%M:%S", t)
@@ -142,6 +147,8 @@ def login():
         print("error: Incorrect email or password'")
         return redirect("http://localhost:8080/start")
 
+    login_yet = True
+    login_email = email
     print("session_token: " + user.session_token)
     print("session_expiration" + str(user.session_expiration))
     print("update_token" + user.update_token)
