@@ -9,6 +9,36 @@
 */
 
 var miniblocks = {
+  do_while: {
+    message0: "do %1",
+    args0: [
+      {
+        type: "input_statement",
+        name: "do_statement",
+      }
+    ],
+    message1: "repeat %1 %2",
+    args1: [
+      {
+        type: "field_dropdown",
+        name: "while_or_until",
+        options: [
+          ["while","while"],
+          ["until","until"]
+        ]
+      },
+      {
+        type: "input_value",
+        name: "condition",
+        check: "Boolean"
+      }
+    ],
+    previousStatement: null,
+    nextStatement: null,
+    colour: 230,
+    tooltip: "",
+    helpUrl: ""
+  },
   // MOVE
   move: {
     type: "move",
@@ -332,6 +362,7 @@ var miniblocks = {
     tooltip: "",
     helpUrl: ""
   },
+
   wait_for_commands: {
     type: "wait_for_commands",
     message0: "wait for commands from %1",
