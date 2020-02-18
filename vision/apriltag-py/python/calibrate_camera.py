@@ -131,7 +131,18 @@ def main_with_video():
 
     # Parse args
     # USAGE:
-    # python3 calibrate_camera.py <rows> <cols> <size>
+    # python3 calibrate_camera.py -r <rows> -c <cols>
+    """
+    IMPORTANT!
+    Make sure the rows entered is (# of boxes in a column) - 1,
+    cols = (# of boxes in a row) - 1
+
+    This has to do with OpenCV's computation of an
+    "inner chessboard". This offset will be built in later, but
+    that would require changing documentation before an implementation
+    has been built.
+
+    """
 
     parser = argparse.ArgumentParser(
         description='calibrate camera intrinsics using OpenCV')
@@ -155,11 +166,18 @@ def main_with_video():
     NUM_CAMERAS = 1
     img_points = []
     obj_points = []
+    objp = []
+
+    options = parser.parse_args()
+    args = vars(options)  # get dict of args parsed
 
     for i in range(NUM_CAMERAS):
         camera = VideoCapture(i)
         img_points.insert(i, [])
         obj_points.insert(i, [])
+        objp = np.zeros((args['rows'] * args['cols'], 3), np.float32)
+        objp[:, :2] = np.mgrid[0:args['cols'],
+                               0:args['rows']].T.reshape(-1, 2)
         if (VideoCapture.isOpened(camera)):
             camera.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
             camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
@@ -169,11 +187,8 @@ def main_with_video():
             camera_ids.append(i)
             pass
         else:
-            print("Failed to open video capture device")
+            print("Failed to open video capture device" + str(i))
             quit()
-
-    options = parser.parse_args()
-    args = vars(options)  # get dict of args parsed
 
     # Make checkerboard points "Calibration variables"
     checkerboard_size = (args['rows'], args['cols'])
@@ -205,20 +220,16 @@ def main_with_video():
                     frame = f_ret
                 time.sleep(0.1)
             gray = cv2.cvtColor(frame, COLOR_BGR2GRAY)
+
             # Find the checkerboard
             flags = CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE + CALIB_CB_FAST_CHECK
-            ret = None
-            while len(corners) == 0 and ret == None:
-                print("Executing find corners")
-                retval, corners = cv2.findChessboardCorners(
-                    gray, checkerboard_size, tuple(corners), flags)
-                time.sleep(0.1)  # sleep instead of spacebar spam
-            # print(corners)
-            print(ret)
+            ret = False
+            # TODO loop this
+            retval, corners = cv2.findChessboardCorners(
+                gray, checkerboard_size, tuple(corners), flags)
             if len(corners) != 0:
                 print("Found checkerboard on " + str(i))
-                img_points[i].append(corners)
-                obj_points[i].append(checkerboard_points)
+                obj_points[i].append(objp)
                 # TODO TERM_CRITERIA_ITER used in C++, using
                 # MAX_ITER OK?
                 win_size = (11, 11)
@@ -227,16 +238,21 @@ def main_with_video():
                             TERM_CRITERIA_MAX_ITER, 30, 0.1)
                 corners = cornerSubPix(
                     gray, corners, win_size, zero_zone, criteria)
+                img_points[i].append(corners)
             assert (frame.any() != None)
             assert (corners.any() != None)
             ret = True
             drawChessboardCorners(frame, checkerboard_size, corners, ret)
         assert(len(frame) != 0)
         # TODO re-enable this for demos
-        # imshow(str(i), frame)
-        # cv2.waitKey(0)
+        imshow(str(i), frame)
+        cv2.waitKey(0)
         break
 
+    print("Image points")
+    print(img_points)
+    print("Object points")
+    print(obj_points)
     # Write .calib file when 'w' is pressed
     # while key == 'w':
     if True:
@@ -255,13 +271,20 @@ def main_with_video():
             # TODO check if calib exists first
             print("Calibrating camera " + str(camera_ids[i]))
             print("Writing 1")
-            obj_points[i] = np.asarray(obj_points[i][0])
-            print(frame.shape[0:2])
+            print(obj_points[i])
+            obj_points[i] = np.asarray(obj_points[i])
+            print("numpy array")
+            print(obj_points[i])
+            # print(img_points[i])
+            # img_points[i] = np.asarray(img_points[i][0])
             # TODO debug this line
             # np.size(frame)
-            print(obj_points[i])
+            # print(obj_points[i].shape)
+            # print(img_points[i].shape)
+            # print(obj_points[i])
+            # print(img_points[i][0])
             ret_r, mtx_r, dist_r, rvecs_r, tvecs_r = cv2.calibrateCamera(
-                obj_points[i], img_points[i], frame.shape[0:2], None, None)
+                obj_points[i], img_points[i], (len(obj_points), len(obj_points[0])), None, None)
             # calibrateCamera(
             # obj_points[i], img_points[i], frame.shape, camera_matrix, dist_coeffs)
             print("Writing 2")
