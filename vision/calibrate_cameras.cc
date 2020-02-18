@@ -11,8 +11,8 @@
     Once you have the calibrate_cameras.o file, you run
 
     ./calibrate_cameras.x  (inner row of checkerboard)
-    (inner columns of checkerboard) (size of checkerboard square) (camera indices)
-    An example input would be:
+    (inner columns of checkerboard) (size of checkerboard square) (camera
+   indices) An example input would be:
 
     ./calibrate_camera.x 7 9 1 0
     Once the camera window opens up, bring the checkerboard in the camera frame
@@ -23,18 +23,19 @@
     Once you are convinced that your calibration is good,
     make sure to click on the camera window and press w until it says wrote
     calibration to 0.
-    (To make calibration robust, make sure you keep changing orientation of checkerbaord
-    however the more times you hit the Space bar longer it takes to write the calibration)
+    (To make calibration robust, make sure you keep changing orientation of
+   checkerbaord however the more times you hit the Space bar longer it takes to
+   write the calibration)
 
     N.B: Make sure to delete any previous calibrations before you hit w
 
     */
-#include <iostream>
-#include <fstream>
-#include <opencv2/opencv.hpp>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <fstream>
+#include <iostream>
+#include <opencv2/opencv.hpp>
 #include <vector>
 
 using namespace cv;
@@ -48,7 +49,14 @@ using std::vector;
 
 int main(int argc, char **argv)
 {
-    // Display usage
+    // main fucntion takes in two parameters:
+    // 1. agrc (int) : the number of arguments passed to the program. Always
+    // be atleast one as name of program is already one parameter.
+
+    // 2. argv: vector containing the arguments. argv[0] is always the name or
+    // path of the function used for this execution
+
+    // Display Usage
     if (argc < 5)
     {
         printf("Usage: %s <rows> <cols> <size> [cameras...]\n", argv[0]);
@@ -73,6 +81,7 @@ int main(int argc, char **argv)
         VideoCapture device(id);
         if (device.isOpened())
         {
+            // The three lines below are specifying settings of the camera
             device.set(CV_CAP_PROP_FRAME_WIDTH, 1280);
             device.set(CV_CAP_PROP_FRAME_HEIGHT, 720);
             device.set(CV_CAP_PROP_FPS, 30);
@@ -118,14 +127,17 @@ int main(int argc, char **argv)
             {
                 cvtColor(frame, gray, COLOR_BGR2GRAY);
                 bool found = findChessboardCorners(gray, checkerboard_size, corners,
-                                                   CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE + CALIB_CB_FAST_CHECK);
+                                                   CALIB_CB_ADAPTIVE_THRESH +
+                                                       CALIB_CB_NORMALIZE_IMAGE +
+                                                       CALIB_CB_FAST_CHECK);
                 if (found)
                 {
                     std::cout << "Found checkerboard on " << i << std::endl;
                     img_points[i].push_back(corners);
                     obj_points[i].push_back(checkerboard_points);
-                    cornerSubPix(gray, corners, Size(11, 11), Size(-1, -1),
-                                 TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));
+                    cornerSubPix(
+                        gray, corners, Size(11, 11), Size(-1, -1),
+                        TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));
                 }
                 drawChessboardCorners(frame, checkerboard_size, Mat(corners), found);
             }
@@ -149,7 +161,8 @@ int main(int argc, char **argv)
                 }
                 if (obj_points[i].size() == 0)
                 {
-                    std::cout << "No checkerboards detected on camera " << device_ids[i] << std::endl;
+                    std::cout << "No checkerboards detected on camera " << device_ids[i]
+                              << std::endl;
                     continue;
                 }
 
@@ -157,8 +170,8 @@ int main(int argc, char **argv)
 
                 std::cout << "Calibrate camera " << device_ids[i] << std::endl;
                 printf("%s", "writing1");
-                calibrateCamera(obj_points[i], img_points[i], frame.size(), camera_matrix,
-                                dist_coeffs, rvecs, tvecs);
+                calibrateCamera(obj_points[i], img_points[i], frame.size(),
+                                camera_matrix, dist_coeffs, rvecs, tvecs);
                 printf("%s", "writing2");
                 std::cout << "Write calibration" << std::endl;
                 std::ofstream fout;
@@ -185,7 +198,8 @@ int main(int argc, char **argv)
                 fout << std::endl;
                 fout.close();
 
-                std::cout << "Write calibration output to " << device_ids[i] << ".calib" << std::endl;
+                std::cout << "Write calibration output to " << device_ids[i] << ".calib"
+                          << std::endl;
             }
         }
     }
