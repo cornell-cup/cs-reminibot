@@ -291,20 +291,22 @@ def main_with_video():
             print("Writing calibration file")
             calib_file = open(str(camera_ids[i]) + ".calib", "w+")
             calib_file.write("camera_matrix =")
-            write_matrix_to_file(camera_matrix, calib_file)
+            write_matrix_to_file(mtx_r, calib_file)
             calib_file.write("dist_coeffs =")
-            write_matrix_to_file(dist_coeffs, calib_file)
+            write_matrix_to_file(dist_r, calib_file)
+            print(rvecs_r)
+            print(tvecs_r)
             calib_file.close()
             print("Calibration file written to " +
                   str(camera_ids[i]) + ".calib")
 
 
 def write_matrix_to_file(matrix, file):
-    np_matrix = np.array(matrix)
-    num_rows, num_cols = np_matrix.shape
+    num_rows, num_cols = matrix.shape
     for r in range(num_rows):
         for c in range(num_cols):
-            file.write(" " + np_matrix[r][c])
+            file.write(" " + str(matrix[r][c]))
+    file.write("\n")
 
 
 if __name__ == '__main__':
