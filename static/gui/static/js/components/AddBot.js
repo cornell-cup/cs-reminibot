@@ -67,6 +67,7 @@ export default class AddBot extends React.Component {
         this.addBotListener = this.addBotListener.bind(this);
         this.selectBotListener = this.selectBotListener.bind(this);
         this.buttonMapListener = this.buttonMapListener.bind(this);
+        this.motorPorts = this.motorPorts.bind(this);
     }
 
     componentDidMount() {
@@ -215,6 +216,26 @@ export default class AddBot extends React.Component {
             .catch(function (error) {
                 console.log(error);
             })
+    }
+
+    /*motor ports*/
+    motorPorts(port1){
+      const _this = this;
+      console.log(port1);
+
+      axios({
+          method: 'POST',
+          url: '/start',
+          data: JSON.stringify({
+              key: "PORTS",
+              leftmotor: port1
+          })
+      })
+          .then(function (response) {
+          })
+          .catch(function (error) {
+              console.log(error);
+          })
     }
 
     /* removes selected object from list*/
@@ -370,6 +391,14 @@ export default class AddBot extends React.Component {
                             </td>
                             <td><button style={styles.Button} bot_list={this.props.bot_list}
                                 onClick={() => _this.deleteBotListener()}>Remove</button></td>
+                        </tr>
+                        <tr>
+                          <td>
+                          <label>
+                            Ports:
+                            <td><button style={styles.Button} onClick={() => this.motorPorts(1)}> ports </button></td>
+                          </label>
+                          </td>
                         </tr>
 
                     </tbody>
