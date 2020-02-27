@@ -14,7 +14,6 @@ db.init_app(app)
 with app.app_context():
     db.create_all()
 
-login_yet = False
 login_email = ""
 
 
@@ -94,15 +93,18 @@ def get_program():
 @app.route("/code/", methods=['POST'])
 def post_code():
     print("can you see me")
-    print(login_email)
+    global login_email
+    print("login_in email: " + login_email)
     data = request.get_json()
     t = time.localtime()
     current_time = time.strftime("%H:%M:%S", t)
     print(data)
     print(current_time)
+    print(login_email)
     program = Program(
         code=data.get('value'),
-        time=current_time
+        time=current_time,
+        email=login_email
     )
     db.session.add(program)
     db.session.commit()
@@ -147,12 +149,13 @@ def login():
         print("error: Incorrect email or password'")
         return redirect("http://localhost:8080/start")
 
-    login_yet = True
+    global login_email
     login_email = email
     print("session_token: " + user.session_token)
     print("session_expiration" + str(user.session_expiration))
     print("update_token" + user.update_token)
     print("user_id" + str(user.id))
+    print('email: ' + login_email)
 
     return redirect("http://localhost:8080/start")
 

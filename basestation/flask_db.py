@@ -12,16 +12,19 @@ class Program(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String, nullable=False)
     time = db.Column(db.Integer, nullable=False)
+    email = db.Column(db.String, nullable=False)
 
     def __init__(self, **kwargs):
         self.code = kwargs.get('code', '')
         self.time = kwargs.get('time', '')
+        self.email = kwargs.get('email', '')
 
     def serialize(self):
         return {
             'id': self.id,
             'code': self.code,
-            'time': self.time
+            'time': self.time,
+            'email': self.email
         }
 
 

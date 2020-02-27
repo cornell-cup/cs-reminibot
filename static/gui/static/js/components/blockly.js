@@ -13,7 +13,8 @@ export default class MinibotBlockly extends React.Component {
       blockly_filename: 'myXmlBlocklyCode.xml',
       data: "",
       filename: "myPythonCode.py",
-      showPopup: false
+      showPopup: false,
+      is_loggedin: false,
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
