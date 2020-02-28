@@ -154,3 +154,7 @@ def ObjectDetection():
     # print b
     print(cmd)
     transmit(cmd)
+
+def SetPorts(ports):
+    for x in ports:
+        print(x)

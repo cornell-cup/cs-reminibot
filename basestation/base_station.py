@@ -231,6 +231,8 @@ class BaseStation:
                 return bot_id
         return None
 
+    
+
     def move_wheels_bot(self, session_id, bot_id, direction, power):
         """
         Gives wheels power based on user input
@@ -346,6 +348,23 @@ class BaseStation:
 
     def set_position_of_bot(self, bot_id, pos):
         pass
+
+    def set_ports( self, ports, session_id, bot_id ):
+        if not session_id or not bot_id:
+            return False
+
+        session = self.active_sessions[session_id]
+        if not session or not session.has_bot(bot_id):
+            return False
+        
+        for x in ports:
+            print(x)
+        
+        self.active_bots[bot_id].sendKV("PORTS", ports)
+        
+        #do something
+
+        return True
 
     # ================== SESSIONS ==================
 

@@ -69,6 +69,12 @@ def parse_command(cmd, tcpInstance):
         elif value == "line_follow":
             print("Line Follow")
             Thread(target=ece.LineFollow).start()
+
+    elif key == "PORTS":
+        ece.SetPorts(value)
+
+        print("Set Ports")    
+
     elif key == "SCRIPTS":
         # The script is always named bot_script.py.
         if len(value) > 0:

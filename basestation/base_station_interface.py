@@ -118,9 +118,20 @@ class ClientHandler(tornado.web.RequestHandler):
             bot_name = data['bot_name']
             direction = data['direction']
             power = str(data['power'])
+
+
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             self.base_station.move_wheels_bot(
-                session_id, bot_id, direction, power)
+                session_id, bot_id, direction, power, leftmotor, rightmotor)
+        elif key == "PORTS":
+            # leftmotor = data['leftmotor']
+            bot_id = self.base_station.bot_name_to_bot_id(data['bot_name'])
+            
+            portarray = data['ports']
+            for x in portarray:
+                print(x)
+            self.base_station.set_ports(session_id, portarray, bot_id)
+
         # Looks for bots on the local network to connect to.
         elif key == "DISCOVERBOTS":
             self.write(json.dumps(
@@ -182,7 +193,7 @@ class ClientHandler(tornado.web.RequestHandler):
         Sends the program received from Blockly to the bot, translated
         into ECE-supplied functions.
 
-        Args: 
+        Args:
             bot: The pi_bot to send to
             program: The string containing the python code generated
             from blockly

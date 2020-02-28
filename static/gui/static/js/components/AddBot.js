@@ -67,6 +67,7 @@ export default class AddBot extends React.Component {
         this.addBotListener = this.addBotListener.bind(this);
         this.selectBotListener = this.selectBotListener.bind(this);
         this.buttonMapListener = this.buttonMapListener.bind(this);
+        this.motorPorts = this.motorPorts.bind(this);
     }
 
     componentDidMount() {
@@ -205,6 +206,9 @@ export default class AddBot extends React.Component {
                 bot_name: _this.props.selected_bot,
                 direction: value,
                 power: _this.state.power,
+                //send left and right motor, hard coded right now
+                leftmotor: 1,
+                rightmotor: 2,
             })
         })
             .then(function (response) {
@@ -212,6 +216,27 @@ export default class AddBot extends React.Component {
             .catch(function (error) {
                 console.log(error);
             })
+    }
+
+    /*motor ports*/
+    motorPorts(port1){
+      const _this = this;
+      console.log(port1);
+
+      axios({
+          method: 'POST',
+          url: '/start',
+          data: JSON.stringify({
+              key: "PORTS",
+              ports: [port1], /*add the other ports [port1, port2, port3, etc] after we write front end stuff*/
+              bot_name: _this.props.selected_bot,
+          })
+      })
+          .then(function (response) {
+          })
+          .catch(function (error) {
+              console.log(error);
+          })
     }
 
     /* removes selected object from list*/
@@ -367,6 +392,14 @@ export default class AddBot extends React.Component {
                             </td>
                             <td><button style={styles.Button} bot_list={this.props.bot_list}
                                 onClick={() => _this.deleteBotListener()}>Remove</button></td>
+                        </tr>
+                        <tr>
+                          <td>
+                          <label>
+                            Ports:
+                            <td><button style={styles.Button} onClick={() => this.motorPorts(1)}> ports </button></td>
+                          </label>
+                          </td>
                         </tr>
 
                     </tbody>
