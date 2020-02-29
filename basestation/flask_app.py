@@ -159,6 +159,16 @@ def login():
 
     return redirect("http://localhost:8080/start")
 
+@app.route('/logout', methods=['POST'])
+def logout():
+    global login_email
+    
+    if login_email == "":
+        print("error: No user to logout")
+        return redirect("http://localhost:8080/start")
+    
+    login_email=""
+    return redirect("http://localhost:8080/start")
 
 @app.route('/session/', methods=['POST'])
 def update_session():
