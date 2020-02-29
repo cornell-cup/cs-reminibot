@@ -69,6 +69,7 @@ while True:
     # receive RPi name and frame from the RPi and acknowledge
     # the receipt
     (rpiName, frame) = imageHub.recv_image()
+    print("server connecting to " + rpiName)
     imageHub.send_reply(b'OK')
 
     # if a device is not in the last active dictionary then it means
