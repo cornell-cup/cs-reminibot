@@ -206,9 +206,6 @@ export default class AddBot extends React.Component {
                 bot_name: _this.props.selected_bot,
                 direction: value,
                 power: _this.state.power,
-                //send left and right motor, hard coded right now
-                leftmotor: 1,
-                rightmotor: 2,
             })
         })
             .then(function (response) {
@@ -228,7 +225,8 @@ export default class AddBot extends React.Component {
           url: '/start',
           data: JSON.stringify({
               key: "PORTS",
-              ports: [port1], /*add the other ports [port1, port2, port3, etc] after we write front end stuff*/
+              ports: [port1, 4, 1, 6], /*hard coded values for testing*/
+              /*add the other ports [port1, port2, port3, etc] after we write front end stuff*/
               bot_name: _this.props.selected_bot,
           })
       })
