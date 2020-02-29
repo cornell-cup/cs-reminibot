@@ -274,6 +274,21 @@ library used by ctypes.
 
     '''
 
+    """
+    A detector has the following fields:
+
+    center (of type numpy.ndarray): The center of this tag
+    corners (of type numpy.ndarray): The corners of this tag
+    decision_margin
+    goodness
+    hamming
+    homography
+    index
+    tag_family
+    tag_id
+    Access them with dot notation.
+    """
+
     def __init__(self, options=None, searchpath=[]):
 
         if options is None:
