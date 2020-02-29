@@ -19,7 +19,7 @@ def main():
     camera.set(CAP_PROP_FRAME_HEIGHT, 720)
     camera.set(CAP_PROP_FPS, 30)
 
-    camera_matrix, dist_coeffs = get_matrices_from_file()
+    camera_matrix, dist_coeffs = get_matrices_from_file(sys.argv[1])
 
     print(camera_matrix)
     print(dist_coeffs)
@@ -47,12 +47,14 @@ def main():
     if len(detections) != 1:
         print("Didn't find exactly 4 apriltags, exiting")
         exit(0)
+    LINE_COLOR = (0, 255, 0)  # (B,G,R), so this is green
     for d in detections:
         print(type(d))  # TODO extract data from detection object
+
     pass
 
 
-def get_matrices_from_file():
+def get_matrices_from_file(file_name):
     """
     Gets the camera matrix and distance coefficients from
     the file name passed in as the first arg of the program.
@@ -65,9 +67,9 @@ def get_matrices_from_file():
     """
     calib_file = None
     try:
-        calib_file = open(sys.argv[1])
+        calib_file = open(file_name)
     except FileNotFoundError:
-        print("Failed to find file " + sys.argv[1])
+        print("Failed to find file " + file_name)
         exit(0)
     assert (calib_file != None)
 
