@@ -209,6 +209,19 @@ export default class MinibotBlockly extends React.Component {
     })
   }
 
+  logout(event) {
+    axios({
+      method: 'POST',
+      url: 'http://localhost:5000/logout',
+    })
+      .then((response) => {
+
+        window.alert(response.data['success']);
+      }).catch((err) => {
+        window.alert(err['error']);
+      })
+  }
+
   register(event) {
     const register_modal = document.querySelector(".register_modal")
     const closeBtn = document.querySelector(".register_close")
@@ -250,6 +263,7 @@ export default class MinibotBlockly extends React.Component {
             <div id="login and register">
               <button id="register" onClick={this.register}>Register</button>
               <button id="login" onClick={this.login}>Login</button>
+              <button id="logout" onClick={this.logout}>Logout</button>
 
               <div class="register_modal">
                 {/* <div class="modal_content"> */}

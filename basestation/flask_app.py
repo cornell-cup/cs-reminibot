@@ -2,9 +2,12 @@ import time
 import json
 from flask import Flask, request, redirect
 from flask_db import db, Program, User
+from flask_api import status
+from flask_cors import CORS
 
 app = Flask(__name__)
 db_filename = 'program.db'
+CORS(app) #allows cross-origin-requests
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///%s' % db_filename
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -164,11 +167,13 @@ def logout():
     global login_email
     
     if login_email == "":
-        print("error: No user to logout")
-        return redirect("http://localhost:8080/start")
+        content = {'error': 'no user to logout'}
+        return content, status.HTTP_400_BAD_REQUEST
     
+   
+    content = {'success': 'user '+login_email+' was logged out.'}
     login_email=""
-    return redirect("http://localhost:8080/start")
+    return content, status.HTTP_200_OK
 
 @app.route('/session/', methods=['POST'])
 def update_session():
