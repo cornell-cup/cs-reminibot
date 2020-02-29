@@ -356,11 +356,12 @@ class BaseStation:
         session = self.active_sessions[session_id]
         if not session or not session.has_bot(bot_id):
             return False
-        
         for x in ports:
             print(x)
         
-        self.active_bots[bot_id].sendKV("PORTS", ports)
+        portsstr = " ".join([str(l) for l in ports])
+
+        self.active_bots[bot_id].sendKV("PORTS", portsstr)
         
         #do something
 

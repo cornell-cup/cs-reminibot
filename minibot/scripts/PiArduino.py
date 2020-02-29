@@ -169,4 +169,4 @@ def ObjectDetection():
 
 
 def SetPorts():
-    print("setting ports!")
+    pass
