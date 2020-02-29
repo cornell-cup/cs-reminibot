@@ -9,12 +9,12 @@ export default class MinibotBlockly extends React.Component {
     super(props);
     this.scriptToCode = this.scriptToCode.bind(this);
     this.state = {
-      user_name: null,
       blockly_filename: 'myXmlBlocklyCode.xml',
       data: "",
       filename: "myPythonCode.py",
       showPopup: false,
       is_loggedin: false,
+      login_email: "fake email"
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -29,6 +29,7 @@ export default class MinibotBlockly extends React.Component {
     this.upload = this.upload.bind(this);
     this.login = this.login.bind(this);
     this.register = this.register.bind(this);
+    this.handleLogin = this.handleLogin.bind(this);
   }
 
 
@@ -252,6 +253,26 @@ export default class MinibotBlockly extends React.Component {
     xmlReader.readAsText(xmlToLoad, 'UTF-8');
   }
 
+  handleLogin(event) {
+    var formData = new FormData(document.getElementById("loginform"));
+    this.state.is_loggedin = true;
+    axios({
+      method: 'post',
+      url: 'http://127.0.0.1:5000/test/',
+      data: formData,
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+      .then(function (response) {
+        console.log("hi");
+        // console.log(JSON.stringify(response));
+        // this.state.login_email = JSON.stringify(response)['email'];
+      })
+      .catch(function (error) {
+        console.log("hello");
+        console.log(JSON.stringify(error));
+      });
+  }
+
   render() {
     var blocklyStyle = { height: '67vh' };
     var marginStyle = { marginLeft: '10px' };
@@ -281,13 +302,17 @@ export default class MinibotBlockly extends React.Component {
                 {/* <div class="modal_content"> */}
                 <span class="close">&times;</span>
                 <p>Login Window</p>
-                <form action="http://127.0.0.1:5000/login/" method="post">
+                <form id="loginform" onSubmit={this.handleLogin}>
                   <input type="text" placeholder="Email" name="email" ></input>
                   <input type="password" placeholder="Password" name="password" ></input>
                   <input class="btn_btn-dir" type="submit" value="Login"></input>
                 </form>
               </div>
               {/* </div> */}
+            </div>
+
+            <div>
+              <label> Login as: {this.state.login_email} </label>
             </div>
 
             <p id="title"><b>Blockly </b> </p>
