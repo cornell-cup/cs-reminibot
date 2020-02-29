@@ -370,10 +370,41 @@ export default class AddBot extends React.Component {
                                     <RefreshingList ref={this.refreshingBotListRef}></RefreshingList>
                                 </label>
                             </td>
-                            <td><button style={styles.Button} onClick={this.addBotListener}>Add Bot</button></td>
+                            <td><td>&nbsp;</td><button style={styles.Button} onClick={this.addBotListener}>Add Bot</button></td>
                             <div class="led-box">&nbsp;&nbsp;
                               <div id="led-red"></div>
                             </div>
+                            <td></td>
+                            <td>
+                            <label>
+                              Ports:
+                              <td>
+                              <nav id="main_nav">
+                          			<ul>
+                          				<li>
+                          					<a href="">Motor Ports</a>
+                          					<ul>
+                          						<li>
+                                        <a href="">Left Motor</a>
+                                        <ul>
+                                          <li><a href="" onClick={() => this.motorPorts(1)}>J1</a></li>
+                                          <li><a href="">J2</a></li>
+
+                                        </ul>
+                                      </li>
+                          						<li><a href="">Right Motor</a></li>
+                          						<li><a href="">Motor 3</a></li>
+                                      <li><a href="">Motor 4</a></li>
+                                      <li><a href="">Motor 5</a></li>
+                                      <li><a href="">Motor 6</a></li>
+                                      <li><a href="">Motor 7</a></li>
+                          					</ul>
+                          				</li>
+                          			</ul>
+                          		</nav>
+                              </td>
+                            </label>
+                            </td>
                         </tr>
                         <tr>
                             <td>
@@ -390,16 +421,10 @@ export default class AddBot extends React.Component {
                                     </select>
                                 </label>
                             </td>
-                            <td><button style={styles.Button} bot_list={this.props.bot_list}
+                            <td><td>&nbsp;</td><button style={styles.Button} bot_list={this.props.bot_list}
                                 onClick={() => _this.deleteBotListener()}>Remove</button></td>
                         </tr>
                         <tr>
-                          <td>
-                          <label>
-                            Ports:
-                            <td><button style={styles.Button} onClick={() => this.motorPorts(1)}> ports </button></td>
-                          </label>
-                          </td>
                         </tr>
 
                     </tbody>

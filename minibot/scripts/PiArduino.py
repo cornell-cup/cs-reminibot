@@ -35,9 +35,9 @@ class TransmitLock():
         """
         self.lock.acquire()
         if self.is_transmitting == 0:
-            # the priority field indicates the priority of the thread that 
+            # the priority field indicates the priority of the thread that
             # was waiting for the lock.  If the thread that is executing this if
-            # statement does not have its priority equal to the priority of the 
+            # statement does not have its priority equal to the priority of the
             # thread that was waiting first, do not let it enter this code block
             if self.priority == priority or self.priority == 0:
                 self.is_transmitting = 1
@@ -61,7 +61,7 @@ tlock = TransmitLock()
 
 
 def setSlave(PiBus):
-    """ 
+    """
     set which arduino to talk to. slave(0) for arduino 1 and slave(1) for arduino 2
     """
     device = 0
@@ -169,4 +169,4 @@ def ObjectDetection():
 
 
 def SetPorts():
-    #do something
+    print("setting ports!")
