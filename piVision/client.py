@@ -11,7 +11,7 @@ import time
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-s", "--server-ip", required=True,
-    help="ip address of the server to which the client will connect")
+                help="ip address of the server to which the client will connect")
 args = vars(ap.parse_args())
 
 # initialize the ImageSender object with the socket address of the
@@ -23,8 +23,9 @@ sender = imagezmq.ImageSender(connect_to="tcp://{}:5555".format(
 # camera sensor to warmup
 rpiName = socket.gethostname()
 vs = VideoStream(usePiCamera=True).start()
+#vs = VideoStream(src=0).start()
 time.sleep(2.0)
- 
+
 while True:
     # read the frame from the camera and send it to the server
     frame = vs.read()
