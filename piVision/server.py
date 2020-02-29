@@ -82,7 +82,7 @@ while True:
 
     # resize the frame to have a maximum width of 400 pixels, then
     # grab the frame dimensions and construct a blob
-    frame = imutils.resize(frame, width=400)
+    frame = imutils.resize(frame, width=400, inter=cv2.INTER_NEAREST)
     (h, w) = frame.shape[:2]
     blob = cv2.dnn.blobFromImage(cv2.resize(frame, (300, 300)),
         0.007843, (300, 300), 127.5)
@@ -143,7 +143,7 @@ while True:
 
     # display the montage(s) on the screen
     for (i, montage) in enumerate(montages):
-        cv2.imshow("Home pet location monitor ({})".format(i),
+        cv2.imshow("On-Bot Video Stream ({})".format(i),
             montage)
 
     # detect any kepresses
