@@ -2,14 +2,19 @@ from cv2 import *
 import apriltag
 import sys
 import numpy as np
+import time
+from calibrate_camera import write_matrix_to_file
 
 TAG_SIZE = 6.5
+
+NUM_DETECTIONS = 1  # The number of tags to detect, usually 4
 
 
 def main():
     if len(sys.argv) != 2:
         print("Usage: {} <file name>".format(sys.argv[0]))
         exit(0)
+    calib_file_name = sys.argv[1]
 
     camera = VideoCapture(0)  # Open the camera
     if (not VideoCapture.isOpened(camera)):
@@ -19,7 +24,7 @@ def main():
     camera.set(CAP_PROP_FRAME_HEIGHT, 720)
     camera.set(CAP_PROP_FPS, 30)
 
-    camera_matrix, dist_coeffs = get_matrices_from_file(sys.argv[1])
+    camera_matrix, dist_coeffs = get_matrices_from_file(calib_file_name)
 
     print(camera_matrix)
     print(dist_coeffs)
@@ -28,8 +33,8 @@ def main():
     frame = []
     gray = []
 
-    img_points = np.zeros(16)
-    obj_points = np.zeros(16)
+    img_points = np.ndarray((4 * NUM_DETECTIONS, 2))
+    obj_points = np.ndarray((4 * NUM_DETECTIONS, 3))
 
     # TODO need to loop this?
     while (not VideoCapture.isOpened(camera)):  # reopen camera if needed
@@ -40,17 +45,69 @@ def main():
             frame = frame_ret
             break
     gray = cvtColor(frame, COLOR_BGR2GRAY)
+
+    # Use the detector and compute useful values from it
     detections, det_image = detector.detect(gray, return_image=True)
     # show_image(detections, det_image, frame)
-    # TODO draw onto the frame?
-    NUM_DETECTIONS = 1
-    if len(detections) != 1:
+    print("Found {} tags".format(len(detections)))
+
+    if len(detections) != NUM_DETECTIONS:
         print("Didn't find exactly 4 apriltags, exiting")
         exit(0)
     LINE_COLOR = (0, 255, 0)  # (B,G,R), so this is green
-    for d in detections:
-        print(type(d))  # TODO extract data from detection object
 
+    for d in detections:
+        id = int(d.tag_id)
+        # Draw onto the frame - TODO fix int/float bug
+        """
+        frame = line(frame, tuple(d.corners[0]), tuple(
+            d.corners[1]), LINE_COLOR)
+        frame = line(frame, d.corners[1], d.corners[2], LINE_COLOR)
+        frame = line(frame, d.corners[2], d.corners[3], LINE_COLOR)
+        frame = line(frame, d.corners[3], d.corners[0], LINE_COLOR)
+        """
+
+        # Compute transformation via PnP
+        # TODO intuitively, what is this really computing?
+        img_points[0 + 4*id] = d.corners[0]
+        img_points[1 + 4*id] = d.corners[1]
+        img_points[2 + 4*id] = d.corners[2]
+        img_points[3 + 4*id] = d.corners[3]
+        a = (id % 2) * 2 + 1
+        b = -((id / 2) * 2 - 1)
+        x1 = -0.5*TAG_SIZE + a*8.5*0.5
+        x2 = 0.5*TAG_SIZE + a*8.5*0.5
+        y1 = -0.5*TAG_SIZE + b*11*0.5
+        y2 = 0.5*TAG_SIZE + b*11*0.5
+        obj_points[0 + 4*id] = (x1, y1, 0.0)
+        obj_points[1 + 4*id] = (x2, y1, 0.0)
+        obj_points[2 + 4*id] = (x2, y2, 0.0)
+        obj_points[3 + 4*id] = (x1, y2, 0.0)
+
+    # Make transform matrices
+    ret, rvec, tvec = solvePnP(
+        obj_points, img_points, camera_matrix, dist_coeffs)
+    dst, jac = Rodrigues(rvec)
+
+    temp = np.append(dst, np.array([[0], [1], [2]]), axis=1)
+    temp = np.append(temp, np.array([[0, 0, 0, 1]]), axis=0)
+    origin_to_camera = np.asmatrix(temp)
+    camera_to_origin = np.linalg.inv(origin_to_camera)
+    print("CAMERA TO ORIGIN: {}".format(camera_to_origin))
+    print(camera_to_origin[1])
+
+    # Generate the location of the camera
+    # Seems to use a homogenous coordinates system (x,y,z,k)
+    gen_out = np.array([[0], [0], [0], [1]])
+    camera_coordinates = np.matmul(camera_to_origin, gen_out)
+    print("CAMERA COORDINATES: {}".format(camera_coordinates))
+
+    # write matrix to file
+    # TODO write the matrix
+    calib_file = open(calib_file_name, "a")
+    write_matrix_to_file(camera_to_origin, calib_file)
+    calib_file.close()
+    print("Finished writing transformation matrix to calibration file")
     pass
 
 
@@ -82,6 +139,8 @@ def get_matrices_from_file(file_name):
     dist_coeffs_items = list(map(lambda x: float(x),
                                  temp_line[len("dist_coeffs = "):].split(" ")))
     dist_coeffs = np.reshape(np.asarray(dist_coeffs_items), (1, 5))
+    calib_file.close()
+
     # TODO check if dist_coeffs is shaped properly
     return (camera_matrix, dist_coeffs)
 
