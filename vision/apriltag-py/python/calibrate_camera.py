@@ -188,7 +188,7 @@ def write_matrix_to_file(matrix, file):
     num_rows, num_cols = matrix.shape
     for r in range(num_rows):
         for c in range(num_cols):
-            file.write(" " + str(matrix[r][c]))
+            file.write(" " + str(matrix[r, c]))
     file.write("\n")
 
 
