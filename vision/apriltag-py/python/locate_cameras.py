@@ -26,8 +26,8 @@ def main():
 
     camera_matrix, dist_coeffs = get_matrices_from_file(calib_file_name)
 
-    print(camera_matrix)
-    print(dist_coeffs)
+    print("CAMERA MATRIX: {}".format(camera_matrix))
+    print("DIST COEFFS: {}".format(dist_coeffs))
 
     detector = apriltag.Detector(searchpath=apriltag._get_demo_searchpath())
     frame = []
@@ -36,24 +36,17 @@ def main():
     img_points = np.ndarray((4 * NUM_DETECTIONS, 2))
     obj_points = np.ndarray((4 * NUM_DETECTIONS, 3))
 
-    # TODO need to loop this?
-    while (not VideoCapture.isOpened(camera)):  # reopen camera if needed
-        camera.open()
-    while (len(frame) == 0):  # Read from the camera
-        read_ok, frame_ret = camera.read()
-        if read_ok:
-            frame = frame_ret
-            break
-    gray = cvtColor(frame, COLOR_BGR2GRAY)
+    detections = []
+    while len(detections) != NUM_DETECTIONS:
+        frame = get_image(camera)
+        gray = cvtColor(frame, COLOR_BGR2GRAY)
 
-    # Use the detector and compute useful values from it
-    detections, det_image = detector.detect(gray, return_image=True)
-    # show_image(detections, det_image, frame)
-    print("Found {} tags".format(len(detections)))
+        # Use the detector and compute useful values from it
+        detections, det_image = detector.detect(gray, return_image=True)
+        # show_image(detections, det_image, frame)
+        print("Found {} tags".format(len(detections)))
+        time.sleep(1)
 
-    if len(detections) != NUM_DETECTIONS:
-        print("Didn't find exactly 4 apriltags, exiting")
-        exit(0)
     LINE_COLOR = (0, 255, 0)  # (B,G,R), so this is green
 
     for d in detections:
@@ -94,7 +87,6 @@ def main():
     origin_to_camera = np.asmatrix(temp)
     camera_to_origin = np.linalg.inv(origin_to_camera)
     print("CAMERA TO ORIGIN: {}".format(camera_to_origin))
-    print(camera_to_origin[1])
 
     # Generate the location of the camera
     # Seems to use a homogenous coordinates system (x,y,z,k)
@@ -103,8 +95,9 @@ def main():
     print("CAMERA COORDINATES: {}".format(camera_coordinates))
 
     # write matrix to file
-    # TODO write the matrix
     calib_file = open(calib_file_name, "a")
+    rows, cols = np.shape(camera_to_origin)
+    calib_file.write("transform_matrix =")
     write_matrix_to_file(camera_to_origin, calib_file)
     calib_file.close()
     print("Finished writing transformation matrix to calibration file")
@@ -143,6 +136,18 @@ def get_matrices_from_file(file_name):
 
     # TODO check if dist_coeffs is shaped properly
     return (camera_matrix, dist_coeffs)
+
+
+def get_image(camera):
+    frame = []
+    while (not VideoCapture.isOpened(camera)):  # reopen camera if needed
+        camera.open()
+    while (len(frame) == 0):  # Read from the camera
+        read_ok, frame_ret = camera.read()
+        if read_ok:
+            frame = frame_ret
+            break
+    return frame
 
 
 def show_image(detections, image, frame):
