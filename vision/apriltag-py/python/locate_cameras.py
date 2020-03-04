@@ -24,7 +24,9 @@ def main():
     camera.set(CAP_PROP_FRAME_HEIGHT, 720)
     camera.set(CAP_PROP_FPS, 30)
 
-    camera_matrix, dist_coeffs = get_matrices_from_file(calib_file_name)
+    calib_file, camera_matrix, dist_coeffs = get_matrices_from_file(
+        calib_file_name)
+    calib_file.close()
 
     print("CAMERA MATRIX: {}".format(camera_matrix))
     print("DIST COEFFS: {}".format(dist_coeffs))
@@ -108,6 +110,9 @@ def get_matrices_from_file(file_name):
     """
     Gets the camera matrix and distance coefficients from
     the file name passed in as the first arg of the program.
+    Make sure to CLOSE the file when you are done, as this
+    function doesn't do that - this is because locate_tags.py
+    uses some of this code as part of another function.
 
     Requires: The first argument is a .calib file generated
     from calibrate_camera.py.
@@ -132,10 +137,9 @@ def get_matrices_from_file(file_name):
     dist_coeffs_items = list(map(lambda x: float(x),
                                  temp_line[len("dist_coeffs = "):].split(" ")))
     dist_coeffs = np.reshape(np.asarray(dist_coeffs_items), (1, 5))
-    calib_file.close()
 
     # TODO check if dist_coeffs is shaped properly
-    return (camera_matrix, dist_coeffs)
+    return (calib_file, camera_matrix, dist_coeffs)
 
 
 def get_image(camera):
