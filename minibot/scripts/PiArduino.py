@@ -70,7 +70,6 @@ def setSlave(PiBus):
     spi.mode = 0
     spi.max_speed_hz = 115200
 
-
 def transmit(message):
     try:
         while tlock.can_transmit():
@@ -95,22 +94,22 @@ def execute(cmd):
 
 def fwd(power):
     acquire_lock()
-    execute("F")
+    execute('F')
 
 
 def back(power):
     acquire_lock()
-    execute("B")
+    execute('B')
 
 
 def left(power):
     acquire_lock()
-    execute("L")
+    execute('L')
 
 
 def right(power):
     acquire_lock()
-    execute("R")
+    execute('R')
 
 
 def stop():
@@ -130,9 +129,9 @@ def stop():
 def LineFollow():
     acquire_lock()
     # The T stands for tape follow
-    execute("T")
+    execute('T')
 
 
 def ObjectDetection():
     acquire_lock()
-    execute("O")
+    execute('O')
