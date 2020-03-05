@@ -386,16 +386,93 @@ export default class AddBot extends React.Component {
                                         <a href="">Left Motor</a>
                                         <ul>
                                           <li><a href="" onClick={() => this.motorPorts(1)}>J1</a></li>
-                                          <li><a href="">J2</a></li>
-
+                                          <li><a href="" onClick={() => this.motorPorts(2)}>J2</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(3)}>J3</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(4)}>J4</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(5)}>J5</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(6)}>J6</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(7)}>J7</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(8)}>J8</a></li>
                                         </ul>
                                       </li>
-                          						<li><a href="">Right Motor</a></li>
-                          						<li><a href="">Motor 3</a></li>
-                                      <li><a href="">Motor 4</a></li>
-                                      <li><a href="">Motor 5</a></li>
-                                      <li><a href="">Motor 6</a></li>
-                                      <li><a href="">Motor 7</a></li>
+                                      <li>
+                                        <a href="">Right Motor</a>
+                                        <ul>
+                                          <li><a href="" onClick={() => this.motorPorts(1)}>J1</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(2)}>J2</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(3)}>J3</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(4)}>J4</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(5)}>J5</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(6)}>J6</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(7)}>J7</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(8)}>J8</a></li>
+                                        </ul>
+                                      </li>
+                                      <li>
+                                        <a href="">Motor 3</a>
+                                        <ul>
+                                          <li><a href="" onClick={() => this.motorPorts(1)}>J1</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(2)}>J2</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(3)}>J3</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(4)}>J4</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(5)}>J5</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(6)}>J6</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(7)}>J7</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(8)}>J8</a></li>
+                                        </ul>
+                                      </li>
+                                      <li>
+                                        <a href="">Motor 4</a>
+                                        <ul>
+                                          <li><a href="" onClick={() => this.motorPorts(1)}>J1</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(2)}>J2</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(3)}>J3</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(4)}>J4</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(5)}>J5</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(6)}>J6</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(7)}>J7</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(8)}>J8</a></li>
+                                        </ul>
+                                      </li>
+                                      <li>
+                                        <a href="">Motor 5</a>
+                                        <ul>
+                                          <li><a href="" onClick={() => this.motorPorts(1)}>J1</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(2)}>J2</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(3)}>J3</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(4)}>J4</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(5)}>J5</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(6)}>J6</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(7)}>J7</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(8)}>J8</a></li>
+                                        </ul>
+                                      </li>
+                                      <li>
+                                        <a href="">Motor 6</a>
+                                        <ul>
+                                          <li><a href="" onClick={() => this.motorPorts(1)}>J1</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(2)}>J2</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(3)}>J3</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(4)}>J4</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(5)}>J5</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(6)}>J6</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(7)}>J7</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(8)}>J8</a></li>
+                                        </ul>
+                                      </li>
+                                      <li>
+                                        <a href="">Motor 7</a>
+                                        <ul>
+                                          <li><a href="" onClick={() => this.motorPorts(1)}>J1</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(2)}>J2</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(3)}>J3</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(4)}>J4</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(5)}>J5</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(6)}>J6</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(7)}>J7</a></li>
+                                          <li><a href="" onClick={() => this.motorPorts(8)}>J8</a></li>
+                                        </ul>
+                                      </li>
                           					</ul>
                           				</li>
                           			</ul>

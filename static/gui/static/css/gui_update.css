@@ -222,15 +222,17 @@ table{
 			float: left;
 			-webkit-transition: .5s;
 			transition: .5s;
+      text-align: center;
 		}
 
 		#main_nav li {
-			float: left;
+			float: right;
 			position: relative;
 			width: 150px;
 			list-style: none;
 			-webkit-transition: .5s;
 			transition: .5s;
+      text-align: center;
 		}
 
 		#main_nav > ul > li > a, h1 {
@@ -242,6 +244,7 @@ table{
 			text-decoration: none;
 			padding: 5px 15px;
 			color: #000;
+      text-align: center;
 		}
 
 		#main_nav ul ul {
@@ -253,7 +256,7 @@ table{
 		}
 
 		#main_nav ul ul ul {
-		  left: 70%;
+		  left: 80%;
 			top: 0;
 		}
 
