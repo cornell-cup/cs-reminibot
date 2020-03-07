@@ -95,7 +95,6 @@ def main_with_video():
     corners = []
 
     # find the checkerboard
-    # TODO are the key press controls from the old one necessary?
     for i in range(len(cameras)):
         while len(frame) == 0:
             # Take a picture and convert it to grayscale
@@ -123,8 +122,11 @@ def main_with_video():
             assert (frame.any() != None)
             assert (corners.any() != None)
         ret = True
+        # Draw corners / lines on the image to show the user
         drawChessboardCorners(frame, checkerboard_size, corners, ret)
     assert(len(frame) != 0)
+
+    # Show the image and prompts to user for confirmation
     print("Press any key other than ESCAPE to continue")
     print("Press ESCAPE to abort calibration. If the camera can't see" +
           "the entire board, you should press ESCAPE and try again.")
@@ -148,6 +150,7 @@ def main_with_video():
             continue
 
         # TODO check if calib exists first
+        # Might not do this and just overwrite each time.
         print("Calibrating camera " + str(camera_ids[i]))
         obj_points[i] = np.asarray(obj_points[i])
         ret_r, mtx_r, dist_r, rvecs_r, tvecs_r = cv2.calibrateCamera(
@@ -160,8 +163,8 @@ def main_with_video():
         calib_file.write("dist_coeffs =")
         write_matrix_to_file(dist_r, calib_file)
         calib_file.close()
-        print("Calibration file written to " +
-              str(camera_ids[i]) + ".calib")
+
+        print("Calibration file written to " + str(camera_ids[i]) + ".calib")
 
 
 if __name__ == '__main__':
