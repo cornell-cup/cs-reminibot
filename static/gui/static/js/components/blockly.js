@@ -227,6 +227,7 @@ export default class MinibotBlockly extends React.Component {
           login_error_label: "",
           register_success_label: "",
           register_error_label: "",
+          is_loggedin: false
         });
         window.alert("logout suceesfully");
       })
@@ -304,6 +305,7 @@ export default class MinibotBlockly extends React.Component {
           login_email: formData.get("email"),
           login_success_label: "Login Suceess",
           login_error_label: "",
+          is_loggedin: true
         });
       })
       .catch((error) => {
@@ -328,8 +330,8 @@ export default class MinibotBlockly extends React.Component {
         <div id="blockly" className="box" className="col-md-7">
           <div id="blocklyDiv" style={blocklyStyle} align="left">
             <div id="login and register">
-              <button id="register" onClick={this.register}>Register</button>
-              <button id="login" onClick={this.login}>Login</button>
+              {!this.state.is_loggedin ? <button id="register" onClick={this.register}>Register</button> : null}
+              {!this.state.is_loggedin ? <button id="login" onClick={this.login}>Login</button> : null}
               {this.state.is_loggedin ? <button id="logout" onClick={this.logout}>Logout</button> : null}
               <div class="register_modal">
                 {/* <div class="modal_content"> */}
