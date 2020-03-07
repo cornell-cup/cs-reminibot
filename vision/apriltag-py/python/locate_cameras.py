@@ -3,11 +3,11 @@ import apriltag
 import sys
 import numpy as np
 import time
-from calibrate_camera import write_matrix_to_file
+from util import get_image, write_matrix_to_file, get_matrices_from_file
 
 TAG_SIZE = 6.5
 
-NUM_DETECTIONS = 1  # The number of tags to detect, usually 4
+NUM_DETECTIONS = 4  # The number of tags to detect, usually 4
 
 
 def main():
@@ -63,7 +63,9 @@ def main():
         """
 
         # Compute transformation via PnP
-        # TODO intuitively, what is this really computing?
+        # TODO Explain why this math exists
+        # This was from a tutorial somehwhere and was directly
+        # transcribed from the C++ system.
         img_points[0 + 4*id] = d.corners[0]
         img_points[1 + 4*id] = d.corners[1]
         img_points[2 + 4*id] = d.corners[2]
@@ -84,7 +86,6 @@ def main():
         obj_points, img_points, camera_matrix, dist_coeffs)
     dst, jac = Rodrigues(rvec)
 
-    # TODO write tvec here
     temp = np.append(dst, tvec, axis=1)
     temp = np.append(temp, np.array([[0, 0, 0, 1]]), axis=0)
     origin_to_camera = np.asmatrix(temp)
@@ -105,77 +106,6 @@ def main():
     calib_file.close()
     print("Finished writing transformation matrix to calibration file")
     pass
-
-
-def get_matrices_from_file(file_name):
-    """
-    Gets the camera matrix and distance coefficients from
-    the file name passed in as the first arg of the program.
-    Make sure to CLOSE the file when you are done, as this
-    function doesn't do that - this is because locate_tags.py
-    uses some of this code as part of another function.
-
-    Requires: The first argument is a .calib file generated
-    from calibrate_camera.py.
-
-    Returns: A tuple of (camera_matrix, dist_coeffs), where
-    both matrices are numpy matrices.
-    """
-    calib_file = None
-    try:
-        calib_file = open(file_name)
-    except FileNotFoundError:
-        print("Failed to find file " + file_name)
-        exit(0)
-    assert (calib_file != None)
-
-    temp_line = calib_file.readline()  # reconstruct camera matrix
-    camera_matrix_items = list(map(lambda x: float(x),
-                                   temp_line[len("camera_matrix = "):].split(" ")))
-    camera_matrix = np.reshape(np.asarray(camera_matrix_items), (3, 3))
-
-    temp_line = calib_file.readline()  # reconstruct dist coeffs matrix
-    dist_coeffs_items = list(map(lambda x: float(x),
-                                 temp_line[len("dist_coeffs = "):].split(" ")))
-    dist_coeffs = np.reshape(np.asarray(dist_coeffs_items), (1, 5))
-
-    # TODO check if dist_coeffs is shaped properly
-    return (calib_file, camera_matrix, dist_coeffs)
-
-
-def get_image(camera):
-    frame = []
-    while (not VideoCapture.isOpened(camera)):  # reopen camera if needed
-        camera.open()
-    while (len(frame) == 0):  # Read from the camera
-        read_ok, frame_ret = camera.read()
-        if read_ok:
-            frame = frame_ret
-            break
-    return frame
-
-
-def show_image(detections, image, frame):
-    window = 'Camera'
-    namedWindow(window)
-
-    num_detections = len(detections)
-    print('Detected {} tags.\n'.format(num_detections))
-
-    for i, detection in enumerate(detections):
-        print('Detection {} of {}:'.format(i+1, num_detections))
-        print()
-        print(detection.tostring(indent=2))
-        print()
-
-    overlay = frame // 2 + image[:, :, None] // 2
-
-    imshow(window, overlay)
-    key = waitKey(1)
-    if key == 27:  # quit on escape
-        exit(0)
-    # TODO do all the drawings / compute transformration/ etc
-    # locate_camres.cc:150 or so
 
 
 if __name__ == '__main__':
