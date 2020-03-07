@@ -3,13 +3,12 @@ import apriltag
 import numpy as np
 import sys
 import time
-import locate_cameras  # imported to get transform matrix and dist coeffs
 import requests
-from locate_cameras import get_image, get_matrices_from_file
+from util import get_image, get_matrices_from_file
 
 TAG_SIZE = 6.5
 DEVICE_ID = 0
-SEND_DATA = False
+SEND_DATA = True
 
 
 def main():
@@ -85,10 +84,10 @@ def main():
                 solvePnP(obj_points, img_points, camera_matrix, dist_coeffs)
             dst, jac = Rodrigues(rvec)
             dst = np.append(dst, tvec, axis=1)
-            dst = np.append(dst, np.array([[0, 0, 0, 1]]), axis=0)
-            tag_to_camera = dst  # np.reshape(dst, (1, 4))  # TODO check this
+            tag_to_camera = np.append(dst, np.array([[0, 0, 0, 1]]), axis=0)
 
-            # this is data2
+            # `origin` here is  `data2` in the C++ system
+            # It starts at point (0,0) in homogenous coordinates.
             origin = np.asmatrix(np.array([[0, 0, 0, 1]]).T)
             tag_to_origin = np.matmul(transform_matrix, tag_to_camera)
             tag_xyz = np.matmul(tag_to_origin, origin)
@@ -103,22 +102,26 @@ def main():
                 angle = 2 * np.pi - angle
             angle = angle * 180.0 / np.pi
 
+            MULT_FACTOR = 0.2
+            x = MULT_FACTOR * tag_xyz[0][0]
+            y = MULT_FACTOR * tag_xyz[1][0]
+
             print("{} :: {} :: {} {} {} {}".format(
-                DEVICE_ID, d.tag_id, tag_xyz[0][0], tag_xyz[1][0], tag_xyz[2][0], angle))
+                DEVICE_ID, d.tag_id, x, y, tag_xyz[2][0], angle))
 
             if SEND_DATA:
-                MULT_FACTOR = 5
+
                 payload = {
-                    "id": str(d.tag_id),
-                    "x": str(MULT_FACTOR * tag_xyz[0][0]),
-                    "y": str(MULT_FACTOR * tag_xyz[1][0]),
-                    "orientation": str(angle)
+                    "id": d.tag_id,
+                    "x": x,
+                    "y": y,
+                    "orientation": angle
                 }
-                r = requests.post(url, data=payload)
+                r = requests.post(url, json=payload)
                 status_code = r.status_code
                 if status_code / 100 != 2:
-                    print("Basestation returned status code {}".format(status_code))
-
+                    print("WARNING: Basestation returned status code {}".format(
+                        status_code))
     pass
 
 

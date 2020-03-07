@@ -6,6 +6,7 @@ from cv2 import VideoCapture
 import argparse
 import time
 import numpy as np
+from util import get_image, write_matrix_to_file
 
 
 def main_with_video():
@@ -66,6 +67,7 @@ def main_with_video():
         camera = VideoCapture(i)
         img_points.insert(i, [])
         obj_points.insert(i, [])
+        # Prepare points - taken from tutorials
         objp = np.zeros((args['rows'] * args['cols'], 3), np.float32)
         objp[:, :2] = np.mgrid[0:args['cols'],
                                0:args['rows']].T.reshape(-1, 2)
@@ -73,7 +75,6 @@ def main_with_video():
             camera.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
             camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
             camera.set(cv2.CAP_PROP_FPS, 30)
-            # TODO need push-backs? seems to append empty arrays
             cameras.append(camera)
             camera_ids.append(i)
             pass
@@ -96,39 +97,31 @@ def main_with_video():
     # find the checkerboard
     # TODO are the key press controls from the old one necessary?
     for i in range(len(cameras)):
-        # Open the camera
-        while not cameras[i].isOpened():
-            cameras[i].open()
-            time.sleep(0.1)
-
-        # take a snapshot & convert to gray
         while len(frame) == 0:
-            read_ok, f_ret = cameras[i].read()
-            if read_ok:
-                frame = f_ret
-            time.sleep(0.1)
-        gray = cv2.cvtColor(frame, COLOR_BGR2GRAY)
+            # Take a picture and convert it to grayscale
+            frame = get_image(cameras[i])
+            gray = cv2.cvtColor(frame, COLOR_BGR2GRAY)
 
-        # Find the checkerboard
-        flags = CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE + \
-            CALIB_CB_FAST_CHECK
-        ret = False
-        # TODO loop this
-        retval, corners = cv2.findChessboardCorners(
-            gray, checkerboard_size, tuple(corners), flags)
-        if len(corners) != 0:
-            print("Found checkerboard on " + str(i))
-            obj_points[i].append(objp)
-            # TODO TERM_CRITERIA_ITER used in C++, using MAX_ITER OK?
-            win_size = (11, 11)
-            zero_zone = (-1, -1)
-            criteria = (TERM_CRITERIA_EPS +
-                        TERM_CRITERIA_MAX_ITER, 30, 0.1)
-            corners = cornerSubPix(
-                gray, corners, win_size, zero_zone, criteria)
-            img_points[i].append(corners)
-        assert (frame.any() != None)
-        assert (corners.any() != None)
+            # Find the checkerboard
+            flags = CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE + \
+                CALIB_CB_FAST_CHECK
+            ret = False
+            retval, corners = cv2.findChessboardCorners(
+                gray, checkerboard_size, tuple(corners), flags)
+            if len(corners) != 0:
+                print("Found checkerboard on " + str(i))
+                obj_points[i].append(objp)
+                # TODO TERM_CRITERIA_ITER used in C++, using MAX_ITER OK?
+                win_size = (11, 11)
+                zero_zone = (-1, -1)
+                criteria = (TERM_CRITERIA_EPS +
+                            TERM_CRITERIA_MAX_ITER, 30, 0.1)
+                corners = cornerSubPix(
+                    gray, corners, win_size, zero_zone, criteria)
+                img_points[i].append(corners)
+                break
+            assert (frame.any() != None)
+            assert (corners.any() != None)
         ret = True
         drawChessboardCorners(frame, checkerboard_size, corners, ret)
     assert(len(frame) != 0)
@@ -169,27 +162,6 @@ def main_with_video():
         calib_file.close()
         print("Calibration file written to " +
               str(camera_ids[i]) + ".calib")
-
-
-def write_matrix_to_file(matrix, file):
-    """
-    Writes a matrix to a file.
-
-    Args:
-      matrix (numpy.ndarray): The numpy matrix to write.
-
-      file (_io.TextIOWrapper): The file to write to, typically
-      found with open(). The file must be open with write permissions
-      BEFORE it is passed in to this function.
-
-    Returns: Nothing.
-    """
-
-    num_rows, num_cols = matrix.shape
-    for r in range(num_rows):
-        for c in range(num_cols):
-            file.write(" " + str(matrix[r, c]))
-    file.write("\n")
 
 
 if __name__ == '__main__':
