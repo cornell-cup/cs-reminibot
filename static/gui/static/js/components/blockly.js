@@ -293,8 +293,7 @@ export default class MinibotBlockly extends React.Component {
             <div id="login and register">
               <button id="register" onClick={this.register}>Register</button>
               <button id="login" onClick={this.login}>Login</button>
-              <button id="logout" onClick={this.logout}>Logout</button>
-
+              {this.state.is_loggedin ? <button id="logout" onClick={this.logout}>Logout</button> : null}
               <div class="register_modal">
                 {/* <div class="modal_content"> */}
                 <span class="register_close">&times;</span>
