@@ -35,7 +35,7 @@ var miniblocks = {
     ],
     previousStatement: null,
     nextStatement: null,
-    colour: 230,
+    colour: 100,
     tooltip: "",
     helpUrl: ""
   },
