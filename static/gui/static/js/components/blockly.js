@@ -34,6 +34,7 @@ export default class MinibotBlockly extends React.Component {
     this.register = this.register.bind(this);
     this.handleLogin = this.handleLogin.bind(this);
     this.handleRegister = this.handleRegister.bind(this);
+    this.logout = this.logout.bind(this);
   }
 
 
@@ -217,13 +218,20 @@ export default class MinibotBlockly extends React.Component {
   logout(event) {
     axios({
       method: 'POST',
-      url: 'http://localhost:5000/logout',
+      url: 'http://127.0.0.1:5000/logout/',
     })
       .then((response) => {
-
-        window.alert(response.data['success']);
-      }).catch((err) => {
-        window.alert(err['error']);
+        this.setState({
+          login_email: "",
+          login_success_label: "",
+          login_error_label: "",
+          register_success_label: "",
+          register_error_label: "",
+        });
+        window.alert("logout suceesfully");
+      })
+      .catch((err) => {
+        window.alert("why is there an error");
       })
   }
 
@@ -266,13 +274,11 @@ export default class MinibotBlockly extends React.Component {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
       .then((response) => {
-        console.log("pass");
         this.setState({
           login_email: formData.get("email"),
           register_success_label: "Register suceess and you are logged in!",
           register_error_label: "",
         });
-        console.log(this.state.login_email);
       })
       .catch((error) => {
         console.log("fail");
@@ -294,13 +300,11 @@ export default class MinibotBlockly extends React.Component {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
       .then((response) => {
-        console.log("pass");
         this.setState({
           login_email: formData.get("email"),
           login_success_label: "Login Suceess",
           login_error_label: "",
         });
-        console.log(this.state.login_email);
       })
       .catch((error) => {
         console.log("fail");
@@ -317,7 +321,8 @@ export default class MinibotBlockly extends React.Component {
     var blocklyStyle = { height: '67vh' };
     var marginStyle = { marginLeft: '10px' };
     var dataStyle = { align: 'right', margin: '75px 0 0 0' };
-
+    console.log("render");
+    console.log(this.state.login_email);
     return (
       <div id="blockyContainer" style={marginStyle} className="row">
         <div id="blockly" className="box" className="col-md-7">

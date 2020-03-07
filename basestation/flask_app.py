@@ -150,6 +150,7 @@ def test():
 
 @app.route('/login/', methods=['POST'])
 def login():
+    global login_email
     email = request.form['email']
     password = request.form['password']
 
@@ -164,6 +165,7 @@ def login():
         return json.dumps({'error': 'Incorrect email or password'}), 404
 
     print("success" + email)
+    login_email = email
     return json.dumps({
         'session_token': user.session_token,
         'session_expiration': str(user.session_expiration),
@@ -173,11 +175,11 @@ def login():
     })
 
 
-@app.route('/logout', methods=['POST'])
+@app.route('/logout/', methods=['POST'])
 def logout():
     global login_email
-
     if login_email == "":
+        print("login email empty")
         content = {'error': 'no user to logout'}
         return content, status.HTTP_400_BAD_REQUEST
 
