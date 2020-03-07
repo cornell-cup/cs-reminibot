@@ -7,7 +7,7 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 db_filename = 'program.db'
-CORS(app) #allows cross-origin-requests
+CORS(app)  # allows cross-origin-requests
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///%s' % db_filename
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -146,6 +146,7 @@ def test():
 def login():
     email = request.form['email']
     password = request.form['password']
+    print("login post")
 
     if email is None or password is None:
         print("fail1")
@@ -184,18 +185,19 @@ def login():
     # return True
     # return redirect("http://localhost:8080/start")
 
+
 @app.route('/logout', methods=['POST'])
 def logout():
     global login_email
-    
+
     if login_email == "":
         content = {'error': 'no user to logout'}
         return content, status.HTTP_400_BAD_REQUEST
-    
-   
+
     content = {'success': 'user '+login_email+' was logged out.'}
-    login_email=""
+    login_email = ""
     return content, status.HTTP_200_OK
+
 
 @app.route('/session/', methods=['POST'])
 def update_session():

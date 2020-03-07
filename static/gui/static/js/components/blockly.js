@@ -30,6 +30,7 @@ export default class MinibotBlockly extends React.Component {
     this.login = this.login.bind(this);
     this.register = this.register.bind(this);
     this.handleLogin = this.handleLogin.bind(this);
+
   }
 
 
@@ -253,23 +254,27 @@ export default class MinibotBlockly extends React.Component {
     xmlReader.readAsText(xmlToLoad, 'UTF-8');
   }
 
+
+
   handleLogin(event) {
     var formData = new FormData(document.getElementById("loginform"));
-    this.state.is_loggedin = true;
+
     axios({
       method: 'post',
-      url: 'http://127.0.0.1:5000/test/',
+      url: 'http://127.0.0.1:5000/login/',
+      //url: 'http://192.168.4.93:5000/login/',
       data: formData,
       headers: { 'Content-Type': 'multipart/form-data' }
     })
-      .then(function (response) {
+      .then((response) => {
         console.log("hi");
-        // console.log(JSON.stringify(response));
-        // this.state.login_email = JSON.stringify(response)['email'];
+        this.setState({ login_email: "pass" });
+        console.log(this.state.login_email);
+        console.log(reponse.data);
       })
-      .catch(function (error) {
-        console.log("hello");
-        console.log(JSON.stringify(error));
+      .catch((error) => {
+        this.setState({ login_email: "fail" });
+        console.log(error);
       });
   }
 
@@ -277,6 +282,10 @@ export default class MinibotBlockly extends React.Component {
     var blocklyStyle = { height: '67vh' };
     var marginStyle = { marginLeft: '10px' };
     var dataStyle = { align: 'right', margin: '75px 0 0 0' };
+    console.log("render");
+    console.log(this.state.login_email);
+    console.log(this.state.filename);
+
     return (
       <div id="blockyContainer" style={marginStyle} className="row">
         <div id="blockly" className="box" className="col-md-7">
@@ -302,10 +311,10 @@ export default class MinibotBlockly extends React.Component {
                 {/* <div class="modal_content"> */}
                 <span class="close">&times;</span>
                 <p>Login Window</p>
-                <form id="loginform" onSubmit={this.handleLogin}>
+                <form id="loginform" >
                   <input type="text" placeholder="Email" name="email" ></input>
                   <input type="password" placeholder="Password" name="password" ></input>
-                  <input class="btn_btn-dir" type="submit" value="Login"></input>
+                  <input class="btn_btn-dir" type="button" value="Login" onClick={this.handleLogin}></input>
                 </form>
               </div>
               {/* </div> */}
