@@ -13,8 +13,11 @@ export default class MinibotBlockly extends React.Component {
       data: "",
       filename: "myPythonCode.py",
       showPopup: false,
-      is_loggedin: false,
-      login_email: "fake email"
+      login_email: "",
+      login_error_label: "",
+      login_success_label: "",
+      register_error_label: "",
+      register_success_label: "",
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -30,7 +33,7 @@ export default class MinibotBlockly extends React.Component {
     this.login = this.login.bind(this);
     this.register = this.register.bind(this);
     this.handleLogin = this.handleLogin.bind(this);
-
+    this.handleRegister = this.handleRegister.bind(this);
   }
 
 
@@ -254,26 +257,58 @@ export default class MinibotBlockly extends React.Component {
     xmlReader.readAsText(xmlToLoad, 'UTF-8');
   }
 
-
-
-  handleLogin(event) {
-    var formData = new FormData(document.getElementById("loginform"));
-
+  handleRegister(event) {
+    var formData = new FormData(document.getElementById("registerform"));
     axios({
       method: 'post',
-      url: 'http://127.0.0.1:5000/login/',
-      //url: 'http://192.168.4.93:5000/login/',
+      url: 'http://127.0.0.1:5000/register/',
       data: formData,
       headers: { 'Content-Type': 'multipart/form-data' }
     })
       .then((response) => {
-        console.log("hi");
-        this.setState({ login_email: "pass" });
+        console.log("pass");
+        this.setState({
+          login_email: formData.get("email"),
+          register_success_label: "Register suceess and you are logged in!",
+          register_error_label: "",
+        });
         console.log(this.state.login_email);
-        console.log(reponse.data);
       })
       .catch((error) => {
-        this.setState({ login_email: "fail" });
+        console.log("fail");
+        this.setState({
+          login_email: "",
+          register_success_label: "",
+          register_error_label: "Account already exist or empty input"
+        });
+        console.log(error);
+      });
+  }
+
+  handleLogin(event) {
+    var formData = new FormData(document.getElementById("loginform"));
+    axios({
+      method: 'post',
+      url: 'http://127.0.0.1:5000/login/',
+      data: formData,
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+      .then((response) => {
+        console.log("pass");
+        this.setState({
+          login_email: formData.get("email"),
+          login_success_label: "Login Suceess",
+          login_error_label: "",
+        });
+        console.log(this.state.login_email);
+      })
+      .catch((error) => {
+        console.log("fail");
+        this.setState({
+          login_email: "",
+          login_success_label: "",
+          login_error_label: "Incorrect password or acount doesn't exist or empty input"
+        });
         console.log(error);
       });
   }
@@ -282,9 +317,6 @@ export default class MinibotBlockly extends React.Component {
     var blocklyStyle = { height: '67vh' };
     var marginStyle = { marginLeft: '10px' };
     var dataStyle = { align: 'right', margin: '75px 0 0 0' };
-    console.log("render");
-    console.log(this.state.login_email);
-    console.log(this.state.filename);
 
     return (
       <div id="blockyContainer" style={marginStyle} className="row">
@@ -299,10 +331,13 @@ export default class MinibotBlockly extends React.Component {
                 {/* <div class="modal_content"> */}
                 <span class="register_close">&times;</span>
                 <p>Register Window</p>
-                <form action="http://127.0.0.1:5000/register/" method="post">
+                <form id="registerform">
                   <input type="text" placeholder="Email" name="email" ></input>
                   <input type="password" placeholder="Password" name="password" ></input>
-                  <input class="btn_btn-dir" type="submit" value="Register"></input>
+                  <input class="btn_btn-dir" type="button" value="Register" onClick={this.handleRegister}></input>
+                  <label style={{ color: 'green' }}> {this.state.register_success_label} </label>
+                  <br />
+                  <label style={{ color: 'red' }}> {this.state.register_error_label} </label>
                 </form>
                 {/* </div> */}
               </div>
@@ -312,9 +347,12 @@ export default class MinibotBlockly extends React.Component {
                 <span class="close">&times;</span>
                 <p>Login Window</p>
                 <form id="loginform" >
-                  <input type="text" placeholder="Email" name="email" ></input>
+                  <input type="text" placeholder="Email" name="email"  ></input>
                   <input type="password" placeholder="Password" name="password" ></input>
                   <input class="btn_btn-dir" type="button" value="Login" onClick={this.handleLogin}></input>
+                  <label style={{ color: 'green' }}> {this.state.login_success_label} </label>
+                  <br />
+                  <label style={{ color: 'red' }}> {this.state.login_error_label} </label>
                 </form>
               </div>
               {/* </div> */}

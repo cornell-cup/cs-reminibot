@@ -121,20 +121,26 @@ def register_account():
 
     if email is None or password is None:
         print("error: Invalid email or password")
-        return redirect("http://localhost:8080/start")
+        return json.dumps({'error': 'Invalid email or password'}), 404
 
     created, user = create_user(email, password)
 
     if not created:
         print("error: User already exists")
-        return redirect("http://localhost:8080/start")
+        return json.dumps({'error': 'User already exists'}), 404
 
     print("session_token: " + user.session_token)
     print("session_expiration" + str(user.session_expiration))
     print("update_token" + user.update_token)
     print("user_id" + str(user.id))
 
-    return redirect("http://localhost:8080/start")
+    return json.dumps({
+        'session_token': user.session_token,
+        'session_expiration': str(user.session_expiration),
+        'update_token': user.update_token,
+        'user_id': user.id,
+        'email': email
+    })
 
 
 @app.route('/test/', methods=['POST'])
@@ -146,7 +152,6 @@ def test():
 def login():
     email = request.form['email']
     password = request.form['password']
-    print("login post")
 
     if email is None or password is None:
         print("fail1")
@@ -166,24 +171,6 @@ def login():
         'user_id': user.id,
         'email': email
     })
-    # if email is None or password is None:
-    #     print("error: Invalid email or password")
-    # return redirect("http://localhost:8080/start")
-
-    # if not success:
-    #     print("error: Incorrect email or password'")
-    #     return False
-    #     # return redirect("http://localhost:8080/start")
-
-    # global login_email
-    # login_email = email
-    # print("session_token: " + user.session_token)
-    # print("session_expiration" + str(user.session_expiration))
-    # print("update_token" + user.update_token)
-    # print("user_id" + str(user.id))
-    # print('email: ' + login_email)
-    # return True
-    # return redirect("http://localhost:8080/start")
 
 
 @app.route('/logout', methods=['POST'])
