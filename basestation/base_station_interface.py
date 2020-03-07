@@ -11,9 +11,12 @@ import logging
 import sys
 import time
 import re  # regex import
+import threading
 
 # Minibot imports.
 from base_station import BaseStation
+from piVision import *
+from piVision.server import startBotVisionServer
 
 
 class BaseInterface:
@@ -251,7 +254,26 @@ class OnBotVisionHandler(tornado.websocket.WebSocketHandler):
         self.base_station = base_station
 
     def get(self):
-        # TODO
+        pass  # TODO
+
+    def post(self):
+        data = json.loads(self.request.body.decode())
+        key = data['key']
+
+        session_id = self.get_secure_cookie("user_id")
+        if session_id:
+            session_id = session_id.decode("utf-8")
+
+        if key == "BOTVISION":  # start the on bot vision
+            bot_name = data['bot_name']
+            bot_id = self.base_station.bot_name_to_bot_id(bot_name)
+            bot = self.base_station.get_bot(bot_id)
+            if bot:
+                self.write("sending key: BOTVISION")
+                # TODO check the server thread works
+                threading.Thread(target=startBotVisionServer,
+                                 daemon=True).start()
+                bot.sendKV(key, '')
 
 
 if __name__ == "__main__":

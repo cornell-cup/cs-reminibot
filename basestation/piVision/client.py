@@ -1,3 +1,5 @@
+# TODO delete this file later -- function should have been incorporated to new_minibot.py
+
 # USAGE
 # python client.py --server-ip SERVER_IP
 

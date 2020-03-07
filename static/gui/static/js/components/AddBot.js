@@ -67,6 +67,7 @@ export default class AddBot extends React.Component {
         this.addBotListener = this.addBotListener.bind(this);
         this.selectBotListener = this.selectBotListener.bind(this);
         this.buttonMapListener = this.buttonMapListener.bind(this);
+        this.getOnBotVision = this.getOnBotVision.bind(this);
     }
 
     componentDidMount() {
@@ -280,6 +281,27 @@ export default class AddBot extends React.Component {
 
     }
 
+    getOnBotVision() {
+        const _this = this;
+        axios({
+            method: 'POST',
+            url: '/onbotvision',
+            data: JSON.stringify({
+                key: "BOTVISION",
+                bot_name: this.props.selected_bot
+            })
+        })
+            .then(function (response) {
+                if (response.data) {
+                    console.log(response.data);
+                }
+            })
+            .catch(function (error) {
+                // console.log(error);
+            })
+
+    }
+
     lineFollowOnClick() {
         const _this = this;
         axios({
@@ -408,6 +430,10 @@ export default class AddBot extends React.Component {
                     <div className="divider" />
                     <div className="col-md-3">
                         <button type="button" className="btn btn-success" onClick={() => this.objectDetectionOnClick()}>Object Detection</button>
+                    </div>
+                    <div className="divider" />
+                    <div className="col-md-3">
+                        <button type="button" className="btn btn-primary" onClick={() => this.getOnBotVision()}>On-Bot Vision</button>
                     </div>
                     <div className="col-md-6">
 

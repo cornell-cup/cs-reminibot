@@ -11,7 +11,7 @@ import imutils
 import cv2
 
 
-def main():
+def startBotVisionServer():
     # construct the argument parser and parse the arguments
     ap = argparse.ArgumentParser()
     ap.add_argument("-p", "--prototxt", default='MobileNetSSD_deploy.prototxt',
@@ -174,4 +174,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    startBotVisionServer()
