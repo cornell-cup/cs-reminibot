@@ -217,7 +217,7 @@ table{
     to { background-color: #A00; }
 }
 
-#main_nav ul {
+    #main_nav ul {
 			background: white;
 			float: left;
 			-webkit-transition: .5s;
@@ -276,3 +276,8 @@ table{
 			visibility: visible;
 			opacity: 1;
 		}
+
+    .btn_ports {
+        background:#ddd;
+        width: 150px;
+    }
