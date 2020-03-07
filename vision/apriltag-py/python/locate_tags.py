@@ -8,17 +8,19 @@ import requests
 from locate_cameras import get_image, get_matrices_from_file
 
 TAG_SIZE = 6.5
+DEVICE_ID = 0
+SEND_DATA = False
 
 
 def main():
-    # TODO parse / validate args
-    if len(sys.argv) != 2:
-        print("Usage: {} <calibration file name>".format(sys.argv[0]))
+    if len(sys.argv) != 3:
+        print("Usage: {} <url> <calibration file name>".format(sys.argv[0]))
         exit(0)
-    calib_file_name = sys.argv[1]
+    url = sys.argv[1]
+    calib_file_name = sys.argv[2]
     calib_file = open(calib_file_name)
 
-    camera = VideoCapture(0)  # Open the camera
+    camera = VideoCapture(DEVICE_ID)  # Open the camera
     if (not VideoCapture.isOpened(camera)):
         print("Failed to open video capture device")
         exit(0)
@@ -89,10 +91,33 @@ def main():
             # this is data2
             origin = np.asmatrix(np.array([[0, 0, 0, 1]]).T)
             tag_to_origin = np.matmul(transform_matrix, tag_to_camera)
-            tag_xyz = np.matmul(tag_to_origin, tag_to_camera)
+            tag_xyz = np.matmul(tag_to_origin, origin)
+            tag_xyz = np.around(tag_xyz, decimals=3)
+
             print("Tag detection OK")
-            # TODO do trig ops?
-            break
+
+            sin = tag_to_origin[0, 1]
+            cos = tag_to_origin[0, 0]
+            angle = np.arccos(cos)
+            if sin < 0:
+                angle = 2 * np.pi - angle
+            angle = angle * 180.0 / np.pi
+
+            print("{} :: {} :: {} {} {} {}".format(
+                DEVICE_ID, d.tag_id, tag_xyz[0][0], tag_xyz[1][0], tag_xyz[2][0], angle))
+
+            if SEND_DATA:
+                MULT_FACTOR = 5
+                payload = {
+                    "id": str(d.tag_id),
+                    "x": str(MULT_FACTOR * tag_xyz[0][0]),
+                    "y": str(MULT_FACTOR * tag_xyz[1][0]),
+                    "orientation": str(angle)
+                }
+                r = requests.post(url, data=payload)
+                status_code = r.status_code
+                if status_code / 100 != 2:
+                    print("Basestation returned status code {}".format(status_code))
 
     pass
 

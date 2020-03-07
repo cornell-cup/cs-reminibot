@@ -85,7 +85,7 @@ def main():
     dst, jac = Rodrigues(rvec)
 
     # TODO write tvec here
-    temp = np.append(dst, np.array([[0], [1], [2]]), axis=1)
+    temp = np.append(dst, tvec, axis=1)
     temp = np.append(temp, np.array([[0, 0, 0, 1]]), axis=0)
     origin_to_camera = np.asmatrix(temp)
     camera_to_origin = np.linalg.inv(origin_to_camera)
