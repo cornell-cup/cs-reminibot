@@ -226,7 +226,7 @@ export default class AddBot extends React.Component {
           url: '/start',
           data: JSON.stringify({
               key: "PORTS",
-              ports: [name, port1],
+              ports: [name, String(port1)],
               bot_name: _this.props.selected_bot,
           })
       })
@@ -369,7 +369,7 @@ export default class AddBot extends React.Component {
                                 </label>
                             </td>
                             <td><td>&nbsp;</td><button style={styles.Button} onClick={this.addBotListener}>Add Bot</button></td>
-                            <div class="led-box">&nbsp;&nbsp;
+                            <div className="led-box">&nbsp;&nbsp;
                               <div id="led-red"></div>
                             </div>
                             <td></td>
