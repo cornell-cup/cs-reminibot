@@ -158,5 +158,4 @@ def ObjectDetection():
 def SetPorts(ports):
     ports = ports.split()
     for x in ports:
-        x = int(x)
         print(x)
