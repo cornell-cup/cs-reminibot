@@ -206,6 +206,18 @@ var miniblocks = {
     tooltip: "",
     helpUrl: ""
   },
+
+  custom_block: {
+    type: "custom_block",
+    message0: "custom block",
+    args0: [],
+    previousStatement: null,
+    nextStatement: null,
+    colour: 230,
+    tooltip: "",
+    helpUrl: ""
+  },
+
   set_power: {
     type: "set_power",
     message0: "set left motor to %1 %% power %2 set right motor to %3 %% power",
