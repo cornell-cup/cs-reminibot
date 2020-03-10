@@ -12,6 +12,7 @@ export default class MinibotBlockly extends React.Component {
       blockly_filename: 'myXmlBlocklyCode.xml',
       data: "",
       filename: "myPythonCode.py",
+      pyblock: "",
       showPopup: false,
       login_email: "",
       login_error_label: "",
@@ -96,7 +97,7 @@ export default class MinibotBlockly extends React.Component {
     };
     Blockly.Python['custom_block'] = function (block) {
       // TODO: Assemble Python into code variable.
-      return _this.state.data;
+      return _this.state.pyblock;
     };
   }
 
@@ -297,12 +298,13 @@ export default class MinibotBlockly extends React.Component {
   
   async custom_block(event) {  
     var _this = this;
+    _this.state.pyblock = _this.state.data
     console.log(_this.state.data, "HERE");
     await this.scriptToCode()
     Blockly.Python['custom_block'] = function () {
       console.log("CUSTOM BLOCK")
       // TODO: Assemble Python into code variable.
-      return _this.state.data;
+      return _this.state.pyblock;
     };
   }
 
