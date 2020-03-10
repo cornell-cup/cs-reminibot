@@ -23,7 +23,7 @@ class BaseInterface:
     base station GUI.
     """
 
-    def __init__(self, port, send_blockly_remote_server=True):
+    def __init__(self, port, send_blockly_remote_server=False):
         """
         Initializes base station
         :param port: Port number from which basestation runs (usually 8080)
@@ -96,7 +96,6 @@ class ClientHandler(tornado.web.RequestHandler):
         session_id = self.get_secure_cookie("user_id")
         if session_id:
             session_id = session_id.decode("utf-8")
-        print("session id:" + session_id)
 
         if key == "CONNECTBOT":
             bot_name = data['bot_name']
