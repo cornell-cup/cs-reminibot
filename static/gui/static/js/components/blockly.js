@@ -376,6 +376,9 @@ export default class MinibotBlockly extends React.Component {
           <br />
           <br />
           <br />
+          <br />
+          <br />
+          <br />
           Blockly File Name:{' '}
           <input
             type="text"
