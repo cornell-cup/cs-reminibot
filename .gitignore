@@ -113,5 +113,8 @@ ENV/
 
 node_modules/
 
+#SqlLitedb files
+*.db
+
 gui/package-lock.json
 
