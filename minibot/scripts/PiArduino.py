@@ -74,7 +74,7 @@ def transmit(message):
     try:
         while tlock.can_transmit():
             print(message)
-            tx = spi.writebytes([message])
+            tx = spi.writebytes([ord(message)])
             # time.sleep(0.1)
         tlock.end_transmit()
     finally:
@@ -85,6 +85,8 @@ def acquire_lock():
     priority = time.time()
     while not tlock.start_transmit(priority):
         time.sleep(0.01)
+
+def execute(cmd):
     setSlave(1)
     print(cmd)
     transmit(cmd)

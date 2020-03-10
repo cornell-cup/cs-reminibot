@@ -72,7 +72,6 @@ def parse_command(cmd, tcpInstance):
 
     elif key == "PORTS":
         ece.SetPorts(value)
-
         print("Set Ports")    
 
     elif key == "SCRIPTS":
