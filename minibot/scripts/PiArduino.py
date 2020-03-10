@@ -35,9 +35,9 @@ class TransmitLock():
         """
         self.lock.acquire()
         if self.is_transmitting == 0:
-            # the priority field indicates the priority of the thread that 
+            # the priority field indicates the priority of the thread that
             # was waiting for the lock.  If the thread that is executing this if
-            # statement does not have its priority equal to the priority of the 
+            # statement does not have its priority equal to the priority of the
             # thread that was waiting first, do not let it enter this code block
             if self.priority == priority or self.priority == 0:
                 self.is_transmitting = 1
@@ -61,7 +61,7 @@ tlock = TransmitLock()
 
 
 def setSlave(PiBus):
-    """ 
+    """
     set which arduino to talk to. slave(0) for arduino 1 and slave(1) for arduino 2
     """
     device = 0
@@ -73,7 +73,8 @@ def setSlave(PiBus):
 def transmit(message):
     try:
         while tlock.can_transmit():
-            spi.writebytes([message])
+            print(message)
+            tx = spi.writebytes([ord(message)])
             # time.sleep(0.1)
         tlock.end_transmit()
     finally:
@@ -83,10 +84,9 @@ def transmit(message):
 def acquire_lock():
     priority = time.time()
     while not tlock.start_transmit(priority):
-        time.sleep(0.1)
+        time.sleep(0.01)
 
 def execute(cmd):
-    """ Executes the command and releases the lock """
     setSlave(1)
     print(cmd)
     transmit(cmd)
@@ -113,14 +113,17 @@ def right(power):
 
 
 def stop():
-    acquire_lock()
+    priority = time.time()
+    while not tlock.start_transmit(priority):
+        time.sleep(0.01)
     setSlave(1)
     cmd = ord('S')
     # print b
     try:
         print(cmd)
-        for _ in range(5):
-            spi.writebytes([cmd])
+        for i in range(500):
+            print(cmd)
+            tx = spi.writebytes([cmd])
         tlock.end_transmit()
     finally:
         spi.close()
@@ -130,6 +133,10 @@ def LineFollow():
     acquire_lock()
     # The T stands for tape follow
     execute('T')
+
+    
+def SetPorts():
+    pass
 
 
 def ObjectDetection():
