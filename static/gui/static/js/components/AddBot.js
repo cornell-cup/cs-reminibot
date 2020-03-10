@@ -136,7 +136,6 @@ export default class AddBot extends React.Component {
         const _this = this;
         axios.get('/heartbeat')
             .then(function (response) {
-                console.log(response.data);
                 if (response.data["is_heartbeat"]) {
                     document.getElementById('led-red').style.animation = "blinkRed 4s 2";
                     var delayInMilliseconds = 2000; //1 second
