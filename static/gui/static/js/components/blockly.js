@@ -9,10 +9,15 @@ export default class MinibotBlockly extends React.Component {
     super(props);
     this.scriptToCode = this.scriptToCode.bind(this);
     this.state = {
-      user_name: null,
       blockly_filename: 'myXmlBlocklyCode.xml',
       data: "",
-      filename: "myPythonCode.py"
+      filename: "myPythonCode.py",
+      showPopup: false,
+      login_email: "",
+      login_error_label: "",
+      login_success_label: "",
+      register_error_label: "",
+      register_success_label: "",
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -25,7 +30,13 @@ export default class MinibotBlockly extends React.Component {
     this.view_history = this.view_history.bind(this);
     this.copy = this.copy.bind(this);
     this.upload = this.upload.bind(this);
+    this.login = this.login.bind(this);
+    this.register = this.register.bind(this);
+    this.handleLogin = this.handleLogin.bind(this);
+    this.handleRegister = this.handleRegister.bind(this);
+    this.logout = this.logout.bind(this);
   }
+
 
   /* handles input change for file name and coding textboxes */
   handleInputChange(event) {
@@ -119,19 +130,19 @@ export default class MinibotBlockly extends React.Component {
   }
 
   download_python(event) {
-      console.log("download listener");
-      event.preventDefault();
-      var element = document.createElement('a');
-      var filename = this.state.filename;
-      if(filename.substring(filename.length-3)!=".py"){
-          filename += ".py";
-      }
-      element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(this.state.data));
-      element.setAttribute('download', filename);
-      element.style.display = 'none';
-      document.body.appendChild(element);
-      element.click();
-      document.body.removeChild(element);
+    console.log("download listener");
+    event.preventDefault();
+    var element = document.createElement('a');
+    var filename = this.state.filename;
+    if (filename.substring(filename.length - 3) != ".py") {
+      filename += ".py";
+    }
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(this.state.data));
+    element.setAttribute('download', filename);
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
   }
 
   upload(event) {
@@ -149,67 +160,89 @@ export default class MinibotBlockly extends React.Component {
      corresponding to blockly to backend. */
   run_blockly(event) {
     console.log(this.props.bot_name, "run_blockly");
-    if (this.state.user_name == null) {
-      var user_name = prompt("You haven't sign-in/sign-up yet. Please enter your user id:", "");
-      var user_password = prompt("Please enter your password:", "");
-      if (user_name != null && user_name != "" & user_password != null && user_password != "") {
-        this.setState({ user_name: user_name});
-      }
-    }
-    else {
-      axios({
-        method: 'POST',
-        url: '/start',
-        data: JSON.stringify({
-          key: 'SCRIPTS',
-          value: blockly.value,
-          bot_name: this.props.bot_name
-        }),
+    axios({
+      method: 'POST',
+      url: '/start',
+      data: JSON.stringify({
+        key: 'SCRIPTS',
+        value: blockly.value,
+        bot_name: this.props.bot_name
+      }),
+    })
+      .then(function (response) {
+        console.log(blockly.value);
+        console.log('sent script');
       })
-        .then(function (response) {
-          console.log(blockly.value);
-          console.log('sent script');
-        })
-        .catch(function (error) {
-          console.warn(error);
-        });
-    }
+      .catch(function (error) {
+        console.warn(error);
+      });
+
   }
 
 
   /* Target function for the button "Run Code". Send python code
      in the editing box to backend. */
   run_script(event) {
-    console.log(this.props.bot_name, "run_script");
-    if (this.state.user_name == null) {
-      var user_name = prompt("You haven't sign-in/sign-up yet. Please enter your user id:", "");
-      var user_password = prompt("Please enter your password:", "");
-      if (user_name != null && user_name != "" & user_password != null && user_password != "") {
-        this.setState({ user_name: user_name});
-      }
-    }
-    else {
-      axios({
-        method: 'POST',
-        url: '/start',
-        data: JSON.stringify({
-          key: 'SCRIPTS',
-          value: blockly.value,
-          bot_name: this.props.bot_name
-        }),
+    axios({
+      method: 'POST',
+      url: '/start',
+      data: JSON.stringify({
+        key: 'SCRIPTS',
+        value: this.state.data,
+        bot_name: this.props.bot_name
+      }),
+    })
+      .then(function (response) {
+        console.log(blockly.value);
+        console.log('sent script');
       })
-        .then(function (response) {
-          console.log(blockly.value);
-          console.log('sent script');
-        })
-        .catch(function (error) {
-          console.warn(error);
-        });
-    }
+      .catch(function (error) {
+        console.warn(error);
+      });
+
   }
 
   view_history(event) {
     window.open("http://127.0.0.1:5000/program/")
+  }
+
+  login(event) {
+    const modal = document.querySelector(".modal")
+    const closeBtn = document.querySelector(".close")
+    modal.style.display = "block";
+    closeBtn.addEventListener("click", () => {
+      modal.style.display = "none";
+    })
+  }
+
+  logout(event) {
+    axios({
+      method: 'POST',
+      url: 'http://127.0.0.1:5000/logout/',
+    })
+      .then((response) => {
+        this.setState({
+          login_email: "",
+          login_success_label: "",
+          login_error_label: "",
+          register_success_label: "",
+          register_error_label: "",
+          is_loggedin: false
+        });
+        window.alert("logout suceesfully");
+      })
+      .catch((err) => {
+        window.alert("why is there an error");
+      })
+  }
+
+  register(event) {
+    const register_modal = document.querySelector(".register_modal")
+    const closeBtn = document.querySelector(".register_close")
+    register_modal.style.display = "block";
+    closeBtn.addEventListener("click", () => {
+      register_modal.style.display = "none";
+    })
   }
 
   /* Target function for the button "Cope Code". Set the text
@@ -231,18 +264,117 @@ export default class MinibotBlockly extends React.Component {
     };
 
     xmlReader.readAsText(xmlToLoad, 'UTF-8');
-  }      
+  }
+
+  handleRegister(event) {
+    var formData = new FormData(document.getElementById("registerform"));
+    axios({
+      method: 'post',
+      url: 'http://127.0.0.1:5000/register/',
+      data: formData,
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+      .then((response) => {
+        this.setState({
+          login_email: formData.get("email"),
+          register_success_label: "Register suceess and you are logged in!",
+          register_error_label: "",
+        });
+      })
+      .catch((error) => {
+        console.log("fail");
+        this.setState({
+          login_email: "",
+          register_success_label: "",
+          register_error_label: "Account already exist or empty input"
+        });
+        console.log(error);
+      });
+  }
+
+  handleLogin(event) {
+    var formData = new FormData(document.getElementById("loginform"));
+    axios({
+      method: 'post',
+      url: 'http://127.0.0.1:5000/login/',
+      data: formData,
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+      .then((response) => {
+        this.setState({
+          login_email: formData.get("email"),
+          login_success_label: "Login Suceess",
+          login_error_label: "",
+          is_loggedin: true
+        });
+      })
+      .catch((error) => {
+        console.log("fail");
+        this.setState({
+          login_email: "",
+          login_success_label: "",
+          login_error_label: "Incorrect password or acount doesn't exist or empty input"
+        });
+        console.log(error);
+      });
+  }
 
   render() {
     var blocklyStyle = { height: '67vh' };
     var marginStyle = { marginLeft: '10px' };
-    var dataStyle = { align: 'right', margin: '75px 0 0 0'};
+    var dataStyle = { align: 'right', margin: '75px 0 0 0' };
+    console.log("render");
+    console.log(this.state.login_email);
     return (
       <div id="blockyContainer" style={marginStyle} className="row">
         <div id="blockly" className="box" className="col-md-7">
           <div id="blocklyDiv" style={blocklyStyle} align="left">
+            <div id="login and register">
+              {!this.state.is_loggedin ? <button id="register" onClick={this.register}>Register</button> : null}
+              {!this.state.is_loggedin ? <button id="login" onClick={this.login}>Login</button> : null}
+              {this.state.is_loggedin ? <button id="logout" onClick={this.logout}>Logout</button> : null}
+              <div class="register_modal">
+                {/* <div class="modal_content"> */}
+                <span class="register_close">&times;</span>
+                <p>Register Window</p>
+                <form id="registerform">
+                  <input type="text" placeholder="Email" name="email" ></input>
+                  <input type="password" placeholder="Password" name="password" ></input>
+                  <input class="btn_btn-dir" type="button" value="Register" onClick={this.handleRegister}></input>
+                  <label style={{ color: 'green' }}> {this.state.register_success_label} </label>
+                  <br />
+                  <label style={{ color: 'red' }}> {this.state.register_error_label} </label>
+                </form>
+                {/* </div> */}
+              </div>
+
+              <div class="modal">
+                {/* <div class="modal_content"> */}
+                <span class="close">&times;</span>
+                <p>Login Window</p>
+                <form id="loginform" >
+                  <input type="text" placeholder="Email" name="email"  ></input>
+                  <input type="password" placeholder="Password" name="password" ></input>
+                  <input class="btn_btn-dir" type="button" value="Login" onClick={this.handleLogin}></input>
+                  <label style={{ color: 'green' }}> {this.state.login_success_label} </label>
+                  <br />
+                  <label style={{ color: 'red' }}> {this.state.login_error_label} </label>
+                </form>
+              </div>
+              {/* </div> */}
+            </div>
+
+            <div>
+              <label> Login as: {this.state.login_email} </label>
+            </div>
+
             <p id="title"><b>Blockly </b> </p>
+
+
           </div>
+          <br />
+          <br />
+          <br />
           <br />
           <br />
           <br />
@@ -260,44 +392,44 @@ export default class MinibotBlockly extends React.Component {
         <button id="blockyRun" onClick={this.run_blockly}>
             Run
         </button>
-        <form>
-          <input
-            type="file"
-            id="blockUpload"
-            multiplesize="1"
-            accept=".xml"
-            onChange={this.loadFileAsBlocks}
-          />
-        </form>
-        <br />
+          <form>
+            <input
+              type="file"
+              id="blockUpload"
+              multiplesize="1"
+              accept=".xml"
+              onChange={this.loadFileAsBlocks}
+            />
+          </form>
+          <br />
 
-      <div id="Python">
-      <p id ="title"> <b>Python </b> </p>
-      <div> <textarea id = "textarea" rows="10" cols="98" onChange={this.handleScriptChange} /></div>
-      Python File Name:
+          <div id="Python">
+            <p id="title"> <b>Python </b> </p>
+            <div> <textarea id="textarea" rows="10" cols="98" onChange={this.handleScriptChange} /></div>
+            Python File Name:
       <input
-        type="text"
-        name="filename"
-        value={this.state.filename}
-        onChange={this.handleFileNameChange}
-        />&nbsp;&nbsp;
+              type="text"
+              name="filename"
+              value={this.state.filename}
+              onChange={this.handleFileNameChange}
+            />&nbsp;&nbsp;
       <button id="submit" onClick={this.download_python}>Download</button>&nbsp;&nbsp;
       <button id="run" onClick={this.run_script}>Run</button>&nbsp;&nbsp;
       <button id="history" onClick={this.view_history}>View History</button>&nbsp;&nbsp;
       <button id="copy" onClick={this.copy}>Copy Code From Blockly</button>
-      <br />
-      <form>
-        <input
-          type="file"
-          id="upload"
-          multiplesize="1"
-          accept=".py"
-          onChange={this.upload}
-        />
-      </form>
-      <br />
-      <br />
-      </div>
+            <br />
+            <form>
+              <input
+                type="file"
+                id="upload"
+                multiplesize="1"
+                accept=".py"
+                onChange={this.upload}
+              />
+            </form>
+            <br />
+            <br />
+          </div>
         </div>
         <div id="data" style={dataStyle} className="col-md-5"></div>
       </div>
