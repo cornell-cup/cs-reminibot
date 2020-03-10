@@ -109,7 +109,6 @@ def process_string(value):
     for i in range(len(cmds)):
         cmds[i] = cmds[i].replace(u'\xa0', u' ')
         program += "    " + cmds[i] + "\n"
-    print(program)
     return program
 
 
