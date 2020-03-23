@@ -52,7 +52,12 @@ def main():
 
     LINE_COLOR = (0, 255, 0)  # (B,G,R), so this is green
 
-    for d in detections:
+    # for d in detections:
+    for i in range(4):
+        # TODO test how this is working
+        # Axes don't work well - x and y were flipped at some point
+
+        d = detections[i]
         id = int(d.tag_id)
         # Draw onto the frame
         # TODO fix int/float bug
@@ -105,7 +110,7 @@ def main():
 
     # Generate the location of the camera
     # Seems to use a homogenous coordinates system (x,y,z,k)
-    gen_out = np.array([0, 0, 0, 1].T)
+    gen_out = np.array([0, 0, 0, 1]).T
     camera_coordinates = np.matmul(camera_to_origin, gen_out)
     print("CAMERA COORDINATES: {}".format(camera_coordinates))
 

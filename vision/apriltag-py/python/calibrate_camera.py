@@ -50,27 +50,40 @@ def main_with_video():
     parser.add_argument('-s', '--size', metavar='NUM', type=float, default=1.0,
                         help='chessboard square size in user-chosen units (should not affect results)')
 
-    # TODO add multiple camera support - currently assuming ONE camera only.
+    parser.add_argument('-n', '--nums', metavar='NUM', type=int, default=1,
+                        help='number of cameras to calibrate')
 
-    # Capture vars
-    cameras = []
-    camera_ids = []
-    NUM_CAMERAS = 1
-    img_points = []
-    obj_points = []
-    objp = []
+    parser.add_argument('-id', '--cameraid', metavar='NUM', type=int, default=0,
+                        help='ID of the camera to calibrate')
+
+    # TODO add multiple camera support - currently assuming ONE camera only.
 
     options = parser.parse_args()
     args = vars(options)  # get dict of args parsed
 
+    # Capture vars
+    cameras = []
+    camera_ids = []
+    NUM_CAMERAS = args['nums']
+    img_points = []
+    obj_points = []
+
+    # Constants
+    # Prepare object points - taken from tutorials
+    objp = np.zeros((args['rows'] * args['cols'], 3), np.float32)
+    objp[:, :2] = np.mgrid[0:args['cols'],
+                           0:args['rows']].T.reshape(-1, 2)
+    WIN_SIZE = (11, 11)
+    ZERO_ZONE = (-1, -1)
+    # TODO TERM_CRITERIA_ITER used in C++, using MAX_ITER OK?
+    TERM_CRITERIA = (TERM_CRITERIA_EPS +
+                     TERM_CRITERIA_MAX_ITER, 30, 0.1)
+
+    # Make sure each camera is accessible, and set it up if it is.
     for i in range(NUM_CAMERAS):
         camera = VideoCapture(i)
         img_points.insert(i, [])
         obj_points.insert(i, [])
-        # Prepare points - taken from tutorials
-        objp = np.zeros((args['rows'] * args['cols'], 3), np.float32)
-        objp[:, :2] = np.mgrid[0:args['cols'],
-                               0:args['rows']].T.reshape(-1, 2)
         if (VideoCapture.isOpened(camera)):
             camera.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
             camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
@@ -79,7 +92,8 @@ def main_with_video():
             camera_ids.append(i)
             pass
         else:
-            print("Failed to open video capture device" + str(i))
+            print("Failed to open video capture device " + str(i))
+            print("Did you check that all cameras are plugged in and ready?")
             quit()
 
     # Make checkerboard points "Calibration variables"
@@ -96,45 +110,44 @@ def main_with_video():
 
     # find the checkerboard
     for i in range(len(cameras)):
-        while len(frame) == 0:
+        frame.append(None)  # placeholder for the camera's image to overwrite
+        while True:  # Loop until checkerboard corners are found
             # Take a picture and convert it to grayscale
-            frame = get_image(cameras[i])
-            gray = cv2.cvtColor(frame, COLOR_BGR2GRAY)
+            frame[i] = get_image(cameras[i])
+            gray = cv2.cvtColor(frame[i], COLOR_BGR2GRAY)
 
             # Find the checkerboard
             flags = CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE + \
                 CALIB_CB_FAST_CHECK
-            ret = False
             retval, corners = cv2.findChessboardCorners(
                 gray, checkerboard_size, tuple(corners), flags)
+            if not retval:
+                continue  # No checkerboard, so keep looking
+
             if len(corners) != 0:
                 print("Found checkerboard on " + str(i))
                 obj_points[i].append(objp)
-                # TODO TERM_CRITERIA_ITER used in C++, using MAX_ITER OK?
-                win_size = (11, 11)
-                zero_zone = (-1, -1)
-                criteria = (TERM_CRITERIA_EPS +
-                            TERM_CRITERIA_MAX_ITER, 30, 0.1)
                 corners = cornerSubPix(
-                    gray, corners, win_size, zero_zone, criteria)
+                    gray, corners, WIN_SIZE, ZERO_ZONE, TERM_CRITERIA)
                 img_points[i].append(corners)
                 break
-            assert (frame.any() != None)
+            assert (frame[i].any() != None)
             assert (corners.any() != None)
         ret = True
         # Draw corners / lines on the image to show the user
-        drawChessboardCorners(frame, checkerboard_size, corners, ret)
-    assert(len(frame) != 0)
+        drawChessboardCorners(frame[i], checkerboard_size, corners, ret)
 
     # Show the image and prompts to user for confirmation
     print("Press any key other than ESCAPE to continue")
     print("Press ESCAPE to abort calibration. If the camera can't see" +
           "the entire board, you should press ESCAPE and try again.")
-    imshow(str(i), frame)
-    key = cv2.waitKey(0)
-    if key == 27:
-        print("Calibration process aborted.")
-        exit(0)
+    for i in camera_ids:
+        print("This is what camera " + str(i) + " sees.")
+        imshow(str(i), frame[i])
+        key = cv2.waitKey(0)
+        if key == 27:
+            print("Calibration process aborted.")
+            exit(0)
 
     # Write the calibration file
     print("Beginning calibration file creation process")

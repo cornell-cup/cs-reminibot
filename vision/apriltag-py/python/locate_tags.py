@@ -7,9 +7,12 @@ import requests
 from util import get_image, get_matrices_from_file
 
 TAG_SIZE = 6.5  # The length of one side of an apriltag, in inches
-MULT_FACTOR = 0.2  # The scale factor of the output coordinates
+MULT_FACTOR = 5  # The scale factor of the output coordinates
 DEVICE_ID = 0  # The device the camera is, usually 0. TODO make this adjustable
 SEND_DATA = True  # Sends data to URL if True. Set to False for debug
+
+# DEBUGGING AND TIMING VARIABLES
+past_time = -1
 
 
 def main():
@@ -126,8 +129,9 @@ def main():
             # prints Device ID :: tag id :: x y z angle
             x = MULT_FACTOR * tag_xyz[0][0]
             y = MULT_FACTOR * tag_xyz[1][0]
-            print("{} :: {} :: {} {} {} {}".format(
-                DEVICE_ID, d.tag_id, x, y, tag_xyz[2][0], angle))
+            print(tag_xyz)
+            # print("{} :: {} :: {} {} {} {}".format(
+            #    DEVICE_ID, d.tag_id, x, y, tag_xyz[2][0], angle))
 
             # Send the data to the URL specified.
             # This is usually a URL to the base station.
