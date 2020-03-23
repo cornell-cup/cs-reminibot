@@ -9,7 +9,7 @@ Utility module for common actions in this module and in OpenCV.
 
 def get_image(camera):
     """
-    Gets the image the camera currently sees.
+    Gets the image the camera currently sees. Blocks until an image is found.
 
     Args:
       :camera ID of the camera, as defined by OpenCV's VideoCapture class.
