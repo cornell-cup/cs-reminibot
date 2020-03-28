@@ -21,8 +21,8 @@ Please install the following:
 * Node.js (The Javascript runtime library)
 * npm (The Javascript package manager) 
 
-## Installing Python Dependencies
-Navigate to the basestation directory in and run 
+## Installing Python3 Dependencies
+Run the following commands to navigate to the basestation directory in and install the Python3 dependencies 
 ```
 cd cs-reminibot/basestation
 pip3 install -r requirements.txt
@@ -31,7 +31,7 @@ cd ..
 
  
 ## Installing JavaScript Dependencies 
-Navigate to the gui directory in static/gui and run 
+Run the following commands to navigate to the gui directory in static/gui and install JavaScript dependencies 
 ```
 cd cs-reminibot/static/gui
 npm install
@@ -47,8 +47,8 @@ The BaseStation is the intermediary that manages information flow between the mi
 hardware to the software and GUI. BaseStation runs on `cs-reminibot/basestation/base_station_interface.py` and is a
 simple web application that runs on HTTP.
 
-To run the BaseStation, run the following line in your terminal from the root directory
-of this repo.
+To run the BaseStation, run the following lines to navigate to the root directory
+of this repo and start the BaseStation.
 
 ```
 cd cs-reminibot
