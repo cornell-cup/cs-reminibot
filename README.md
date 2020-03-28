@@ -8,6 +8,12 @@ minibot and send custom scripts.
 
 This repository is currently in development.
 
+## Cloning the respository
+To clone (download) the respository onto your local machine:
+```
+git clone https://github.com/cornell-cup/cs-reminibot.git
+```
+
 ## Initial Requirements
 Please install the following:
 * Python3
@@ -20,13 +26,16 @@ Navigate to the basestation directory in and run
 ```
 cd cs-reminibot/basestation
 pip3 install -r requirements.txt
+cd ..
 ```
 
  
 ## Installing JavaScript Dependencies 
 Navigate to the gui directory in static/gui and run 
 ```
+cd cs-reminibot/static/gui
 npm install
+cd ../..
 ```
 
 ## Run the BaseStation
@@ -46,6 +55,6 @@ cd cs-reminibot
 ./run_BS.sh
 ```
 
-Go to any browser on your computer and go to `localhost:8080` to see the GUI in action.
+Go to any browser on your computer and go to `localhost:8080/start` to see the GUI in action.
 If you are having trouble running the previous line, make sure that python3 is installed.
 You can check this by typing `python3` in your terminal.
