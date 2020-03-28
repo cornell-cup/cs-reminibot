@@ -8,18 +8,18 @@ minibot and send custom scripts.
 
 This repository is currently in development.
 
-## Cloning the respository
-To clone (download) the respository onto your local machine:
-```
-git clone https://github.com/cornell-cup/cs-reminibot.git
-```
-
 ## Initial Requirements
 Please install the following:
 * Python3
 * pip3 (The package manager for python3)
 * Node.js (The Javascript runtime library)
 * npm (The Javascript package manager) 
+
+## Cloning the respository
+To clone (download) the respository onto your local machine:
+```
+git clone https://github.com/cornell-cup/cs-reminibot.git
+```
 
 ## Installing Python3 Dependencies
 Run the following commands to navigate to the basestation directory in and install the Python3 dependencies 
@@ -31,15 +31,16 @@ cd ..
 
  
 ## Installing JavaScript Dependencies 
-Run the following commands to navigate to the gui directory in static/gui and install JavaScript dependencies 
+Run the following commands to navigate to the gui directory in static/gui and install JavaScript dependencies.
+You should currently be in the cs-reminibot directory
+
 ```
-cd cs-reminibot/static/gui
+cd static/gui
 npm install
 cd ../..
 ```
 
 ## Run the BaseStation
-
 After all dependencies are successfully installed, you can run the BaseStation on your
 computer and start working with the minibot.
 
@@ -47,11 +48,9 @@ The BaseStation is the intermediary that manages information flow between the mi
 hardware to the software and GUI. BaseStation runs on `cs-reminibot/basestation/base_station_interface.py` and is a
 simple web application that runs on HTTP.
 
-To run the BaseStation, run the following lines to navigate to the root directory
-of this repo and start the BaseStation.
+To run the BaseStation, run the following line of code.  You should currently be in the cs-reminibot directory.
 
 ```
-cd cs-reminibot
 ./run_BS.sh
 ```
 
