@@ -7,10 +7,12 @@ import axios from 'axios';
 export default class MinibotBlockly extends React.Component {
   constructor(props) {
     super(props);
+    this.redefine_custom_blocks();
     this.scriptToCode = this.scriptToCode.bind(this);
     this.state = {
       blockly_filename: 'myXmlBlocklyCode.xml',
       data: "",
+      custom_blocks: [["hi","print"]],
       filename: "myPythonCode.py",
       pyblock: "",
       showPopup: false,
@@ -19,11 +21,13 @@ export default class MinibotBlockly extends React.Component {
       login_success_label: "",
       register_error_label: "",
       register_success_label: "",
+      function_name: "default_function"
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleScriptChange = this.handleScriptChange.bind(this);
     this.handleFileNameChange = this.handleFileNameChange.bind(this);
+    this.handleFunctionNameChange = this.handleFunctionNameChange.bind(this);
     this.download = this.download.bind(this);
     this.download_python = this.download_python.bind(this);
     this.run_blockly = this.run_blockly.bind(this);
@@ -37,6 +41,7 @@ export default class MinibotBlockly extends React.Component {
     this.handleLogin = this.handleLogin.bind(this);
     this.handleRegister = this.handleRegister.bind(this);
     this.logout = this.logout.bind(this);
+    this.redefine_custom_blocks = this.redefine_custom_blocks.bind(this)
   }
 
 
@@ -54,11 +59,13 @@ export default class MinibotBlockly extends React.Component {
      Update this.state with the current text. */
   handleScriptChange(event) {
     this.setState({ data: event.target.value });
-    console.log(this.state.data);
   }
 
   handleFileNameChange(event) {
     this.setState({ filename: event.target.value });
+  }
+  handleFunctionNameChange(event) {
+    this.setState({ function_name: event.target.value });
   }
 
   /* Runs after component loads - this generates the blockly stuff */
@@ -80,7 +87,6 @@ export default class MinibotBlockly extends React.Component {
           (Every drag/drop or change in visual code will be
           reflected in actual code view) */
     _this.workspace.addChangeListener(function (event) {
-      console.log('workspace change listener');
       _this.scriptToCode();
     });
 
@@ -106,7 +112,6 @@ export default class MinibotBlockly extends React.Component {
   https://developers.google.com/blockly/guides/get-started/web
   */
   scriptToCode() {
-    console.log('run')
     var xml = Blockly.Xml.workspaceToDom(this.workspace);
     var xml_text = Blockly.Xml.domToText(xml);
     this.props.setBlockly(xml_text);
@@ -117,7 +122,6 @@ export default class MinibotBlockly extends React.Component {
     document.getElementById('data').innerHTML = code;
     //document.getElementById('blockly').value = window.Blockly.Python.workspaceToCode(this.workspace);
     document.getElementById('blockly').value = window.Blockly.Python.workspaceToCode(this.workspace);
-    console.log(blockly.value);
   }
 
   download(event) {
@@ -294,17 +298,32 @@ export default class MinibotBlockly extends React.Component {
     };
 
     xmlReader.readAsText(xmlToLoad, 'UTF-8');
-  }     
-  
-  async custom_block(event) {  
+  }
+
+  redefine_custom_blocks() {
     var _this = this;
-    _this.state.pyblock = _this.state.data
-    console.log(_this.state.data, "HERE");
-    await this.scriptToCode()
-    Blockly.Python['custom_block'] = function () {
-      console.log("CUSTOM BLOCK")
-      // TODO: Assemble Python into code variable.
-      return _this.state.pyblock;
+    Blockly.Blocks['custom_block'] = {
+      init: function () {
+        this.jsonInit({
+          type: "custom_block",
+          message0: "function %1",
+          args0: [
+            {
+              "type": "field_dropdown",
+              "name": "function_content",
+              "options": _this.state.custom_blocks
+            }
+          ],
+          previousStatement: null,
+          nextStatement: null,
+          colour: 230,
+          tooltip: "",
+          helpUrl: ""
+        });
+      }
+    };
+    Blockly.Python['custom_block'] = function (block) {
+      return block.getFieldValue('function_content');
     };
   }
 
@@ -359,6 +378,42 @@ export default class MinibotBlockly extends React.Component {
         });
         console.log(error);
       });
+    Blockly.Blocks['custom_block'] = {
+      init: function () {
+        this.jsonInit({
+          type: "custom_block",
+          message0: "function %1",
+          args0: [
+            {
+              "type": "field_dropdown",
+              "name": "function_content",
+              "options": _this.state.custom_blocks
+            }
+          ],
+          previousStatement: null,
+          nextStatement: null,
+          colour: 230,
+          tooltip: "",
+          helpUrl: ""
+        });
+      }
+    };
+    Blockly.Python['custom_block'] = function (block) {
+      return block.getFieldValue('function_content');
+    };
+  }
+
+  async custom_block(event) {
+    var _this = this;
+    await this.scriptToCode();
+    var item = _this.state.custom_blocks.find(element => element[0] === _this.state.function_name)
+    if (item == undefined) {
+      _this.state.custom_blocks.push([_this.state.function_name,_this.state.data]);
+    } else {
+      item[1] = _this.state.data;
+    }
+    await this.setState({custom_blocks: _this.state.custom_blocks});
+    this.redefine_custom_blocks();
   }
 
   render() {
@@ -434,38 +489,40 @@ export default class MinibotBlockly extends React.Component {
         <button id="blocklyRun" onClick={this.run_blockly}>
             Run
         </button>
-      
-        &nbsp;&nbsp;
-        {<button id="blocklyStop" onClick={() => this.stop_blockly()}>
-            Stop
-        </button> }
+        <form>
+          <input
+            type="file"
+            id="blockUpload"
+            multiplesize="1"
+            accept=".xml"
+            onChange={this.loadFileAsBlocks}
+          />
+        </form>
+        <br />
 
-          <form>
-            <input
-              type="file"
-              id="blockUpload"
-              multiplesize="1"
-              accept=".xml"
-              onChange={this.loadFileAsBlocks}
-            />
-          </form>
-          <br />
-
-          <div id="Python">
-            <p id="title"> <b>Python </b> </p>
-            <div> <textarea id="textarea" rows="10" cols="98" onChange={this.handleScriptChange} /></div>
-            Python File Name:
-
+      <div id="Python">
+      <p id ="title"> <b>Python </b> </p>
+      <div> <textarea id = "textarea" rows="10" cols="98" onChange={this.handleScriptChange} /></div>
+      Function Name:
       <input
-              type="text"
-              name="filename"
-              value={this.state.filename}
-              onChange={this.handleFileNameChange}
-            />&nbsp;&nbsp;
+        type="text"
+        name="function_name"
+        value={this.state.function_name}
+        onChange={this.handleFunctionNameChange}
+      />&nbsp;&nbsp;
+      <button id="CBlock" onClick={this.custom_block}>Update Custom Function</button>&nbsp;&nbsp;
+      <br />
+      Python File Name:
+      <input
+        type="text"
+        name="filename"
+        value={this.state.filename}
+        onChange={this.handleFileNameChange}
+        />&nbsp;&nbsp;
+        <br />
       <button id="submit" onClick={this.download_python}>Download</button>&nbsp;&nbsp;
       <button id="run" onClick={this.run_script}>Run</button>&nbsp;&nbsp;
       <button id="history" onClick={this.view_history}>View History</button>&nbsp;&nbsp;
-      <button id="CBlock" onClick={this.custom_block}>Custom Block</button>&nbsp;&nbsp;
       <button id="copy" onClick={this.copy}>Copy Code From Blockly</button>
             <br />
             <form>
