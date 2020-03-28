@@ -302,13 +302,28 @@ export default class MinibotBlockly extends React.Component {
 
   redefine_custom_blocks() {
     var _this = this;
-    _this.state.pyblock = _this.state.data
-    console.log(_this.state.data, "HERE");
-    await this.scriptToCode()
-    Blockly.Python['custom_block'] = function () {
-      console.log("CUSTOM BLOCK")
-      // TODO: Assemble Python into code variable.
-      return _this.state.pyblock;
+    Blockly.Blocks['custom_block'] = {
+      init: function () {
+        this.jsonInit({
+          type: "custom_block",
+          message0: "function %1",
+          args0: [
+            {
+              "type": "field_dropdown",
+              "name": "function_content",
+              "options": _this.state.custom_blocks
+            }
+          ],
+          previousStatement: null,
+          nextStatement: null,
+          colour: 230,
+          tooltip: "",
+          helpUrl: ""
+        });
+      }
+    };
+    Blockly.Python['custom_block'] = function (block) {
+      return block.getFieldValue('function_content');
     };
   }
 
