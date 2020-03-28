@@ -10,10 +10,32 @@ This repository is currently in development.
 
 ## Initial Requirements
 Please install the following:
+* Git
 * Python3
 * pip3 (The package manager for python3)
 * Node.js (The Javascript runtime library)
 * npm (The Javascript package manager) 
+
+### Ubuntu 18: Installing Initial Requirements
+
+#### Git installation:
+In a terminal run:
+```
+sudo apt install git
+```
+
+#### Python3 installation:
+Python 3 should already be installed.  Run the following command in a terminal and you should see the python interpreter open.  
+```
+python3
+```
+Run quit() in the interpreter to exit out of it.  
+
+#### Pip3 installation:
+In a terminal run:
+```
+sudo apt install python3-pip
+```
 
 ## Cloning the respository
 To clone (download) the respository onto your local machine:
