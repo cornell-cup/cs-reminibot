@@ -8,17 +8,26 @@ minibot and send custom scripts.
 
 This repository is currently in development.
 
-Software resources:
- - Tornado
- - Adafruit RPi libraries (TCS34725)
+## Initial Requirements
+Please install the following:
+* Python3
+* pip3 (The package manager for python3)
+* Node.js (The Javascript runtime library)
+* npm (The Javascript package manager) 
+
+## Installing Python Dependencies
+Navigate to the basestation directory in and run 
+```
+cd cs-reminibot/basestation
+pip3 install -r requirements.txt
+```
+
  
-## Installing Dependencies 
+## Installing JavaScript Dependencies 
 Navigate to the gui directory in static/gui and run 
 ```
 npm install
 ```
-
-If npm does not exist, install it with pip or other package downloader. In the future, this process will be incorporated into a bash file. 
 
 ## Run the BaseStation
 
@@ -33,6 +42,7 @@ To run the BaseStation, run the following line in your terminal from the root di
 of this repo.
 
 ```
+cd cs-reminibot
 ./run_BS.sh
 ```
 
