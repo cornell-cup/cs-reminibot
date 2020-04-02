@@ -8,7 +8,7 @@ minibot and send custom scripts.
 
 This repository is currently in development.
 
-## Initial Requirements
+# Initial Requirements
 Please install the following:
 * Git
 * Python3
@@ -16,7 +16,7 @@ Please install the following:
 * Node.js (The Javascript runtime library)
 * npm (The Javascript package manager) 
 
-### Ubuntu 18: Installing Initial Requirements
+## Ubuntu 18: Installing Initial Requirements
 
 #### Git installation:
 In a terminal run:
@@ -51,13 +51,13 @@ Upgrade npm to the lastest version by running:
 sudo npm install npm@latest -g
 ```
 
-## Cloning the respository
+# Cloning the respository
 To clone (download) the respository onto your local machine:
 ```
 git clone https://github.com/cornell-cup/cs-reminibot.git
 ```
 
-## Installing Python3 Dependencies
+# Installing Python3 Dependencies
 Run the following commands to navigate to the basestation directory in and install the Python3 dependencies 
 ```
 cd cs-reminibot/basestation
@@ -66,7 +66,7 @@ cd ..
 ```
 
  
-## Installing JavaScript Dependencies 
+# Installing JavaScript Dependencies 
 Run the following commands to navigate to the gui directory in static/gui and install JavaScript dependencies.
 You should currently be in the cs-reminibot directory
 
@@ -76,7 +76,7 @@ npm install
 cd ../..
 ```
 
-## Run the BaseStation
+# Run the BaseStation
 After all dependencies are successfully installed, you can run the BaseStation on your
 computer and start working with the minibot.
 
