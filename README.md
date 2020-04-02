@@ -51,20 +51,34 @@ Upgrade npm to the lastest version by running:
 sudo npm install npm@latest -g
 ```
 
+
+## Windows 10: Installing Initial Requirements
+
+#### Git installation:
+1. Go to https://gitforwindows.org/ and click Download.
+2. Run the installer that downloads (the .exe file) and install Git. 
+
+#### Python3 and Pip3 installation:
+1. Go to https://www.python.org/downloads/ and press "Download Python <version_number>"
+2. Open the installer that downloads (the .exe file) and select the checkbox that says "Add Python 3.8 to PATH"
+3. Click the "Install Now" button
+
+#### Node.js and npm installation:
+TODO
+
 # Cloning the respository
 To clone (download) the respository onto your local machine:
 ```
 git clone https://github.com/cornell-cup/cs-reminibot.git
 ```
 
-# Installing Python3 Dependencies
+# Installing BaseStation Python Dependencies
 Run the following commands to navigate to the basestation directory in and install the Python3 dependencies 
 ```
 cd cs-reminibot/basestation
 pip3 install -r requirements.txt
 cd ..
 ```
-
  
 # Installing JavaScript Dependencies 
 Run the following commands to navigate to the gui directory in static/gui and install JavaScript dependencies.
