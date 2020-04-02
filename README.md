@@ -45,6 +45,12 @@ sudo apt install nodejs
 sudo apt install npm
 ```
 
+Upgrade npm to the lastest version by running:
+
+```
+sudo npm install npm@latest -g
+```
+
 ## Cloning the respository
 To clone (download) the respository onto your local machine:
 ```
