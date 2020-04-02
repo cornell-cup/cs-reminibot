@@ -37,6 +37,14 @@ In a terminal run:
 sudo apt install python3-pip
 ```
 
+#### Node.js and npm installation:
+In a terminal run:
+```
+sudo apt update
+sudo apt install nodejs
+sudo apt install npm
+```
+
 ## Cloning the respository
 To clone (download) the respository onto your local machine:
 ```
