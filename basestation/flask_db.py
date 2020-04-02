@@ -36,6 +36,9 @@ class User(db.Model):
     email = db.Column(db.String, nullable=False, unique=True)
     password_digest = db.Column(db.String, nullable=False)
 
+    # Custom Functions
+    custom_function = db.Column(db.String, nullable=False)
+
     # Session information
     session_token = db.Column(db.String, nullable=False, unique=True)
     session_expiration = db.Column(db.DateTime, nullable=False)
@@ -45,6 +48,7 @@ class User(db.Model):
         self.email = kwargs.get('email')
         self.password_digest = bcrypt.hashpw(str(kwargs.get('password')).encode('utf8'),
                                              bcrypt.gensalt(rounds=13))
+        self.custom_function = "{}"
         self.renew_session()
 
     # Used to randomly generate session/update tokens
@@ -73,5 +77,6 @@ class User(db.Model):
     def serialize(self):
         return{
             'id': self.id,
-            'email': self.email
+            'email': self.email,
+            'custom_function': self.custom_function
         }
