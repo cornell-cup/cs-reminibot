@@ -67,6 +67,14 @@ sudo npm install npm@latest -g
 1. Download node.js by visiting https://nodejs.org/en/download/, and clicking the download button for the Windows Installer (.msi) version, for your computer.  Your computer is most likely 64-bit, but you can look up online to confirm.  
 2. Run the installer that downloads, and keep pressing "Next" without changing any default options.  However, in the **Tools for Native Modules section**, make sure to select the checkbox for *"Automatically install the necessary tools....."*.  Press Install and let the installer run.  A new script will pop up to install additional tools.  Press any key to continue, and allow Powershell to install the additional tools automatically.  
 
+#### Bash in Powershell installation
+1. Click the Start Button
+2. Click Control Panel
+3. Click Programs
+4. Click "Turn Windows Features on or off"
+5. Enable "Windows Subsystem for Linux"
+6. You might be prompted to restart your computer.  
+
 # Cloning the respository
 To clone (download) the respository onto your local machine.  On Linux or MacOS, open a new terminal and run the command below.  On Windows, open Git Bash and run the command below.  
 ```
@@ -79,10 +87,6 @@ Run the following commands to navigate to the basestation directory in and insta
 cd cs-reminibot/basestation
 pip3 install -r requirements.txt
 cd ..
-```
-If the *pip3 install -r requirements.txt* command does not work run the following command instead:
-```
-pip install -r requirements.txt
 ```
  
 # Installing JavaScript Dependencies 
@@ -105,8 +109,14 @@ simple web application that runs on HTTP.
 
 To run the BaseStation, run the following line of code.  You should currently be in the cs-reminibot directory.
 
+If you are on Linux or MacOS run: 
 ```
 ./run_BS.sh
+```
+
+If you are on Windows run:
+```
+bash run_BS.sh
 ```
 
 Go to any browser on your computer and go to `localhost:8080/start` to see the GUI in action.
