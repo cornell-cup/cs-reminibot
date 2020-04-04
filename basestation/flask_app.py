@@ -31,6 +31,14 @@ def get_user_by_session_token(session_token):
 def get_user_by_update_token(update_token):
     return User.query.filter(User.update_token == update_token).first()
 
+def update_custom_function_by_session_token(session_token, custom_function):
+    user = get_user_by_session_token(session_token)
+    if not user:
+        return False, "Invalid session token"
+    user.custom_function = custom_function
+    db.session.commit()
+    return True, user
+
 
 def verify_credentials(email, password):
     optional_user = get_user_by_email(email)
@@ -171,7 +179,8 @@ def login():
         'session_expiration': str(user.session_expiration),
         'update_token': user.update_token,
         'user_id': user.id,
-        'email': email
+        'email': email,
+        'custom_function': user.custom_function
     })
 
 
@@ -206,6 +215,21 @@ def update_session():
         'update_token': user.update_token
     })
 
+@app.route('/custom_function/', methods=['POST'])
+def update_custom_function():
+    session_token = request.form['session_token']
+    custom_function = request.form['custom_function']
+
+    if not session_token or not custom_function:
+        print("error: Missing session_token or custom_function")
+        return json.dumps({'error': 'Missing session_token or custom_function'}), 404
+
+    success, res = update_custom_function_by_session_token(session_token, custom_function)
+
+    if not success:
+        print("error: invalid session_token")
+        return json.dumps({'error': 'invalid session_token'}), 404
+    return json.dumps({'custom_function': custom_function}), 201
 
 if __name__ == "__main__":
     app.run()
