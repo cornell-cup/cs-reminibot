@@ -117,3 +117,34 @@ def get_matrices_from_file(file_name):
     # Matrix dimensions (row x col):
     # camera_matrix: 3 x 3, dist_coeffs: 1 x 5
     return (calib_file, camera_matrix, dist_coeffs)
+
+
+def undistort_image(frame, camera_matrix, dist_coeffs):
+    """
+    Un-distorts an image and crops the undistorted image back to the same size as
+    the original image. Cameras normally have some distortion, but knowing
+    some parameters about the camera can allow OpenCV to undo the camera's
+    natural distortion.
+
+    TODO document this in higher-level documentation
+
+    Args:
+        :frame The distorted image
+        :camera_matrix The camera's intrinsic parameters from cv2.calibrateCamera
+        :dist_coeffs The distortion coefficients from cv2.calibrateCamera
+
+    Returns: The new frame.
+    """
+    h, w = frame.shape[:2]
+    dim = (w, h)
+    SCALE_FACTOR = 1
+    new_camera_mtx, roi = \
+        cv2.getOptimalNewCameraMatrix(
+            camera_matrix, dist_coeffs, dim, SCALE_FACTOR, dim)
+
+    # Crop the undistorted image bc it can change shape
+    dst = cv2.undistort(frame, camera_matrix,
+                        dist_coeffs, None, new_camera_mtx)
+    x, y, w, h = roi
+    dst = dst[y:y+h, x:x+w]
+    return dst
