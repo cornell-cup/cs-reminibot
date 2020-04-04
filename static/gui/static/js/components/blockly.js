@@ -12,7 +12,7 @@ export default class MinibotBlockly extends React.Component {
     this.state = {
       blockly_filename: 'myXmlBlocklyCode.xml',
       data: "",
-      custom_blocks: [["hi","print"]],
+      custom_blocks: [["hi", "print"]],
       filename: "myPythonCode.py",
       pyblock: "",
       showPopup: false,
@@ -196,21 +196,21 @@ export default class MinibotBlockly extends React.Component {
 
   stop_blockly() {
     console.log(this.props.bot_name, "stop_blockly");
-        axios({
-            method: 'POST',
-            url: '/start',
-            data: JSON.stringify({
-                key: "WHEELS",
-                bot_name: this.props.bot_name,
-                direction: "stop",
-                power: 0,
-            })
-        })
-            .then(function (response) {
-            })
-            .catch(function (error) {
-                console.log(error);
-            })
+    axios({
+      method: 'POST',
+      url: '/start',
+      data: JSON.stringify({
+        key: "WHEELS",
+        bot_name: this.props.bot_name,
+        direction: "stop",
+        power: 0,
+      })
+    })
+      .then(function (response) {
+      })
+      .catch(function (error) {
+        console.log(error);
+      })
   }
 
 
@@ -408,11 +408,11 @@ export default class MinibotBlockly extends React.Component {
     await this.scriptToCode();
     var item = _this.state.custom_blocks.find(element => element[0] === _this.state.function_name)
     if (item == undefined) {
-      _this.state.custom_blocks.push([_this.state.function_name,_this.state.data]);
+      _this.state.custom_blocks.push([_this.state.function_name, _this.state.data]);
     } else {
       item[1] = _this.state.data;
     }
-    await this.setState({custom_blocks: _this.state.custom_blocks});
+    await this.setState({ custom_blocks: _this.state.custom_blocks });
     this.redefine_custom_blocks();
   }
 
@@ -466,8 +466,6 @@ export default class MinibotBlockly extends React.Component {
             </div>
 
             <p id="title"><b>Blockly </b> </p>
-
-
           </div>
           <br />
           <br />
@@ -485,45 +483,46 @@ export default class MinibotBlockly extends React.Component {
           />&nbsp;&nbsp;
           <button id="blocklySubmit" onClick={this.download}>
             Download
-        </button>&nbsp;&nbsp;
-        <button id="blocklyRun" onClick={this.run_blockly}>
+          </button>&nbsp;&nbsp;
+          <button id="blocklyRun" onClick={this.run_blockly}>
             Run
-        </button>
-        <form>
-          <input
-            type="file"
-            id="blockUpload"
-            multiplesize="1"
-            accept=".xml"
-            onChange={this.loadFileAsBlocks}
-          />
-        </form>
-        <br />
+          </button>
+          <form>
+            <input
+              type="file"
+              id="blockUpload"
+              multiplesize="1"
+              accept=".xml"
+              onChange={this.loadFileAsBlocks}
+            />
+          </form>
+          <br />
 
-      <div id="Python">
-      <p id ="title"> <b>Python </b> </p>
-      <div> <textarea id = "textarea" rows="10" cols="98" onChange={this.handleScriptChange} /></div>
-      Function Name:
-      <input
-        type="text"
-        name="function_name"
-        value={this.state.function_name}
-        onChange={this.handleFunctionNameChange}
-      />&nbsp;&nbsp;
-      <button id="CBlock" onClick={this.custom_block}>Update Custom Function</button>&nbsp;&nbsp;
-      <br />
-      Python File Name:
-      <input
-        type="text"
-        name="filename"
-        value={this.state.filename}
-        onChange={this.handleFileNameChange}
-        />&nbsp;&nbsp;
-        <br />
-      <button id="submit" onClick={this.download_python}>Download</button>&nbsp;&nbsp;
-      <button id="run" onClick={this.run_script}>Run</button>&nbsp;&nbsp;
-      <button id="history" onClick={this.view_history}>View History</button>&nbsp;&nbsp;
-      <button id="copy" onClick={this.copy}>Copy Code From Blockly</button>
+          <div id="Python">
+            <p id="title"> <b>Python </b> </p>
+            <div> <textarea id="textarea" rows="10" cols="98" onChange={this.handleScriptChange} />
+            </div>
+            Function Name:
+            <input
+              type="text"
+              name="function_name"
+              value={this.state.function_name}
+              onChange={this.handleFunctionNameChange}
+            />&nbsp;&nbsp;
+            <button id="CBlock" onClick={this.custom_block}>Update Custom Function</button>&nbsp;&nbsp;
+            <br />
+            Python File Name:
+            <input
+              type="text"
+              name="filename"
+              value={this.state.filename}
+              onChange={this.handleFileNameChange}
+            />&nbsp;&nbsp;
+            <br />
+            <button id="submit" onClick={this.download_python}>Download</button>&nbsp;&nbsp;
+            <button id="run" onClick={this.run_script}>Run</button>&nbsp;&nbsp;
+            <button id="history" onClick={this.view_history}>View History</button>&nbsp;&nbsp;
+            <button id="copy" onClick={this.copy}>Copy Code From Blockly</button>
             <br />
             <form>
               <input
@@ -538,7 +537,7 @@ export default class MinibotBlockly extends React.Component {
             <br />
           </div>
         </div>
-      <div id="data" style={dataStyle} className="col-md-5"></div>
+        <div id="data" style={dataStyle} className="col-md-5"></div>
       </div>
     );
   }
