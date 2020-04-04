@@ -3,7 +3,7 @@ import apriltag
 import sys
 import numpy as np
 import time
-from util import get_image, write_matrix_to_file, get_matrices_from_file
+from util import get_image, write_matrix_to_file, get_matrices_from_file, undistort_image
 
 TAG_SIZE = 6.5  # The length of a side of a tag, in inches
 NUM_DETECTIONS = 4  # The number of tags to detect, usually 4
@@ -41,7 +41,12 @@ def main():
 
     while len(detections) != NUM_DETECTIONS:
         frame = get_image(camera)  # take a new picture
-        gray = cvtColor(frame, COLOR_BGR2GRAY)
+
+        # TODO check if image undistortion is doing anything useful
+        dst = undistort_image(frame, camera_matrix, dist_coeffs)
+
+        # Convert undistorted image to grayscale
+        gray = cvtColor(dst, COLOR_BGR2GRAY)
 
         # Use the detector and compute useful values from it
         detections, det_image = detector.detect(gray, return_image=True)
@@ -54,8 +59,6 @@ def main():
 
     # for d in detections:
     for i in range(4):
-        # TODO test how this is working
-        # Axes don't work well - x and y were flipped at some point
 
         d = detections[i]
         id = int(d.tag_id)

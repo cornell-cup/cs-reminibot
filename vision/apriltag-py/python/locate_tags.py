@@ -4,10 +4,10 @@ import numpy as np
 import sys
 import time
 import requests
-from util import get_image, get_matrices_from_file
+from util import get_image, get_matrices_from_file, undistort_image
 
 TAG_SIZE = 6.5  # The length of one side of an apriltag, in inches
-MULT_FACTOR = 1  # The scale factor of the output coordinates
+MULT_FACTOR = 0.5  # The scale factor of the output coordinates
 DEVICE_ID = 0  # The device the camera is, usually 0. TODO make this adjustable
 SEND_DATA = True  # Sends data to URL if True. Set to False for debug
 
@@ -69,7 +69,8 @@ def main():
 
         # take a picture and get detections
         frame = get_image(camera)
-        gray = cvtColor(frame, COLOR_BGR2GRAY)
+        dst = undistort_image(frame, camera_matrix, dist_coeffs)
+        gray = cvtColor(dst, COLOR_BGR2GRAY)
         detections, det_image = detector.detect(gray, return_image=True)
         if len(detections) == 0:
             continue  # Try again if we don't get anything
