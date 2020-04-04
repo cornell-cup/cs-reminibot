@@ -4,7 +4,7 @@ import numpy as np
 import sys
 import time
 import requests
-from util import get_image, get_matrices_from_file, undistort_image
+from util import get_image, get_matrices_from_file, undistort_image, get_offsets_from_file
 
 TAG_SIZE = 6.5  # The length of one side of an apriltag, in inches
 MULT_FACTOR = 0.5  # The scale factor of the output coordinates
@@ -37,7 +37,9 @@ def main():
     calib_file, camera_matrix, dist_coeffs = get_matrices_from_file(
         calib_file_name)
     transform_matrix = get_transform_matrix(calib_file)
+    x_offset, y_offset = get_offsets_from_file(calib_file)
     calib_file.close()
+
     assert (camera_matrix.shape == (3, 3))
     assert (dist_coeffs.shape == (1, 5))
     assert (transform_matrix.shape == (4, 4))
@@ -128,8 +130,9 @@ def main():
 
             # Scale the coordinates, and print for debugging
             # prints Device ID :: tag id :: x y z angle
-            x = MULT_FACTOR * tag_xyz[0][0]
-            y = MULT_FACTOR * tag_xyz[1][0]
+            # TODO debug offset method - is better, but not perfect.
+            x = MULT_FACTOR * (tag_xyz[0][0] + x_offset)
+            y = MULT_FACTOR * (tag_xyz[1][0] + y_offset)
             # print(tag_xyz)
             print("{} :: {} :: {} {} {} {}".format(
                 DEVICE_ID, d.tag_id, x, y, tag_xyz[2][0], angle))
