@@ -48,7 +48,7 @@ class User(db.Model):
         self.email = kwargs.get('email')
         self.password_digest = bcrypt.hashpw(str(kwargs.get('password')).encode('utf8'),
                                              bcrypt.gensalt(rounds=13))
-        self.custom_function = "{}"
+        self.custom_function = "[]"
         self.renew_session()
 
     # Used to randomly generate session/update tokens

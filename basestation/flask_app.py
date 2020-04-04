@@ -179,7 +179,8 @@ def login():
         'session_expiration': str(user.session_expiration),
         'update_token': user.update_token,
         'user_id': user.id,
-        'email': email
+        'email': email,
+        'custom_function': user.custom_function
     })
 
 
@@ -214,7 +215,7 @@ def update_session():
         'update_token': user.update_token
     })
 
-@app.route('/custom_function/', methods=['UPDATE'])
+@app.route('/custom_function/', methods=['POST'])
 def update_custom_function():
     session_token = request.form['session_token']
     custom_function = request.form['custom_function']
@@ -229,23 +230,6 @@ def update_custom_function():
         print("error: invalid session_token")
         return json.dumps({'error': 'invalid session_token'}), 404
     return json.dumps({'custom_function': custom_function}), 201
-
-@app.route('/custom_function/', methods=['GET'])
-def get_custom_function():
-    session_token = request.form['session_token']
-
-    if not session_token:
-        print("error: Missing session_token")
-        return json.dumps({'error': 'Missing session_token'}), 404
-
-    user = get_user_by_session_token(session_token)
-
-    if not user:
-        print("error: invalid session_token")
-        return json.dumps({'error': 'invalid session_token'}), 404
-    return json.dumps({'custom_function': user.custom_function}), 200
-
-
 
 if __name__ == "__main__":
     app.run()

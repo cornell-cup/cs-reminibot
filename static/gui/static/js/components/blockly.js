@@ -12,11 +12,12 @@ export default class MinibotBlockly extends React.Component {
     this.state = {
       blockly_filename: 'myXmlBlocklyCode.xml',
       data: "",
-      custom_blocks: [["hi","print"]],
+      custom_blocks: [],
       filename: "myPythonCode.py",
       pyblock: "",
       showPopup: false,
       login_email: "",
+      session_token: "",
       login_error_label: "",
       login_success_label: "",
       register_error_label: "",
@@ -98,12 +99,26 @@ export default class MinibotBlockly extends React.Component {
 
     Blockly.Blocks['custom_block'] = {
       init: function () {
-        this.jsonInit(miniblocks.custom_block);
+        this.jsonInit({
+          type: "custom_block",
+          message0: "function %1",
+          args0: [
+            {
+              "type": "field_dropdown",
+              "name": "function_content",
+              "options": _this.state.custom_blocks
+            }
+          ],
+          previousStatement: null,
+          nextStatement: null,
+          colour: 230,
+          tooltip: "",
+          helpUrl: ""
+        });
       }
     };
     Blockly.Python['custom_block'] = function (block) {
-      // TODO: Assemble Python into code variable.
-      return _this.state.pyblock;
+      return block.getFieldValue('function_content');
     };
   }
 
@@ -257,11 +272,13 @@ export default class MinibotBlockly extends React.Component {
       .then((response) => {
         this.setState({
           login_email: "",
+          session_token: "",
           login_success_label: "",
           login_error_label: "",
           register_success_label: "",
           register_error_label: "",
-          is_loggedin: false
+          is_loggedin: false,
+          custom_blocks: []
         });
         window.alert("logout suceesfully");
       })
@@ -337,9 +354,8 @@ export default class MinibotBlockly extends React.Component {
     })
       .then((response) => {
         this.setState({
-          login_email: formData.get("email"),
-          register_success_label: "Register suceess and you are logged in!",
-          register_error_label: "",
+          register_success_label: "Register suceess!",
+          register_error_label: ""
         });
       })
       .catch((error) => {
@@ -364,10 +380,13 @@ export default class MinibotBlockly extends React.Component {
       .then((response) => {
         this.setState({
           login_email: formData.get("email"),
+          session_token: response.data.session_token,
           login_success_label: "Login Suceess",
           login_error_label: "",
-          is_loggedin: true
+          is_loggedin: true,
+          custom_blocks: JSON.parse(response.data.custom_function)
         });
+        this.redefine_custom_blocks();
       })
       .catch((error) => {
         console.log("fail");
@@ -378,34 +397,32 @@ export default class MinibotBlockly extends React.Component {
         });
         console.log(error);
       });
-    Blockly.Blocks['custom_block'] = {
-      init: function () {
-        this.jsonInit({
-          type: "custom_block",
-          message0: "function %1",
-          args0: [
-            {
-              "type": "field_dropdown",
-              "name": "function_content",
-              "options": _this.state.custom_blocks
-            }
-          ],
-          previousStatement: null,
-          nextStatement: null,
-          colour: 230,
-          tooltip: "",
-          helpUrl: ""
-        });
-      }
-    };
-    Blockly.Python['custom_block'] = function (block) {
-      return block.getFieldValue('function_content');
-    };
+  }
+
+  update_custom_function() {
+    if (!this.state.is_loggedin) return;
+    var formData = new FormData();
+    formData.append("session_token",this.state.session_token);
+    formData.append("custom_function", JSON.stringify(this.state.custom_blocks));
+    axios({
+      method: 'post',
+      url: 'http://127.0.0.1:5000/custom_function/',
+      data: formData,
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+      .then((response) => {
+        console.log("Custom function update success")
+      })
+      .catch((error) => {
+        console.log("Custom function update error");
+        console.log(error);
+      });
   }
 
   async custom_block(event) {
     var _this = this;
     await this.scriptToCode();
+    console.log(_this.state.custom_blocks);
     var item = _this.state.custom_blocks.find(element => element[0] === _this.state.function_name)
     if (item == undefined) {
       _this.state.custom_blocks.push([_this.state.function_name,_this.state.data]);
@@ -414,14 +431,13 @@ export default class MinibotBlockly extends React.Component {
     }
     await this.setState({custom_blocks: _this.state.custom_blocks});
     this.redefine_custom_blocks();
+    this.update_custom_function();
   }
 
   render() {
     var blocklyStyle = { height: '67vh' };
     var marginStyle = { marginLeft: '10px' };
     var dataStyle = { align: 'right', margin: '75px 0 0 0' };
-    console.log("render");
-    console.log(this.state.login_email);
     return (
       <div id="blockyContainer" style={marginStyle} className="row">
         <div id="blockly" className="box" className="col-md-7">
