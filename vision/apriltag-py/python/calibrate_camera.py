@@ -25,7 +25,7 @@ def main_with_video():
     that would require changing documentation before an implementation
     has been built.
 
-    Once you've done that, the code will open a program that shows a 
+    Once you've done that, the code will open a program that shows a
     picture of the checkerboard and any calibration lines the
     computer vision library made. Press any key other than
     ESCAPE to continue the calibration process. It is recommended
@@ -73,13 +73,14 @@ def main_with_video():
     objp = np.zeros((args['rows'] * args['cols'], 3), np.float32)
     objp[:, :2] = np.mgrid[0:args['cols'],
                            0:args['rows']].T.reshape(-1, 2)
+
     WIN_SIZE = (11, 11)
     ZERO_ZONE = (-1, -1)
     # TODO TERM_CRITERIA_ITER used in C++, using MAX_ITER OK?
     TERM_CRITERIA = (TERM_CRITERIA_EPS +
-                     TERM_CRITERIA_MAX_ITER, 30, 0.1)
+                     TERM_CRITERIA_MAX_ITER, 30, 0.001)  # 0.1 --> 0.001
 
-    # Make sure each camera is accessible, and set it up if it is.
+   # Make sure each camera is accessible, and set it up if it is.
     for i in range(NUM_CAMERAS):
         camera = VideoCapture(i)
         img_points.insert(i, [])
@@ -97,7 +98,8 @@ def main_with_video():
             quit()
 
     # Make checkerboard points "Calibration variables"
-    checkerboard_size = (args['rows'], args['cols'])
+    # Official docs says checkerboard size should be (cols, rows)
+    checkerboard_size = (args['cols'], args['rows'])
     checkerboard_points = []
     for j in range(args['cols']):
         for i in range(args['rows']):
@@ -139,7 +141,7 @@ def main_with_video():
 
     # Show the image and prompts to user for confirmation
     print("Press any key other than ESCAPE to continue")
-    print("Press ESCAPE to abort calibration. If the camera can't see" +
+    print("Press ESCAPE to abort calibration. If the camera can't see " +
           "the entire board, you should press ESCAPE and try again.")
     for i in camera_ids:
         print("This is what camera " + str(i) + " sees.")
