@@ -119,6 +119,23 @@ def get_matrices_from_file(file_name):
     return (calib_file, camera_matrix, dist_coeffs)
 
 
+def get_offsets_from_file(file):
+    """
+    Gets the offsets from the calibration file.
+    Requires the file to already be open and reading at the start of
+    the offsets label.
+
+    # TODO document this in higher-level documentation
+
+    Args:
+        :file The already-open calibration file
+    """
+    temp_line = file.readline()
+    items = list(map(lambda x: float(x),
+                     temp_line[len("offsets = "):].split(" ")))
+    return (items[0], items[1])
+
+
 def undistort_image(frame, camera_matrix, dist_coeffs):
     """
     Un-distorts an image and crops the undistorted image back to the same size as

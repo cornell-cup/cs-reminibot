@@ -10,6 +10,10 @@ NUM_DETECTIONS = 4  # The number of tags to detect, usually 4
 
 
 def main():
+    # offsets to force (0,0) to the center of the axis calib board
+    x_offset = 0
+    y_offset = 0
+
     # Check if arguments are OK
     if len(sys.argv) != 2:
         print("Usage: {} <file name>".format(sys.argv[0]))
@@ -62,6 +66,13 @@ def main():
 
         d = detections[i]
         id = int(d.tag_id)
+
+        # Add to offsets
+        # TODO make sure this works
+        (ctr_x, ctr_y) = d.center
+        x_offset += ctr_x
+        y_offset += ctr_y
+
         # Draw onto the frame
         # TODO fix int/float bug
         """
@@ -122,6 +133,15 @@ def main():
     rows, cols = np.shape(camera_to_origin)
     calib_file.write("transform_matrix =")
     write_matrix_to_file(camera_to_origin, calib_file)
+
+    # Write offsets
+    # TODO make sure this works
+    calib_file.write("offsets = ")
+    calib_file.write(str(-1 * x_offset / 4.0))
+    calib_file.write(" ")
+    calib_file.write(str(-1 * y_offset / 4.0))
+    calib_file.write("\n")
+
     calib_file.close()
     print("Finished writing transformation matrix to calibration file")
     pass
