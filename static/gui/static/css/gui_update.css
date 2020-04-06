@@ -38,9 +38,22 @@
     padding-top: 15px;
 }
 
+.horizontalDiv div {
+    float: left;
+}
+
+.horizontalDiv {
+    clear: both;
+    padding-top: 10px;
+}
+
 .button-wrapper {
     padding-top: 10px;
     padding-bottom: 10px;
+}
+
+.element-wrapper {
+    padding-right: 10px;
 }
 
 .divider {
@@ -97,7 +110,7 @@ table {
     padding: 10px;
 }
 
-#data {
+#generatedPythonFromBlocklyBox {
     background: #000000;
     color: white;
     border: 1px solid gray;

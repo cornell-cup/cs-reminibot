@@ -50,9 +50,9 @@ def verify_credentials(email, password):
 
 
 def create_user(email, password):
-    optional_user = get_user_by_email(email)
+    already_exisiting_user = get_user_by_email(email)
 
-    if optional_user is not None:
+    if already_exisiting_user:
         return False, optional_user
 
     user = User(
@@ -166,6 +166,7 @@ def login():
         print("fail1")
         return json.dumps({'error': 'Invalid email or password'}), 404
 
+    print("Reached Here!")
     success, user = verify_credentials(email, password)
 
     if not success:
