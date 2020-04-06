@@ -12,11 +12,7 @@ export default class MinibotBlockly extends React.Component {
     this.state = {
       blockly_filename: 'myXmlBlocklyCode.xml',
       data: "",
-<<<<<<< HEAD
-      custom_blocks: [["hi", "print"]],
-=======
       custom_blocks: [],
->>>>>>> ffda1b091c8650aabc8330613514bcc0aacc8675
       filename: "myPythonCode.py",
       pyblock: "",
       showPopup: false,
