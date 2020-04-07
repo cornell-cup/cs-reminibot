@@ -552,21 +552,6 @@ export default class MinibotBlockly extends React.Component {
                 successLabel={this.state.loginSuccessLabel}
                 errorLabel={this.state.loginErrorLabel}
               />
-
-              <div id="loginModal" className="modal">
-                {/* <div className="modal_content"> */}
-                <span id="loginClose" className="close">&times;</span>
-                <p>Login Window</p>
-                <form id="loginForm" >
-                  <input type="text" placeholder="Email" name="email"  ></input>
-                  <input type="password" placeholder="Password" name="password" ></input>
-                  <input className="btn_btn-dir" type="button" value="Login" onClick={this.handleLogin}></input>
-                  <label style={{ color: 'green' }}> {this.state.loginSuccessLabel} </label>
-                  <br />
-                  <label style={{ color: 'red' }}> {this.state.loginErrorLabel} </label>
-                </form>
-              </div>
-              {/* </div> */}
             </div>
 
             <div>
