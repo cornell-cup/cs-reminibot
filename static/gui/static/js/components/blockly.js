@@ -12,7 +12,7 @@ export default class MinibotBlockly extends React.Component {
     this.state = {
       blockly_filename: 'myXmlBlocklyCode.xml',
       data: "",
-      custom_blocks: [["hi","print"]],
+      custom_blocks: [],
       filename: "myPythonCode.py",
       pyblock: "",
       showPopup: false,
@@ -21,7 +21,8 @@ export default class MinibotBlockly extends React.Component {
       login_success_label: "",
       register_error_label: "",
       register_success_label: "",
-      function_name: "default_function"
+      function_name: "default_function",
+      is_loggedin: false,
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -34,6 +35,7 @@ export default class MinibotBlockly extends React.Component {
     this.run_script = this.run_script.bind(this);
     this.view_history = this.view_history.bind(this);
     this.custom_block = this.custom_block.bind(this);
+    this.dblock = this.dblock.bind(this);
     this.copy = this.copy.bind(this);
     this.upload = this.upload.bind(this);
     this.login = this.login.bind(this);
@@ -41,7 +43,7 @@ export default class MinibotBlockly extends React.Component {
     this.handleLogin = this.handleLogin.bind(this);
     this.handleRegister = this.handleRegister.bind(this);
     this.logout = this.logout.bind(this);
-    this.redefine_custom_blocks = this.redefine_custom_blocks.bind(this)
+    this.redefine_custom_blocks = this.redefine_custom_blocks.bind(this);
   }
 
 
@@ -95,16 +97,6 @@ export default class MinibotBlockly extends React.Component {
       var xml = Blockly.Xml.textToDom(this.props.blockly_xml);
       Blockly.Xml.domToWorkspace(xml, _this.workspace);
     }
-
-    Blockly.Blocks['custom_block'] = {
-      init: function () {
-        this.jsonInit(miniblocks.custom_block);
-      }
-    };
-    Blockly.Python['custom_block'] = function (block) {
-      // TODO: Assemble Python into code variable.
-      return _this.state.pyblock;
-    };
   }
 
   /* Helper for realtime code generation (Blockly => Python)
@@ -286,6 +278,19 @@ export default class MinibotBlockly extends React.Component {
     this.setState({ data: data.innerText });
   }
 
+  async dblock(event) {
+    var _this = this;
+    await this.scriptToCode();
+    var item = _this.state.custom_blocks.find(element => element[0] === _this.state.function_name)
+    const index = _this.state.custom_blocks.indexOf(item);
+    if (index > -1) {
+      _this.state.custom_blocks.splice(index, 1);
+    }
+    await this.setState({custom_blocks: _this.state.custom_blocks});
+    this.redefine_custom_blocks();
+    
+  }
+
   loadFileAsBlocks(event) {
     var xmlToLoad = document.getElementById('blockUpload').files[0];
     var xmlReader = new FileReader();
@@ -300,7 +305,7 @@ export default class MinibotBlockly extends React.Component {
     xmlReader.readAsText(xmlToLoad, 'UTF-8');
   }
 
-  redefine_custom_blocks() {
+  async redefine_custom_blocks() {
     var _this = this;
     Blockly.Blocks['custom_block'] = {
       init: function () {
@@ -322,8 +327,10 @@ export default class MinibotBlockly extends React.Component {
         });
       }
     };
+    await this.scriptToCode();
     Blockly.Python['custom_block'] = function (block) {
       return block.getFieldValue('function_content');
+      return _this.state.data;
     };
   }
 
@@ -419,7 +426,8 @@ export default class MinibotBlockly extends React.Component {
   render() {
     var blocklyStyle = { height: '67vh' };
     var marginStyle = { marginLeft: '10px' };
-    var dataStyle = { align: 'right', margin: '75px 0 0 0' };
+    var dataStyle = { align: 'right', margin: '137px 0 0 0' };
+    var buttond = { margin: '5px 0 0 0' };
     console.log("render");
     console.log(this.state.login_email);
     return (
@@ -510,8 +518,9 @@ export default class MinibotBlockly extends React.Component {
         value={this.state.function_name}
         onChange={this.handleFunctionNameChange}
       />&nbsp;&nbsp;
-      <button id="CBlock" onClick={this.custom_block}>Update Custom Function</button>&nbsp;&nbsp;
-      <br />
+      <button id="CBlock" onClick={this.custom_block}>Create Custom Function</button>&nbsp;&nbsp;
+      <button id="CBlock" onClick={this.dblock}>Delete Custom Function</button>&nbsp;&nbsp;
+      <div style={buttond}></div>
       Python File Name:
       <input
         type="text"
@@ -519,12 +528,14 @@ export default class MinibotBlockly extends React.Component {
         value={this.state.filename}
         onChange={this.handleFileNameChange}
         />&nbsp;&nbsp;
-        <br />
+      <br />
+      <div style={buttond}></div>
       <button id="submit" onClick={this.download_python}>Download</button>&nbsp;&nbsp;
       <button id="run" onClick={this.run_script}>Run</button>&nbsp;&nbsp;
       <button id="history" onClick={this.view_history}>View History</button>&nbsp;&nbsp;
       <button id="copy" onClick={this.copy}>Copy Code From Blockly</button>
-            <br />
+      <br />
+      <div style={buttond}></div>
             <form>
               <input
                 type="file"
