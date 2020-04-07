@@ -27,6 +27,30 @@ function LabeledTextBox(props) {
   );
 }
 
+function UserAccountModal(props) {
+  const s = props.modalType;
+  const modalId = s + "Modal";
+  const formId = s + "Form";
+  const closeId = s + "Close";
+  // Make first letter of s uppercase 
+  const sUpperCased = s.charAt(0).toUpperCase() + s.slice(1) 
+  const title = sUpperCased + " Window";
+  return (
+    <div id={modalId} className="modal">
+      <span id={closeId} className="close">&times;</span>
+      <p>{title}</p>
+      <form id={formId}>
+        <input type="text" placeholder="Email" name="email" ></input>
+        <input type="password" placeholder="Password" name="password" ></input>
+        <input className="btn_btn-dir" type="button" value={sUpperCased} onClick={props.handleEvent}></input>
+        <label style={{ color: 'green' }}> {props.successLabel} </label>
+        <br />
+        <label style={{ color: 'red' }}> {props.errorLabel} </label>
+      </form>
+    </div>
+  )
+}
+
 //////////////////////////////////////////////////
 // PYTHON CODING TEXT BOX AND BUTTONS COMPONENT
 //////////////////////////////////////////////////
@@ -253,10 +277,10 @@ export default class MinibotBlockly extends React.Component {
       login_email: "",
       isLoggedIn: false,
       sessionToken: "",
-      login_error_label: "",
-      login_success_label: "",
-      register_error_label: "",
-      register_success_label: "",
+      loginErrorLabel: "",
+      loginSuccessLabel: "",
+      registerErrorLabel: "",
+      registerSuccessLabel: "",
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -422,8 +446,8 @@ export default class MinibotBlockly extends React.Component {
   }
 
   login(event) {
-    const modal = document.querySelector(".modal")
-    const closeBtn = document.querySelector(".close")
+    const modal = document.getElementById("loginModal")
+    const closeBtn = document.getElementById("loginClose")
     modal.style.display = "block";
     closeBtn.addEventListener("click", () => {
       modal.style.display = "none";
@@ -439,14 +463,13 @@ export default class MinibotBlockly extends React.Component {
         this.setState({
           login_email: "",
           sessionToken: "",
-          login_success_label: "",
-          login_error_label: "",
-          register_success_label: "",
-          register_error_label: "",
+          loginSuccessLabel: "",
+          loginErrorLabel: "",
+          registerSuccessLabel: "",
+          registerErrorLabel: "",
           isLoggedIn: false,
-          custom_blocks: []
         });
-        window.alert("logout suceesfully");
+        window.alert("Logout successful!");
       })
       .catch((err) => {
         window.alert("why is there an error");
@@ -454,8 +477,8 @@ export default class MinibotBlockly extends React.Component {
   }
 
   register(event) {
-    const register_modal = document.querySelector(".register_modal")
-    const closeBtn = document.querySelector(".register_close")
+    const register_modal = document.getElementById("registerModal")
+    const closeBtn = document.getElementById("registerClose")
     register_modal.style.display = "block";
     closeBtn.addEventListener("click", () => {
       register_modal.style.display = "none";
@@ -479,7 +502,7 @@ export default class MinibotBlockly extends React.Component {
 
 
   handleRegister(event) {
-    var formData = new FormData(document.getElementById("registerform"));
+    var formData = new FormData(document.getElementById("registerForm"));
     axios({
       method: 'post',
       url: 'http://127.0.0.1:5000/register/',
@@ -488,23 +511,23 @@ export default class MinibotBlockly extends React.Component {
     })
       .then((response) => {
         this.setState({
-          register_success_label: "Register suceess!",
-          register_error_label: ""
+          registerSuccessLabel: "Registered successfully!",
+          registerErrorLabel: ""
         });
       })
       .catch((error) => {
         console.log("fail");
         this.setState({
           login_email: "",
-          register_success_label: "",
-          register_error_label: "Account already exist or empty input"
+          registerSuccessLabel: "",
+          registerErrorLabel: "Account already exist or empty input"
         });
         console.log(error);
       });
   }
 
   handleLogin(event) {
-    var formData = new FormData(document.getElementById("loginform"));
+    var formData = new FormData(document.getElementById("loginForm"));
     axios({
       method: 'post',
       url: 'http://127.0.0.1:5000/login/',
@@ -515,8 +538,8 @@ export default class MinibotBlockly extends React.Component {
         this.setState({
           login_email: formData.get("email"),
           sessionToken: response.data.session_token,
-          login_success_label: "Login Suceess",
-          login_error_label: "",
+          loginSuccessLabel: "Login Suceess",
+          loginErrorLabel: "",
           isLoggedIn: true,
           custom_blocks: JSON.parse(response.data.custom_function)
         });
@@ -526,8 +549,8 @@ export default class MinibotBlockly extends React.Component {
         console.log("fail");
         this.setState({
           login_email: "",
-          login_success_label: "",
-          login_error_label: "Incorrect password or acount doesn't exist or empty input"
+          loginSuccessLabel: "",
+          loginErrorLabel: "Incorrect password or acount doesn't exist or empty input"
         });
         console.log(error);
       });
@@ -546,32 +569,31 @@ export default class MinibotBlockly extends React.Component {
               {!this.state.isLoggedIn ? <button id="register" onClick={this.register}>Register</button> : null}
               {!this.state.isLoggedIn ? <button id="login" onClick={this.login}>Login</button> : null}
               {this.state.isLoggedIn ? <button id="logout" onClick={this.logout}>Logout</button> : null}
-              <div className="register_modal">
-                {/* <div className="modal_content"> */}
-                <span className="register_close">&times;</span>
-                <p>Register Window</p>
-                <form id="registerform">
-                  <input type="text" placeholder="Email" name="email" ></input>
-                  <input type="password" placeholder="Password" name="password" ></input>
-                  <input className="btn_btn-dir" type="button" value="Register" onClick={this.handleRegister}></input>
-                  <label style={{ color: 'green' }}> {this.state.register_success_label} </label>
-                  <br />
-                  <label style={{ color: 'red' }}> {this.state.register_error_label} </label>
-                </form>
-                {/* </div> */}
-              </div>
+              <UserAccountModal
+                modalType="register"
+                handleEvent={this.handleRegister}
+                successLabel={this.state.registerSuccessLabel}
+                errorLabel={this.state.registerErrorLabel}
+              />
 
-              <div className="modal">
+              <UserAccountModal
+                modalType="login"
+                handleEvent={this.handleLogin}
+                successLabel={this.state.loginSuccessLabel}
+                errorLabel={this.state.loginErrorLabel}
+              />
+
+              <div id="loginModal" className="modal">
                 {/* <div className="modal_content"> */}
-                <span className="close">&times;</span>
+                <span id="loginClose" className="close">&times;</span>
                 <p>Login Window</p>
-                <form id="loginform" >
+                <form id="loginForm" >
                   <input type="text" placeholder="Email" name="email"  ></input>
                   <input type="password" placeholder="Password" name="password" ></input>
                   <input className="btn_btn-dir" type="button" value="Login" onClick={this.handleLogin}></input>
-                  <label style={{ color: 'green' }}> {this.state.login_success_label} </label>
+                  <label style={{ color: 'green' }}> {this.state.loginSuccessLabel} </label>
                   <br />
-                  <label style={{ color: 'red' }}> {this.state.login_error_label} </label>
+                  <label style={{ color: 'red' }}> {this.state.loginErrorLabel} </label>
                 </form>
               </div>
               {/* </div> */}

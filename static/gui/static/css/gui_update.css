@@ -324,20 +324,6 @@ h1 {
     /* background-color: rgba(0, 0, 0, 0.25); */
 }
 
-.register_modal {
-    background-color: white;
-    display: none;
-    position: fixed;
-    top: 45%;
-    left: 45%;
-    width: 400px;
-    max-width: 100%;
-    height: 200px;
-    max-height: 100%;
-    z-index: 1;
-    /* background-color: rgba(0, 0, 0, 0.25); */
-}
-
 .modal_content {
     background-color: white;
     position: absolute;
