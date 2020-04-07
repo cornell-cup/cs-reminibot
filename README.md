@@ -56,7 +56,7 @@ sudo npm install npm@latest -g
 
 #### Git installation:
 1. Go to https://gitforwindows.org/ and click Download.
-2. Run the installer that downloads (the .exe file) and install Git. 
+2. Run the installer that downloads (the .exe file) and install Git.  You can leave all options as their defaults.
 
 #### Python3 and Pip3 installation:
 1. Go to https://www.python.org/downloads/ and press "Download Python <version_number>"
