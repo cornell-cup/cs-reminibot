@@ -34,45 +34,25 @@ class PythonTextBox extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      custom_blocks: [],
       pythonTextBoxCode: "",
       filename: "myPythonCode.py",
       function_name: "default_function",
     }
 
     this.copy = this.copy.bind(this);
-    this.custom_block = this.custom_block.bind(this);
     this.download_python = this.download_python.bind(this);
     this.handleFileNameChange = this.handleFileNameChange.bind(this);
     this.handleFunctionNameChange = this.handleFunctionNameChange.bind(this);
     this.handleScriptChange = this.handleScriptChange.bind(this);
-    this.redefine_custom_blocks = this.redefine_custom_blocks.bind(this)
     this.run_script = this.run_script.bind(this);
     this.upload = this.upload.bind(this);
     this.view_history = this.view_history.bind(this);
-    
-    this.redefine_custom_blocks();
   }
   /* Target function for the button "Cope Code". Set the text
      in the editing box according to blockly. */
   copy(event) {
     document.getElementById("textarea").value = generatedPythonFromBlocklyBox.innerText;
     this.setState({ pythonTextBoxCode: generatedPythonFromBlocklyBox.innerText });
-  }
-
-  async custom_block(event) {
-    var _this = this;
-    await this.props.scriptToCode();
-    console.log(_this.state.custom_blocks);
-    var item = _this.state.custom_blocks.find(element => element[0] === _this.state.function_name)
-    if (item == undefined) {
-      _this.state.custom_blocks.push([_this.state.function_name, _this.state.pythonTextBoxCode]);
-    } else {
-      item[1] = _this.state.pythonTextBoxCode;
-    }
-    await this.setState({ custom_blocks: _this.state.custom_blocks });
-    this.redefine_custom_blocks();
-    this.update_custom_function();
   }
 
   download_python(event) {
@@ -104,54 +84,6 @@ class PythonTextBox extends React.Component {
      Update this.state with the current text. */
   handleScriptChange(event) {
     this.setState({ pythonTextBoxCode: event.target.value });
-  }
-
-  redefine_custom_blocks() {
-    var _this = this;
-    Blockly.Blocks['custom_block'] = {
-      init: function () {
-        this.jsonInit({
-          type: "custom_block",
-          message0: "function %1",
-          args0: [
-            {
-              "type": "field_dropdown",
-              "name": "function_content",
-              "options": _this.state.custom_blocks
-            }
-          ],
-          previousStatement: null,
-          nextStatement: null,
-          colour: 230,
-          tooltip: "",
-          helpUrl: ""
-        });
-      }
-    };
-    Blockly.Python['custom_block'] = function (block) {
-      return block.getFieldValue('function_content');
-    };
-  }
-
-
-  update_custom_function() {
-    if (!this.props.getLoginStatus()) return;
-    var formData = new FormData();
-    formData.append("session_token", this.props.getSessionToken());
-    formData.append("custom_function", JSON.stringify(this.state.custom_blocks));
-    axios({
-      method: 'post',
-      url: 'http://127.0.0.1:5000/custom_function/',
-      data: formData,
-      headers: { 'Content-Type': 'multipart/form-data' }
-    })
-      .then((response) => {
-        console.log("Custom function update success")
-      })
-      .catch((error) => {
-        console.log("Custom function update error");
-        console.log(error);
-      });
   }
 
   upload(event) {
@@ -197,23 +129,27 @@ class PythonTextBox extends React.Component {
       <div id="Python">
         <p id="title"> <b>Python </b> </p>
         {/* Python  */}
-        <div> <textarea id="textarea" rows="10" cols="98" onChange={this.handleScriptChange} /> 
+        <div> <textarea id="textarea" rows="10" cols="98" onChange={this.handleScriptChange} />
         </div>
         {/* Custom blockly button and textbox */}
         <div id="UpdateCustomFunction" className="horizontalDiv">
-          <Button id={"CBlock"} onClick={() => this.custom_block()} name={"Update Custom Function"} />
-          <LabeledTextBox 
+          <Button
+            id={"CBlock"}
+            onClick={() => this.props.custom_block(this.state.function_name, this.state.pythonTextBoxCode)}
+            name={"Update Custom Function"}
+          />
+          <LabeledTextBox
             type={"text"}
-            name={"function_name"} 
+            name={"function_name"}
             placeholder={"default_function"}
             onChange={(event) => this.handleFunctionNameChange(event)}
           />
         </div>
         <div id="PythonDownload" className="horizontalDiv">
           <Button id={"download_python"} onClick={this.download_python} name={"Download"} />
-          <LabeledTextBox 
+          <LabeledTextBox
             type={"text"}
-            name={"filename"} 
+            name={"filename"}
             placeholder={"FileName.py"}
             onChange={(event) => this.handleFileNameChange(event)}
           />
@@ -234,19 +170,20 @@ class PythonTextBox extends React.Component {
             />
           </form>
         </div>
-      </div> 
+      </div>
     );
   }
 }
 
 //////////////////////////////////////////
 // BLOCKLY TAB PARENT COMPONENT
-////////////////////////////////////////// 
+//////////////////////////////////////////
 export default class MinibotBlockly extends React.Component {
   constructor(props) {
     super(props);
     this.scriptToCode = this.scriptToCode.bind(this);
     this.state = {
+      custom_blocks: [],
       blockly_filename: 'myXmlBlocklyCode.xml',
       pyblock: "",
       showPopup: false,
@@ -267,16 +204,73 @@ export default class MinibotBlockly extends React.Component {
     this.handleLogin = this.handleLogin.bind(this);
     this.handleRegister = this.handleRegister.bind(this);
     this.logout = this.logout.bind(this);
-    this.getLoginStatus = this.getLoginStatus.bind(this);
-    this.getSessionToken = this.getSessionToken.bind(this);
+    this.redefine_custom_blocks = this.redefine_custom_blocks.bind(this)
+    this.update_custom_blocks = this.update_custom_blocks.bind(this)
+    this.custom_block = this.custom_block.bind(this)
+
+    this.redefine_custom_blocks();
   }
 
-  getLoginStatus() {
-    return this.state.isLoggedIn;
+  update_custom_blocks() {
+    if (!this.state.isLoggedIn) return;
+    var formData = new FormData();
+    formData.append("session_token", this.state.sessionToken);
+    formData.append("custom_function", JSON.stringify(this.state.custom_blocks));
+    axios({
+      method: 'post',
+      url: 'http://127.0.0.1:5000/custom_function/',
+      data: formData,
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+      .then((response) => {
+        console.log("Custom function update success")
+      })
+      .catch((error) => {
+        console.log("Custom function update error");
+        console.log(error);
+      });
   }
 
-  getSessionToken() {
-    return this.state.sessionToken;
+  redefine_custom_blocks() {
+    var _this = this;
+    Blockly.Blocks['custom_block'] = {
+      init: function () {
+        this.jsonInit({
+          type: "custom_block",
+          message0: "function %1",
+          args0: [
+            {
+              "type": "field_dropdown",
+              "name": "function_content",
+              "options": _this.state.custom_blocks
+            }
+          ],
+          previousStatement: null,
+          nextStatement: null,
+          colour: 230,
+          tooltip: "",
+          helpUrl: ""
+        });
+      }
+    };
+    Blockly.Python['custom_block'] = function (block) {
+      return block.getFieldValue('function_content');
+    };
+  }
+
+  async custom_block(function_name, pythonTextBoxCode) {
+    var _this = this;
+    await this.scriptToCode();
+    console.log(_this.state.custom_blocks);
+    var item = _this.state.custom_blocks.find(element => element[0] === function_name)
+    if (item == undefined) {
+      _this.state.custom_blocks.push([function_name, pythonTextBoxCode]);
+    } else {
+      item[1] = pythonTextBoxCode;
+    }
+    await this.setState({ custom_blocks: _this.state.custom_blocks });
+    this.redefine_custom_blocks();
+    this.update_custom_blocks();
   }
 
   /* handles input change for file name and coding textboxes */
@@ -316,30 +310,6 @@ export default class MinibotBlockly extends React.Component {
       var xml = Blockly.Xml.textToDom(this.props.blockly_xml);
       Blockly.Xml.domToWorkspace(xml, _this.workspace);
     }
-
-    Blockly.Blocks['custom_block'] = {
-      init: function () {
-        this.jsonInit({
-          type: "custom_block",
-          message0: "function %1",
-          args0: [
-            {
-              "type": "field_dropdown",
-              "name": "function_content",
-              "options": _this.state.custom_blocks
-            }
-          ],
-          previousStatement: null,
-          nextStatement: null,
-          colour: 230,
-          tooltip: "",
-          helpUrl: ""
-        });
-      }
-    };
-    Blockly.Python['custom_block'] = function (block) {
-      return block.getFieldValue('function_content');
-    };
   }
 
   /* Helper for realtime code generation (Blockly => Python)
@@ -352,7 +322,7 @@ export default class MinibotBlockly extends React.Component {
     this.props.setBlockly(xml_text);
 
     var code = window.Blockly.Python.workspaceToCode(this.workspace);
-    /* Fix spacing in the Python Code box */ 
+    /* Fix spacing in the Python Code box */
     code = code.replace(/\n/g, '<br>');
     code = code.replace(/ /g, '&nbsp;');
     document.getElementById('generatedPythonFromBlocklyBox').innerHTML = code;
@@ -613,11 +583,9 @@ export default class MinibotBlockly extends React.Component {
             />
           </form>
           <br />
-          <PythonTextBox 
+          <PythonTextBox
             botName={this.props.bot_name}
-            getLoginStatus={this.getLoginStatus} 
-            getSessionToken={this.getSessionToken}
-            scriptToCode={this.scriptToCode}
+            custom_block={this.custom_block}
           />
         </div>
         <div id="generatedPythonFromBlocklyBox" style={dataStyle} className="col-md-5"></div>
