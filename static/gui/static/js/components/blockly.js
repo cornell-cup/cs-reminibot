@@ -156,6 +156,7 @@ class PythonTextBox extends React.Component {
         <div> <textarea id="textarea" rows="10" cols="98" onChange={this.handleScriptChange} />
         </div>
         {/* Custom blockly button and textbox */}
+        <button id="CBlock" onClick={this.props.dblock}>Delete Custom Function</button>&nbsp;&nbsp;
         <div id="UpdateCustomFunction" className="horizontalDiv">
           <Button
             id={"CBlock"}
@@ -223,6 +224,7 @@ export default class MinibotBlockly extends React.Component {
     this.handleInputChange = this.handleInputChange.bind(this);
     this.download = this.download.bind(this);
     this.run_blockly = this.run_blockly.bind(this);
+    this.dblock = this.dblock.bind(this);
     this.login = this.login.bind(this);
     this.register = this.register.bind(this);
     this.handleLogin = this.handleLogin.bind(this);
@@ -456,6 +458,19 @@ export default class MinibotBlockly extends React.Component {
   }
 
 
+  async dblock(event) {
+    var _this = this;
+    await this.scriptToCode();
+    var item = _this.state.custom_blocks.find(element => element[0] === _this.state.function_name)
+    const index = _this.state.custom_blocks.indexOf(item);
+    if (index > -1) {
+      _this.state.custom_blocks.splice(index, 1);
+    }
+    await this.setState({custom_blocks: _this.state.custom_blocks});
+    this.redefine_custom_blocks();
+    
+  }
+
   loadFileAsBlocks(event) {
     var xmlToLoad = document.getElementById('blockUpload').files[0];
     var xmlReader = new FileReader();
@@ -469,7 +484,6 @@ export default class MinibotBlockly extends React.Component {
 
     xmlReader.readAsText(xmlToLoad, 'UTF-8');
   }
-
 
   handleRegister(event) {
     var formData = new FormData(document.getElementById("registerForm"));
@@ -530,7 +544,8 @@ export default class MinibotBlockly extends React.Component {
   render() {
     var blocklyStyle = { height: '67vh' };
     var marginStyle = { marginLeft: '10px' };
-    var dataStyle = { align: 'right', margin: '75px 0 0 0' };
+    var dataStyle = { align: 'right', margin: '137px 0 0 0' };
+    var buttond = { margin: '5px 0 0 0' };
     return (
       <div id="blockyContainer" style={marginStyle} className="row">
         <div id="blockly" className="box" className="col-md-7">
@@ -593,6 +608,7 @@ export default class MinibotBlockly extends React.Component {
           <PythonTextBox
             botName={this.props.bot_name}
             custom_block={this.custom_block}
+            delete_block={this.dblock}
           />
         </div>
         <div id="generatedPythonFromBlocklyBox" style={dataStyle} className="col-md-5"></div>
