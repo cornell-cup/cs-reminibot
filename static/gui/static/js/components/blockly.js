@@ -508,7 +508,7 @@ export default class MinibotBlockly extends React.Component {
         this.setState({
           login_email: formData.get("email"),
           sessionToken: response.data.session_token,
-          loginSuccessLabel: "Login Suceess",
+          loginSuccessLabel: "Login Success",
           loginErrorLabel: "",
           isLoggedIn: true,
           custom_blocks: JSON.parse(response.data.custom_function)
