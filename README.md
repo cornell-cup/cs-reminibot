@@ -60,12 +60,13 @@ sudo npm install npm@latest -g
 
 #### Python3 and Pip3 installation:
 1. Go to https://www.python.org/downloads/ and press "Download Python <version_number>"
-2. Open the installer that downloads (the .exe file) and select the checkbox that says "Add Python 3.8 to PATH"
+2. Open the installer that downloads (the .exe file) and **select the checkbox that says "Add Python 3.8 to PATH"**
 3. Click the "Install Now" button
 
 #### Node.js and npm installation:
 1. Download node.js by visiting https://nodejs.org/en/download/, and clicking the download button for the Windows Installer (.msi) version, for your computer.  Your computer is most likely 64-bit, but you can look up online to confirm.  
-2. Run the installer that downloads, and keep pressing "Next" without changing any default options.  However, in the **Tools for Native Modules section**, make sure to select the checkbox for *"Automatically install the necessary tools....."*.  Press Install and let the installer run.  A new script will pop up to install additional tools.  Press any key to continue, and allow Powershell to install the additional tools automatically.  
+2. Run the installer that downloads, and keep pressing "Next" without changing any default options.  
+**However, in the *Tools for Native Modules section*, make sure to select the checkbox for *"Automatically install the necessary tools....."*.**  Press Install and let the installer run.  A new script will pop up to install additional tools.  Press any key to continue, and allow Powershell to install the additional tools automatically.  
 
 #### Bash in Powershell installation
 1. Click the Start Button
