@@ -212,7 +212,7 @@ export default class MinibotBlockly extends React.Component {
     super(props);
     this.scriptToCode = this.scriptToCode.bind(this);
     this.state = {
-      custom_blocks: [],
+      customBlockList: [],
       blockly_filename: 'myXmlBlocklyCode.xml',
       pyblock: "",
       showPopup: false,
@@ -241,11 +241,31 @@ export default class MinibotBlockly extends React.Component {
     this.redefine_custom_blocks();
   }
 
+  /* Populated the customBlocklyList with a default function if addOrDelete == true
+     Deletes default function from customBlocklyList if addOrDelete == false */
+  manageDefaultCustomBlocklyFunction(addOrDelete) {
+    const defaultFunction = ["none", "# Please create custom function"];
+    if (addOrDelete) {
+      if (this.state.customBlockList.length == 0) {
+        this.state.customBlockList.push(defaultFunction);
+      }
+    // default function can only exist if only one element in array
+    } else if (this.state.customBlockList.length == 1) {
+      const eqCheck = (
+        item => item[0] === defaultFunction[0] && item[1] === defaultFunction[1]
+      );
+      if (this.state.customBlockList.some(eqCheck)) {
+        // delete first element
+        this.state.customBlockList.shift();
+      }
+    }
+  }
+
   update_custom_blocks() {
     if (!this.state.isLoggedIn) return;
     var formData = new FormData();
     formData.append("session_token", this.state.sessionToken);
-    formData.append("custom_function", JSON.stringify(this.state.custom_blocks));
+    formData.append("custom_function", JSON.stringify(this.state.customBlocksList));
     axios({
       method: 'post',
       url: 'http://127.0.0.1:5000/custom_function/',
@@ -263,6 +283,8 @@ export default class MinibotBlockly extends React.Component {
 
   redefine_custom_blocks() {
     var _this = this;
+    this.manageDefaultCustomBlocklyFunction(true);
+
     Blockly.Blocks['custom_block'] = {
       init: function () {
         this.jsonInit({
@@ -272,7 +294,7 @@ export default class MinibotBlockly extends React.Component {
             {
               "type": "field_dropdown",
               "name": "function_content",
-              "options": _this.state.custom_blocks
+              "options": _this.state.customBlockList,
             }
           ],
           previousStatement: null,
@@ -289,16 +311,16 @@ export default class MinibotBlockly extends React.Component {
   }
 
   async custom_block(function_name, pythonTextBoxCode) {
+    this.manageDefaultCustomBlocklyFunction(false);
     var _this = this;
     await this.scriptToCode();
-    console.log(_this.state.custom_blocks);
-    var item = _this.state.custom_blocks.find(element => element[0] === function_name)
+    var item = _this.y
     if (item == undefined) {
-      _this.state.custom_blocks.push([function_name, pythonTextBoxCode]);
+      _this.state.customBlockList.push([function_name, pythonTextBoxCode]);
     } else {
       item[1] = pythonTextBoxCode;
     }
-    await this.setState({ custom_blocks: _this.state.custom_blocks });
+    await this.setState({ customBlockList: _this.state.customBlockList});
     this.redefine_custom_blocks();
     this.update_custom_blocks();
   }
@@ -306,12 +328,12 @@ export default class MinibotBlockly extends React.Component {
   async dblock(function_name) {
     var _this = this;
     await this.scriptToCode();
-    var item = _this.state.custom_blocks.find(element => element[0] === function_name)
-    const index = _this.state.custom_blocks.indexOf(item);
+    var item = _this.state.customBlockList.find(element => element[0] === function_name)
+    const index = _this.state.customBlockList.indexOf(item);
     if (index > -1) {
-      _this.state.custom_blocks.splice(index, 1);
+      _this.state.customBlockList.splice(index, 1);
     }
-    await this.setState({custom_blocks: _this.state.custom_blocks});
+    await this.setState({ customBlockList: _this.state.customBlockList});
     this.redefine_custom_blocks();
     this.update_custom_blocks();
     
@@ -529,7 +551,7 @@ export default class MinibotBlockly extends React.Component {
           loginSuccessLabel: "Login Success",
           loginErrorLabel: "",
           isLoggedIn: true,
-          custom_blocks: JSON.parse(response.data.custom_function)
+          customBlockList: JSON.parse(response.data.custom_function)
         });
         this.redefine_custom_blocks();
       })
