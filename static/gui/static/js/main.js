@@ -4,8 +4,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import GridView from './components/gridview.js';
-import ControlTab from './components/ControlTab';
-import AddBot from './components/AddBot';
+import Blockly from './components/blockly.js';
+import AddBot from './components/AddBot.js';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 
 /**
@@ -30,6 +30,7 @@ class Platform extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      customBlockList: [],
       bot_name: '',
       blockly_xml: null,
       bot_list: [],
@@ -63,6 +64,8 @@ class Platform extends React.Component {
   }
 
   render() {
+    console.log("Hello");
+    console.log(this.state.customBlocksList);
     return (
       <div id="platform">
         <Tabs>
@@ -82,11 +85,11 @@ class Platform extends React.Component {
             />
           </TabPanel>
           <TabPanel>
-            <ControlTab
-              updateBotName={this.updateBotName}
-              bot_name={this.state.bot_name}
+            <Blockly
               blockly_xml={this.state.blockly_xml}
               setBlockly={this.setBlockly}
+              bot_name={this.state.bot_name}
+              customBlockList={this.state.customBlockList}
             />
           </TabPanel>
         </Tabs>

@@ -210,9 +210,15 @@ class PythonTextBox extends React.Component {
 export default class MinibotBlockly extends React.Component {
   constructor(props) {
     super(props);
+    console.log("Hello2");
+    console.log(this.props.customBlockList);
+
     this.scriptToCode = this.scriptToCode.bind(this);
+    
+    console.log("Hello25");
+    console.log(this.props.customBlockList);
+
     this.state = {
-      customBlockList: [],
       blockly_filename: 'myXmlBlocklyCode.xml',
       pyblock: "",
       showPopup: false,
@@ -237,7 +243,10 @@ export default class MinibotBlockly extends React.Component {
     this.redefine_custom_blocks = this.redefine_custom_blocks.bind(this)
     this.update_custom_blocks = this.update_custom_blocks.bind(this)
     this.custom_block = this.custom_block.bind(this)
+    this.manageDefaultCustomBlocklyFunction = this.manageDefaultCustomBlocklyFunction.bind(this)
 
+    console.log("Hello3");
+    console.log(this.props.customBlockList);
     this.redefine_custom_blocks();
   }
 
@@ -246,17 +255,17 @@ export default class MinibotBlockly extends React.Component {
   manageDefaultCustomBlocklyFunction(addOrDelete) {
     const defaultFunction = ["none", "# Please create custom function"];
     if (addOrDelete) {
-      if (this.state.customBlockList.length == 0) {
-        this.state.customBlockList.push(defaultFunction);
+      if (this.props.customBlockList.length == 0) {
+        this.props.customBlockList.push(defaultFunction);
       }
     // default function can only exist if only one element in array
-    } else if (this.state.customBlockList.length == 1) {
+    } else if (this.props.customBlockList.length == 1) {
       const eqCheck = (
         item => item[0] === defaultFunction[0] && item[1] === defaultFunction[1]
       );
-      if (this.state.customBlockList.some(eqCheck)) {
+      if (this.props.customBlockList.some(eqCheck)) {
         // delete first element
-        this.state.customBlockList.shift();
+        this.props.customBlockList.shift();
       }
     }
   }
@@ -265,7 +274,7 @@ export default class MinibotBlockly extends React.Component {
     if (!this.state.isLoggedIn) return;
     var formData = new FormData();
     formData.append("session_token", this.state.sessionToken);
-    formData.append("custom_function", JSON.stringify(this.state.customBlocksList));
+    formData.append("custom_function", JSON.stringify(this.props.customBlocksList));
     axios({
       method: 'post',
       url: 'http://127.0.0.1:5000/custom_function/',
@@ -282,6 +291,8 @@ export default class MinibotBlockly extends React.Component {
   }
 
   redefine_custom_blocks() {
+    console.log("Hello2");
+    console.log(this.props.customBlockList);
     var _this = this;
     this.manageDefaultCustomBlocklyFunction(true);
 
@@ -294,7 +305,7 @@ export default class MinibotBlockly extends React.Component {
             {
               "type": "field_dropdown",
               "name": "function_content",
-              "options": _this.state.customBlockList,
+              "options": _this.props.customBlockList,
             }
           ],
           previousStatement: null,
@@ -316,11 +327,11 @@ export default class MinibotBlockly extends React.Component {
     await this.scriptToCode();
     var item = _this.y
     if (item == undefined) {
-      _this.state.customBlockList.push([function_name, pythonTextBoxCode]);
+      _this.props.customBlockList.push([function_name, pythonTextBoxCode]);
     } else {
       item[1] = pythonTextBoxCode;
     }
-    await this.setState({ customBlockList: _this.state.customBlockList});
+    await this.setState({ customBlockList: _this.props.customBlockList});
     this.redefine_custom_blocks();
     this.update_custom_blocks();
   }
@@ -328,12 +339,12 @@ export default class MinibotBlockly extends React.Component {
   async dblock(function_name) {
     var _this = this;
     await this.scriptToCode();
-    var item = _this.state.customBlockList.find(element => element[0] === function_name)
-    const index = _this.state.customBlockList.indexOf(item);
+    var item = _this.props.customBlockList.find(element => element[0] === function_name)
+    const index = _this.props.customBlockList.indexOf(item);
     if (index > -1) {
-      _this.state.customBlockList.splice(index, 1);
+      _this.props.customBlockList.splice(index, 1);
     }
-    await this.setState({ customBlockList: _this.state.customBlockList});
+    await this.setState({ customBlockList: _this.props.customBlockList});
     this.redefine_custom_blocks();
     this.update_custom_blocks();
     
