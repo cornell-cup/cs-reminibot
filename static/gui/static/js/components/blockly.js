@@ -32,8 +32,8 @@ function UserAccountModal(props) {
   const modalId = s + "Modal";
   const formId = s + "Form";
   const closeId = s + "Close";
-  // Make first letter of s uppercase 
-  const sUpperCased = s.charAt(0).toUpperCase() + s.slice(1) 
+  // Make first letter of s uppercase
+  const sUpperCased = s.charAt(0).toUpperCase() + s.slice(1)
   const title = sUpperCased + " Window";
   return (
     <div id={modalId} className="modal">
@@ -214,7 +214,7 @@ export default class MinibotBlockly extends React.Component {
     console.log(this.props.customBlockList);
 
     this.scriptToCode = this.scriptToCode.bind(this);
-    
+
     console.log("Hello25");
     console.log(this.props.customBlockList);
 
@@ -274,7 +274,7 @@ export default class MinibotBlockly extends React.Component {
     if (!this.state.isLoggedIn) return;
     var formData = new FormData();
     formData.append("session_token", this.state.sessionToken);
-    formData.append("custom_function", JSON.stringify(this.props.customBlocksList));
+    formData.append("custom_function", JSON.stringify(this.props.customBlockList));
     axios({
       method: 'post',
       url: 'http://127.0.0.1:5000/custom_function/',
@@ -291,8 +291,6 @@ export default class MinibotBlockly extends React.Component {
   }
 
   redefine_custom_blocks() {
-    console.log("Hello2");
-    console.log(this.props.customBlockList);
     var _this = this;
     this.manageDefaultCustomBlocklyFunction(true);
 
@@ -347,7 +345,7 @@ export default class MinibotBlockly extends React.Component {
     await this.setState({ customBlockList: _this.props.customBlockList});
     this.redefine_custom_blocks();
     this.update_custom_blocks();
-    
+
   }
 
   /* handles input change for file name and coding textboxes */
@@ -549,6 +547,7 @@ export default class MinibotBlockly extends React.Component {
 
   handleLogin(event) {
     var formData = new FormData(document.getElementById("loginForm"));
+    console.log(formData);
     axios({
       method: 'post',
       url: 'http://127.0.0.1:5000/login/',

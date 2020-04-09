@@ -64,8 +64,6 @@ class Platform extends React.Component {
   }
 
   render() {
-    console.log("Hello");
-    console.log(this.state.customBlocksList);
     return (
       <div id="platform">
         <Tabs>
