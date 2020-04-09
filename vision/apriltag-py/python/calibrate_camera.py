@@ -100,11 +100,6 @@ def main_with_video():
     # Make checkerboard points "Calibration variables"
     # Official docs says checkerboard size should be (cols, rows)
     checkerboard_size = (args['cols'], args['rows'])
-    checkerboard_points = []
-    for j in range(args['cols']):
-        for i in range(args['rows']):
-            point = (i * args['size'], j * args['size'], 0.0)
-            checkerboard_points.append(point)
 
     frame = []
     gray = None
