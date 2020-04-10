@@ -234,6 +234,18 @@ export default class MinibotBlockly extends React.Component {
         console.warn(error);
       });
 
+    axios({
+      method: 'GET',
+      url: '/result',
+    })
+      .then((response) => {
+        console.log("The error message is: !!!")
+        console.log(response);
+      })
+      .catch((err) => {
+        window.alert("why is there an error");
+      })
+
   }
 
   view_history(event) {

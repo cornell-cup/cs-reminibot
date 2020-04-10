@@ -18,6 +18,7 @@ class PiBot(BaseStationBot, object):
         self.tcp_listener_thread.start()
 
         self.scripts = []
+        self.result = None
         return
 
     def get_ip(self):
@@ -31,6 +32,9 @@ class PiBot(BaseStationBot, object):
         return port value of bot
         """
         return self.port
+
+    def get_result(self):
+        return self.result
 
     def is_active(self):
         """
@@ -75,6 +79,12 @@ class PiBot(BaseStationBot, object):
                 key = data[start + 4: comma]
                 value = data[comma+1: end]
                 self.tcp_act_on_incoming(key, value)
+
+            print("???????????????????????")
+            print("key")
+            print(key)
+            print("value")
+            print(value)
             return True
 
         def tcp_act_on_incoming(self, key, value):
@@ -84,3 +94,6 @@ class PiBot(BaseStationBot, object):
             elif key == "BOTSTATUS":
                 self.status = value
             # print("key: " + key + ", value:" + value)
+            elif key == "RESULT":
+                print("yeyeyeyeyeyeyeyeyeyey")
+                self.result = value
