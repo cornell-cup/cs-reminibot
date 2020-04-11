@@ -46,6 +46,63 @@ class RefreshingList extends React.Component {
     }
 }
 
+/*
+ *  A toggle button to turn on/off the on-bot vision system
+ */
+class Toggle extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            on: false
+        }
+        this.toggle = this.toggle.bind(this);
+        this.getOnBotVision = this.getOnBotVision.bind(this);
+    }
+
+    toggle() {
+        this.getOnBotVision(this.state.on);
+        this.setState({
+            on: !this.state.on
+        })
+    }
+
+    getOnBotVision(isOn) {
+        const _this = this;
+        console.log(isOn ? "STOPBOTVISION" : "STARTBOTVISION")
+        axios({
+            method: 'POST',
+            url: '/onbotvision',
+            data: JSON.stringify({
+                key: isOn ? "STOPBOTVISION" : "STARTBOTVISION",
+                bot_name: this.props.selected_bot
+            })
+        })
+            .then(function (response) {
+                if (response.data) {
+                    console.log(response.data);
+                }
+            })
+            .catch(function (error) {
+                // console.log(error);
+            })
+    }
+
+    render() {
+        var x = "";
+        if (this.state.on) {
+            x = "Stop On-Bot Vision";
+        }
+        else {
+            x = "Start On-Bot Vision";
+        }
+        return (
+            <div>
+                <button className="btn btn-primary" onClick={this.toggle}>{x}</button>
+            </div>
+        )
+    }
+}
+
 export default class AddBot extends React.Component {
     constructor(props) {
         super(props);
@@ -67,7 +124,6 @@ export default class AddBot extends React.Component {
         this.addBotListener = this.addBotListener.bind(this);
         this.selectBotListener = this.selectBotListener.bind(this);
         this.buttonMapListener = this.buttonMapListener.bind(this);
-        this.getOnBotVision = this.getOnBotVision.bind(this);
     }
 
     componentDidMount() {
@@ -281,27 +337,6 @@ export default class AddBot extends React.Component {
 
     }
 
-    getOnBotVision() {
-        const _this = this;
-        axios({
-            method: 'POST',
-            url: '/onbotvision',
-            data: JSON.stringify({
-                key: "BOTVISION",
-                bot_name: this.props.selected_bot
-            })
-        })
-            .then(function (response) {
-                if (response.data) {
-                    console.log(response.data);
-                }
-            })
-            .catch(function (error) {
-                // console.log(error);
-            })
-
-    }
-
     lineFollowOnClick() {
         const _this = this;
         axios({
@@ -433,7 +468,8 @@ export default class AddBot extends React.Component {
                     </div>
                     <div className="divider" />
                     <div className="col-md-3">
-                        <button type="button" className="btn btn-primary" onClick={() => this.getOnBotVision()}>On-Bot Vision</button>
+                        <Toggle selected_bot={this.props.selected_bot} />
+                        {/* <button type="button" className="btn btn-primary" onClick={() => this.getOnBotVision()}>On-Bot Vision</button> */}
                     </div>
                     <div className="col-md-6">
 

@@ -256,18 +256,16 @@ class StoppableThread(threading.Thread):
     def __init__(self,  *args, **kwargs):
         super(StoppableThread, self).__init__(*args, **kwargs)
         self._stop_event = threading.Event()
-        isBotVisionOn = True
 
     def stop(self):
         self._stop_event.set()
-        isBotVisionOn = False
 
     def stopped(self):
         return self._stop_event.is_set()
 
 
-# global variable for on bot vision handler
-isBotVisionOn = False
+# global var for onBotVisionServer
+onBotVisionServer = None
 
 
 class OnBotVisionHandler(tornado.websocket.WebSocketHandler):
@@ -284,25 +282,25 @@ class OnBotVisionHandler(tornado.websocket.WebSocketHandler):
         session_id = self.get_secure_cookie("user_id")
         if session_id:
             session_id = session_id.decode("utf-8")
-
-        if key == "BOTVISION":  # start the on bot vision
             bot_name = data['bot_name']
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             bot = self.base_station.get_bot(bot_id)
-            onBotVisionServer = StoppableThread(target=startBotVisionServer,
-                                                daemon=True)
-            if bot:
-                if not isBotVisionOn:
-                    # onBotVisionServer.isAlive():
-                    print("sending key: BOTVISION")
-                    bot.sendKV(key, '')
-                    print("starting onBotVisionServer thread")
-                    onBotVisionServer.start()
-                else:
-                    print("ending onBotVisionServer thread")
+
+            if key == "STARTBOTVISION":  # start the on bot vision
+                print("starting onBotVisionServer thread")
+                onBotVisionServer = StoppableThread(
+                    target=startBotVisionServer, daemon=True)
+                onBotVisionServer.start()
+                bot.sendKV(key, '')
+            elif key == "STOPBOTVISION":
+                print("ending onBotVisionServer thread")
+                if (onBotVisionServer):
                     onBotVisionServer.stop()
+                    bot.sendKV(key, '')
+                else:
+                    print("ERROR: No on bot vision server started")
             else:
-                print("No bot detected")
+                print("Invalid key")
 
 
 if __name__ == "__main__":
