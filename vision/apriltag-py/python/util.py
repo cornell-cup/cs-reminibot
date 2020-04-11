@@ -124,8 +124,6 @@ def get_offsets_from_file(file):
     Requires the file to already be open and reading at the start of
     the offsets label.
 
-    # TODO document this in higher-level documentation
-
     Args:
         :file The already-open calibration file
     """
@@ -206,7 +204,7 @@ def undistort_image(frame, camera_matrix, dist_coeffs):
     some parameters about the camera can allow OpenCV to undo the camera's
     natural distortion.
 
-    WARNING: This is deprecated. It was once used to try to un-distort images,
+    WARNING: This is unused. It was once used to try to un-distort images,
     but it only made the distortion worse.
     TODO remove this if unused? Not sure if it is needed for later.
 
