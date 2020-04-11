@@ -146,7 +146,7 @@ def run_script(scriptname):
     importlib.reload(script)
     try:
         script.run()
-        return "program successfully executed"
+        return "Successful execution"
     except StopIteration as exception:
         print("Exception occurred")
         str_exception = "StopIteration: " + str(exception)

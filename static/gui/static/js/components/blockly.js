@@ -21,7 +21,8 @@ export default class MinibotBlockly extends React.Component {
       login_success_label: "",
       register_error_label: "",
       register_success_label: "",
-      function_name: "default_function"
+      function_name: "default_function",
+      coding_start: -1
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -59,6 +60,9 @@ export default class MinibotBlockly extends React.Component {
      Update this.state with the current text. */
   handleScriptChange(event) {
     this.setState({ data: event.target.value });
+    if (this.state.coding_start == -1) {
+      this.setState({ coding_start: new Date().getTime()})
+    }
   }
 
   handleFileNameChange(event) {
@@ -217,6 +221,13 @@ export default class MinibotBlockly extends React.Component {
   /* Target function for the button "Run Code". Send python code
      in the editing box to backend. */
   run_script(event) {
+    var start_time = this.state.coding_start;
+    if (start_time != -1) {
+      var time = (new Date().getTime() - start_time) / 1000
+      document.getElementById("time").value = time.toString() + "s";
+      this.setState({coding_start : -1})
+    }
+
     axios({
       method: 'POST',
       url: '/start',
@@ -541,6 +552,7 @@ export default class MinibotBlockly extends React.Component {
       <button id="history" onClick={this.view_history}>View History</button>&nbsp;&nbsp;
       <button id="copy" onClick={this.copy}>Copy Code From Blockly</button>
       <div> <textarea style={{ color: 'red' }} id = "errormessage" rows="1" cols="40" /></div>
+      <div> <textarea style={{ color: 'green' }} id = "time" rows="1" cols="20" /></div>
             <br />
             <form>
               <input
