@@ -56,24 +56,34 @@ sudo npm install npm@latest -g
 
 #### Git installation:
 1. Go to https://gitforwindows.org/ and click Download.
-2. Run the installer that downloads (the .exe file) and install Git. 
+2. Run the installer that downloads (the .exe file) and install Git.  You can leave all options as their defaults.
 
 #### Python3 and Pip3 installation:
 1. Go to https://www.python.org/downloads/ and press "Download Python <version_number>"
-2. Open the installer that downloads (the .exe file) and select the checkbox that says "Add Python 3.8 to PATH"
+2. Open the installer that downloads (the .exe file) and **select the checkbox that says "Add Python 3.8 to PATH"**
 3. Click the "Install Now" button
 
 #### Node.js and npm installation:
-TODO
+1. Download node.js by visiting https://nodejs.org/en/download/, and clicking the download button for the Windows Installer (.msi) version, for your computer.  Your computer is most likely 64-bit, but you can look up online to confirm.  
+2. Run the installer that downloads, and keep pressing "Next" without changing any default options.  
+**However, in the *Tools for Native Modules section*, make sure to select the checkbox for *"Automatically install the necessary tools....."*.**  Press Install and let the installer run.  A new script will pop up to install additional tools.  Press any key to continue, and allow Powershell to install the additional tools automatically.  
+
+#### Bash in Powershell installation
+1. Click the Start Button
+2. Click Control Panel
+3. Click Programs
+4. Click "Turn Windows Features on or off"
+5. Enable "Windows Subsystem for Linux"
+6. You might be prompted to restart your computer.  
 
 # Cloning the respository
-To clone (download) the respository onto your local machine:
+To clone (download) the respository onto your local machine.  On Linux or MacOS, open a new terminal and run the command below.  On Windows, open Git Bash and run the command below.  
 ```
 git clone https://github.com/cornell-cup/cs-reminibot.git
 ```
 
 # Installing BaseStation Python Dependencies
-Run the following commands to navigate to the basestation directory in and install the Python3 dependencies 
+Run the following commands to navigate to the basestation directory in and install the Python3 dependencies.  On Windows open PowerShell and run the following commands.  On Linux or MacOS open terminal and run the commands
 ```
 cd cs-reminibot/basestation
 pip3 install -r requirements.txt
@@ -100,8 +110,14 @@ simple web application that runs on HTTP.
 
 To run the BaseStation, run the following line of code.  You should currently be in the cs-reminibot directory.
 
+If you are on Linux or MacOS run: 
 ```
 ./run_BS.sh
+```
+
+If you are on Windows run:
+```
+bash run_BS.sh
 ```
 
 Go to any browser on your computer and go to `localhost:8080/start` to see the GUI in action.
