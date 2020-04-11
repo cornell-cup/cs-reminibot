@@ -323,7 +323,7 @@ export default class MinibotBlockly extends React.Component {
     this.manageDefaultCustomBlocklyFunction(false);
     var _this = this;
     await this.scriptToCode();
-    var item = _this.y
+    var item = _this.props.customBlockList.find(element => element[0] === function_name); 
     if (item == undefined) {
       _this.props.customBlockList.push([function_name, pythonTextBoxCode]);
     } else {
