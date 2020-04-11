@@ -3,7 +3,6 @@ import numpy as np
 
 """
 Utility module for common actions in this module and in OpenCV.
-
 """
 
 
@@ -207,9 +206,9 @@ def undistort_image(frame, camera_matrix, dist_coeffs):
     some parameters about the camera can allow OpenCV to undo the camera's
     natural distortion.
 
-    TODO
     WARNING: This is deprecated. It was once used to try to un-distort images,
     but it only made the distortion worse.
+    TODO remove this if unused? Not sure if it is needed for later.
 
     Args:
         :frame The distorted image
