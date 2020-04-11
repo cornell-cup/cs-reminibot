@@ -12,9 +12,6 @@ from util import get_image, write_matrix_to_file
 def main_with_video():
     """
     This is the main entry point of the camera calibration script.
-    Run this with the following args:
-
-    python3 calibrate_camera.py -r <rows> -c <cols>
 
     IMPORTANT!
     Make sure the rows entered is (# of boxes in a column) - 1,
@@ -31,35 +28,12 @@ def main_with_video():
     ESCAPE to continue the calibration process. It is recommended
     to press ESCAPE if the camera does not see the entire board.
 
-    The code will then compute what it needs to do to calibrate the camera
+    The code will then compute many matrices to calibrate the camera
     and write an output in a file typically named 0.calib.
 
     """
 
-    parser = argparse.ArgumentParser(
-        description='calibrate camera intrinsics using OpenCV')
-
-    parser.add_argument('-r', '--rows', metavar='N', type=int,
-                        required=True,
-                        help='# of chessboard corners in vertical direction')
-
-    parser.add_argument('-c', '--cols', metavar='N', type=int,
-                        required=True,
-                        help='# of chessboard corners in horizontal direction')
-
-    parser.add_argument('-s', '--size', metavar='NUM', type=float, default=1.0,
-                        help='chessboard square size in user-chosen units (should not affect results)')
-
-    parser.add_argument('-n', '--nums', metavar='NUM', type=int, default=1,
-                        help='number of cameras to calibrate')
-
-    parser.add_argument('-id', '--cameraid', metavar='NUM', type=int, default=0,
-                        help='ID of the camera to calibrate')
-
-    # TODO add multiple camera support - currently assuming ONE camera only.
-
-    options = parser.parse_args()
-    args = vars(options)  # get dict of args parsed
+    args = get_args()
 
     # Capture vars
     cameras = []
@@ -175,6 +149,37 @@ def main_with_video():
         calib_file.close()
 
         print("Calibration file written to " + str(camera_ids[i]) + ".calib")
+
+
+def get_args():
+    """
+    Get the arguments that were passed in.
+    """
+    parser = argparse.ArgumentParser(
+        description='calibrate camera intrinsics using OpenCV')
+
+    parser.add_argument('-r', '--rows', metavar='<rows>', type=int,
+                        required=True,
+                        help='# of chessboard corners in vertical direction')
+
+    parser.add_argument('-c', '--cols', metavar='<cols>', type=int,
+                        required=True,
+                        help='# of chessboard corners in horizontal direction')
+
+    parser.add_argument('-s', '--size', metavar='<size>', type=float, default=1.0,
+                        help='chessboard square size in user-chosen units (should not affect results)')
+
+    parser.add_argument('-n', '--nums', metavar='<num-cameras>', type=int, default=1,
+                        help='number of cameras to calibrate')
+
+    parser.add_argument('-id', '--cameraid', metavar='<camera-id>', type=int, default=0,
+                        help='ID of the camera to calibrate')
+
+    # TODO add multiple camera support - currently assuming ONE camera only.
+
+    options = parser.parse_args()
+    args = vars(options)  # get dict of args parsed
+    return args
 
 
 if __name__ == '__main__':

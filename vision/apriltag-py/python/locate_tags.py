@@ -1,5 +1,6 @@
 from cv2 import *
 import apriltag
+import argparse
 import numpy as np
 import sys
 import time
@@ -17,12 +18,12 @@ past_time = -1
 
 
 def main():
-    # Check for correct number of args
-    if len(sys.argv) != 3:
-        print("Usage: {} <url> <calibration file name>".format(sys.argv[0]))
-        exit(0)
-    url = sys.argv[1]
-    calib_file_name = sys.argv[2]
+    args = get_args()
+    url = args['url']
+    if args['url'] == None:
+        SEND_DATA = False
+    calib_file_name = args['file']
+    TAG_SIZE = args['size']
     calib_file = open(calib_file_name)
 
     camera = VideoCapture(DEVICE_ID)  # Open the camera & set camera arams
@@ -135,6 +136,32 @@ def get_transform_matrix(file):
                                       temp_line[len("transform_matrix = "):].split(" ")))
     transform_matrix = np.reshape(np.asarray(transform_matrix_items), (4, 4))
     return transform_matrix
+
+
+def get_args():
+    """
+    Get the arguments that were passed in.
+    """
+    parser = argparse.ArgumentParser(
+        description='Locate and send Apriltag poses')
+
+    parser.add_argument('-u', '--url',
+                        metavar='<url>',
+                        type=str, required=False,
+                        help='URL to send data to')
+
+    parser.add_argument('-f', '--file', metavar='<calib file name>',
+                        type=str, required=True,
+                        help='.calib file to use for un-distortion')
+
+    parser.add_argument('-s', '--size', metavar='<size>',
+                        type=float, required=False, default=6.5,
+                        help='size of tags to detect')
+
+    options = parser.parse_args()
+    args = vars(options)  # get dict of args parsed
+
+    return args
 
 
 if __name__ == '__main__':

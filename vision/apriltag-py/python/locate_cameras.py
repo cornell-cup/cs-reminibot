@@ -1,27 +1,26 @@
 from cv2 import *
 import apriltag
+import argparse
 import sys
 import numpy as np
 import time
 from util import get_image, write_matrix_to_file, get_matrices_from_file, undistort_image
 from util import compute_tag_undistorted_pose
 
-BOARD_TAG_SIZE = 3.25  # The length of a side of a tag on the axis board, in inches
+BOARD_TAG_SIZE = 6.5  # The length of a side of a tag on the axis board, in inches
 ORIGIN_TAG_SIZE = 6.5  # The length of a side of a tag used to calibrate the origin
-# Usually 6.5 for printed tags
 NUM_DETECTIONS = 4  # The number of tags to detect, usually 4
 
 
 def main():
-    # offsets to force (0,0) to the center of the axis calib board
+    args = get_args()
+    BOARD_TAG_SIZE = args['board']
+    ORIGIN_TAG_SIZE = args['origin']
+    calib_file_name = args['file']
+
+    # offsets to reposition where (0,0) is
     x_offset = 0
     y_offset = 0
-
-    # Check if arguments are OK
-    if len(sys.argv) != 2:
-        print("Usage: {} <file name>".format(sys.argv[0]))
-        exit(0)
-    calib_file_name = sys.argv[1]
 
     camera = VideoCapture(0)  # Open the camera and set camera params
     if (not VideoCapture.isOpened(camera)):
@@ -171,7 +170,6 @@ def main():
             continue
 
     # Write offsets
-    # TODO make sure this works
     calib_file.write("offsets = ")
     calib_file.write(str(-1 * x_offset))
     calib_file.write(" ")
@@ -181,6 +179,32 @@ def main():
     calib_file.close()
     print("Finished writing transformation matrix to calibration file")
     pass
+
+
+def get_args():
+    """
+    Get the arguments that were passed in.
+    """
+    parser = argparse.ArgumentParser(description='Calibrate camera axes')
+
+    parser.add_argument('-f', '--file', metavar='<calib file name>',
+                        type=str, required=True,
+                        help='.calib file to use for un-distortion')
+
+    parser.add_argument('-b', '--board',
+                        metavar='<board tag size>',
+                        type=float, required=False, default=6.5,
+                        help='size of one side of a tag on the axis calibration \
+                            board, in inches')
+
+    parser.add_argument('-o', '--origin', metavar='<origin tag size>',
+                        type=float, required=False, default=6.5,
+                        help='size of one side of the tag to calibrate \
+                            the origin, in inches')
+
+    options = parser.parse_args()
+    args = vars(options)  # get dict of args parsed
+    return args
 
 
 if __name__ == '__main__':
