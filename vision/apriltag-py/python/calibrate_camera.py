@@ -117,7 +117,7 @@ def main_with_video():
             flags = CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE + \
                 CALIB_CB_FAST_CHECK
             retval, corners = cv2.findChessboardCorners(
-                gray, checkerboard_size, tuple(corners), flags)
+                gray, (args['cols'], args['rows']), None)
             if not retval:
                 continue  # No checkerboard, so keep looking
 

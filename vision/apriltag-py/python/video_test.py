@@ -6,10 +6,20 @@ import time
 """
 Shows a video to detect tags live.
 
-Most recent tests got around 4 to 5 fps (!)
+Interesting notes:
+
+DETECT_TAGS SHOW_IMAGE  STABLE FPS
+False       False       30
+False       True        4-5
+
+
+This DOES NOT include any overhead that our vision
+system may add.
 """
 
-DETECT_TAGS = False
+DETECT_TAGS = True
+SHOW_IMAGE = False
+BLUE = (255, 0, 0)
 
 
 def main():
@@ -21,7 +31,9 @@ def main():
     while True:
         frame_num += 1
         ret, frame = camera.read()
-        cv2.imshow('frame', frame)
+        if not DETECT_TAGS:
+            if SHOW_IMAGE:
+                cv2.imshow('frame', frame)
         fps = frame_num / (time.time() - start)
         print("Showing frame {}".format(frame_num))
         print("Current speed: {} fps".format(fps))
@@ -31,6 +43,10 @@ def main():
             for d in detections:
                 tag_x, tag_y = d.center
                 print("Tag {} found at ({},{})".format(d.tag_id, tag_x, tag_y))
+                # cv2.circle(frame, d.center, 5, BLUE)
+                cv2.circle(frame, (int(tag_x), int(tag_y)), 5, (0, 0, 255))
+            if SHOW_IMAGE:
+                cv2.imshow('frame', frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
     camera.release()

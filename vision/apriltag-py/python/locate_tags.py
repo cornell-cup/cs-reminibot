@@ -5,9 +5,10 @@ import sys
 import time
 import requests
 from util import get_image, get_matrices_from_file, undistort_image, get_offsets_from_file
+from util import compute_tag_undistorted_pose
 
 TAG_SIZE = 6.5  # The length of one side of an apriltag, in inches
-MULT_FACTOR = 0.5  # The scale factor of the output coordinates
+MULT_FACTOR = 5  # The scale factor of the output coordinates
 DEVICE_ID = 0  # The device the camera is, usually 0. TODO make this adjustable
 SEND_DATA = True  # Sends data to URL if True. Set to False for debug
 
@@ -71,8 +72,12 @@ def main():
 
         # take a picture and get detections
         frame = get_image(camera)
-        dst = undistort_image(frame, camera_matrix, dist_coeffs)
-        gray = cvtColor(dst, COLOR_BGR2GRAY)
+        gray = cvtColor(frame, COLOR_BGR2GRAY)
+
+        # Un-distorting an image worsened distortion effects
+        # Uncomment this if needed
+        # dst = undistort_image(frame, camera_matrix, dist_coeffs)
+        # gray = cvtColor(dst, COLOR_BGR2GRAY)
         detections, det_image = detector.detect(gray, return_image=True)
         if len(detections) == 0:
             continue  # Try again if we don't get anything
@@ -83,59 +88,17 @@ def main():
             # TODO draw tag - might be better to generalize, because
             # locate_cameras does this too.
 
-            # Compute transformation using PnP
-            for i in range(4):
-                img_points[i] = d.corners[i]
-            x = 0.5 * TAG_SIZE
-            obj_points[0] = (-x, -x, 0.0)
-            obj_points[1] = (x, -x, 0.0)
-            obj_points[2] = (x, x, 0.0)
-            obj_points[3] = (-x, x, 0.0)
-            ret, rvec, tvec = \
-                solvePnP(obj_points, img_points, camera_matrix, dist_coeffs)
-
-            # Make tag_to_camera matrix (homogenous transform matrix)
-            """
-            The tag_to_camera matrix looks like this:
-
-            dst[0,0] dst[0,1] dst[0,2] tvec[0,0]
-            dst[1,0] dst[1,1] dst[1,2] tvec[1,0]
-            dst[2,0] dst[2,1] dst[2,2] tvec[2,0]
-            0           0       0       1
-            """
-            dst, jac = Rodrigues(rvec)  # dst is a 3 x 3 rotation matrix
-            dst = np.append(dst, tvec, axis=1)
-            tag_to_camera = np.append(dst, np.array([[0, 0, 0, 1]]), axis=0)
-
-            # Compute tag coordinates tag_xyz
-            # tag_xyz is a column vector [x,y,z,h] where each coordinate is
-            # rounded to 3 decimal places.
-            # `origin` here is  `data2` in the C++ system
-            # It starts at point (0,0) in homogenous coordinates.
-            # Matrix multiplication simply applies the transformation.
-            origin = np.asmatrix(np.array([[0, 0, 0, 1]]).T)
-            tag_to_origin = np.matmul(transform_matrix, tag_to_camera)
-            tag_xyz = np.matmul(tag_to_origin, origin)
-            tag_xyz = np.around(tag_xyz, decimals=3)
-
-            print("Tag detection OK")
-
-            # Compute orientation (also called heading), in degrees
-            sin = tag_to_origin[0, 1]
-            cos = tag_to_origin[0, 0]
-            angle = np.arccos(cos)
-            if sin < 0:
-                angle = 2 * np.pi - angle
-            angle = angle * 180.0 / np.pi
+            (x, y, z, angle) = compute_tag_undistorted_pose(
+                camera_matrix, dist_coeffs, transform_matrix, d, TAG_SIZE)
 
             # Scale the coordinates, and print for debugging
             # prints Device ID :: tag id :: x y z angle
             # TODO debug offset method - is better, but not perfect.
-            x = MULT_FACTOR * (tag_xyz[0][0] + x_offset)
-            y = MULT_FACTOR * (tag_xyz[1][0] + y_offset)
+            x = MULT_FACTOR * (x + x_offset)
+            y = MULT_FACTOR * (y + y_offset)
             # print(tag_xyz)
             print("{} :: {} :: {} {} {} {}".format(
-                DEVICE_ID, d.tag_id, x, y, tag_xyz[2][0], angle))
+                DEVICE_ID, d.tag_id, x, y, z, angle))
 
             # Send the data to the URL specified.
             # This is usually a URL to the base station.

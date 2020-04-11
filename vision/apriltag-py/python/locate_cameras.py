@@ -4,8 +4,11 @@ import sys
 import numpy as np
 import time
 from util import get_image, write_matrix_to_file, get_matrices_from_file, undistort_image
+from util import compute_tag_undistorted_pose
 
-TAG_SIZE = 6.5  # The length of a side of a tag, in inches
+BOARD_TAG_SIZE = 3.25  # The length of a side of a tag on the axis board, in inches
+ORIGIN_TAG_SIZE = 6.5  # The length of a side of a tag used to calibrate the origin
+# Usually 6.5 for printed tags
 NUM_DETECTIONS = 4  # The number of tags to detect, usually 4
 
 
@@ -32,9 +35,10 @@ def main():
     calib_file, camera_matrix, dist_coeffs = get_matrices_from_file(
         calib_file_name)
     calib_file.close()
+    print("Read from calibration file")
     print("CAMERA MATRIX: {}".format(camera_matrix))
     print("DIST COEFFS: {}".format(dist_coeffs))
-
+    print()
     # Initialize the detector
     detector = apriltag.Detector(searchpath=apriltag._get_demo_searchpath())
     frame = []
@@ -43,60 +47,66 @@ def main():
     obj_points = np.ndarray((4 * NUM_DETECTIONS, 3))
     detections = []
 
-    while len(detections) != NUM_DETECTIONS:
+    print("The program will now attempt to detect the 4 tags on the axis calibration board")
+    print("The four tags should have a red circle on their centers if detected properly.")
+    print("There will also be a blue circle in the middle of the 4 tags if 4 are detected.")
+    print("Align the blue dot with the middle of the screen.")
+    print("Then, press SPACE.")
+    while True:
         frame = get_image(camera)  # take a new picture
 
-        # TODO check if image undistortion is doing anything useful
-        dst = undistort_image(frame, camera_matrix, dist_coeffs)
+        # For weird reasons, anti-distortion measures WORSENED the problem,
+        # so they have been removed. If you need to put them back,
+        # this is the place for it.
 
         # Convert undistorted image to grayscale
-        gray = cvtColor(dst, COLOR_BGR2GRAY)
+        gray = cvtColor(frame, COLOR_BGR2GRAY)
 
         # Use the detector and compute useful values from it
         detections, det_image = detector.detect(gray, return_image=True)
 
-        # show_image(detections, det_image, frame) if you want
-        print("Found {} tags".format(len(detections)))
-        time.sleep(1)
+        x_offset = 0
+        y_offset = 0
 
-    LINE_COLOR = (0, 255, 0)  # (B,G,R), so this is green
+        for i in range(len(detections)):
+            d = detections[i]
+            id = int(d.tag_id)
 
-    # for d in detections:
-    for i in range(4):
+            # Add to offsets
+            (ctr_x, ctr_y) = d.center
+            x_offset += ctr_x
+            y_offset += ctr_y
 
-        d = detections[i]
+            # Draw onto the frame
+            cv2.circle(frame, (int(ctr_x), int(ctr_y)), 5, (0, 0, 255), 3)
+
+        # Draw origin
+        if len(detections) == 4:
+            cv2.circle(frame, (int(x_offset / 4),
+                               int(y_offset/4)), 5, (255, 0, 0), 3)
+        imshow("Calibration board", frame)
+        if cv2.waitKey(1) & 0xFF == ord(' '):
+            break
+        else:
+            continue
+    cv2.destroyAllWindows()
+
+    # Compute transformation via PnP
+    # TODO What's the reasoning from this math?
+    # This was from a tutorial somehwhere and was directly
+    # transcribed from the C++ system.
+    for d in detections:
         id = int(d.tag_id)
-
-        # Add to offsets
-        # TODO make sure this works
-        (ctr_x, ctr_y) = d.center
-        x_offset += ctr_x
-        y_offset += ctr_y
-
-        # Draw onto the frame
-        # TODO fix int/float bug
-        """
-        frame = line(frame, tuple(d.corners[0]), tuple(
-            d.corners[1]), LINE_COLOR)
-        frame = line(frame, d.corners[1], d.corners[2], LINE_COLOR)
-        frame = line(frame, d.corners[2], d.corners[3], LINE_COLOR)
-        frame = line(frame, d.corners[3], d.corners[0], LINE_COLOR)
-        """
-
-        # Compute transformation via PnP
-        # TODO What's the reasoning from this math?
-        # This was from a tutorial somehwhere and was directly
-        # transcribed from the C++ system.
         img_points[0 + 4*id] = d.corners[0]
         img_points[1 + 4*id] = d.corners[1]
         img_points[2 + 4*id] = d.corners[2]
         img_points[3 + 4*id] = d.corners[3]
         a = (id % 2) * 2 + 1
         b = -((id / 2) * 2 - 1)
-        x1 = -0.5*TAG_SIZE + a*8.5*0.5
-        x2 = 0.5*TAG_SIZE + a*8.5*0.5
-        y1 = -0.5*TAG_SIZE + b*11*0.5
-        y2 = 0.5*TAG_SIZE + b*11*0.5
+        x1 = -0.5*BOARD_TAG_SIZE + a*8.5*0.5
+        x2 = 0.5*BOARD_TAG_SIZE + a*8.5*0.5
+        y1 = -0.5*BOARD_TAG_SIZE + b*11*0.5
+        y2 = 0.5*BOARD_TAG_SIZE + b*11*0.5
         obj_points[0 + 4*id] = (x1, y1, 0.0)
         obj_points[1 + 4*id] = (x2, y1, 0.0)
         obj_points[2 + 4*id] = (x2, y2, 0.0)
@@ -134,12 +144,38 @@ def main():
     calib_file.write("transform_matrix =")
     write_matrix_to_file(camera_to_origin, calib_file)
 
+    # Compute offsets via new calibration process
+    print("Axis calibration was successful!")
+    print("We will now center the camera. Place any apriltag where you would \
+        like (0,0) to be.")
+    print("A blue dot will appear in the center of the tag you placed to help \
+        show where (0,0) will be set to.")
+    print("When you have your tag in the right place, press SPACE.")
+
+    while True:
+        # Locate tag for use as origin
+        frame = get_image(camera)
+        gray = cvtColor(frame, COLOR_BGR2GRAY)
+        detections, det_image = detector.detect(gray, return_image=True)
+
+        if len(detections) == 0:
+            continue
+        (x_offset, y_offset, _, _) = compute_tag_undistorted_pose(
+            camera_matrix, dist_coeffs, camera_to_origin, detections[0], ORIGIN_TAG_SIZE)
+        cv2.circle(frame, (int(x_offset), int(y_offset)), 5, (255, 0, 0), 3)
+
+        imshow("Origin tag", frame)
+        if cv2.waitKey(1) & 0xFF == ord(' '):
+            break
+        else:
+            continue
+
     # Write offsets
     # TODO make sure this works
     calib_file.write("offsets = ")
-    calib_file.write(str(-1 * x_offset / 4.0))
+    calib_file.write(str(-1 * x_offset))
     calib_file.write(" ")
-    calib_file.write(str(-1 * y_offset / 4.0))
+    calib_file.write(str(-1 * y_offset))
     calib_file.write("\n")
 
     calib_file.close()
