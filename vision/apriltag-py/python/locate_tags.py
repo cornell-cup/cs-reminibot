@@ -8,9 +8,13 @@ import requests
 from util import get_image, get_matrices_from_file, undistort_image, get_offsets_from_file
 from util import compute_tag_undistorted_pose
 
+# Constants
+DEVICE_ID = 0  # The device the camera is, usually 0. TODO make this adjustable
+
+# Arguments
+# These are effectively constant after the argument parser has ran.
 TAG_SIZE = 6.5  # The length of one side of an apriltag, in inches
 MULT_FACTOR = 5  # The scale factor of the output coordinates
-DEVICE_ID = 0  # The device the camera is, usually 0. TODO make this adjustable
 SEND_DATA = True  # Sends data to URL if True. Set to False for debug
 
 # DEBUGGING AND TIMING VARIABLES
