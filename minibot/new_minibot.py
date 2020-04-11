@@ -146,10 +146,78 @@ def run_script(scriptname):
     importlib.reload(script)
     try:
         script.run()
-        return "Program successfully executed"
-    except Exception as exception:
+        return "program successfully executed"
+    except StopIteration as exception:
         print("Exception occurred")
-        str_exception = str(exception)
+        str_exception = "StopIteration: " + str(exception)
+        return str_exception
+    except StopAsyncIteration as exception:
+        print("Exception occurred")
+        str_exception = "StopAsyncIteration: " + str(exception)
+        return str_exception
+    except ArithmeticError as exception:
+        print("Exception occurred")
+        str_exception = "ArithmeticError: " + str(exception)
+        return str_exception
+    except AssertionError as exception:
+        print("Exception occurred")
+        str_exception = "AssertionError: " + str(exception)
+        return str_exception
+    except AttributeError as exception:
+        print("Exception occurred")
+        str_exception = "AttributeError: " + str(exception)
+        return str_exception
+    except BufferError as exception:
+        print("Exception occurred")
+        str_exception = "BufferError: " + str(exception)
+        return str_exception
+    except EOFError as exception:
+        print("Exception occurred")
+        str_exception = "EOFError: " + str(exception)
+        return str_exception
+    except ImportError as exception:
+        print("Exception occurred")
+        str_exception = "ImportError: " + str(exception)
+        return str_exception
+    except LookupError as exception:
+        print("Exception occurred")
+        str_exception = "LookupError: " + str(exception)
+        return str_exception
+    except MemoryError as exception:
+        print("Exception occurred")
+        str_exception = "MemoryError: " + str(exception)
+        return str_exception
+    except NameError as exception:
+        print("Exception occurred")
+        str_exception = "NameError: " + str(exception)
+        return str_exception
+    except OSError as exception:
+        print("Exception occurred")
+        str_exception = "OSError: " + str(exception)
+        return str_exception
+    except ReferenceError as exception:
+        print("Exception occurred")
+        str_exception = "ReferenceError: " + str(exception)
+        return str_exception
+    except RuntimeError as exception:
+        print("Exception occurred")
+        str_exception = "RuntimeError: " + str(exception)
+        return str_exception
+    except SyntaxError as exception:
+        print("Exception occurred")
+        str_exception = "SyntaxError: " + str(exception)
+        return str_exception
+    except SystemError as exception:
+        print("Exception occurred")
+        str_exception = "SystemError: " + str(exception)
+        return str_exception
+    except TypeError as exception:
+        print("Exception occurred")
+        str_exception = "TypeError: " + str(exception)
+        return str_exception
+    except ValueError as exception:
+        print("Exception occurred")
+        str_exception = "ValueError: " + str(exception)
         return str_exception
 
 

@@ -280,11 +280,19 @@ class ErrorMessageHandler(tornado.websocket.WebSocketHandler):
     def initialize(self, base_station):
         self.base_station = base_station
 
-    def get(self):
-        error_message = self.base_station.get_error_message()
+    def post(self):
+        data = json.loads(self.request.body.decode())
+        bot_name = data['bot_name']
+        error_message = self.base_station.get_error_message(bot_name)
+        print("error_message is:")
+        print(error_message)
         while (error_message is None):
-            error_message = self.base_station.get_error_message()
+            # print("error_message is: ")
+            # print(error_message)
+            error_message = self.base_station.get_error_message(bot_name)
         error_json = {"error": error_message}
+        print("error_json is: ")
+        print(error_json)
         self.write(json.dumps(error_json).encode())
 
 

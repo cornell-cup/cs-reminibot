@@ -509,7 +509,9 @@ class BaseStation:
 
     
 
-    def get_error_message(self, bot_id):
+    def get_error_message(self, bot_name):
+        bot_id = self.bot_name_to_bot_id(bot_name)
         bot = self.active_bots[bot_id]
-        print(bot.get_result())
+        if (bot.get_result() is not None):
+            print(bot.get_result())
         return bot.get_result()

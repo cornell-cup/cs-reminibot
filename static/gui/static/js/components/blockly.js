@@ -227,7 +227,7 @@ export default class MinibotBlockly extends React.Component {
       }),
     })
       .then(function (response) {
-        console.log(blockly.value);
+        // console.log(blockly.value);
         console.log('sent script');
       })
       .catch(function (error) {
@@ -235,15 +235,19 @@ export default class MinibotBlockly extends React.Component {
       });
 
     axios({
-      method: 'GET',
+      method: 'POST',
       url: '/result',
+      data: JSON.stringify({
+        bot_name: this.props.bot_name
+      }),
     })
       .then((response) => {
         console.log("The error message is: !!!")
         console.log(response);
+        document.getElementById("errormessage").value = response.data["error"];
       })
       .catch((err) => {
-        window.alert("why is there an error");
+        console.log(err)
       })
 
   }
@@ -536,6 +540,7 @@ export default class MinibotBlockly extends React.Component {
       <button id="run" onClick={this.run_script}>Run</button>&nbsp;&nbsp;
       <button id="history" onClick={this.view_history}>View History</button>&nbsp;&nbsp;
       <button id="copy" onClick={this.copy}>Copy Code From Blockly</button>
+      <div> <textarea style={{ color: 'red' }} id = "errormessage" rows="1" cols="40" /></div>
             <br />
             <form>
               <input
