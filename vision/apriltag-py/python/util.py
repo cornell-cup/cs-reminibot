@@ -136,6 +136,70 @@ def get_offsets_from_file(file):
     return (items[0], items[1])
 
 
+def compute_tag_undistorted_pose(camera_matrix, dist_coeffs, transform_matrix, d, tag_size):
+    """
+    Computes the undistorted tag pose.
+    This isn't totally "raw" - we use the args from the calib file
+    to account for distortion, but the coordinates outputted may need scaling.
+
+    This uses the four corners of the tags for a more accurate computation than
+    using only the center of the tag.
+
+    Args:
+        :camera_matrix The camera's internal parameters matrix from calibrateCamera()
+        :dist_coeffs The camera's distance coefficients from calibrateCamera()
+        :transform_matrix The transform matrix, often found in a calib file.
+        :d A Detection from the Apritag library's Detector
+        :tag_size The size of one side of a tag, in inches.
+    """
+    img_points = np.ndarray((4, 2))  # 4 2D points
+    obj_points = np.ndarray((4, 3))  # 4 3D points
+
+    # Compute transformation using PnP
+    for i in range(4):
+        img_points[i] = d.corners[i]
+    x = 0.5 * tag_size
+    obj_points[0] = (-x, -x, 0.0)
+    obj_points[1] = (x, -x, 0.0)
+    obj_points[2] = (x, x, 0.0)
+    obj_points[3] = (-x, x, 0.0)
+    ret, rvec, tvec = \
+        solvePnP(obj_points, img_points, camera_matrix, dist_coeffs)
+
+    # Make tag_to_camera matrix (homogenous transform matrix)
+    """
+    The tag_to_camera matrix looks like this:
+
+    dst[0,0] dst[0,1] dst[0,2] tvec[0,0]
+    dst[1,0] dst[1,1] dst[1,2] tvec[1,0]
+    dst[2,0] dst[2,1] dst[2,2] tvec[2,0]
+    0           0       0       1
+    """
+    dst, jac = Rodrigues(rvec)  # dst is a 3 x 3 rotation matrix
+    dst = np.append(dst, tvec, axis=1)
+    tag_to_camera = np.append(dst, np.array([[0, 0, 0, 1]]), axis=0)
+
+    # Compute tag coordinates tag_xyz
+    # tag_xyz is a column vector [x,y,z,h] where each coordinate is
+    # rounded to 3 decimal places.
+    # `origin` here is  `data2` in the C++ system
+    # It starts at point (0,0) in homogenous coordinates.
+    # Matrix multiplication simply applies the transformation.
+    origin = np.asmatrix(np.array([[0, 0, 0, 1]]).T)
+    tag_to_origin = np.matmul(transform_matrix, tag_to_camera)
+    tag_xyz = np.matmul(tag_to_origin, origin)
+    tag_xyz = np.around(tag_xyz, decimals=3)
+
+    # Compute orientation (also called heading), in degrees
+    sin = tag_to_origin[0, 1]
+    cos = tag_to_origin[0, 0]
+    angle = np.arccos(cos)
+    if sin < 0:
+        angle = 2 * np.pi - angle
+    angle = angle * 180.0 / np.pi
+    return tag_xyz[0][0], tag_xyz[1][0], tag_xyz[2][0], angle
+
+
 def undistort_image(frame, camera_matrix, dist_coeffs):
     """
     Un-distorts an image and crops the undistorted image back to the same size as
@@ -143,7 +207,9 @@ def undistort_image(frame, camera_matrix, dist_coeffs):
     some parameters about the camera can allow OpenCV to undo the camera's
     natural distortion.
 
-    TODO document this in higher-level documentation
+    TODO
+    WARNING: This is deprecated. It was once used to try to un-distort images,
+    but it only made the distortion worse.
 
     Args:
         :frame The distorted image
