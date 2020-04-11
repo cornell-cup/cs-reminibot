@@ -169,7 +169,7 @@ class ClientHandler(tornado.web.RequestHandler):
         Sends the program received from Blockly to the bot, translated
         into ECE-supplied functions.
 
-        Args: 
+        Args:
             bot: The pi_bot to send to
             program: The string containing the python code generated
             from blockly
@@ -249,6 +249,27 @@ class HeartbeatHandler(tornado.websocket.WebSocketHandler):
         self.write(json.dumps(heartbeat_json).encode())
 
 
+class StoppableThread(threading.Thread):
+    """Thread class with a stop() method. The thread itself has to check
+    regularly for the stopped() condition."""
+
+    def __init__(self,  *args, **kwargs):
+        super(StoppableThread, self).__init__(*args, **kwargs)
+        self._stop_event = threading.Event()
+        isBotVisionOn = True
+
+    def stop(self):
+        self._stop_event.set()
+        isBotVisionOn = False
+
+    def stopped(self):
+        return self._stop_event.is_set()
+
+
+# global variable for on bot vision handler
+isBotVisionOn = False
+
+
 class OnBotVisionHandler(tornado.websocket.WebSocketHandler):
     def initialize(self, base_station):
         self.base_station = base_station
@@ -268,12 +289,20 @@ class OnBotVisionHandler(tornado.websocket.WebSocketHandler):
             bot_name = data['bot_name']
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             bot = self.base_station.get_bot(bot_id)
+            onBotVisionServer = StoppableThread(target=startBotVisionServer,
+                                                daemon=True)
             if bot:
-                self.write("sending key: BOTVISION")
-                # TODO check the server thread works
-                threading.Thread(target=startBotVisionServer,
-                                 daemon=True).start()
-                bot.sendKV(key, '')
+                if not isBotVisionOn:
+                    # onBotVisionServer.isAlive():
+                    print("sending key: BOTVISION")
+                    bot.sendKV(key, '')
+                    print("starting onBotVisionServer thread")
+                    onBotVisionServer.start()
+                else:
+                    print("ending onBotVisionServer thread")
+                    onBotVisionServer.stop()
+            else:
+                print("No bot detected")
 
 
 if __name__ == "__main__":

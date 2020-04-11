@@ -5,13 +5,16 @@
 from imutils import build_montages
 from datetime import datetime
 import numpy as np
-from imagezmq import imagezmq
+from . import imagezmq
 import argparse
 import imutils
 import cv2
+import os
 
 
 def startBotVisionServer():
+    # TODO remove
+    print("Entered the startBotVisionServer thread")
     # construct the argument parser and parse the arguments
     ap = argparse.ArgumentParser()
     ap.add_argument("-p", "--prototxt", default='MobileNetSSD_deploy.prototxt',
@@ -38,7 +41,12 @@ def startBotVisionServer():
 
     # load our serialized model from disk
     print("[INFO] loading model...")
-    net = cv2.dnn.readNetFromCaffe(args["prototxt"], args["model"])
+    direc = os.path.dirname(__file__)
+    model = os.path.join(direc, args["model"])
+    prototxt = os.path.join(direc, args["prototxt"])
+
+    net = cv2.dnn.readNetFromCaffe(prototxt, model)
+    #net = cv2.dnn.readNetFromCaffe(args["prototxt"], args["model"])
 
     # initialize the consider set (class labels we care about and want
     # to count), the object count dictionary, and the frame  dictionary

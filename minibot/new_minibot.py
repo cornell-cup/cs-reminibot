@@ -87,7 +87,8 @@ def parse_command(cmd, tcpInstance):
     elif key == "BOTVISION":
         print("On bot vision w/ server ip: " + server_ip)
         # TODO: Thread is not working / needs to be tested
-        Thread(target=startBotVisionClient, args=server_ip, daemon=True)
+        Thread(target=startBotVisionClient,
+               args=server_ip, daemon=True).start()
         print("Thread has been made")
 
 
@@ -153,7 +154,8 @@ def start_base_station_heartbeat(ip_address):
 
 def startBotVisionClient(server_ip):
     import socket
-    print("in startBotVisionClient")
+    # TODO remove
+    print("Entered the startBotVisionClient thread")
 
     # initialize the ImageSender object with the socket address of server
     sender = imagezmq.ImageSender(connect_to="tcp://{}:5555".format(server_ip))
