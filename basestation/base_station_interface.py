@@ -23,7 +23,7 @@ class BaseInterface:
     base station GUI.
     """
 
-    def __init__(self, port, send_blockly_remote_server=False):
+    def __init__(self, port, send_blockly_remote_server=True):
         """
         Initializes base station
         :param port: Port number from which basestation runs (usually 8080)
@@ -143,8 +143,9 @@ class ClientHandler(tornado.web.RequestHandler):
             print(value)
             bot_name = data['bot_name']
             print(bot_name)
+            duration = data["duration"]
 
-            params = {'bot_name': bot_name, 'value': value}
+            params = {'bot_name': bot_name, 'value': value, 'duration': duration}
 
             if self.send_blockly_remote_server:
                 url = 'http://127.0.0.1:5000/code/'

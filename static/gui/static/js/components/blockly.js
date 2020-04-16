@@ -22,7 +22,8 @@ export default class MinibotBlockly extends React.Component {
       register_error_label: "",
       register_success_label: "",
       function_name: "default_function",
-      coding_start: -1
+      coding_start: -1,
+      coding_duration: -1
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -224,7 +225,11 @@ export default class MinibotBlockly extends React.Component {
     var start_time = this.state.coding_start;
     if (start_time != -1) {
       var time = (new Date().getTime() - start_time) / 1000
-      document.getElementById("time").value = time.toString() + "s";
+      time = time.toString() + "s"
+      document.getElementById("time").value = time;
+      this.setState({
+        coding_duration: time
+      })
       this.setState({coding_start : -1})
     }
 
@@ -234,6 +239,7 @@ export default class MinibotBlockly extends React.Component {
       data: JSON.stringify({
         key: 'SCRIPTS',
         value: this.state.data,
+        duration: this.state.coding_duration,
         bot_name: this.props.bot_name
       }),
     })
