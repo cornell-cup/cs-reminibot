@@ -17,8 +17,10 @@ Please install the following:
 * npm (The Javascript package manager) 
 
 [Ubuntu 18 Installing Requirements guide](#Ubuntu)
+[Windows 10 Installing Requirements guide](#Windows)
 
 
+<a name="Continue"></a>
 # Cloning the respository
 To clone (download) the respository onto your local machine.  On Linux or MacOS, open a new terminal and run the command below.  On Windows, open Git Bash and run the command below.  
 ```
@@ -103,8 +105,9 @@ Upgrade npm to the lastest version by running:
 ```
 sudo npm install npm@latest -g
 ```
+[Continue with the remaining installation steps](#Continue)
 
-
+<a name="Windows"></a>
 ## Windows 10: Installing Initial Requirements
 
 #### Windows Subsystem for Linux Installation
@@ -147,3 +150,4 @@ Upgrade npm to the lastest version by running:
 ```
 sudo npm install npm@latest -g
 ```
+[Continue with the remaining installation steps](#Continue)
