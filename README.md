@@ -16,9 +16,9 @@ Please install the following:
 * Node.js (The Javascript runtime library)
 * npm (The Javascript package manager) 
 
-[Ubuntu 18 Installing Requirements guide](#Ubuntu)
+[Ubuntu 18 Installing Initial Requirements guide](#Ubuntu)
 
-[Windows 10 Installing Requirements guide](#Windows)
+[Windows 10 Installing Initial Requirements guide](#Windows)
 
 
 <a name="Continue"></a>
