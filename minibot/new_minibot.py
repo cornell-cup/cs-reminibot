@@ -14,8 +14,7 @@ import os
 from imutils.video import VideoStream
 from imagezmq import imagezmq
 from scripts.stoppableThreads import StoppableThread
-import socket
-import picamera
+# import picamera
 
 # Create a UDP socket
 sock = socket(AF_INET, SOCK_DGRAM)
@@ -166,7 +165,7 @@ def start_base_station_heartbeat(ip_address):
 
 
 def startBotVisionClient(server_ip):
-    # TODO remove
+    import socket  # import needs to be here b/c same name as "from socket ..." on line 0
     print("Entered the startBotVisionClient thread")
 
     # initialize the ImageSender object with the socket address of server
