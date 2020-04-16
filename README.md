@@ -17,6 +17,7 @@ Please install the following:
 * npm (The Javascript package manager) 
 
 [Ubuntu 18 Installing Requirements guide](#Ubuntu)
+
 [Windows 10 Installing Requirements guide](#Windows)
 
 
@@ -54,22 +55,17 @@ The BaseStation is the intermediary that manages information flow between the mi
 hardware to the software and GUI. BaseStation runs on `cs-reminibot/basestation/base_station_interface.py` and is a
 simple web application that runs on HTTP.
 
-To run the BaseStation, run the following line of code.  You should currently be in the cs-reminibot directory.
-
-If you are on Linux or MacOS run: 
+To run the BaseStation, run the following command.  You should currently be in the cs-reminibot directory.
+ 
 ```
 ./run_BS.sh
-```
-
-If you are on Windows run:
-```
-bash run_BS.sh
 ```
 
 Go to any browser on your computer and go to `localhost:8080/start` to see the GUI in action.
 If you are having trouble running the previous line, make sure that python3 is installed.
 You can check this by typing `python3` in your terminal.
 
+# Operating System Specific Guides to Install Initial Requirements
 <a name="Ubuntu"></a>
 ## Ubuntu 18: Installing Initial Requirements
 
