@@ -24,8 +24,7 @@ past_time = -1
 def main():
     args = get_args()
     url = args['url']
-    if args['url'] == None:
-        SEND_DATA = False
+    SEND_DATA = (args['url'] != None)
     calib_file_name = args['file']
     TAG_SIZE = args['size']
     calib_file = open(calib_file_name)
