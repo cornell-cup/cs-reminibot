@@ -16,6 +16,59 @@ Please install the following:
 * Node.js (The Javascript runtime library)
 * npm (The Javascript package manager) 
 
+[Ubuntu 18 Installing Requirements guide](#Ubuntu)
+
+
+# Cloning the respository
+To clone (download) the respository onto your local machine.  On Linux or MacOS, open a new terminal and run the command below.  On Windows, open Git Bash and run the command below.  
+```
+git clone https://github.com/cornell-cup/cs-reminibot.git
+```
+
+# Installing BaseStation Python Dependencies
+Run the following commands to navigate to the basestation directory in and install the Python3 dependencies.  On Windows open PowerShell and run the following commands.  On Linux or MacOS open terminal and run the commands
+```
+cd cs-reminibot/basestation
+pip3 install -r requirements.txt
+cd ..
+```
+ 
+# Installing JavaScript Dependencies 
+Run the following commands to navigate to the gui directory in static/gui and install JavaScript dependencies.
+You should currently be in the cs-reminibot directory
+
+```
+cd static/gui
+npm install
+npm install --save-dev @testing-library/react
+cd ../..
+```
+
+# Run the BaseStation
+After all dependencies are successfully installed, you can run the BaseStation on your
+computer and start working with the minibot.
+
+The BaseStation is the intermediary that manages information flow between the minibot and
+hardware to the software and GUI. BaseStation runs on `cs-reminibot/basestation/base_station_interface.py` and is a
+simple web application that runs on HTTP.
+
+To run the BaseStation, run the following line of code.  You should currently be in the cs-reminibot directory.
+
+If you are on Linux or MacOS run: 
+```
+./run_BS.sh
+```
+
+If you are on Windows run:
+```
+bash run_BS.sh
+```
+
+Go to any browser on your computer and go to `localhost:8080/start` to see the GUI in action.
+If you are having trouble running the previous line, make sure that python3 is installed.
+You can check this by typing `python3` in your terminal.
+
+<a name="Ubuntu"></a>
 ## Ubuntu 18: Installing Initial Requirements
 
 #### Git installation:
@@ -94,52 +147,3 @@ Upgrade npm to the lastest version by running:
 ```
 sudo npm install npm@latest -g
 ```
-
-# Cloning the respository
-To clone (download) the respository onto your local machine.  On Linux or MacOS, open a new terminal and run the command below.  On Windows, open Git Bash and run the command below.  
-```
-git clone https://github.com/cornell-cup/cs-reminibot.git
-```
-
-# Installing BaseStation Python Dependencies
-Run the following commands to navigate to the basestation directory in and install the Python3 dependencies.  On Windows open PowerShell and run the following commands.  On Linux or MacOS open terminal and run the commands
-```
-cd cs-reminibot/basestation
-pip3 install -r requirements.txt
-cd ..
-```
- 
-# Installing JavaScript Dependencies 
-Run the following commands to navigate to the gui directory in static/gui and install JavaScript dependencies.
-You should currently be in the cs-reminibot directory
-
-```
-cd static/gui
-npm install
-npm install --save-dev @testing-library/react
-cd ../..
-```
-
-# Run the BaseStation
-After all dependencies are successfully installed, you can run the BaseStation on your
-computer and start working with the minibot.
-
-The BaseStation is the intermediary that manages information flow between the minibot and
-hardware to the software and GUI. BaseStation runs on `cs-reminibot/basestation/base_station_interface.py` and is a
-simple web application that runs on HTTP.
-
-To run the BaseStation, run the following line of code.  You should currently be in the cs-reminibot directory.
-
-If you are on Linux or MacOS run: 
-```
-./run_BS.sh
-```
-
-If you are on Windows run:
-```
-bash run_BS.sh
-```
-
-Go to any browser on your computer and go to `localhost:8080/start` to see the GUI in action.
-If you are having trouble running the previous line, make sure that python3 is installed.
-You can check this by typing `python3` in your terminal.
