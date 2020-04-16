@@ -54,27 +54,46 @@ sudo npm install npm@latest -g
 
 ## Windows 10: Installing Initial Requirements
 
+#### Windows Subsystem for Linux Installation
+1. Click on Start (or press *Windows Key + S*) to open the Windows Search Bar, and search for "Windows Features".  Select "Turn Windows Features on or off".
+2. Select **Windows Subsystem for Linux** and click OK.  You will be prompted to restart your computer.  Please do so.  
+3. Open the Microsoft Store app and search for Ubuntu 18.04 LTS.  Please install it.
+4. After installation, click launch.  You will be prompted to *"press any key to continue"* and then to create a username and password.  Please do these things.  
+5. You now have WSL (Windows Subsystem for Linux) installed.  Please run:
+```
+lsb_release -a
+```
+to confirm the installation was successful.  You should see *Ubuntu* in the Description section of the output.  
+6. You can start WSL anytime by typing *wsl* in your windows search bar and choosing the prompted command.  
+
 #### Git installation:
-1. Go to https://gitforwindows.org/ and click Download.
-2. Run the installer that downloads (the .exe file) and install Git.  You can leave all options as their defaults.
+In Windows Subsytem for Linux run:
+```
+sudo add-apt-repository ppa:git-core/ppa
+sudo apt update
+sudo apt install git
+```
+While running these commands you will be prompted to enter your *sudo* password.  This password is the same password that you configured when installing WSL.  
 
 #### Python3 and Pip3 installation:
-1. Go to https://www.python.org/downloads/ and press "Download Python <version_number>"
-2. Open the installer that downloads (the .exe file) and **select the checkbox that says "Add Python 3.8 to PATH"**
-3. Click the "Install Now" button
+In Windows Subsytem for Linux run:
+```
+sudo apt update && upgrade
+sudo apt install python3 python3-pip
+```
 
 #### Node.js and npm installation:
-1. Download node.js by visiting https://nodejs.org/en/download/, and clicking the download button for the Windows Installer (.msi) version, for your computer.  Your computer is most likely 64-bit, but you can look up online to confirm.  
-2. Run the installer that downloads, and keep pressing "Next" without changing any default options.  
-**However, in the *Tools for Native Modules section*, make sure to select the checkbox for *"Automatically install the necessary tools....."*.**  Press Install and let the installer run.  A new script will pop up to install additional tools.  Press any key to continue, and allow Powershell to install the additional tools automatically.  
+In Windows Subsytem for Linux run:
+```
+curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+sudo apt-get install -y nodejs
+```
 
-#### Bash in Powershell installation
-1. Click the Start Button
-2. Click Control Panel
-3. Click Programs
-4. Click "Turn Windows Features on or off"
-5. Enable "Windows Subsystem for Linux"
-6. You might be prompted to restart your computer.  
+Upgrade npm to the lastest version by running:
+
+```
+sudo npm install npm@latest -g
+```
 
 # Cloning the respository
 To clone (download) the respository onto your local machine.  On Linux or MacOS, open a new terminal and run the command below.  On Windows, open Git Bash and run the command below.  
