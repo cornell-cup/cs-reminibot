@@ -287,11 +287,14 @@ class OnBotVisionHandler(tornado.websocket.WebSocketHandler):
             bot = self.base_station.get_bot(bot_id)
 
             if key == "STARTBOTVISION":  # start the on bot vision
-                print("starting onBotVisionServer thread")
-                onBotVisionServer = StoppableThread(
-                    target=startBotVisionServer, daemon=True)
-                onBotVisionServer.start()
-                bot.sendKV(key, '')
+                if (bot):
+                    print("starting onBotVisionServer thread")
+                    onBotVisionServer = StoppableThread(
+                        target=startBotVisionServer, daemon=True)
+                    onBotVisionServer.start()
+                    bot.sendKV(key, '')
+                else:
+                    print("no bot found")
             elif key == "STOPBOTVISION":
                 print("ending onBotVisionServer thread")
                 if (onBotVisionServer):

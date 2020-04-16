@@ -9,9 +9,13 @@ import ast
 import os
 # mport scripts.PiArduino as ece
 # import scripts.ece_dummy_ops as ece
-from imutils.video import VideoStream  # for on-bot vision
-from imagezmq import imagezmq  # for on-bot vision
-from scripts.stoppableThreads import StoppableThread  # for on-bot vision
+
+# for on-bot vision
+from imutils.video import VideoStream
+from imagezmq import imagezmq
+from scripts.stoppableThreads import StoppableThread
+import socket
+import picamera
 
 # Create a UDP socket
 sock = socket(AF_INET, SOCK_DGRAM)
@@ -93,9 +97,8 @@ def parse_command(cmd, tcpInstance):
         print("On bot vision w/ server ip: " + server_ip)
         # TODO: Thread is not working / needs to be tested
         botVisionClient = StoppableThread(
-            target=startBotVisionClient, args=server_ip, daemon=True)
+            target=startBotVisionClient, kwargs={'server_ip': server_ip}, daemon=True)
         botVisionClient.start()
-        print("Thread has been made")
     elif key == "STOPBOTVISION":
         if (botVisionClient):
             botVisionClient.stop()
@@ -162,8 +165,7 @@ def start_base_station_heartbeat(ip_address):
         time.sleep(9)
 
 
-def startBotVisionClient(self, server_ip):
-    import socket
+def startBotVisionClient(server_ip):
     # TODO remove
     print("Entered the startBotVisionClient thread")
 
