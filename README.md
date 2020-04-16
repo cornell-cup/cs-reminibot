@@ -23,13 +23,13 @@ Please install the following:
 
 <a name="Continue"></a>
 # Cloning the respository
-To clone (download) the respository onto your local machine.  On Linux or MacOS, open a new terminal and run the command below.  On Windows, open Git Bash and run the command below.  
+To clone (download) the respository onto your local machine.  On Windows open WSL (Windows Subsystem for Linux) and run the following command.  On Linux or MacOS open terminal and run the command. 
 ```
 git clone https://github.com/cornell-cup/cs-reminibot.git
 ```
 
 # Installing BaseStation Python Dependencies
-Run the following commands to navigate to the basestation directory in and install the Python3 dependencies.  On Windows open PowerShell and run the following commands.  On Linux or MacOS open terminal and run the commands
+Run the following commands to navigate to the basestation directory in and install the Python3 dependencies.  On Windows open WSL (Windows Subsystem for Linux) and run the following commands.  On Linux or MacOS open terminal and run the commands
 ```
 cd cs-reminibot/basestation
 pip3 install -r requirements.txt
