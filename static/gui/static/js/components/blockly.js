@@ -293,6 +293,7 @@ export default class MinibotBlockly extends React.Component {
   redefine_custom_blocks() {
     var _this = this;
     this.manageDefaultCustomBlocklyFunction(true);
+    console.log(this.props.customBlockList)
 
     Blockly.Blocks['custom_block'] = {
       init: function () {
@@ -319,34 +320,41 @@ export default class MinibotBlockly extends React.Component {
     };
   }
 
-  async custom_block(function_name, pythonTextBoxCode) {
+ async custom_block(function_name, pythonTextBoxCode) {
     this.manageDefaultCustomBlocklyFunction(false);
     var _this = this;
-    await this.scriptToCode();
     var item = _this.props.customBlockList.find(element => element[0] === function_name); 
     if (item == undefined) {
       _this.props.customBlockList.push([function_name, pythonTextBoxCode]);
+      // this.redefine_custom_blocks();
     } else {
       item[1] = pythonTextBoxCode;
+      await this.scriptToCode()
+      Blockly.Python['custom_block'] = function () {
+        // return block.getFieldValue('function_content');
+        return pythonTextBoxCode;
+      };
+      await this.scriptToCode()
     }
-    await this.setState({ customBlockList: _this.props.customBlockList});
-    this.redefine_custom_blocks();
-    this.update_custom_blocks();
+  this.setState({ customBlockList: _this.props.customBlockList});
+  this.redefine_custom_blocks();
+  this.update_custom_blocks();
+
   }
 
-  async dblock(function_name) {
+  dblock(function_name) {
     var _this = this;
-    await this.scriptToCode();
     var item = _this.props.customBlockList.find(element => element[0] === function_name)
     const index = _this.props.customBlockList.indexOf(item);
     if (index > -1) {
       _this.props.customBlockList.splice(index, 1);
     }
-    await this.setState({ customBlockList: _this.props.customBlockList});
+    this.setState({ customBlockList: _this.props.customBlockList});
     this.redefine_custom_blocks();
     this.update_custom_blocks();
 
   }
+  
 
   /* handles input change for file name and coding textboxes */
   handleInputChange(event) {
