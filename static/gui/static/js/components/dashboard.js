@@ -1,32 +1,9 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import { render } from 'react-dom';
-// import BarChartComponent from './barchart';
-// import LineChartComponent from './linechart';
+import BarChartComponent from './barchart';
+import LineChartComponent from './linechart';
 
-const data = [
-    {
-        name: 'Error 1', error: 10,
-    },
-    {
-        name: 'Error 2', error: 5,
-    },
-    {
-        name: 'Error 3', error: 25,
-    },
-    {
-        name: 'Error 4', error: 15,
-    },
-    {
-        name: 'Error 5', error: 13,
-    },
-    {
-        name: 'Error 6', error: 3,
-    },
-    {
-        name: 'Error 7', error: 7,
-    },
-];
 
 export default class Dashboard extends React.Component {
     constructor() {
@@ -128,7 +105,7 @@ export default class Dashboard extends React.Component {
                 </div>
 
 
-                {/* <div className="row">
+                <div className="row">
                     <div className="card col-md-6">
                         <BarChartComponent></BarChartComponent>
                     </div>
@@ -137,7 +114,7 @@ export default class Dashboard extends React.Component {
                         <LineChartComponent></LineChartComponent>
                     </div>
 
-                </div> */}
+                </div>
             </div>
 
 
