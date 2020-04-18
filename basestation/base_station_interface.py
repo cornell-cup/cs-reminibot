@@ -52,6 +52,7 @@ class BaseInterface:
             )),
             ("/vision", VisionHandler, dict(base_station=self.base_station)),
             ("/heartbeat", HeartbeatHandler, dict(base_station=self.base_station))
+            ("/voice", VoiceHandler, dict(base_station=self.base_station))
         ]
 
     def start(self):
@@ -274,6 +275,43 @@ class HeartbeatHandler(tornado.websocket.WebSocketHandler):
         heartbeat_json = {"is_heartbeat": is_heartbeat}
         self.write(json.dumps(heartbeat_json).encode())
 
+class VoiceHandler(tornado.websocket.WebSocketHandler):
+    def initialize(self, base_station):
+        self.base_station = base_station
+
+    def get(self):
+        pass #not sure what's supposed to happen here
+
+    def post(self):
+        data = json.loads(self.request.body.decode())
+        key = data['key']
+
+        session_id = self.get_secure_cookie("user_id")
+        if session_id:
+            session_id = session_id.decode("utf-8")
+            bot_name = data['bot_name']
+            bot_id = self.base_station.bot_name_to_bot_id(bot_name)
+            bot = self.base_station.get_bot(bot_id)
+
+            if key == "START VOICE":  # start listening
+                if (bot):
+                    print("starting onBotVisionServer thread")
+                    onBotVisionServer = StoppableThread(
+                        target=startBotVisionServer, daemon=True)
+                    onBotVisionServer.start()
+                    bot.sendKV(key, '')
+                else:
+                    print("no bot found")
+            elif key == "STOP VOICE":
+                print("ending onBotVisionServer thread")
+                if (onBotVisionServer):
+                    onBotVisionServer.stop()
+                    bot.sendKV(key, '')
+                else:
+                    print("ERROR: No on bot vision server started")
+            else:
+                print("Invalid key")
+    
 
 if __name__ == "__main__":
     """

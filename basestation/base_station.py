@@ -367,6 +367,9 @@ class BaseStation:
 
         return True
 
+    def get_voice_command( self ):
+        #TODO
+
     # ================== SESSIONS ==================
 
     def list_active_sessions(self):
