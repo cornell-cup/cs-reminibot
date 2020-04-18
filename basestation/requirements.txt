@@ -2,10 +2,11 @@ bcrypt==3.1.7
 cffi==1.11.5
 click==6.7        
 Flask==1.1.1     
+Flask-API==2.0
+Flask-Cors==3.0.8
 Flask-SQLAlchemy==2.4.1    
 itsdangerous==0.24
 Jinja2==2.10
-MarkupSafe==1.0
 pycparser==2.19
 six==1.11.0            
 requests==2.22.0     

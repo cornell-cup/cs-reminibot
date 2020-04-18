@@ -8,6 +8,9 @@ echo "================= MINIBOT BASESTATION GUI ================="
 cd ..
 cd ..
 cd basestation
+echo "================= STARTING BLOCKLY USER PROGRAM DATABASE ================="
+python3 flask_app.py &
+DATABASEPID=$!
 echo "=========== STARTING BASESTATION ==============="
 if [ $# -eq 1 ]
 then
@@ -16,3 +19,5 @@ then
 else
     python3 base_station_interface.py
 fi
+kill -9 $DATABASEPID 
+
