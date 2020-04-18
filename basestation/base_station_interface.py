@@ -300,17 +300,17 @@ class VoiceHandler(tornado.websocket.WebSocketHandler):
 
             if key == "START VOICE":  # start listening
                 if (bot):
-                    print("starting onBotVisionServer thread")
-                    onBotVisionServer = StoppableThread(
-                        target=startBotVisionServer, daemon=True)
-                    onBotVisionServer.start()
+                    print("starting voiceServer thread")
+                    voiceServer = StoppableThread(
+                        target=self.base_station.voice_recognition, daemon=True)
+                    voiceServer.start()
                     bot.sendKV(key, '')
                 else:
                     print("no bot found")
             elif key == "STOP VOICE":
                 print("ending onBotVisionServer thread")
                 if (onBotVisionServer):
-                    onBotVisionServer.stop()
+                    voiceServer.stop()
                     bot.sendKV(key, '')
                 else:
                     print("ERROR: No on bot vision server started")
