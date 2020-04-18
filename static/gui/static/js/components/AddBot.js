@@ -58,23 +58,59 @@ function Ports(props) {
 
 
 
-    // const portNames = ["LMOTOR", "RMOTOR", "MOTOR3", "LINE", "INFRARED", "RFID", "ULTRASONIC"]
-    // let buttonList = [];
-    //
-    // for(let j = 0; j < 7; j++){
-    //     buttonList.push(<li><a href="">{portNames[j]}</a><ul>);
-    //     buttonList.push(</li>);
-    //         <ul>
-    //             <Ports motorPorts = {this.motorPorts}/>
-    //         </ul>
-    //       </li>)
-    //
-    //     for (let i = 0; i < 8; i++) {
-    //         buttonList.push(<li><button className="btn_ports" onClick={() => props.motorPorts(props.portName, ports[i])}>{ports[i]}</button></li>);
-    //     }
-    // }
-    // return buttonList;
-//};
+  class Voice extends React.Component {
+      constructor(props) {
+          super(props);
+          this.state = {
+              on: false
+          }
+          this.toggle = this.toggle.bind(this);
+          this.getVoice = this.getVoice.bind(this);
+      }
+
+      toggle() {
+          this.getVoice(this.state.on);
+          this.setState({
+              on: !this.state.on
+          })
+      }
+
+      getVoice(isOn) {
+          const _this = this;
+          console.log(isOn ? "STOP VOICE" : "START VOICE")
+          axios({
+              method: 'POST',
+              url: '/start',
+              data: JSON.stringify({
+                  key: isOn ? "STOP VOICE" : "START VOICE",
+                  bot_name: this.props.selected_bot
+              })
+          })
+              .then(function (response) {
+                  if (response.data) {
+                      console.log(response.data);
+                  }
+              })
+              .catch(function (error) {
+                  // console.log(error);
+              })
+      }
+
+      render() {
+          var x = "";
+          if (this.state.on) {
+              x = "Stop Voice";
+          }
+          else {
+              x = "Start Voice";
+          }
+          return (
+              <div>
+                  <button className="btn btn-primary" onClick={this.toggle}>{x}</button>
+              </div>
+          )
+      }
+  }
 
 
 export default class AddBot extends React.Component {
@@ -513,6 +549,7 @@ export default class AddBot extends React.Component {
                             Power:
                           <input type="text" defaultValue="50" name="wheel_power" onChange={evt => this.updatePowerValue(evt)} />
                         </label>
+                         <Voice selected_bot={this.props.selected_bot} float="right" />
                     </form>
                 </div>
                 {/* button-wrapper is a custom class to add padding
