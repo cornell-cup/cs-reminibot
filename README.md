@@ -97,6 +97,7 @@ You should currently be in the cs-reminibot directory
 ```
 cd static/gui
 npm install
+npm install --save-dev @testing-library/react
 cd ../..
 ```
 
