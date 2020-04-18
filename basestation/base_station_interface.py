@@ -6,6 +6,7 @@ import tornado
 import tornado.web
 import tornado.websocket
 import os.path
+import os
 import json
 import logging
 import sys
@@ -48,7 +49,9 @@ class BaseInterface:
         self.handlers = [
             ("/start", ClientHandler, dict(base_station=self.base_station)),
             ("/vision", VisionHandler, dict(base_station=self.base_station)),
-            ("/heartbeat", HeartbeatHandler, dict(base_station=self.base_station))
+            ("/heartbeat", HeartbeatHandler, dict(base_station=self.base_station)),
+            ("/builtin-script", BuiltinScriptHandler,
+             dict(base_station=self.base_station))
         ]
 
     def start(self):
@@ -254,6 +257,52 @@ class HeartbeatHandler(tornado.websocket.WebSocketHandler):
         is_heartbeat = self.base_station.is_heartbeat_recent(time_interval)
         heartbeat_json = {"is_heartbeat": is_heartbeat}
         self.write(json.dumps(heartbeat_json).encode())
+
+
+class BuiltinScriptHandler(tornado.web.RequestHandler):
+    def initialize(self, base_station):
+        self.base_station = base_station
+
+    def set_default_headers(self):
+        return self.set_header("Content-Type", 'application/json')
+
+    """
+    Format for START requests:
+    {
+        op: 'START'
+        path: <path to script to run, relative to root directory>
+        script_name: <file to run>
+        args: {
+            <flag> : <value>
+            ...
+        }
+    }
+
+    """
+
+    def post(self):
+        req = json.loads(self.request.body.decode())
+        res = None  # send this back to client
+
+        # Check that our JSON is good
+        if req['op'] == None:
+            self.set_status(400, reason="missing op")
+        elif req['op'] != 'START' and req['op'] != "STOP":
+            self.set_status(400, reason="op must be START or STOP")
+        elif req['op'] == 'START':
+            # TODO resolve permission denied?
+            script_name = "../" + req['path'] + "/" + req['script_name']
+            print("Starting script " + script_name)
+            os.system(script_name)
+
+            self.set_status(200)
+        elif req['op'] == 'STOP':
+            # TODO do something to kill an existing thread
+            script_name = "../" + req['path'] + "/" + req['script_name']
+            print("Stopping script " + script_name)
+            self.set_status(200)
+
+        print(req)
 
 
 if __name__ == "__main__":

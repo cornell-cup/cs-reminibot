@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+import RequestButton from '../components/RequestButton'
 /**
  * Component for the grid view of the simulated bots.
  */
@@ -101,7 +102,7 @@ export default class GridView extends React.Component {
             .attr('transform', `rotate(${o}, ${this.state.width / 2 + x}, ${this.state.height / 2 - y})`)
     }
 
-    deleteBot(){
+    deleteBot() {
         // deletes the circle and logo
         this.svg.selectAll("circle").remove();
         this.svg.selectAll("image").remove();
@@ -125,32 +126,32 @@ export default class GridView extends React.Component {
         const _this = this;
         var pos = [];
         axios.get('/vision')
-        .then(function(response) {
-            console.log(response.data);
-            pos.push(response.data);
-            // delete robot if empty string for x coordinate
-            if(pos[0]['x']===''){
-                _this.deleteBot();
-            }
-            // call drawBot with x,y coordinate, color, orientation
-            else{
-                _this.state.xcor=parseInt(pos[0]['x']);
-                _this.state.ycor=parseInt(pos[0]['y']);
-                _this.drawBot(_this.state.xcor,_this.state.ycor,'red',parseInt(pos[0]['orientation']));
-            }
-        })
-        .catch(function (error) {
-        // console.log(error);
-        })
+            .then(function (response) {
+                console.log(response.data);
+                pos.push(response.data);
+                // delete robot if empty string for x coordinate
+                if (pos[0]['x'] === '') {
+                    _this.deleteBot();
+                }
+                // call drawBot with x,y coordinate, color, orientation
+                else {
+                    _this.state.xcor = parseInt(pos[0]['x']);
+                    _this.state.ycor = parseInt(pos[0]['y']);
+                    _this.drawBot(_this.state.xcor, _this.state.ycor, 'red', parseInt(pos[0]['orientation']));
+                }
+            })
+            .catch(function (error) {
+                // console.log(error);
+            })
 
     }
 
-    displayRobot(){
+    displayRobot() {
         // counter for number of times button is clicked
-        this.state.count=this.state.count+1
+        this.state.count = this.state.count + 1
         //stops call to getvisionData
-        if(this.state.count%2==0){
-            clearInterval(this.find); 
+        if (this.state.count % 2 == 0) {
+            clearInterval(this.find);
         }
         // calls getvisionData every 10 milliseconds
         else {
@@ -163,8 +164,20 @@ export default class GridView extends React.Component {
             <div id="component_view" className="box">
                 <p id="small_title">Vision </p>
                 <button id="grid_recenter" onClick={this.displayRobot}>Display Bot</button>
+                <RequestButton name="Hello"
+                    script_name="hello_world.py"
+                    path="vision/apriltag-py/python"></RequestButton>
+                <RequestButton name="Calibrate Camera"
+                    script_name="calibrate_camera.py"
+                    path="vision/apriltag-py/python"></RequestButton>
+                <RequestButton name="Calibrate Axes"
+                    script_name="locate_camera.py"
+                    path="vision/apriltag-py/python"></RequestButton>
+                <RequestButton name="Locate tags"
+                    script_name="locate_tags.py"
+                    path="vision/apriltag-py/python"></RequestButton>
                 <div id="view"></div>
-            </div>
+            </div >
         );
     }
 }
