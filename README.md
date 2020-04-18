@@ -16,6 +16,57 @@ Please install the following:
 * Node.js (The Javascript runtime library)
 * npm (The Javascript package manager) 
 
+[Ubuntu 18 Installing Initial Requirements guide](#Ubuntu)
+
+[Windows 10 Installing Initial Requirements guide](#Windows)
+
+
+<a name="Continue"></a>
+# Cloning the respository
+To clone (download) the respository onto your local machine.  On Windows open WSL (Windows Subsystem for Linux) and run the following command.  On Linux or MacOS open terminal and run the command. 
+```
+git clone https://github.com/cornell-cup/cs-reminibot.git
+```
+
+# Installing BaseStation Python Dependencies
+Run the following commands to navigate to the basestation directory in and install the Python3 dependencies.  On Windows open WSL (Windows Subsystem for Linux) and run the following commands.  On Linux or MacOS open terminal and run the commands
+```
+cd cs-reminibot/basestation
+pip3 install -r requirements.txt
+cd ..
+```
+ 
+# Installing JavaScript Dependencies 
+Run the following commands to navigate to the gui directory in static/gui and install JavaScript dependencies.
+You should currently be in the cs-reminibot directory
+
+```
+cd static/gui
+npm install
+npm install --save-dev @testing-library/react
+cd ../..
+```
+
+# Run the BaseStation
+After all dependencies are successfully installed, you can run the BaseStation on your
+computer and start working with the minibot.
+
+The BaseStation is the intermediary that manages information flow between the minibot and
+hardware to the software and GUI. BaseStation runs on `cs-reminibot/basestation/base_station_interface.py` and is a
+simple web application that runs on HTTP.
+
+To run the BaseStation, run the following command.  You should currently be in the cs-reminibot directory.
+ 
+```
+./run_BS.sh
+```
+
+Go to any browser on your computer and go to `localhost:8080/start` to see the GUI in action.
+If you are having trouble running the previous line, make sure that python3 is installed.
+You can check this by typing `python3` in your terminal.
+
+# Operating System Specific Guides to Install Initial Requirements
+<a name="Ubuntu"></a>
 ## Ubuntu 18: Installing Initial Requirements
 
 #### Git installation:
@@ -50,77 +101,49 @@ Upgrade npm to the lastest version by running:
 ```
 sudo npm install npm@latest -g
 ```
+[Continue with the remaining installation steps](#Continue)
 
-
+<a name="Windows"></a>
 ## Windows 10: Installing Initial Requirements
 
+#### Windows Subsystem for Linux Installation
+1. Click on Start (or press *Windows Key + S*) to open the Windows Search Bar, and search for "Windows Features".  Select "Turn Windows Features on or off".
+2. Select **Windows Subsystem for Linux** and click OK.  You will be prompted to restart your computer.  Please do so.  
+3. Open the Microsoft Store app and search for Ubuntu 18.04 LTS.  Please install it.
+4. After installation, click launch.  You will be prompted to *"press any key to continue"* and then to create a username and password.  Please do these things.  
+5. You now have WSL (Windows Subsystem for Linux) installed.  Please run:
+```
+lsb_release -a
+```
+to confirm the installation was successful.  You should see *Ubuntu* in the Description section of the output.  
+6. You can start WSL anytime by typing *wsl* in your windows search bar and choosing the prompted command.  
+
 #### Git installation:
-1. Go to https://gitforwindows.org/ and click Download.
-2. Run the installer that downloads (the .exe file) and install Git.  You can leave all options as their defaults.
+In Windows Subsytem for Linux run:
+```
+sudo add-apt-repository ppa:git-core/ppa
+sudo apt update
+sudo apt install git
+```
+While running these commands you will be prompted to enter your *sudo* password.  This password is the same password that you configured when installing WSL.  
 
 #### Python3 and Pip3 installation:
-1. Go to https://www.python.org/downloads/ and press "Download Python <version_number>"
-2. Open the installer that downloads (the .exe file) and **select the checkbox that says "Add Python 3.8 to PATH"**
-3. Click the "Install Now" button
+In Windows Subsytem for Linux run:
+```
+sudo apt update && upgrade
+sudo apt install python3 python3-pip
+```
 
 #### Node.js and npm installation:
-1. Download node.js by visiting https://nodejs.org/en/download/, and clicking the download button for the Windows Installer (.msi) version, for your computer.  Your computer is most likely 64-bit, but you can look up online to confirm.  
-2. Run the installer that downloads, and keep pressing "Next" without changing any default options.  
-**However, in the *Tools for Native Modules section*, make sure to select the checkbox for *"Automatically install the necessary tools....."*.**  Press Install and let the installer run.  A new script will pop up to install additional tools.  Press any key to continue, and allow Powershell to install the additional tools automatically.  
-
-#### Bash in Powershell installation
-1. Click the Start Button
-2. Click Control Panel
-3. Click Programs
-4. Click "Turn Windows Features on or off"
-5. Enable "Windows Subsystem for Linux"
-6. You might be prompted to restart your computer.  
-
-# Cloning the respository
-To clone (download) the respository onto your local machine.  On Linux or MacOS, open a new terminal and run the command below.  On Windows, open Git Bash and run the command below.  
+In Windows Subsytem for Linux run:
 ```
-git clone https://github.com/cornell-cup/cs-reminibot.git
+curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+sudo apt-get install -y nodejs
 ```
 
-# Installing BaseStation Python Dependencies
-Run the following commands to navigate to the basestation directory in and install the Python3 dependencies.  On Windows open PowerShell and run the following commands.  On Linux or MacOS open terminal and run the commands
-```
-cd cs-reminibot/basestation
-pip3 install -r requirements.txt
-cd ..
-```
- 
-# Installing JavaScript Dependencies 
-Run the following commands to navigate to the gui directory in static/gui and install JavaScript dependencies.
-You should currently be in the cs-reminibot directory
+Upgrade npm to the lastest version by running:
 
 ```
-cd static/gui
-npm install
-npm install --save-dev @testing-library/react
-cd ../..
+sudo npm install npm@latest -g
 ```
-
-# Run the BaseStation
-After all dependencies are successfully installed, you can run the BaseStation on your
-computer and start working with the minibot.
-
-The BaseStation is the intermediary that manages information flow between the minibot and
-hardware to the software and GUI. BaseStation runs on `cs-reminibot/basestation/base_station_interface.py` and is a
-simple web application that runs on HTTP.
-
-To run the BaseStation, run the following line of code.  You should currently be in the cs-reminibot directory.
-
-If you are on Linux or MacOS run: 
-```
-./run_BS.sh
-```
-
-If you are on Windows run:
-```
-bash run_BS.sh
-```
-
-Go to any browser on your computer and go to `localhost:8080/start` to see the GUI in action.
-If you are having trouble running the previous line, make sure that python3 is installed.
-You can check this by typing `python3` in your terminal.
+[Continue with the remaining installation steps](#Continue)
