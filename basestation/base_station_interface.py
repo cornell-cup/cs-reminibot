@@ -14,6 +14,7 @@ import re  # regex import
 import threading
 
 # Minibot imports.
+import subprocess
 from base_station import BaseStation
 from piVision import *
 from piVision.server import startBotVisionServer
@@ -264,13 +265,11 @@ class StoppableThread(threading.Thread):
         return self._stop_event.is_set()
 
 
-# global var for onBotVisionServer
-onBotVisionServer = None
-
-
 class OnBotVisionHandler(tornado.websocket.WebSocketHandler):
     def initialize(self, base_station):
         self.base_station = base_station
+        # TODO: make this a class var somehow
+        self.bot_vision_server = None
 
     def get(self):
         pass  # TODO
@@ -287,18 +286,23 @@ class OnBotVisionHandler(tornado.websocket.WebSocketHandler):
             bot = self.base_station.get_bot(bot_id)
 
             if key == "STARTBOTVISION":  # start the on bot vision
-                if (bot):
-                    print("starting onBotVisionServer thread")
-                    onBotVisionServer = StoppableThread(
-                        target=startBotVisionServer, daemon=True)
-                    onBotVisionServer.start()
-                    bot.sendKV(key, '')
-                else:
-                    print("no bot found")
+                # if (bot):
+                print("starting onBotVisionServer process")
+
+                self.bot_vision_server = subprocess.Popen(
+                    ['/usr/local/bin/python3', 'piVision/oldServer.py'])
+
+                # onBotVisionServer = StoppableThread(
+                #     target=startBotVisionServer, daemon=True)
+                # onBotVisionServer.start()
+                bot.sendKV(key, '')
+                # else:
+                #     print("no bot found")
             elif key == "STOPBOTVISION":
                 print("ending onBotVisionServer thread")
-                if (onBotVisionServer):
-                    onBotVisionServer.stop()
+                if (self.bot_vision_server):
+                    self.bot_vision_server.kill()
+                    # onBotVisionServer.terminate()
                     bot.sendKV(key, '')
                 else:
                     print("ERROR: No on bot vision server started")
