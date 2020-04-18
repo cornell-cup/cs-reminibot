@@ -7,6 +7,7 @@
     "axios": "^0.19.2",
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
+    "jest": "^22.4.3",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
     "react-tabs": "^2.0.0"
@@ -16,6 +17,9 @@
       "react",
       "es2015"
     ]
+  },
+  "jest": {
+    "testURL": "http://localhost/"
   },
   "devDependencies": {
     "babel": "^6.23.0",
@@ -33,7 +37,7 @@
     "webpack-cli": "^3.3.7"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --watchAll",
     "build": "babel src -d lib",
     "webpack": "webpack"
   },

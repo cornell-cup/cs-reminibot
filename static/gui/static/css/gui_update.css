@@ -7,12 +7,38 @@
     width: 560px;
 }
 
-.slightly_larger_text {
-    size: 5em;
+.button-wrapper {
+    padding-top: 10px;
+    padding-bottom: 10px;
 }
 
+.control {
+    padding-left: 15px;
+    padding-top: 15px;
+}
 
-/* NAVBAR */
+.divider {
+    width: 100px;
+    height: auto;
+    display: inline-block;
+}
+
+.element-wrapper {
+    padding-right: 10px;
+}
+
+.horizontalDiv {
+    clear: both;
+    padding-top: 10px;
+}
+
+.horizontalDiv div {
+    float: left;
+}
+
+.main-body {
+    background: white;
+}
 
 .navbar {
     width: 100vw;
@@ -22,6 +48,10 @@
     color: white;
 }
 
+.newDiv {
+    padding-top: 15px;
+}
+
 .logo {
     height: 7vh;
     width: 7vh;
@@ -29,38 +59,10 @@
     text-align: right;
 }
 
-.control {
-    padding-left: 15px;
-    padding-top: 15px;
+.slightly_larger_text {
+    size: 5em;
 }
 
-.newDiv {
-    padding-top: 15px;
-}
-
-.horizontalDiv div {
-    float: left;
-}
-
-.horizontalDiv {
-    clear: both;
-    padding-top: 10px;
-}
-
-.button-wrapper {
-    padding-top: 10px;
-    padding-bottom: 10px;
-}
-
-.element-wrapper {
-    padding-right: 10px;
-}
-
-.divider {
-    width: 100px;
-    height: auto;
-    display: inline-block;
-}
 
 table {
     text-align: center;
@@ -187,7 +189,7 @@ table {
 .btn_btn-dir_movement {
     background: #d1150c;
     color: white;
-    border-radius: 15px;
+    border-radius: 30px;
     height: 40px;
     width: 120px;
     font-weight: 650;

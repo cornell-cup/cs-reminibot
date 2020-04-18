@@ -210,12 +210,10 @@ class PythonTextBox extends React.Component {
 export default class MinibotBlockly extends React.Component {
   constructor(props) {
     super(props);
-    console.log("Hello2");
     console.log(this.props.customBlockList);
 
     this.scriptToCode = this.scriptToCode.bind(this);
 
-    console.log("Hello25");
     console.log(this.props.customBlockList);
 
     this.state = {
@@ -245,7 +243,6 @@ export default class MinibotBlockly extends React.Component {
     this.custom_block = this.custom_block.bind(this)
     this.manageDefaultCustomBlocklyFunction = this.manageDefaultCustomBlocklyFunction.bind(this)
 
-    console.log("Hello3");
     console.log(this.props.customBlockList);
     this.redefine_custom_blocks();
   }
