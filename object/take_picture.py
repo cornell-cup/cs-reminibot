@@ -40,7 +40,12 @@ while i + 1 < len(args):
     except IndexError:
         print('Expected more arguments')
 
+cv2.namedWindow("Capture")
 cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+if not cap.isOpened():
+    cap = cv2.VideoCapture(-1)
+
+
 while cap.isOpened():
     ret, frame = cap.read()
     key = cv2.waitKey(1)
@@ -54,12 +59,12 @@ while cap.isOpened():
     cv2.imshow('Capture', shown_frame)
 
 
-    if key == ord('c'):
+    if key & 0xFF == ord('c'):
         color = not color
-    if key == ord(' '):
+    if key & 0xFF == ord(' '):
         cv2.imwrite(image_folder + '/' + image_name + '_' + str(image_counter) + '.png', frame)
         image_counter = image_counter + 1
-    if key in [27, 1048603, ord('q')]:
+    if key & 0xFF in [27, 1048603, ord('q')]:
         break
 
 cap.release()
