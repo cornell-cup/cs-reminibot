@@ -1,6 +1,7 @@
 import cv2
 import sys
 
+
 args = sys.argv
 color = True
 image_counter = 0
@@ -42,9 +43,13 @@ while i + 1 < len(args):
 
 cv2.namedWindow("Capture")
 cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+
 if not cap.isOpened():
     cap = cv2.VideoCapture(-1)
 
+if not cap.isOpened():
+    print("Not opening")
+    exit(0)
 
 while cap.isOpened():
     ret, frame = cap.read()
