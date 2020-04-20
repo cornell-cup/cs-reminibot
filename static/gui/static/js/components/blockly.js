@@ -312,6 +312,7 @@ export default class MinibotBlockly extends React.Component {
       }
     };
 
+
     // Unfortunately the code above only updates the drop down menu 
     // when the block's drop down menu is clicked.  To update the currently 
     // selected function's python code value without making 
@@ -327,7 +328,14 @@ export default class MinibotBlockly extends React.Component {
         // get currently selected function in drop down menu
         var currentFunc = allBlocks[i].getField(fieldName).text_;
         var item = _this.props.customBlockList.find(element => element[0] === currentFunc); 
-        allBlocks[i].setFieldValue(item[1], fieldName);
+        if (item == undefined) {
+          var field = allBlocks[i].getField(fieldName);
+          field.setText(this.props.customBlockList[0][0]);
+          allBlocks[i].setFieldValue(_this.props.customBlockList[0][1], fieldName);
+          console.log(allBlocks[i].getField(fieldName));
+        } else {
+          allBlocks[i].setFieldValue(item[1], fieldName);
+        }
       }
     }
 
