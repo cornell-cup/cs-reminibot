@@ -210,11 +210,6 @@ class PythonTextBox extends React.Component {
 export default class MinibotBlockly extends React.Component {
   constructor(props) {
     super(props);
-    console.log(this.props.customBlockList);
-
-    this.scriptToCode = this.scriptToCode.bind(this);
-
-    console.log(this.props.customBlockList);
 
     this.state = {
       blockly_filename: 'myXmlBlocklyCode.xml',
@@ -227,6 +222,8 @@ export default class MinibotBlockly extends React.Component {
       loginSuccessLabel: "",
       registerErrorLabel: "",
       registerSuccessLabel: "",
+      // updated in componentDidMount
+      workspace: null,
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -235,6 +232,7 @@ export default class MinibotBlockly extends React.Component {
     this.dblock = this.dblock.bind(this);
     this.login = this.login.bind(this);
     this.register = this.register.bind(this);
+    this.scriptToCode = this.scriptToCode.bind(this);
     this.handleLogin = this.handleLogin.bind(this);
     this.handleRegister = this.handleRegister.bind(this);
     this.logout = this.logout.bind(this);
@@ -243,11 +241,11 @@ export default class MinibotBlockly extends React.Component {
     this.custom_block = this.custom_block.bind(this)
     this.manageDefaultCustomBlocklyFunction = this.manageDefaultCustomBlocklyFunction.bind(this)
 
-    console.log(this.props.customBlockList);
-    this.redefine_custom_blocks();
   }
 
-  /* Populated the customBlocklyList with a default function if addOrDelete == true
+  /* Populates the customBlocklyList with a default function if addOrDelete == true
+     and if there are no custom function already defined in the customBlocklyList
+
      Deletes default function from customBlocklyList if addOrDelete == false */
   manageDefaultCustomBlocklyFunction(addOrDelete) {
     const defaultFunction = ["none", "# Please create custom function"];
@@ -289,18 +287,19 @@ export default class MinibotBlockly extends React.Component {
 
   redefine_custom_blocks() {
     var _this = this;
+    const blockType = "custom_block";
+    const fieldName = "function_content";
     this.manageDefaultCustomBlocklyFunction(true);
-    console.log(this.props.customBlockList)
 
-    Blockly.Blocks['custom_block'] = {
+    Blockly.Blocks[blockType] = {
       init: function () {
         this.jsonInit({
-          type: "custom_block",
+          type: blockType,
           message0: "function %1",
           args0: [
             {
               "type": "field_dropdown",
-              "name": "function_content",
+              "name": fieldName,
               "options": _this.props.customBlockList,
             }
           ],
@@ -312,31 +311,42 @@ export default class MinibotBlockly extends React.Component {
         });
       }
     };
-    Blockly.Python['custom_block'] = function (block) {
-      return block.getFieldValue('function_content');
+
+    // Unfortunately the code above only updates the drop down menu 
+    // when the block's drop down menu is clicked.  To update the currently 
+    // selected function's python code value without making 
+    // the user click on the menu, we need to use the setFieldValue function
+    // for the custom block.  Then in the code after this, we can set the 
+    // Blockly.Python["custom_block"] to be the value of the currently 
+    // selected function in the drop down menu and everything will be updated
+    // instantly :)
+    var allBlocks = _this.workspace.getAllBlocks();
+    for (let i = 0; i < allBlocks.length; i++) {
+      // only need to update custom blocks
+      if (allBlocks[i].type === blockType) {
+        // get currently selected function in drop down menu
+        var currentFunc = allBlocks[i].getField(fieldName).text_;
+        var item = _this.props.customBlockList.find(element => element[0] === currentFunc); 
+        allBlocks[i].setFieldValue(item[1], fieldName);
+      }
+    }
+
+    Blockly.Python[blockType] = function (block) {
+      return block.getFieldValue(fieldName);
     };
   }
 
- async custom_block(function_name, pythonTextBoxCode) {
+ custom_block(function_name, pythonTextBoxCode) {
     this.manageDefaultCustomBlocklyFunction(false);
     var _this = this;
     var item = _this.props.customBlockList.find(element => element[0] === function_name); 
     if (item == undefined) {
       _this.props.customBlockList.push([function_name, pythonTextBoxCode]);
-      // this.redefine_custom_blocks();
     } else {
       item[1] = pythonTextBoxCode;
-      await this.scriptToCode()
-      Blockly.Python['custom_block'] = function () {
-        // return block.getFieldValue('function_content');
-        return pythonTextBoxCode;
-      };
-      await this.scriptToCode()
     }
-  this.setState({ customBlockList: _this.props.customBlockList});
-  this.redefine_custom_blocks();
-  this.update_custom_blocks();
-
+    this.redefine_custom_blocks();
+    this.update_custom_blocks();
   }
 
   dblock(function_name) {
@@ -390,6 +400,7 @@ export default class MinibotBlockly extends React.Component {
       var xml = Blockly.Xml.textToDom(this.props.blockly_xml);
       Blockly.Xml.domToWorkspace(xml, _this.workspace);
     }
+    this.redefine_custom_blocks();
   }
 
   /* Helper for realtime code generation (Blockly => Python)
