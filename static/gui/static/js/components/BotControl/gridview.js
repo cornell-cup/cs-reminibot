@@ -21,6 +21,9 @@ export default class GridView extends React.Component {
             xcor: 0,
             ycor: 0,
             count: 0,
+            point_count: 0, // number of frames received for FPS counter
+            time: new Date().getTime(), // timer for FPS counter
+            fps: 0 // drawing rate, typically ~90 FPS
         };
 
         this.svg = null;
@@ -133,7 +136,7 @@ export default class GridView extends React.Component {
         var pos = [];
         axios.get('/vision')
             .then(function (response) {
-                console.log(response.data);
+                // console.log(response.data);
                 pos.push(response.data);
                 if (pos[0]['x'] === '') {
                     _this.deleteBot();
@@ -142,6 +145,13 @@ export default class GridView extends React.Component {
                     _this.state.xcor = parseInt(pos[0]['x']);
                     _this.state.ycor = parseInt(pos[0]['y']);
                     _this.drawBot(_this.state.xcor, _this.state.ycor, 'red', parseInt(pos[0]['orientation']));
+                    // each drawing is one frame added to the FPS
+                    _this.setState({
+                        point_count: _this.state.point_count + 1
+                    });
+                    _this.setState({
+                        fps: _this.state.point_count * 1000 / (new Date().getTime() - _this.state.time)
+                    });
                 }
             })
             .catch(function (error) {

@@ -17,11 +17,12 @@ TAG_SIZE = 6.5  # The length of one side of an apriltag, in inches
 MULT_FACTOR = 5  # The scale factor of the output coordinates
 SEND_DATA = True  # Sends data to URL if True. Set to False for debug
 
-# DEBUGGING AND TIMING VARIABLES
-past_time = -1
-
 
 def main():
+    # DEBUGGING AND TIMING VARIABLES
+    past_time = -1  # time to start counting. Set just before first picture taken
+    num_frames = 0  # number of frames processed
+
     args = get_args()
     url = args['url']
     SEND_DATA = (args['url'] != None)
@@ -68,7 +69,7 @@ def main():
     img_points = np.ndarray((4, 2))  # 4 2D points
     obj_points = np.ndarray((4, 3))  # 4 3D points
     detections = []
-
+    past_time = time.time()
     while True:
         if not camera.isOpened():
             print("Failed to open camera")
@@ -119,6 +120,9 @@ def main():
                     # Status codes not starting in '2' are usually error codes.
                     print("WARNING: Basestation returned status code {}".format(
                         status_code))
+                else:
+                    num_frames += 1
+                    print("FPS: {}".format(num_frames / (time.time() - past_time)))
     pass
 
 
