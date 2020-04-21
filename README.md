@@ -18,6 +18,8 @@ Please install the following:
 
 [Ubuntu 18 Installing Initial Requirements guide](#Ubuntu)
 
+[Mac OS Installing Initial Requirements guide](#MacOS)
+
 [Windows 10 Installing Initial Requirements guide](#Windows)
 
 
@@ -43,7 +45,6 @@ You should currently be in the cs-reminibot directory
 ```
 cd static/gui
 npm install
-npm install --save-dev @testing-library/react
 cd ../..
 ```
 
@@ -100,6 +101,42 @@ Upgrade npm to the lastest version by running:
 
 ```
 sudo npm install npm@latest -g
+```
+[Continue with the remaining installation steps](#Continue)
+
+<a name="MacOS"></a>
+## MacOS: Installing Initial Requirements
+
+#### Homebrew Installation
+1. Press *Cmd + Space* to open Spotlight Search.  Search for Terminal and open it.  
+2. Visit brew.sh in your browser to install Homebrew.  Copy the command specified in the installation section into your terminal and run it.  
+3.  After installation is complete, run the following command in your terminal:
+```
+brew upgrade 
+```
+
+#### Git installation:
+In a terminal run:
+```
+brew install git
+```
+
+#### Python3 and Pip3 installation:
+In a terminal run:
+```
+brew install python
+```
+
+#### Node.js and npm installation:
+In a terminal run:
+```
+brew install node
+```
+
+Upgrade npm to the lastest version by running:
+
+```
+npm install npm@latest -g
 ```
 [Continue with the remaining installation steps](#Continue)
 
