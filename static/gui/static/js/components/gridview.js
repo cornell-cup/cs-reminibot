@@ -14,6 +14,9 @@ export default class GridView extends React.Component {
             xcor: 0,
             ycor: 0,
             count: 0,
+            point_count: 0, // number of frames received for FPS counter
+            time: new Date().getTime(), // timer for FPS counter
+            fps: 0 // drawing rate, typically ~90 FPS
         };
 
         this.svg = null;
@@ -127,8 +130,9 @@ export default class GridView extends React.Component {
         var pos = [];
         axios.get('/vision')
             .then(function (response) {
-                console.log(response.data);
+                // console.log(response.data);
                 pos.push(response.data);
+
                 // delete robot if empty string for x coordinate
                 if (pos[0]['x'] === '') {
                     _this.deleteBot();
@@ -138,6 +142,13 @@ export default class GridView extends React.Component {
                     _this.state.xcor = parseInt(pos[0]['x']);
                     _this.state.ycor = parseInt(pos[0]['y']);
                     _this.drawBot(_this.state.xcor, _this.state.ycor, 'red', parseInt(pos[0]['orientation']));
+                    // each drawing is one frame added to the FPS
+                    _this.setState({
+                        point_count: _this.state.point_count + 1
+                    });
+                    _this.setState({
+                        fps: _this.state.point_count * 1000 / (new Date().getTime() - _this.state.time)
+                    });
                 }
             })
             .catch(function (error) {
@@ -148,7 +159,11 @@ export default class GridView extends React.Component {
 
     displayRobot() {
         // counter for number of times button is clicked
-        this.state.count = this.state.count + 1
+        this.state.count = this.state.count + 1;
+
+        // set start time to record FPS
+        this.setState({ time: new Date().getTime() });
+
         //stops call to getvisionData
         if (this.state.count % 2 == 0) {
             clearInterval(this.find);
@@ -163,6 +178,7 @@ export default class GridView extends React.Component {
         return (
             <div id="component_view" className="box">
                 <p id="small_title">Vision </p>
+                <p id="fps_count">FPS: {this.state.fps}</p>
                 <button id="grid_recenter" onClick={this.displayRobot}>Display Bot</button>
                 <RequestButton name="Hello"
                     script_name="hello_world.py"
