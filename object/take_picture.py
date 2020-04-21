@@ -1,12 +1,13 @@
 import cv2
 import sys
+import os
 
 
 args = sys.argv
 color = True
 image_counter = 0
 image_name = 'img'
-image_folder = 'images'
+path = os.getcwd() + '/images'
 image_dim = (600, 600)
 window_dim = (600, 600)
 
@@ -30,7 +31,7 @@ while i + 1 < len(args):
             except ValueError:
                 print('Expected two integers over 100 after \'-window\' ')
         elif args[i] == '-folder':
-            image_folder = args[i+1]
+            path = os.getcwd() + args[i+1]
             i += 1
         elif args[i] == '-name':
             image_name = args[i+1]
@@ -67,7 +68,9 @@ while cap.isOpened():
     if key & 0xFF == ord('c'):
         color = not color
     if key & 0xFF == ord(' '):
-        cv2.imwrite(image_folder + '/' + image_name + '_' + str(image_counter) + '.png', frame)
+        if not os.path.isdir(path):
+            os.makedirs(path)
+        cv2.imwrite(path + '/' + image_name + '_' + str(image_counter) + '.jpg', frame)
         image_counter = image_counter + 1
     if key & 0xFF in [27, 1048603, ord('q')]:
         break
