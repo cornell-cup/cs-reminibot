@@ -23,7 +23,7 @@ class BaseInterface:
     base station GUI.
     """
 
-    def __init__(self, port, send_blockly_remote_server=False):
+    def __init__(self, port, send_blockly_remote_server=True):
         """
         Initializes base station
         :param port: Port number from which basestation runs (usually 8080)
@@ -51,7 +51,8 @@ class BaseInterface:
                 send_blockly_remote_server=send_blockly_remote_server,
             )),
             ("/vision", VisionHandler, dict(base_station=self.base_station)),
-            ("/heartbeat", HeartbeatHandler, dict(base_station=self.base_station))
+            ("/heartbeat", HeartbeatHandler, dict(base_station=self.base_station)),
+            ("/result", ErrorMessageHandler, dict(base_station=self.base_station))
         ]
 
     def start(self):
@@ -142,8 +143,9 @@ class ClientHandler(tornado.web.RequestHandler):
             print(value)
             bot_name = data['bot_name']
             print(bot_name)
+            duration = data["duration"]
 
-            params = {'bot_name': bot_name, 'value': value}
+            params = {'bot_name': bot_name, 'value': value, 'duration': duration}
 
             if self.send_blockly_remote_server:
                 url = 'http://127.0.0.1:5000/code/'
@@ -273,6 +275,26 @@ class HeartbeatHandler(tornado.websocket.WebSocketHandler):
         is_heartbeat = self.base_station.is_heartbeat_recent(time_interval)
         heartbeat_json = {"is_heartbeat": is_heartbeat}
         self.write(json.dumps(heartbeat_json).encode())
+
+
+class ErrorMessageHandler(tornado.websocket.WebSocketHandler):
+    def initialize(self, base_station):
+        self.base_station = base_station
+
+    def post(self):
+        data = json.loads(self.request.body.decode())
+        bot_name = data['bot_name']
+        error_message = self.base_station.get_error_message(bot_name)
+        print("error_message is:")
+        print(error_message)
+        while (error_message is None):
+            # print("error_message is: ")
+            # print(error_message)
+            error_message = self.base_station.get_error_message(bot_name)
+        error_json = {"error": error_message}
+        print("error_json is: ")
+        print(error_json)
+        self.write(json.dumps(error_json).encode())
 
 
 if __name__ == "__main__":

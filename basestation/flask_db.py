@@ -13,18 +13,21 @@ class Program(db.Model):
     code = db.Column(db.String, nullable=False)
     time = db.Column(db.Integer, nullable=False)
     email = db.Column(db.String, nullable=False)
+    duration = db.Column(db.String, nullable=False)
 
     def __init__(self, **kwargs):
         self.code = kwargs.get('code', '')
         self.time = kwargs.get('time', '')
         self.email = kwargs.get('email', '')
+        self.duration = kwargs.get("duration", '')
 
     def serialize(self):
         return {
             'id': self.id,
             'code': self.code,
             'time': self.time,
-            'email': self.email
+            'email': self.email,
+            'duration': self.duration
         }
 
 

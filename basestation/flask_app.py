@@ -115,7 +115,8 @@ def post_code():
     program = Program(
         code=data.get('value'),
         time=current_time,
-        email=login_email
+        email=login_email,
+        duration=data.get('duration')
     )
     db.session.add(program)
     db.session.commit()
