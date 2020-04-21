@@ -286,6 +286,7 @@ export default class MinibotBlockly extends React.Component {
   }
 
   redefine_custom_blocks() {
+    console.log("Redefining");
     var _this = this;
     const blockType = "custom_block";
     const fieldName = "function_content";
@@ -325,16 +326,17 @@ export default class MinibotBlockly extends React.Component {
     for (let i = 0; i < allBlocks.length; i++) {
       // only need to update custom blocks
       if (allBlocks[i].type === blockType) {
+        console.log("Entered_here");
+        var field = allBlocks[i].getField(fieldName);
         // get currently selected function in drop down menu
-        var currentFunc = allBlocks[i].getField(fieldName).text_;
+        var currentFunc = field.getText();
         var item = _this.props.customBlockList.find(element => element[0] === currentFunc); 
         if (item == undefined) {
-          var field = allBlocks[i].getField(fieldName);
           field.setText(this.props.customBlockList[0][0]);
-          allBlocks[i].setFieldValue(_this.props.customBlockList[0][1], fieldName);
-          console.log(allBlocks[i].getField(fieldName));
+          field.setValue(_this.props.customBlockList[0][1]);
         } else {
-          allBlocks[i].setFieldValue(item[1], fieldName);
+          field.setText(item[0]);
+          field.setValue(item[1]);
         }
       }
     }
@@ -364,7 +366,6 @@ export default class MinibotBlockly extends React.Component {
     if (index > -1) {
       _this.props.customBlockList.splice(index, 1);
     }
-    this.setState({ customBlockList: _this.props.customBlockList});
     this.redefine_custom_blocks();
     this.update_custom_blocks();
 
@@ -411,6 +412,20 @@ export default class MinibotBlockly extends React.Component {
     this.redefine_custom_blocks();
   }
 
+  compareCustomBlockLists(list1, list2) {
+    if (list1.length !== list2.length) {
+      return false;
+    }
+
+    for (let i = 0; i < list1.length; i++) {
+      if (list1[i][0] !== list2[i][0] || list1[i][1] !== list2[i][1]) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   /* Helper for realtime code generation (Blockly => Python)
   Stores blockly state in parent component so it can load the previous state after switching react tabs
   https://developers.google.com/blockly/guides/get-started/web
@@ -451,7 +466,6 @@ export default class MinibotBlockly extends React.Component {
   /* Target function for the button "Run". Send python code
      corresponding to blockly to backend. */
   run_blockly(event) {
-    console.log(this.props.bot_name, "run_blockly");
     axios({
       method: 'POST',
       url: '/start',
@@ -462,8 +476,6 @@ export default class MinibotBlockly extends React.Component {
       }),
     })
       .then(function (response) {
-        console.log(blockly.value);
-        console.log('sent script');
       })
       .catch(function (error) {
         console.warn(error);
@@ -472,7 +484,6 @@ export default class MinibotBlockly extends React.Component {
 
 
   stop_blockly() {
-    console.log(this.props.bot_name, "stop_blockly");
     axios({
       method: 'POST',
       url: '/start',
@@ -535,7 +546,6 @@ export default class MinibotBlockly extends React.Component {
     var xmlReader = new FileReader();
     xmlReader.onload = function (event) {
       var textFromFileLoaded = event.target.result;
-      console.log(textFromFileLoaded);
       var dom = Blockly.Xml.textToDom(textFromFileLoaded);
       Blockly.getMainWorkspace().clear();
       Blockly.Xml.domToWorkspace(dom, Blockly.getMainWorkspace());
@@ -570,8 +580,8 @@ export default class MinibotBlockly extends React.Component {
   }
 
   handleLogin(event) {
+    const _this = this;
     var formData = new FormData(document.getElementById("loginForm"));
-    console.log(formData);
     axios({
       method: 'post',
       url: 'http://127.0.0.1:5000/login/',
@@ -579,22 +589,23 @@ export default class MinibotBlockly extends React.Component {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
       .then((response) => {
+        _this.props.redefineCustomBlockList(
+            JSON.parse(response.data.custom_function));
+        // invokes component did update
         this.setState({
           login_email: formData.get("email"),
           sessionToken: response.data.session_token,
           loginSuccessLabel: "Login Success",
           loginErrorLabel: "",
           isLoggedIn: true,
-          customBlockList: JSON.parse(response.data.custom_function)
         });
-        this.redefine_custom_blocks();
       })
       .catch((error) => {
         console.log("fail");
         this.setState({
           login_email: "",
           loginSuccessLabel: "",
-          loginErrorLabel: "Incorrect password or acount doesn't exist or empty input"
+          loginErrorLabel: "Incorrect password or account doesn't exist or empty input"
         });
         console.log(error);
       });
