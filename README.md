@@ -109,20 +109,25 @@ sudo npm install npm@latest -g
 #### Windows Subsystem for Linux Installation
 1. Click on Start (or press *Windows Key + S*) to open the Windows Search Bar, and search for "Windows Features".  Select "Turn Windows Features on or off".
 2. Select **Windows Subsystem for Linux** and click OK.  You will be prompted to restart your computer.  Please do so.  
-3. Open the Microsoft Store app and search for Ubuntu 18.04 LTS.  Please install it.
+3. Open the Microsoft Store app and search for Ubuntu 18.04 LTS.  Please install it.  (If this doesn't work look at the steps after step 6)
 4. After installation, click launch.  You will be prompted to *"press any key to continue"* and then to create a username and password.  Please do these things.  
 5. You now have WSL (Windows Subsystem for Linux) installed.  Please run:
 ```
 lsb_release -a
 ```
 to confirm the installation was successful.  You should see *Ubuntu* in the Description section of the output.  
-6. You can start WSL anytime by typing *wsl* in your windows search bar and choosing the prompted command.  
+6. You can start WSL anytime by typing *wsl* in your windows search bar and choosing the prompted command.
+
+If you are unable to install Windows Subsystem for Linux through the Microsoft Store please follow the steps here: 
+1. Installation: https://docs.microsoft.com/en-us/windows/wsl/install-manual 
+2. Initialization: https://docs.microsoft.com/en-us/windows/wsl/initialize-distro
+
 
 #### Git installation:
 In Windows Subsytem for Linux run:
 ```
 sudo add-apt-repository ppa:git-core/ppa
-sudo apt update
+sudo apt update && upgrade
 sudo apt install git
 ```
 While running these commands you will be prompted to enter your *sudo* password.  This password is the same password that you configured when installing WSL.  
@@ -130,7 +135,6 @@ While running these commands you will be prompted to enter your *sudo* password.
 #### Python3 and Pip3 installation:
 In Windows Subsytem for Linux run:
 ```
-sudo apt update && upgrade
 sudo apt install python3 python3-pip
 ```
 
