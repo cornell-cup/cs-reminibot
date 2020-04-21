@@ -15,7 +15,7 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 class Navbar extends React.Component {
   render() {
     return (
-      <div className="jumbotron text-center">
+      <div className="navbar">
         <img className="logo" src="./static/gui/static/img/logo.png" />
         <h1>ReMiniBot GUI</h1>
       </div>
@@ -66,7 +66,7 @@ class Platform extends React.Component {
   render() {
     return (
       <div id="platform">
-        <Tabs> 
+        <Tabs>
           <TabList>
             <Tab>Setup</Tab>
             <Tab>Coding/Control</Tab>
@@ -107,19 +107,24 @@ class SetupTab extends React.Component {
     return (
       <div id="tab_setup">
         <div className="row">
-          <div>
-            <Tabs>
-              <TabPanel>
-                <NormalTab
-                  updateBotName={this.props.updateBotName}
-                  bot_name={this.props.bot_name}
-                  setBotList={this.props.setBotList}
-                  bot_list={this.props.bot_list}
-                  setSelectedBot={this.props.setSelectedBot}
-                  selected_bot={this.props.selected_bot}
-                />
-              </TabPanel>
-            </Tabs>
+          <div className="col-md-6">
+            <div>
+              <Tabs>
+                <TabList>
+                  <Tab>Normal</Tab>
+                </TabList>
+                <TabPanel>
+                  <NormalTab
+                    updateBotName={this.props.updateBotName}
+                    bot_name={this.props.bot_name}
+                    setBotList={this.props.setBotList}
+                    bot_list={this.props.bot_list}
+                    setSelectedBot={this.props.setSelectedBot}
+                    selected_bot={this.props.selected_bot}
+                  />
+                </TabPanel>
+              </Tabs>
+            </div>
           </div>
         </div>
       </div>
@@ -132,7 +137,7 @@ class NormalTab extends React.Component {
     return (
       <div id="tab_normal">
         <div className="row">
-          <div className="col">
+          <div className="col-md-6">
             <AddBot
               updateBotName={this.props.updateBotName}
               setBotList={this.props.setBotList}
@@ -140,8 +145,6 @@ class NormalTab extends React.Component {
               setSelectedBot={this.props.setSelectedBot}
               selected_bot={this.props.selected_bot}
             />
-          </div>
-          <div className="col">
             <GridView />
           </div>
         </div>
@@ -152,7 +155,8 @@ class NormalTab extends React.Component {
 class ClientGUI extends React.Component {
   render() {
     return (
-      <div className="container-fluid main-body">
+      <div>
+        <div> Welcome to Client GUI : </div>
         <Navbar />
         <Platform />
       </div>
