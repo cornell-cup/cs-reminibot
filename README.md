@@ -16,6 +16,8 @@ Please install the following:
 * Node.js (The Javascript runtime library)
 * npm (The Javascript package manager) 
 
+**Click on the links below for Operating Specific guide on how to install the above dependencies:**
+
 [Ubuntu 18 Installing Initial Requirements guide](#Ubuntu)
 
 [Mac OS Installing Initial Requirements guide](#MacOS)
