@@ -34,8 +34,8 @@ class PiBot(BaseStationBot, object):
         return self.port
 
     def get_result(self):
-        print("result is: ")
-        print(self.result)
+        # print("result is: ")
+        # print(self.result)
         return self.result
 
     def set_result(self, result):

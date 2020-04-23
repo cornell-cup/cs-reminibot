@@ -143,9 +143,8 @@ class ClientHandler(tornado.web.RequestHandler):
             print(value)
             bot_name = data['bot_name']
             print(bot_name)
-            duration = data["duration"]
 
-            params = {'bot_name': bot_name, 'value': value, 'duration': duration}
+            params = {'bot_name': bot_name, 'value': value, 'duration': ''}
 
             if self.send_blockly_remote_server:
                 url = 'http://127.0.0.1:5000/code/'

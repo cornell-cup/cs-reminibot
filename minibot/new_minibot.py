@@ -28,7 +28,7 @@ BOT_LIB_FUNCS = "PiArduino"
 # Load the ECE Dummy ops if testing, real bot-level function library otherwise.
 # ECE dummy ops replace physical bot outputs with print statements.
 if (len(sys.argv) == 2) and (sys.argv[1] == "-t"):
-    import scriptss.ece_dummy_ops as ece
+    import scripts.ece_dummy_ops as ece
     BOT_LIB_FUNCS = "ece_dummy_ops"
 else:
     import scripts.PiArduino as ece
@@ -104,7 +104,7 @@ def process_string(value):
         value (:obj:`str`): The program to format.
     """
     cmds = value.splitlines()
-    program = "from scriptss." + BOT_LIB_FUNCS + " import *\n"
+    program = "from scripts." + BOT_LIB_FUNCS + " import *\n"
     program += "import time\n"
     program += "from threading import *\n"
     program += "def run():\n"
