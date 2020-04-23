@@ -64,7 +64,7 @@ To run the BaseStation, run the following command.  You should currently be in t
 ./run_BS.sh
 ```
 
-Go to any browser on your computer and go to `localhost:8080/start` to see the GUI in action.
+Wait until you see the message *======= STARTING BASESTATION========* in your terminal.  Go to any browser on your computer and go to `localhost:8080/start` to see the GUI in action.
 If you are having trouble running the previous line, make sure that python3 is installed.
 You can check this by typing `python3` in your terminal.
 
