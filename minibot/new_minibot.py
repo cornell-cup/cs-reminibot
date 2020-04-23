@@ -85,7 +85,7 @@ def parse_command(cmd, tcpInstance):
                 # file_dir is the path to folder this file is in
                 file_dir = os.path.dirname(os.path.realpath(__file__))
                 file = open(
-                    file_dir + "/scriptss/" + script_name, 'w+')
+                    file_dir + "/scripts/" + script_name, 'w+')
                 file.write(program)
                 file.close()
                 return_value = spawn_script_process(script_name)
@@ -141,7 +141,7 @@ def run_script(scriptname):
     # the most recent script is executed
     index = scriptname.find(".")
     importlib.invalidate_caches()
-    script_name = "scriptss." + scriptname[0: index]
+    script_name = "scripts." + scriptname[0: index]
     script = importlib.import_module(script_name)
     importlib.reload(script)
     try:

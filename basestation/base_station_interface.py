@@ -139,6 +139,8 @@ class ClientHandler(tornado.web.RequestHandler):
                 self.base_station.get_active_bots_names()).encode())
         # Receives the Blockly Generated Python scripts sent from the GUI.
         elif key == "SCRIPTS":
+            print('data is:')
+            print(data)
             value = data['value']
             print(value)
             bot_name = data['bot_name']
