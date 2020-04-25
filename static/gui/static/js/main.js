@@ -151,7 +151,6 @@ class NormalTab extends React.Component {
     );
   }
 }
-
 class ClientGUI extends React.Component {
   render() {
     return (

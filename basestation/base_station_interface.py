@@ -96,6 +96,7 @@ class ClientHandler(tornado.web.RequestHandler):
         session_id = self.get_secure_cookie("user_id")
         if session_id:
             session_id = session_id.decode("utf-8")
+        print("session id:" + session_id)
 
         if key == "CONNECTBOT":
             bot_name = data['bot_name']
@@ -122,10 +123,15 @@ class ClientHandler(tornado.web.RequestHandler):
 
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             self.base_station.move_wheels_bot(
-                session_id, bot_id, direction, power, leftmotor, rightmotor)
+                session_id, bot_id, direction, power)
         elif key == "PORTS":
-            leftmotor = data['leftmotor']
-            self.base_station.set_ports(leftmotor)
+            # leftmotor = data['leftmotor']
+            bot_id = self.base_station.bot_name_to_bot_id(data['bot_name'])
+            
+            portarray = data['ports']
+            for x in portarray:
+                print(x)
+            self.base_station.set_ports(portarray, session_id, bot_id)
 
         # Looks for bots on the local network to connect to.
         elif key == "DISCOVERBOTS":

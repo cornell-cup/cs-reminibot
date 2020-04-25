@@ -54,7 +54,7 @@ class BaseStation:
 
     def generate_id(self, length=7):
         """
-        Generates a unique 7 character id composed of digits, lowercase,
+        Generates a unique 7 character id composed of digits, lowercase, 
         and uppercase letters
         """
         chars = digits + ascii_lowercase + ascii_uppercase
@@ -67,7 +67,7 @@ class BaseStation:
         """
         Updates vision log. Size of log based on MAX_VISION_LOG_LENGTH
         Args:
-            values (dict): dictionary containing positions
+            values (dict): dictionary containing positions 
         """
         locations = {'id': value['id'], 'x': value['x'],
                      'y': value['y'], 'orientation': value['orientation']}
@@ -151,7 +151,7 @@ class BaseStation:
 
     def discover_and_create_bots(self):
         """
-        Discovers active bots, creates an Bot object for each one, and stores
+        Discovers active bots, creates an Bot object for each one, and stores 
         them in active bots. If existing bot is not active, remove it from active_bots.
         """
         while True:
@@ -231,21 +231,7 @@ class BaseStation:
                 return bot_id
         return None
 
-    def set_ports(self, port1):
-        '''
-        sets ports of motors and sensors
-
-        Args:
-            port1
-
-        Return:
-            True if ports are sucessfully received
-            False if otherwise
-        '''
-
-        print("Motor Ports" + str(port1))
-
-        return True
+    
 
     def move_wheels_bot(self, session_id, bot_id, direction, power):
         """
@@ -283,7 +269,6 @@ class BaseStation:
         # TODO remove print
         print("Active bot " + str(type(self.active_bots[bot_id])))
         self.active_bots[bot_id].sendKV("WHEELS", direction)
-
         return True
 
     # def move_wings_bot(self, session_id, bot_id, power):
@@ -363,6 +348,24 @@ class BaseStation:
 
     def set_position_of_bot(self, bot_id, pos):
         pass
+
+    def set_ports( self, ports, session_id, bot_id ):
+        if not session_id or not bot_id:
+            return False
+
+        session = self.active_sessions[session_id]
+        if not session or not session.has_bot(bot_id):
+            return False
+        for x in ports:
+            print(x)
+        
+        portsstr = " ".join([str(l) for l in ports])
+
+        self.active_bots[bot_id].sendKV("PORTS", portsstr)
+        
+        #do something
+
+        return True
 
     # ================== SESSIONS ==================
 

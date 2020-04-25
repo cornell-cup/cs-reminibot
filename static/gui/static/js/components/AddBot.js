@@ -46,6 +46,17 @@ class RefreshingList extends React.Component {
     }
 }
 
+function Ports(props) {
+    const ports = ["2","3","4","5","6","7","8","9","10","11","12","13"];
+    let buttonList = [];
+
+    for (let i = 0; i < 12; i++) {
+        buttonList.push(<li><button className="btn_ports" onClick={() => props.motorPorts(props.portName, ports[i])}>{ports[i]}</button></li>);
+    }
+    return buttonList;
+  };
+
+
 export default class AddBot extends React.Component {
     constructor(props) {
         super(props);
@@ -206,9 +217,6 @@ export default class AddBot extends React.Component {
                 bot_name: _this.props.selected_bot,
                 direction: value,
                 power: _this.state.power,
-                //send left and right motor, hard coded right now
-                leftmotor: 1,
-                rightmotor: 2,
             })
         })
             .then(function (response) {
@@ -219,8 +227,9 @@ export default class AddBot extends React.Component {
     }
 
     /*motor ports*/
-    motorPorts(port1){
+    motorPorts(name, port1){
       const _this = this;
+      console.log(name);
       console.log(port1);
 
       axios({
@@ -228,7 +237,8 @@ export default class AddBot extends React.Component {
           url: '/start',
           data: JSON.stringify({
               key: "PORTS",
-              leftmotor: port1
+              ports: [name, String(port1)],
+              bot_name: _this.props.selected_bot,
           })
       })
           .then(function (response) {
@@ -344,6 +354,7 @@ export default class AddBot extends React.Component {
     }
 
 
+
     render() {
         var styles = {
             Select: {
@@ -369,10 +380,69 @@ export default class AddBot extends React.Component {
                                     <RefreshingList ref={this.refreshingBotListRef}></RefreshingList>
                                 </label>
                             </td>
-                            <td><button style={styles.Button} onClick={this.addBotListener}>Add Bot</button></td>
-                            <div class="led-box">&nbsp;&nbsp;
+                            <td><td>&nbsp;</td><button style={styles.Button} onClick={this.addBotListener}>Add Bot</button></td>
+                            <div className="led-box">&nbsp;&nbsp;
                               <div id="led-red"></div>
                             </div>
+                            <td></td>
+                            <td>
+                            <label>
+                              Ports:
+                              <td>
+                              <nav id="main_nav">
+                          			<ul>
+                          				<li>
+                          					<a href="">Motor Ports</a>
+                          					<ul>
+                          				<li>
+                                        <a href="">Left Motor</a>
+                                        <ul>
+                                            <Ports portName={"LMOTOR"} motorPorts = {this.motorPorts}/>
+                                        </ul>
+                                      </li>
+                                      <li>
+                                        <a href="">Right Motor</a>
+                                        <ul>
+                                            <Ports portName={"RMOTOR"} motorPorts = {this.motorPorts}/>
+                                        </ul>
+                                      </li>
+                                      <li>
+                                        <a href="">Motor 3</a>
+                                        <ul>
+                                            <Ports portName={"MOTOR3"} motorPorts = {this.motorPorts}/>
+                                        </ul>
+                                      </li>
+                                      <li>
+                                        <a href="">Line Follower</a>
+                                        <ul>
+                                            <Ports portName={"LINE"} motorPorts = {this.motorPorts}/>
+                                        </ul>
+                                      </li>
+                                      <li>
+                                        <a href="">Infrared</a>
+                                        <ul>
+                                            <Ports portName={"INFARED"} motorPorts = {this.motorPorts}/>
+                                        </ul>
+                                      </li>
+                                      <li>
+                                        <a href="">RFID</a>
+                                        <ul>
+                                            <Ports portName={"RFID"} motorPorts = {this.motorPorts}/>
+                                        </ul>
+                                      </li>
+                                      <li>
+                                        <a href="">Ultrasonic</a>
+                                        <ul>
+                                            <Ports portName={"ULTRASONIC"} motorPorts = {this.motorPorts}/>
+                                        </ul>
+                                      </li>
+                          					</ul>
+                          				</li>
+                          			</ul>
+                          		</nav>
+                              </td>
+                            </label>
+                            </td>
                         </tr>
                         <tr>
                             <td>
@@ -389,16 +459,10 @@ export default class AddBot extends React.Component {
                                     </select>
                                 </label>
                             </td>
-                            <td><button style={styles.Button} bot_list={this.props.bot_list}
+                            <td><td>&nbsp;</td><button style={styles.Button} bot_list={this.props.bot_list}
                                 onClick={() => _this.deleteBotListener()}>Remove</button></td>
                         </tr>
                         <tr>
-                          <td>
-                          <label>
-                            Ports:
-                            <td><button style={styles.Button} onClick={() => this.motorPorts(1)}> ports </button></td>
-                          </label>
-                          </td>
                         </tr>
 
                     </tbody>
