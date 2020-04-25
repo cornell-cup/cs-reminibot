@@ -40,10 +40,6 @@ else:
     BOT_LIB_FUNCS = "PiArduino"
 
 
-# global variable for on bot vision
-botVisionClient = None
-
-
 def parse_command(cmd, tcpInstance):
     """
     Parses command sent by SendKV via TCP to the bot.
@@ -57,6 +53,7 @@ def parse_command(cmd, tcpInstance):
     end = cmd.find(">>>>")
     key = cmd[start + 4:comma]
     value = cmd[comma + 1:end]
+    botVisionClient = None
     if key == "WHEELS":
         if value == "forward":
             Thread(target=ece.fwd, args=[50]).start()
