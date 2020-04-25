@@ -28,6 +28,8 @@ export default class GridView extends React.Component {
         this.deleteBot = this.deleteBot.bind(this);
         this.getVisionData = this.getVisionData.bind(this);
         this.displayRobot = this.displayRobot.bind(this);
+
+        this.getArgs = this.getArgs.bind(this);
     }
 
     drawGrid() {
@@ -174,6 +176,46 @@ export default class GridView extends React.Component {
         }
     }
 
+
+    getArgs(name) {
+        if (name === "Hello") {
+            return {
+                "required": {},
+                "optional": {}
+            }
+        } else if (name === "Calibrate Camera") {
+            return {
+                required: {
+                    "Interior rows": "r",
+                    "Interior": "c"
+                },
+                optional: {
+                    "Tag Size, in inches": "-s"
+                }
+            }
+        } else if (name === "Calibrate Axes") {
+            return {
+                "required": {
+                    ".calib file name": "f"
+                },
+                "optional": {
+                    "Origin tag size, inches": "o",
+                    "Board tag size, inches": "b"
+                }
+            }
+        } else if (name === "Locate Tags") {
+            return {
+                "required": {
+                    ".calib file name": "f"
+                },
+                "optional": {
+                    "URL": "u",
+                    "Tag Size, inches": "s"
+                }
+            }
+        }
+    }
+
     render() {
         return (
             <div id="component_view" className="box">
@@ -182,16 +224,21 @@ export default class GridView extends React.Component {
                 <button id="grid_recenter" onClick={this.displayRobot}>Display Bot</button>
                 <RequestButton name="Hello"
                     script_name="hello_world.py"
-                    path="vision/apriltag-py/python"></RequestButton>
+                    path="vision/apriltag-py/python"
+                    args={this.getArgs("Hello")}></RequestButton>
                 <RequestButton name="Calibrate Camera"
                     script_name="calibrate_camera.py"
-                    path="vision/apriltag-py/python"></RequestButton>
+                    path="vision/apriltag-py/python"
+                    args={this.getArgs("Calibrate Camera")}
+                ></RequestButton>
                 <RequestButton name="Calibrate Axes"
                     script_name="locate_camera.py"
-                    path="vision/apriltag-py/python"></RequestButton>
+                    path="vision/apriltag-py/python"
+                    args={this.getArgs("Calibrate Axes")}></RequestButton>
                 <RequestButton name="Locate tags"
                     script_name="locate_tags.py"
-                    path="vision/apriltag-py/python"></RequestButton>
+                    path="vision/apriltag-py/python"
+                    args={this.getArgs("Locate Tags")}></RequestButton>
                 <div id="view"></div>
             </div >
         );
