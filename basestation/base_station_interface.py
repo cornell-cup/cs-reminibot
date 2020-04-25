@@ -13,6 +13,7 @@ import sys
 import time
 import re  # regex import
 import requests
+from threading import Thread
 
 # Minibot imports.
 from base_station import BaseStation
@@ -179,7 +180,7 @@ class ClientHandler(tornado.web.RequestHandler):
         Sends the program received from Blockly to the bot, translated
         into ECE-supplied functions.
 
-        Args: 
+        Args:
             bot: The pi_bot to send to
             program: The string containing the python code generated
             from blockly
@@ -280,6 +281,14 @@ class BuiltinScriptHandler(tornado.web.RequestHandler):
 
     """
 
+    def make_cmd_str(self, req):
+        # paths start from root directory
+        script_name = "../" + req['path'] + "/" + req['script_name'] + " "
+        for k in req['args'].keys():
+            # add on any args
+            script_name += "-{} {} ".format(k, req['args'][k])
+        return script_name
+
     def post(self):
         req = json.loads(self.request.body.decode())
         res = None  # send this back to client
@@ -290,17 +299,18 @@ class BuiltinScriptHandler(tornado.web.RequestHandler):
         elif req['op'] != 'START' and req['op'] != "STOP":
             self.set_status(400, reason="op must be START or STOP")
         elif req['op'] == 'START':
-            # TODO resolve permission denied?
-            script_name = "../" + req['path'] + "/" + req['script_name']
-            print("Starting script " + script_name)
-            os.system(script_name)
-
+            cmd = "python3 " + self.make_cmd_str(req)
+            # TODO make the thread into a process so it's stoppable
+            # os.system(cmd)
+            Thread(target=os.system, args=[cmd]).start()
             self.set_status(200)
         elif req['op'] == 'STOP':
             # TODO do something to kill an existing thread
             script_name = "../" + req['path'] + "/" + req['script_name']
             print("Stopping script " + script_name)
             self.set_status(200)
+        else:
+            self.set_status(400)
 
         print(req)
 

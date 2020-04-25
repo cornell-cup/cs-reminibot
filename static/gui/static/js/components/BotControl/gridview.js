@@ -35,6 +35,8 @@ export default class GridView extends React.Component {
         this.deleteBot = this.deleteBot.bind(this);
         this.getVisionData = this.getVisionData.bind(this);
         this.displayRobot = this.displayRobot.bind(this);
+
+        this.getArgs = this.getArgs.bind(this);
     }
 
     drawGrid() {
@@ -179,6 +181,46 @@ export default class GridView extends React.Component {
         // allow for faster communication
         else {
             this.find = setInterval(this.getVisionData.bind(this), 100);
+        }
+    }
+
+
+    getArgs(name) {
+        if (name === "Hello") {
+            return {
+                "required": {},
+                "optional": {}
+            }
+        } else if (name === "Calibrate Camera") {
+            return {
+                required: {
+                    "Interior rows": "r",
+                    "Interior": "c"
+                },
+                optional: {
+                    "Tag Size, in inches": "-s"
+                }
+            }
+        } else if (name === "Calibrate Axes") {
+            return {
+                "required": {
+                    ".calib file name": "f"
+                },
+                "optional": {
+                    "Origin tag size, inches": "o",
+                    "Board tag size, inches": "b"
+                }
+            }
+        } else if (name === "Locate Tags") {
+            return {
+                "required": {
+                    ".calib file name": "f"
+                },
+                "optional": {
+                    "URL": "u",
+                    "Tag Size, inches": "s"
+                }
+            }
         }
     }
 
