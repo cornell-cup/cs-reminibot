@@ -91,9 +91,7 @@ def parse_command(cmd, tcpInstance):
                 return_value = spawn_script_process(script_name)
                 return return_value
             except Exception as exception:
-                print("Exception occurred at compile time")
-                str_exception = str(type(exception)) + ": " + str(exception)
-                return str_exception
+                print("Exception occurred")
 
 
 def process_string(value):
@@ -138,16 +136,15 @@ def run_script(scriptname):
 
     # Cache invalidation and module refreshes are needed to ensure
     # the most recent script is executed
-    index = scriptname.find(".")
-    importlib.invalidate_caches()
-    script_name = "scripts." + scriptname[0: index]
-    script = importlib.import_module(script_name)
-    importlib.reload(script)
     try:
+        index = scriptname.find(".")
+        importlib.invalidate_caches()
+        script_name = "scripts." + scriptname[0: index]
+        script = importlib.import_module(script_name)
+        importlib.reload(script)
         script.run()
         return "Successful execution"
     except Exception as exception:
-        print("Exception occurred at run time")
         str_exception = str(type(exception)) + ": " + str(exception)
         return str_exception
 

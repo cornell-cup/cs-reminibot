@@ -417,13 +417,6 @@ class BaseStation:
             bot_id (str): a unique id
         """
 
-        print("session_id is:")
-        print(session_id)
-        print("bot_name is: ")
-        print(bot_name)
-
-        print(self.active_bots)
-
         bot_id = self.bot_name_to_bot_id(bot_name)
         if bot_id in self.active_bots:
             bot = self.active_bots[bot_id]

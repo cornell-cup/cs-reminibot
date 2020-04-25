@@ -165,10 +165,7 @@ class PythonTextBox extends React.Component {
       }),
     })
       .then((response) => {
-        console.log("The error message is: !!!")
-        console.log(response);
         document.getElementById("errormessage").value = response.data["error"];
-        console.log(document.get)
         if (response.data["code"] === 1) {
           // lime green 
           document.getElementById("errormessage").style.color="#32CD32";

@@ -148,14 +148,8 @@ class ClientHandler(tornado.web.RequestHandler):
             if self.send_blockly_remote_server:
                 url = 'http://127.0.0.1:5000/code/'
                 x = requests.post(url, json=params)
-                print("Post")
-                print(x.json)
-
-                print('database test')
                 url2 = 'http://127.0.0.1:5000/program/'
                 x = requests.get(url2)
-                print("Get")
-                print(x.json)
 
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             bot = self.base_station.get_bot(bot_id)
@@ -291,8 +285,6 @@ class ErrorMessageHandler(tornado.websocket.WebSocketHandler):
             error_json = {"error": error_message, "code": 1}
         else:
             error_json = {"error": error_message, "code": 0}
-        print("error_json is: ")
-        print(error_json)
         self.write(json.dumps(error_json).encode())
 
 
