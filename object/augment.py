@@ -5,7 +5,7 @@ from keras_preprocessing.image import ImageDataGenerator
 import sys
 import os
 
-def augment(arguments):
+def augmentation(arguments):
     """
     Class ImageDataGenerator:
 
@@ -14,6 +14,8 @@ def augment(arguments):
     - fill_mode
 
     User-given parameter: (Not complete)
+
+    For ImageDataGenerator:
     - rotation_range
     - width_shift_range
     - height_shift_range
@@ -21,6 +23,10 @@ def augment(arguments):
     - zoom_range
     - horizontal_flip
     - vertical_flip
+
+    For flow_from_directory: (need to implement this)
+    - batch_size
+    - target_size (can be user given but will impact the model so may wanna rethink this)
 
     Working on providing user information about these parameters.
     """
@@ -38,7 +44,23 @@ def augment(arguments):
     #for validation data
     validation_datagen = ImageDataGenerator(rescale = 1./255)
 
+    #flowing in data from the respective directories using the instances created above
+
+    train_generator = training_datagen.flow_from_directory(
+            './images/train',  # training directory inside images
+            target_size=(300, 300),  # Resize images to 300 x 300
+            batch_size=128,   #batch size
+            class_mode='binary') # class_mode is the type of classification
+
+
+    validation_generator = validation_datagen.flow_from_directory(
+            './images/validation',  # validation directory inside images
+            target_size=(300, 300),  # Resize images to 300 x 300
+            batch_size=32, #batch size - tend to keep smaller than the train_generator batch size
+            class_mode='binary') # class_mode is the type of classification
+
     print("works")
+
 
 def read_images(path):
     imagepaths, labels = list(), list()
