@@ -1,11 +1,12 @@
 #packages
 import tensorflow as tf
 import os
+import argparse
 
 #modules
 import augment
 
-def readDirectories(train_directory, validation_directory):
+def readDirectories(args):
     """
     Inputs:
     train_directories (list of length 2)
@@ -15,16 +16,18 @@ def readDirectories(train_directory, validation_directory):
     classes (binary classification).
     """
     # Training data directory with True pictures of the object
-    trainDirectory_true = os.path.join(train_directories[0])
+    trainDirectory_true = os.path.join(args["trainDirectory_true"])
 
     # Training data directory with False pictures of the object
-    trainDirectory_false = os.path.join(train_directories[1])
+    trainDirectory_false = os.path.join(args["trainDirectory_false"])
 
     # Validation data directory with True pictures of object
-    valDirectory_true = os.path.join(validation_directories[0])
+    valDirectory_true = os.path.join(args["valDirectory_true"])
 
     # Validation data directory with training human pictures
-    valDirectory_false = os.path.join(validation_directories[1])
+    valDirectory_false = os.path.join(args["valDirectory_false"])
+
+    print("works")
 
 
 
@@ -32,3 +35,16 @@ def readDirectories(train_directory, validation_directory):
 
 def model(arguments):
     #Define model here
+    pass
+
+
+if __name__=="__main__":
+
+    parser = argparse.ArgumentParser(description='Model parameters')
+    parser.add_argument('trainDirectory_true', type=str, help='Training data directory with True pictures of the object')
+    parser.add_argument('trainDirectory_false', type=str, help='Training data directory with False pictures of the object')
+    parser.add_argument('valDirectory_true', type=str, help='Validation data directory with True pictures of object')
+    parser.add_argument('valDirectory_false', type=str, help='Validation data directory with training human pictures')
+    args = vars(parser.parse_args())
+
+    readDirectories(args)
