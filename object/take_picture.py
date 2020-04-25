@@ -58,13 +58,20 @@ def take_pictures(args):
 if __name__=="__main__":
     # Defines arguments for parser
     parser = argparse.ArgumentParser(description='Take in arguments for taking pictures')
-    parser.add_argument("-color", "-col", action="store",type=bool,dest="color", default="True")
-    parser.add_argument("-name", "-n", action="store", dest="image_name", default="img")
-    parser.add_argument("-dim", "-d", nargs='*', action="store", dest="image_dim", type=int, default=[600,600])
-    parser.add_argument("-window", "-w", nargs='*', action="store", dest="window_dim", type=int, default=[600,600])
-    parser.add_argument("-folder", "-f", action="store", dest="folder", default="images")
-    parser.add_argument("-category", "-c", action="store", dest="category", default="True")
-    parser.add_argument("-ratio", "-r", action="store", dest="ratio", default=.2, type=float)
+    parser.add_argument("-color", "-col", action="store",type=bool,dest="color", default="True",
+        help="Specifies whether the pictures taken should be in color")
+    parser.add_argument("-name", "-n", action="store", dest="image_name", default="img",
+        help="Specifies the names of the images to generate")
+    parser.add_argument("-dim", "-d", nargs='*', action="store", dest="image_dim", type=int, default=[600,600],
+        help="Specifies the dimensions of the output images in px (accepts exactly two args)")
+    parser.add_argument("-window", "-w", nargs='*', action="store", dest="window_dim", type=int, default=[600,600],
+        help="Specifies the dimensions of the webcame feed window in px (accepts exactly two args)")
+    parser.add_argument("-folder", "-f", action="store", dest="folder", default="images",
+        help="Specifies the folder that the images should be stored in")
+    parser.add_argument("-category", "-c", action="store", dest="category", default="True",
+        help="Specifies the category of the images")
+    parser.add_argument("-ratio", "-r", action="store", dest="ratio", default=.2, type=float,
+        help="Specifies the ratio of images to be store as training images to all taken (0 < ratio < 1)")
     args = parser.parse_args()
 
     # Additional constrainst on arguments
