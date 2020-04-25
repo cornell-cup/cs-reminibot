@@ -92,16 +92,16 @@ def parse_command(cmd, tcpInstance):
                 print(e)
     elif key == "STARTBOTVISION":
         print("On bot vision w/ server ip: " + server_ip)
-        botVisionClient = StoppableThread(
-            target=startBotVisionClient, kwargs={'server_ip': server_ip}, daemon=True)
-        botVisionClient.start()
+        if (botVisionClient):
+            vs.start()
+        else:
+            botVisionClient = StoppableThread(
+                target=startBotVisionClient, kwargs={'server_ip': server_ip}, daemon=True)
+            botVisionClient.start()
     elif key == "STOPBOTVISION":
         if (botVisionClient):
             print("Stop on bot vision w/ server ip: " + server_ip)
-            vs.stop()
-            botVisionClient.stop()
-            botVisionClient = None
-
+            vs.stream.stream.release()
 
 def process_string(value):
     """
