@@ -47,34 +47,14 @@ class RefreshingList extends React.Component {
 }
 
 function Ports(props) {
-    const ports = ["1","2","3","4","5","6","7","8"];
+    const ports = ["2","3","4","5","6","7","8","9","10","11","12","13"];
     let buttonList = [];
 
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 12; i++) {
         buttonList.push(<li><button className="btn_ports" onClick={() => props.motorPorts(props.portName, ports[i])}>{ports[i]}</button></li>);
     }
     return buttonList;
   };
-
-
-
-    // const portNames = ["LMOTOR", "RMOTOR", "MOTOR3", "LINE", "INFRARED", "RFID", "ULTRASONIC"]
-    // let buttonList = [];
-    //
-    // for(let j = 0; j < 7; j++){
-    //     buttonList.push(<li><a href="">{portNames[j]}</a><ul>);
-    //     buttonList.push(</li>);
-    //         <ul>
-    //             <Ports motorPorts = {this.motorPorts}/>
-    //         </ul>
-    //       </li>)
-    //
-    //     for (let i = 0; i < 8; i++) {
-    //         buttonList.push(<li><button className="btn_ports" onClick={() => props.motorPorts(props.portName, ports[i])}>{ports[i]}</button></li>);
-    //     }
-    // }
-    // return buttonList;
-//};
 
 
 export default class AddBot extends React.Component {
