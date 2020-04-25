@@ -17,7 +17,6 @@ import threading
 import subprocess
 from base_station import BaseStation
 from piVision import *
-from piVision.server import startBotVisionServer
 
 
 class BaseInterface:
@@ -266,10 +265,11 @@ class StoppableThread(threading.Thread):
 
 
 class OnBotVisionHandler(tornado.websocket.WebSocketHandler):
+    bot_vision_server = None
+
     def initialize(self, base_station):
         self.base_station = base_station
         # TODO: make this a class var somehow
-        self.bot_vision_server = None
 
     def get(self):
         pass  # TODO
@@ -286,22 +286,18 @@ class OnBotVisionHandler(tornado.websocket.WebSocketHandler):
             bot = self.base_station.get_bot(bot_id)
 
             if key == "STARTBOTVISION":  # start the on bot vision
-                # if (bot):
-                print("starting onBotVisionServer process")
+                if (bot):
+                    print("starting onBotVisionServer process")
+                    OnBotVisionHandler.bot_vision_server = subprocess.Popen(
+                        ['python3', 'piVision/server.py'])
 
-                self.bot_vision_server = subprocess.Popen(
-                    ['/usr/local/bin/python3', 'piVision/oldServer.py'])
-
-                # onBotVisionServer = StoppableThread(
-                #     target=startBotVisionServer, daemon=True)
-                # onBotVisionServer.start()
-                bot.sendKV(key, '')
-                # else:
-                #     print("no bot found")
+                    bot.sendKV(key, '')
+                else:
+                    print("no bot found")
             elif key == "STOPBOTVISION":
                 print("ending onBotVisionServer thread")
-                if (self.bot_vision_server):
-                    self.bot_vision_server.kill()
+                if (OnBotVisionHandler.bot_vision_server):
+                    OnBotVisionHandler.bot_vision_server.kill()
                     # onBotVisionServer.terminate()
                     bot.sendKV(key, '')
                 else:

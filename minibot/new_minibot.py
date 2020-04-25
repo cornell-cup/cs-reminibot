@@ -94,7 +94,6 @@ def parse_command(cmd, tcpInstance):
                 print(e)
     elif key == "STARTBOTVISION":
         print("On bot vision w/ server ip: " + server_ip)
-        # TODO: Thread is not working / needs to be tested
         botVisionClient = StoppableThread(
             target=startBotVisionClient, kwargs={'server_ip': server_ip}, daemon=True)
         botVisionClient.start()
