@@ -1,5 +1,6 @@
 absl-py==0.9.0
 appdirs==1.4.3
+argparse==1.4.0
 astor==0.8.1
 astroid==2.3.3
 attrs==19.3.0
@@ -63,7 +64,7 @@ mock==3.0.5
 murmurhash==1.0.2
 numpy==1.17.2
 oauthlib==3.1.0
-opencv-python==4.2.0.32
+opencv-contrib-python==4.2.0.34
 opt-einsum==3.2.1
 pandas==0.25.0
 pandas-datareader==0.7.0
