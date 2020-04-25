@@ -54,6 +54,7 @@ def parse_command(cmd, tcpInstance):
     key = cmd[start + 4:comma]
     value = cmd[comma + 1:end]
     botVisionClient = None
+    vs = None
     if key == "WHEELS":
         if value == "forward":
             Thread(target=ece.fwd, args=[50]).start()
@@ -96,6 +97,8 @@ def parse_command(cmd, tcpInstance):
         botVisionClient.start()
     elif key == "STOPBOTVISION":
         if (botVisionClient):
+            print("Stop on bot vision w/ server ip: " + server_ip)
+            vs.stop()
             botVisionClient.stop()
             botVisionClient = None
 
@@ -163,6 +166,7 @@ def start_base_station_heartbeat(ip_address):
 def startBotVisionClient(server_ip):
     import socket  # import needs to be here b/c same name as "from socket ..." on line 0
     print("Entered the startBotVisionClient thread")
+    global vs
 
     # initialize the ImageSender object with the socket address of server
     sender = imagezmq.ImageSender(connect_to="tcp://{}:5555".format(server_ip))
@@ -170,8 +174,8 @@ def startBotVisionClient(server_ip):
     # get the host name, initialize the video stream, and allow the
     # camera sensor to warmup
     rpiName = socket.gethostname()
-    vs = VideoStream(usePiCamera=True, resolution=(
-        240, 135), framerate=25).start()
+    vs = VideoStream(usePiCamera=True, resolution=(240, 135), framerate=25)
+    vs.start()
     # vs = VideoStream(src=0).start()
     time.sleep(2.0)
 
