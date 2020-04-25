@@ -162,6 +162,9 @@ class ClientHandler(tornado.web.RequestHandler):
 
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             bot = self.base_station.get_bot(bot_id)
+            # reset the previous script's error message, so we can get the new error message
+            # of the new script
+            bot.set_result(None)
             if bot:
                 print("Code len = " + str(len(value)))
                 print(type(bot))
@@ -286,11 +289,7 @@ class ErrorMessageHandler(tornado.websocket.WebSocketHandler):
         data = json.loads(self.request.body.decode())
         bot_name = data['bot_name']
         error_message = self.base_station.get_error_message(bot_name)
-        print("error_message is:")
-        print(error_message)
-        while (error_message is None):
-            # print("error_message is: ")
-            # print(error_message)
+        while not error_message:
             error_message = self.base_station.get_error_message(bot_name)
         error_json = {"error": error_message}
         print("error_json is: ")
