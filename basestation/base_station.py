@@ -370,33 +370,36 @@ class BaseStation:
         return True
 
     def voice_recognition( self ):
-        r = sr.Recognizer()
-        while True:
-            with sr.Microphone() as source:
-                print("Say something!")
-                audio = None
-                try:
-                    audio = r.listen(source, 5) 
-                    print("Processing...")
-                except BaseException:
-                    print("timed out")
-                else:
-                    words = None
-                    try:
-                        words = r.recognize_google(audio)
-                    except BaseException:
-                        print("words not recognized")
-                    else:
-                        print("You said: " + words)
-                        if words == "forward":
-                            print("Minibot moves forward...")
-                        elif words == "stop":
-                            print("Minibot stops...")
-                        elif words == "object detection":
-                            print("Minibot starts object detection mode...")
-                        #can add more commands here
-                        else:
-                            print("Not a valid command")
+        print("entered base_station.py")
+        with sr.Microphone() as source:
+            print("mic works")
+        # r = sr.Recognizer()
+        # while True:
+        #     with sr.Microphone() as source:
+        #         print("Say something!")
+        #         audio = None
+        #         try:
+        #             audio = r.listen(source, 5) 
+        #             print("Processing...")
+        #         except BaseException:
+        #             print("timed out")
+        #         else:
+        #             words = None
+        #             try:
+        #                 words = r.recognize_google(audio)
+        #             except BaseException:
+        #                 print("words not recognized")
+        #             else:
+        #                 print("You said: " + words)
+        #                 if words == "forward":
+        #                     print("Minibot moves forward...")
+        #                 elif words == "stop":
+        #                     print("Minibot stops...")
+        #                 elif words == "object detection":
+        #                     print("Minibot starts object detection mode...")
+        #                 #can add more commands here
+        #                 else:
+        #                     print("Not a valid command")
 
     # ================== SESSIONS ==================
 

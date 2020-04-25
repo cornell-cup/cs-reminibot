@@ -80,7 +80,7 @@ function Ports(props) {
           console.log(isOn ? "STOP VOICE" : "START VOICE")
           axios({
               method: 'POST',
-              url: '/start',
+              url: '/voice',
               data: JSON.stringify({
                   key: isOn ? "STOP VOICE" : "START VOICE",
                   bot_name: this.props.selected_bot

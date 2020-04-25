@@ -279,6 +279,8 @@ class HeartbeatHandler(tornado.websocket.WebSocketHandler):
         self.write(json.dumps(heartbeat_json).encode())
 
 class VoiceHandler(tornado.websocket.WebSocketHandler):
+    print("testing")
+
     def initialize(self, base_station):
         self.base_station = base_station
 

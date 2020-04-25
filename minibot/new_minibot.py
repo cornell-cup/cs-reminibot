@@ -11,9 +11,9 @@ import os
 # import scripts.ece_dummy_ops as ece
 
 # for on-bot vision
-from imutils.video import VideoStream
-from imagezmq import imagezmq
-from scripts.stoppableThreads import StoppableThread
+# from imutils.video import VideoStream
+# from imagezmq import imagezmq
+# from scripts.stoppableThreads import StoppableThread
 # import picamera
 
 # Create a UDP socket
