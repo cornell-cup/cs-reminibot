@@ -142,10 +142,7 @@ class ClientHandler(tornado.web.RequestHandler):
             print('data is:')
             print(data)
             value = data['value']
-            print(value)
             bot_name = data['bot_name']
-            print(bot_name)
-
             params = {'bot_name': bot_name, 'value': value, 'duration': ''}
 
             if self.send_blockly_remote_server:
@@ -181,7 +178,6 @@ class ClientHandler(tornado.web.RequestHandler):
                     # TODO check if a "long enough" program
                     # is supposed to be sent over
                     print("RUNNING SCRIPT")
-                    print(value)
                     self.send_program(bot, value)
 
         elif key == "DISCONNECTBOT":
@@ -291,7 +287,10 @@ class ErrorMessageHandler(tornado.websocket.WebSocketHandler):
         error_message = self.base_station.get_error_message(bot_name)
         while not error_message:
             error_message = self.base_station.get_error_message(bot_name)
-        error_json = {"error": error_message}
+        if error_message == "Successful execution":
+            error_json = {"error": error_message, "code": 1}
+        else:
+            error_json = {"error": error_message, "code": 0}
         print("error_json is: ")
         print(error_json)
         self.write(json.dumps(error_json).encode())

@@ -169,7 +169,7 @@ class PythonTextBox extends React.Component {
         console.log(response);
         document.getElementById("errormessage").value = response.data["error"];
         console.log(document.get)
-        if (document.getElementById("errormessage").value === "Successful execution") {
+        if (response.data["code"] === 1) {
           // lime green 
           document.getElementById("errormessage").style.color="#32CD32";
         }
@@ -223,7 +223,7 @@ class PythonTextBox extends React.Component {
           <Button id={"run"} onClick={this.run_script} name={"Run"} />
           <Button id={"history"} onClick={this.view_history} name={"View History"} />
           <Button id={"copy"} onClick={this.copy} name={"Copy Code From Blockly"} />
-          <div> <textarea id = "errormessage" rows="1" cols="40" /></div>
+          <div> <textarea id = "errormessage" rows="1" cols="60" /></div>
           <div> <textarea style={{ color: 'blue' }} id = "time" rows="1" cols="20" /></div>
         </div>
         <div id="PythonUpload" className="horizontalDiv">
