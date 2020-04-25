@@ -157,7 +157,17 @@ def ObjectDetection():
 
 def SetPorts(ports):
     ports = ports.split()
-    ports[0] = str(ports[0])
-    ports[1] = int(ports[1])
-    for x in ports:
+    portname = ports[0]
+    portnumber = str(ports[1])
+    portsdict = {
+        "LMOTOR" : "LM",
+        "RMOTOR" : "RM",
+        "MOTOR3" : "M",
+        "LINE" : "L",
+        "INFARED" : "I",
+        "RFID" : "R",
+        "ULTRASONIC" : "U"
+    }
+    arr = ['\n'] + list(portnumber) + list(portsdict[portname]) + ['\r']
+    for x in arr:
         print(x)

@@ -70,63 +70,51 @@ def setSlave(PiBus):
     spi.mode = 0
     spi.max_speed_hz = 115200
 
-
 def transmit(message):
     try:
         while tlock.can_transmit():
             print(message)
-            tx = spi.writebytes([message])
+            tx = spi.writebytes([ord(message)])
             # time.sleep(0.1)
         tlock.end_transmit()
     finally:
-        tx = spi.writebytes([ord('S')])
+        spi.writebytes([ord('S')])
         spi.close()
 
-
-def fwd(power):
+def acquire_lock():
     priority = time.time()
     while not tlock.start_transmit(priority):
         time.sleep(0.01)
+
+def execute(cmd):
     setSlave(1)
-    cmd = ord('F')
-    # print b
     print(cmd)
     transmit(cmd)
-    # cmd = ord(param) -- do some math on the param to separate different speeds.
-    # Maybe >100 one speed <100 another set speed
+
+def execute_once(cmd):
+    setSlave(1)
+    print(cmd)
+    spi.writebytes([ord(cmd)])
+    tlock.end_transmit()
+
+def fwd(power):
+    acquire_lock()
+    execute('F')
 
 
 def back(power):
-    priority = time.time()
-    while not tlock.start_transmit(priority):
-        time.sleep(0.01)
-    setSlave(1)
-    cmd = ord('B')
-    # print b
-    print(cmd)
-    transmit(cmd)
+    acquire_lock()
+    execute('B')
 
 
 def left(power):
-    priority = time.time()
-    while not tlock.start_transmit(priority):
-        time.sleep(0.01)
-    setSlave(1)
-    cmd = ord('L')
-    # print b
-    print(cmd)
-    transmit(cmd)
+    acquire_lock()
+    execute('L')
 
 
 def right(power):
-    priority = time.time()
-    while not tlock.start_transmit(priority):
-        time.sleep(0.01)
-    setSlave(1)
-    cmd = ord('R')
-    # print b
-    print(cmd)
-    transmit(cmd)
+    acquire_lock()
+    execute('R')
 
 
 def stop():
@@ -147,26 +135,30 @@ def stop():
 
 
 def LineFollow():
-    priority = time.time()
-    while not tlock.start_transmit(priority):
-        time.sleep(0.01)
-    setSlave(1)
-    cmd = ord('T')  # for tape follow
-    # print b
-    print(cmd)
-    transmit(cmd)
+    acquire_lock()
+    # The T stands for tape follow
+    execute('T')
+
+    
+def SetPorts():
+    acquire_lock()
+    ports = ports.split()
+    portname = ports[0]
+    portnumber = str(ports[1])
+    portsdict = {
+        "LMOTOR" : "LM",
+        "RMOTOR" : "RM",
+        "MOTOR3" : "M",
+        "LINE" : "L",
+        "INFARED" : "I",
+        "RFID" : "R",
+        "ULTRASONIC" : "U"
+    }
+    arr = ['\n'] + list(portnumber) + list(portsdict[portname]) + ['\r']
+    for x in arr:
+        execute_once(x)
 
 
 def ObjectDetection():
-    priority = time.time()
-    while not tlock.start_transmit(priority):
-        time.sleep(0.01)
-    setSlave(0)
-    cmd = ord('O')
-    # print b
-    print(cmd)
-    transmit(cmd)
-
-
-def SetPorts():
-    pass
+    acquire_lock()
+    execute('O')
