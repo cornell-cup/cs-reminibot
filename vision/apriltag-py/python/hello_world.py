@@ -1,3 +1,5 @@
 print("Type in your name:")
-name = input()
+name = "Name"  # input()
 print("Hello, " + name + "!")
+while True:
+    name = "Name"
