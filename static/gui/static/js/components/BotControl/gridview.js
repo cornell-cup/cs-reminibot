@@ -106,7 +106,7 @@ export default class GridView extends React.Component {
         console.log("Drew Circle");
         // draws cornell cup logo on top of circle
         var image = this.svg.append('image')
-            .attr('xlink:href', 'https://media.licdn.com/dms/image/C510BAQGykNIrqhEdwA/company-logo_200_200/0?e=2159024400&v=beta&t=a_p2RqS1wnk78rvFhlKl2ivlm4eaqeB2eu5lrIhGROo')
+            .attr('href', './static/gui/static/img/bot-dot.png')
             .attr('x', this.state.width / 2 - 10 + x)
             .attr("y", this.state.height / 2 - 10 - y)
             .attr('width', 20)

@@ -13,7 +13,7 @@ import sys
 import time
 import re  # regex import
 import requests
-from threading import Thread
+import threading
 
 # Minibot imports.
 from base_station import BaseStation
@@ -260,9 +260,28 @@ class HeartbeatHandler(tornado.websocket.WebSocketHandler):
         self.write(json.dumps(heartbeat_json).encode())
 
 
+class StoppableThread(threading.Thread):
+    # TODO merge this with Rachel's code - this is her Stoppable Thread implementation
+    """Thread class with a stop() method. The thread itself has to check
+    regularly for the stopped() condition."""
+
+    def __init__(self,  *args, **kwargs):
+        super(StoppableThread, self).__init__(*args, **kwargs)
+        self._stop_event = threading.Event()
+
+    def stop(self):
+        self._stop_event.set()
+
+    def stopped(self):
+        return self._stop_event.is_set()
+
+
 class BuiltinScriptHandler(tornado.web.RequestHandler):
+
     def initialize(self, base_station):
         self.base_station = base_station
+        self.threads = {}
+        self.next_req_id = 0
 
     def set_default_headers(self):
         return self.set_header("Content-Type", 'application/json')
@@ -300,9 +319,24 @@ class BuiltinScriptHandler(tornado.web.RequestHandler):
             self.set_status(400, reason="op must be START or STOP")
         elif req['op'] == 'START':
             cmd = "python3 " + self.make_cmd_str(req)
-            # TODO make the thread into a process so it's stoppable
-            # os.system(cmd)
-            Thread(target=os.system, args=[cmd]).start()
+            # TODO make the thread stoppable
+
+            # TODO is this too slow? Running locate_tags seems to only capture
+            # at 15 FPS now - maybe I'm just running a lot of stuff today?
+
+            # This is still a good thing to have for
+            script_thread = StoppableThread(
+                target=os.system, args=[cmd], daemon=True)
+            self.threads[str(self.next_req_id)] = script_thread
+            self.next_req_id += 1
+            print("Threads: {}".format(self.threads))
+            script_thread.start()
+            res = {
+                "status": "OK",
+                "handle": self.next_req_id - 1
+            }
+            print("Sending {}".format(res))
+            self.write(json.dumps(res).encode())
             self.set_status(200)
         elif req['op'] == 'STOP':
             # TODO do something to kill an existing thread
