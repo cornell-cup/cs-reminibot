@@ -1,5 +1,8 @@
+import time
+
 print("Type in your name:")
-name = "Name"  # input()
-print("Hello, " + name + "!")
+#name = input()
+#print("Hello, " + name + "!")
 while True:
-    name = "Name"
+    print("obnoxious!")
+    time.sleep(1)
