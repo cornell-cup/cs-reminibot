@@ -2,6 +2,7 @@ import binascii
 import spidev
 import time
 import threading
+from statistics import median
 
 spi = spidev.SpiDev()
 
@@ -98,9 +99,13 @@ def execute_once(cmd):
     tlock.end_transmit()
 
 def read_once(cmd):
+    NUM_READS = 20
     setSlave(1)
     print(cmd)
-    val = spi.readbytes([ord(cmd)])
+    values = []
+    for _ in range(NUM_READS):
+        values += [spi.readbytes([ord(cmd)])]
+    val = median(values)
     tlock.end_transmit()
     return val
     
@@ -144,6 +149,9 @@ def stop():
 
 def read_ultrasonic():
     acquire_lock()
+    arr_cmds="\ndu"
+    for cmd in arr_cmds:
+        execute_once(cmd)
     return read_once('SU')
 
 
