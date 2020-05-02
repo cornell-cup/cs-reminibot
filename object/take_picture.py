@@ -89,7 +89,7 @@ if __name__=="__main__":
     #may want to keep it as images
     parser.add_argument("-folder", "-f", action="store", dest="folder", default="images",
         help="Specifies the folder that the images should be stored in")
-        
+
     parser.add_argument("-category", "-c", action="store", dest="category", default="True",
         help="Specifies the category of the images")
     parser.add_argument("-ratio", "-r", action="store", dest="ratio", default=.2, type=float,
