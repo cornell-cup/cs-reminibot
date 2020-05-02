@@ -13,6 +13,8 @@ import time
 import re  # regex import
 import requests
 import threading
+import pyaudio
+import speech_recognition  as sr
 
 # Minibot imports.
 from base_station import BaseStation
@@ -279,7 +281,7 @@ class HeartbeatHandler(tornado.websocket.WebSocketHandler):
         self.write(json.dumps(heartbeat_json).encode())
 
 class VoiceHandler(tornado.websocket.WebSocketHandler):
-    print("testing")
+    flag = False
 
     def initialize(self, base_station):
         self.base_station = base_station
@@ -301,21 +303,53 @@ class VoiceHandler(tornado.websocket.WebSocketHandler):
             if key == "START VOICE":  # start listening
                 if (bot):
                     print("starting voiceServer thread")
+                    VoiceHandler.flag = True
                     voiceServer = StoppableThread(
-                        target=self.base_station.voice_recognition, daemon=True)
+                        target=VoiceHandler.voice_recognition(self), daemon=True)
                     voiceServer.start()
-                    bot.sendKV(key, '')
                 else:
                     print("no bot found")
             elif key == "STOP VOICE":
                 print("ending onBotVisionServer thread")
+                VoiceHandler.flag = False
                 if (onBotVisionServer):
                     voiceServer.stop()
-                    bot.sendKV(key, '')
                 else:
                     print("ERROR: No on bot vision server started")
             else:
                 print("Invalid key")
+    
+    def voice_recognition(self):
+        print("entered base_station.py")
+        with sr.Microphone() as source:
+            print("mic works")
+            r = sr.Recognizer()
+            while VoiceHandler.flag:
+                with sr.Microphone() as source:
+                    print("Say something!")
+                    audio = None
+                    try:
+                        audio = r.listen(source, 5)
+                        print("Processing...")
+                    except BaseException:
+                        print("timed out")
+                    else:
+                        words = None
+                        try:
+                            words = r.recognize_google(audio)
+                        except BaseException:
+                            print("words not recognized")
+                        else:
+                            print("You said: " + words)
+                            if words == "forward":
+                                print("Minibot moves forward...")
+                            elif words == "stop":
+                                print("Minibot stops...")
+                            elif words == "object detection":
+                                print("Minibot starts object detection mode...")
+                            #can add more commands here
+                            else:
+                                print("Not a valid command")
     
 
 class StoppableThread(threading.Thread):
