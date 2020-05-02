@@ -1,5 +1,5 @@
 #!/bin/bash
-
+​
 echo "================= MINIBOT CLIENT GUI ================="
 cd static
 cd gui
@@ -19,5 +19,4 @@ then
 else
     python3 base_station_interface.py
 fi
-kill -9 $DATABASEPID 
-
+kill -9 $DATABASEPID

@@ -9,6 +9,36 @@
 */
 
 var miniblocks = {
+  do_while: {
+    message0: "do %1",
+    args0: [
+      {
+        type: "input_statement",
+        name: "do_statement",
+      }
+    ],
+    message1: "repeat %1 %2",
+    args1: [
+      {
+        type: "field_dropdown",
+        name: "while_or_until",
+        options: [
+          ["while","while"],
+          ["until","until"]
+        ]
+      },
+      {
+        type: "input_value",
+        name: "condition",
+        check: "Boolean"
+      }
+    ],
+    previousStatement: null,
+    nextStatement: null,
+    colour: 100,
+    tooltip: "",
+    helpUrl: ""
+  },
   // MOVE
   move: {
     type: "move",
@@ -206,6 +236,18 @@ var miniblocks = {
     tooltip: "",
     helpUrl: ""
   },
+
+  custom_block: {
+    type: "custom_block",
+    message0: "custom block",
+    args0: [],
+    previousStatement: null,
+    nextStatement: null,
+    colour: 230,
+    tooltip: "",
+    helpUrl: ""
+  },
+
   set_power: {
     type: "set_power",
     message0: "set left motor to %1 %% power %2 set right motor to %3 %% power",
@@ -332,6 +374,7 @@ var miniblocks = {
     tooltip: "",
     helpUrl: ""
   },
+
   wait_for_commands: {
     type: "wait_for_commands",
     message0: "wait for commands from %1",

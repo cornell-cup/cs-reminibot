@@ -1,16 +1,19 @@
 /* GlOBAL */
-.box{
+
+.box {
     margin: 1vh;
-    background:lightgrey;
+    background: lightgrey;
     padding: 1vh;
     width: 560px;
 }
 
-.slightly_larger_text{
+.slightly_larger_text {
     size: 5em;
 }
 
+
 /* NAVBAR */
+
 .navbar {
     width: 100vw;
     height: 8vh;
@@ -18,10 +21,11 @@
     background: #323232;
     color: white;
 }
+
 .logo {
     height: 7vh;
     width: 7vh;
-    padding:0.5vh;
+    padding: 0.5vh;
     text-align: right;
 }
 
@@ -34,79 +38,89 @@
     padding-top: 15px;
 }
 
-.button-wrapper{
-    padding-top:10px;
-    padding-bottom:10px;
+.horizontalDiv div {
+    float: left;
 }
 
-.divider{
-    width:100px;
-    height:auto;
-    display:inline-block;
+.horizontalDiv {
+    clear: both;
+    padding-top: 10px;
 }
 
-input[type="text"] {
-    margin-left: 10px;
+.button-wrapper {
+    padding-top: 10px;
+    padding-bottom: 10px;
 }
 
-table{
-    text-align:center;
+.element-wrapper {
+    padding-right: 10px;
 }
 
-table{
-    text-align:center;
+.divider {
+    width: 100px;
+    height: auto;
+    display: inline-block;
 }
+
+table {
+    text-align: center;
+}
+
+table {
+    text-align: center;
+}
+
 
 /*SETUP TAB*/
-#setuptab {
 
-}
+#setuptab {}
 
 #view {
     min-height: 0;
 }
 
-.gridControlTable{
+.gridControlTable {
     width: 40%;
 }
 
-.gridControl{
+.gridControl {
     width: 200%;
 }
 
-#component_view{
+#component_view {
     min-height: 0;
 }
 
+
 /*CONTROL TAB*/
-#controltab {
 
-}
-#controlpanel {
+#controltab {}
 
-}
+#controlpanel {}
 
-#blockly{
+#blockly {
     height: 80vh;
 }
 
-.controlgrid{
-    padding:10px;
+.controlgrid {
+    padding: 10px;
 }
 
-#data{
+#generatedPythonFromBlocklyBox {
     background: #000000;
     color: white;
     border: 1px solid gray;
-    overflow:scroll;
-    font-family:Consolas, monospace;
+    overflow: scroll;
+    font-family: Consolas, monospace;
     font-size: 17px;
-    padding:10px;
+    padding: 10px;
     max-width: 39vw;
     max-height: 67vh;
 }
 
+
 /* REACT TABS */
+
 .react-tabs__tab-list {
     border-bottom: 1px solid #aaa;
     margin: 0 0 10px;
@@ -161,7 +175,7 @@ table{
 }
 
 .btn_btn-dir {
-    background:#d1150c;
+    background: #d1150c;
     color: white;
     border-radius: 15px;
     height: 40px;
@@ -171,7 +185,7 @@ table{
 }
 
 .btn_btn-dir_movement {
-    background:#d1150c;
+    background: #d1150c;
     color: white;
     border-radius: 15px;
     height: 40px;
@@ -180,104 +194,133 @@ table{
     letter-spacing: 0.11em;
 }
 
-#title{
+#title {
     font-size: 40px;
 }
 
-#small_title{
+#small_title {
     font-size: 30px;
     font-weight: bold;
 }
 
 .led-box {
-  height: 30px;
-  width: 25%;
-  margin: 10px 0;
-  float: left;
+    height: 30px;
+    width: 25%;
+    margin: 10px 0;
+    float: left;
 }
 
 .led-box p {
-  font-size: 12px;
-  text-align: center;
-  margin: 1em;
+    font-size: 12px;
+    text-align: center;
+    margin: 1em;
 }
 
 #led-red {
-  margin: 0 auto;
-  width: 24px;
-  height: 24px;
-  background-color: #A00;
-  border-radius: 50%;
-  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px, rgba(255, 0, 0, 0.5) 0 2px 12px;
+    margin: 0 auto;
+    width: 24px;
+    height: 24px;
+    background-color: #A00;
+    border-radius: 50%;
+    box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px, rgba(255, 0, 0, 0.5) 0 2px 12px;
 }
 
 @keyframes blinkRed {
-    from { background-color: #A00; }
-    50% { background-color: rgb(81, 255, 0); box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px, rgba(60, 255, 0, 0.5) 0 2px 0;}
-    to { background-color: #A00; }
+    from {
+        background-color: #A00;
+    }
+    50% {
+        background-color: rgb(81, 255, 0);
+        box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px, rgba(60, 255, 0, 0.5) 0 2px 0;
+    }
+    to {
+        background-color: #A00;
+    }
 }
 
-    #main_nav ul {
-			background: white;
-			float: left;
-			-webkit-transition: .5s;
-			transition: .5s;
-      text-align: center;
-		}
+#main_nav ul {
+    background: white;
+    float: left;
+    -webkit-transition: .5s;
+    transition: .5s;
+    text-align: center;
+}
 
-		#main_nav li {
-			float: right;
-			position: relative;
-			width: 150px;
-			list-style: none;
-			-webkit-transition: .5s;
-			transition: .5s;
-      text-align: center;
-		}
+#main_nav li {
+    float: right;
+    position: relative;
+    width: 150px;
+    list-style: none;
+    -webkit-transition: .5s;
+    transition: .5s;
+    text-align: center;
+}
 
-		#main_nav > ul > li > a, h1 {
-			text-transform: uppercase;
-		}
+#main_nav>ul>li>a,
+h1 {
+    text-transform: uppercase;
+}
 
-		#main_nav a {
-			display: block;
-			text-decoration: none;
-			padding: 5px 15px;
-			color: #000;
-      text-align: center;
-		}
+#main_nav a {
+    display: block;
+    text-decoration: none;
+    padding: 5px 15px;
+    color: #000;
+    text-align: center;
+}
 
-		#main_nav ul ul {
-			position: absolute;
-			left: 0;
-			top: 100%;
-			visibility: hidden;
-			opacity: 0;
-		}
+#main_nav ul ul {
+    position: absolute;
+    left: 0;
+    top: 100%;
+    visibility: hidden;
+    opacity: 0;
+}
 
-		#main_nav ul ul ul {
-		  left: 80%;
-			top: 0;
-		}
+#main_nav ul ul ul {
+    left: 80%;
+    top: 0;
+}
 
-		#main_nav li:hover, #main_nav li:hover li {
-			background: #ddd;
-		}
+#main_nav li:hover,
+#main_nav li:hover li {
+    background: #ddd;
+}
 
-		#main_nav li li:hover, #main_nav li li:hover li {
-			background: #bbb;
-		}
+#main_nav li li:hover,
+#main_nav li li:hover li {
+    background: #bbb;
+}
 
-		#main_nav li li li:hover {
-			background: #999;
-		}
+#main_nav li li li:hover {
+    background: #999;
+}
 
-		#main_nav li:hover > ul {
-			visibility: visible;
-			opacity: 1;
-		}
+#main_nav li:hover>ul {
+    visibility: visible;
+    opacity: 1;
+}
 
-    .btn_ports {
-        background:#ddd;
-        width: 150px;
-    }
+.btn_ports {
+    background: #ddd;
+    width: 150px;
+}
+
+.modal {
+    background-color: white;
+    display: none;
+    position: fixed;
+    top: 45%;
+    left: 45%;
+    width: 400px;
+    max-width: 100%;
+    height: 200px;
+    max-height: 100%;
+    z-index: 1;
+    /* background-color: rgba(0, 0, 0, 0.25); */
+}
+
+.modal_content {
+    background-color: white;
+    position: absolute;
+}

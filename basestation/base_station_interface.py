@@ -96,7 +96,6 @@ class ClientHandler(tornado.web.RequestHandler):
         session_id = self.get_secure_cookie("user_id")
         if session_id:
             session_id = session_id.decode("utf-8")
-        print("session id:" + session_id)
 
         if key == "CONNECTBOT":
             bot_name = data['bot_name']
@@ -149,11 +148,13 @@ class ClientHandler(tornado.web.RequestHandler):
             if self.send_blockly_remote_server:
                 url = 'http://127.0.0.1:5000/code/'
                 x = requests.post(url, json=params)
+                print("Post")
                 print(x.json)
 
                 print('database test')
                 url2 = 'http://127.0.0.1:5000/program/'
                 x = requests.get(url2)
+                print("Get")
                 print(x.json)
 
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)

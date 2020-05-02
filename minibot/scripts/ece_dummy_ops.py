@@ -31,6 +31,10 @@ class TransmitLock():
         """
         self.lock.acquire()
         if self.is_transmitting == 0:
+            # the priority field indicates the priority of the thread that
+            # was waiting for the lock.  If the thread that is executing this if
+            # statement does not have its priority equal to the priority of the
+            # thread that was waiting first, do not let it enter this code block
             if self.priority == priority or self.priority == 0:
                 self.is_transmitting = 1
                 self.priority = 0
@@ -52,110 +56,66 @@ class TransmitLock():
 tlock = TransmitLock()
 
 
-def setSlave(PiBus):
-    """ 
-    set which arduino to talk to. slave(0) for arduino 1 and slave(1) for arduino 2
-    """
-    print("Slave Set")
-
-
 def transmit(message):
     try:
         while tlock.can_transmit():
             print(message)
-            # tx = spi.writebytes([message])
             # time.sleep(0.1)
         tlock.end_transmit()
     finally:
-        #tx = spi.writebytes([ord('S')])
-        print(message)
+        print('S')
+
+def acquire_lock():
+    priority = time.time()
+    while not tlock.start_transmit(priority):
+        time.sleep(0.01)
+
+def execute(cmd):
+    transmit(cmd)
 
 
 def fwd(power):
-    priority = time.time()
-    while not tlock.start_transmit(priority):
-        time.sleep(0.1)
-    setSlave(1)
-    cmd = ord('F')
-    # print b
-    print(cmd)
-    transmit(cmd)
-    # cmd = ord(param) -- do some math on the param to separate different speeds.
-    # Maybe >100 one speed <100 another set speed
+    acquire_lock()
+    execute('F')
 
 
 def back(power):
-    priority = time.time()
-    while not tlock.start_transmit(priority):
-        time.sleep(0.1)
-    setSlave(1)
-    cmd = ord('B')
-    # print b
-    print(cmd)
-    transmit(cmd)
+    acquire_lock()
+    execute('B')
 
 
 def left(power):
-    priority = time.time()
-    while not tlock.start_transmit(priority):
-        time.sleep(0.1)
-    setSlave(1)
-    cmd = ord('L')
-    # print b
-    print(cmd)
-    transmit(cmd)
+    acquire_lock()
+    execute('L')
 
 
 def right(power):
-    priority = time.time()
-    while not tlock.start_transmit(priority):
-        time.sleep(0.1)
-    setSlave(1)
-    cmd = ord('R')
-    # print b
-    print(cmd)
-    transmit(cmd)
+    acquire_lock()
+    execute('R')
 
 
 def stop():
     priority = time.time()
     while not tlock.start_transmit(priority):
-        time.sleep(0.1)
-    setSlave(1)
-    cmd = ord('S')
-    # print b
+        time.sleep(0.01)
+    cmd = 'S'
     try:
         print(cmd)
-        for _ in range(5):
+        for _ in range(500):
             print(cmd)
-        # time.sleep(0.1)
         tlock.end_transmit()
     finally:
-        print("close")
+        print('S')
 
 
 def LineFollow():
-    priority = time.time()
-    while not tlock.start_transmit(priority):
-        time.sleep(0.1)
-    setSlave(1)
-    cmd = ord('T')  # for tape follow
-    # print b
-    print(cmd)
-    transmit(cmd)
-
-
-def ObjectDetection():
-    priority = time.time()
-    while not tlock.start_transmit(priority):
-        time.sleep(0.1)
-    setSlave(0)
-    cmd = ord('O')
-    # print b
-    print(cmd)
-    transmit(cmd)
+    acquire_lock()
+    # The T stands for tape follow
+    execute('T')
+    
 
 def SetPorts(ports):
+    acquire_lock()
     ports = ports.split()
     portname = ports[0]
     portnumber = str(ports[1])
@@ -171,3 +131,9 @@ def SetPorts(ports):
     arr = ['\n'] + list(portnumber) + list(portsdict[portname]) + ['\r']
     for x in arr:
         print(x)
+
+        
+def ObjectDetection():
+    acquire_lock()
+    execute('O')
+

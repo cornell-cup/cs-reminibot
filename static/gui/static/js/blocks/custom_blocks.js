@@ -1,7 +1,6 @@
 /*
 	Code generators for custom blocks.
 */
-
 var BOT_HEADER = "bot.";
 var FCN_ENDING = "\n";
 
@@ -12,6 +11,23 @@ var FCN_ENDING = "\n";
 function generateWait(time) {
   return BOT_HEADER + "wait(" + time + ")" + FCN_ENDING + BOT_HEADER + "stop()" + FCN_ENDING
 }
+
+// ================ DO WHILE BLOCK ================ //
+
+Blockly.Blocks['do_while'] = {
+  init: function () {
+    this.jsonInit(miniblocks.do_while);
+  }
+};
+
+Blockly.Python['do_while'] = function (block) {
+  var do_statement = Blockly.Python.statementToCode(block, 'do_statement');
+  var negation = (block.getFieldValue('while_or_until') == 'until') ? '' : '!';
+  var condition = Blockly.Python.valueToCode(block, 'condition', Blockly.Python.ORDER_NONE);
+  var do_statement = Blockly.Python.addLoopTrap(do_statement, block.id);
+
+  return 'while True:\n' + do_statement + '  break if ' + negation + '(' + condition + ')\n';
+};
 
 // ================ MOVE BLOCK ================ //
 Blockly.Blocks['move'] = {

@@ -9,7 +9,6 @@ import importlib
 import ast
 import os
 
-
 # Create a UDP socket
 sock = socket(AF_INET, SOCK_DGRAM)
 # can bind to the same port using the same ip address
@@ -22,10 +21,11 @@ sock.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
 server_address = ('255.255.255.255', 9434)
 message = 'i_am_a_minibot'
 
-# Bot library function names
-BOT_LIB_FUNCS = "PiArduino"  # "ece_dummy_ops"
+# Bot library name is stored here
+BOT_LIB_FUNCS = "PiArduino"
 
-# SETUP testing mode / normal mode
+# Load the ECE Dummy ops if testing, real bot-level function library otherwise.
+# ECE dummy ops replace physical bot outputs with print statements.
 if (len(sys.argv) == 2) and (sys.argv[1] == "-t"):
     import scripts.ece_dummy_ops as ece
     BOT_LIB_FUNCS = "ece_dummy_ops"
@@ -72,7 +72,6 @@ def parse_command(cmd, tcpInstance):
 
     elif key == "PORTS":
         ece.SetPorts(value)
-
         print("Set Ports")    
 
     elif key == "SCRIPTS":
@@ -98,10 +97,11 @@ def process_string(value):
     """
     Function from /minibot/main.py. Encases programs in a function
     called run(), which can later be ran when imported via the
-    import library.
+    import library. Also adds imports necessary to run bot functions.
+    Args:
+        value (:obj:`str`): The program to format.
     """
     cmds = value.splitlines()
-    # Import modules needed for calling ECE functions
     program = "from scripts." + BOT_LIB_FUNCS + " import *\n"
     program += "import time\n"
     program += "from threading import *\n"
@@ -109,14 +109,14 @@ def process_string(value):
     for i in range(len(cmds)):
         cmds[i] = cmds[i].replace(u'\xa0', u' ')
         program += "    " + cmds[i] + "\n"
-    print(program)
     return program
 
 
 def spawn_script_process(scriptname):
     """
-    Function from /minibot/main.py. Creates a new thread to run
-    the script process on.
+    Creates a new thread to run the script process on.
+    Args:
+        scriptname (:obj:`str`): The name of the script to run.
     """
     time.sleep(0.1)
     Thread(target=run_script, args=[scriptname], daemon=True).start()
@@ -124,7 +124,9 @@ def spawn_script_process(scriptname):
 
 def run_script(scriptname):
     """
-    Function from /minibot/main.py. Tells a bot to run a script.
+    Loads a script and runs it.
+    Args:
+        scriptname (:obj:`str`): The name of the script to run.
     """
 
     # Cache invalidation and module refreshes are needed to ensure
@@ -134,11 +136,16 @@ def run_script(scriptname):
     script_name = "scripts." + scriptname[0: index]
     script = importlib.import_module(script_name)
     importlib.reload(script)
-    print("Reached here")
     script.run()
 
 
 def start_base_station_heartbeat(ip_address):
+    """
+    Starts the heartbeat messages to signal to the server that
+    a bot is still connected.
+    Args:
+        ip_address (:obj:`str`): The IP address of the server to contact
+    """
     # Define broadcasting address and message
     server_address = (ip_address, 5001)
     heartbeat_message = 'Hello, I am a minibot!'

@@ -138,7 +138,7 @@ def LineFollow():
     acquire_lock()
     # The T stands for tape follow
     execute('T')
-
+    
     
 def SetPorts():
     acquire_lock()
@@ -162,3 +162,4 @@ def SetPorts():
 def ObjectDetection():
     acquire_lock()
     execute('O')
+
