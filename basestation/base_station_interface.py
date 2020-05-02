@@ -219,7 +219,7 @@ class ClientHandler(tornado.web.RequestHandler):
         # Regex is for bot-specific functions (move forward, stop, etc)
         # 1st group is the whitespace (useful for def, for, etc),
         # 2nd group is for func name, 3rd group is for args.
-        pattern = "(\s*)bot.(\w*)\((.*)\)"
+        pattern = "(.*)bot.(\w*)\((.*)\)(.*)"
         regex = re.compile(pattern)
 
         # TODO what to do after a function bound to a wait is done?
@@ -239,11 +239,11 @@ class ClientHandler(tornado.web.RequestHandler):
                     whitespace = ""
                 # parsed_program.append(whitespace + func + "(" + args + ")\n")
                 parsed_line = whitespace
-                if func != "time.sleep":
+                if func != "time.sleep" and func != "read_ultrasonic":
                     parsed_line += "Thread(target={}, args=[{}]).start()\n".format(
                         func, args)
                 else:
-                    parsed_line += func + "(" + args + ")\n"
+                    parsed_line += func + "(" + args + ")" + match.group(4) + "\n"
                 parsed_program.append(parsed_line)
 
         parsed_program_string = "".join(parsed_program)

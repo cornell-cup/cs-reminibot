@@ -1,5 +1,7 @@
+import binascii
 import time
 import threading
+
 
 
 class TransmitLock():
@@ -56,14 +58,27 @@ class TransmitLock():
 tlock = TransmitLock()
 
 
+def setSlave(PiBus):
+    """
+    set which arduino to talk to. slave(0) for arduino 1 and slave(1) for arduino 2
+    """
+    device = 0
+    bus = PiBus
+    # spi.open(device, bus)
+    # spi.mode = 0
+    # spi.max_speed_hz = 115200
+
 def transmit(message):
     try:
         while tlock.can_transmit():
             print(message)
-            # time.sleep(0.1)
+            #tx = spi.writebytes([ord(message)])
+            time.sleep(0.1)
         tlock.end_transmit()
     finally:
-        print('S')
+        print("S")
+        #spi.writebytes([ord('S')])
+        #spi.close()
 
 def acquire_lock():
     priority = time.time()
@@ -71,8 +86,24 @@ def acquire_lock():
         time.sleep(0.01)
 
 def execute(cmd):
+    setSlave(1)
+    print(cmd)
     transmit(cmd)
 
+def execute_once(cmd):
+    setSlave(1)
+    print(cmd)
+    # spi.writebytes([ord(cmd)])
+    tlock.end_transmit()
+
+def read_once(cmd):
+    setSlave(1)
+    print(cmd)
+    val = 20
+    #val = spi.readbytes([ord(cmd)])
+    tlock.end_transmit()
+    return val
+    
 
 def fwd(power):
     acquire_lock()
@@ -98,14 +129,20 @@ def stop():
     priority = time.time()
     while not tlock.start_transmit(priority):
         time.sleep(0.01)
-    cmd = 'S'
+    setSlave(1)
+    cmd = ord('S')
+    # print b
     try:
-        print(cmd)
-        for _ in range(500):
-            print(cmd)
+        print("S")
         tlock.end_transmit()
     finally:
-        print('S')
+        pass
+        #spi.close()
+
+
+def read_ultrasonic():
+    acquire_lock()
+    return read_once('SU')
 
 
 def LineFollow():
@@ -113,7 +150,7 @@ def LineFollow():
     # The T stands for tape follow
     execute('T')
     
-
+    
 def SetPorts(ports):
     acquire_lock()
     ports = ports.split()
@@ -130,10 +167,9 @@ def SetPorts(ports):
     }
     arr = ['\n'] + list(portnumber) + list(portsdict[portname]) + ['\r']
     for x in arr:
-        print(x)
+        execute_once(x)
 
-        
+
 def ObjectDetection():
     acquire_lock()
     execute('O')
-

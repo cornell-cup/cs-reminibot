@@ -97,6 +97,14 @@ def execute_once(cmd):
     spi.writebytes([ord(cmd)])
     tlock.end_transmit()
 
+def read_once(cmd):
+    setSlave(1)
+    print(cmd)
+    val = spi.readbytes([ord(cmd)])
+    tlock.end_transmit()
+    return val
+    
+
 def fwd(power):
     acquire_lock()
     execute('F')
@@ -134,6 +142,11 @@ def stop():
         spi.close()
 
 
+def read_ultrasonic():
+    acquire_lock()
+    return read_once('SU')
+
+
 def LineFollow():
     acquire_lock()
     # The T stands for tape follow
@@ -162,4 +175,3 @@ def SetPorts():
 def ObjectDetection():
     acquire_lock()
     execute('O')
-
