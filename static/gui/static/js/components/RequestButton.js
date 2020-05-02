@@ -59,8 +59,12 @@ export default class RequestButton extends React.Component {
       })
     }).then(function (res) {
       console.log("SUCCESS")
-      console.log(res)
-      _this.setState({ stopOnNextClick: true });
+      console.log("Handle: " + res.data.handle);
+      _this.setState({
+        handle: res.data.handle,
+        stopOnNextClick: true,
+        running: true
+      });
     }).catch(function (err) {
       console.log("ERROR")
       console.log(err)
@@ -85,12 +89,16 @@ export default class RequestButton extends React.Component {
         op: "STOP",
         path: this.props.path,
         script_name: this.props.script_name,
+        handle: this.state.handle,
         args: this.state.args
       })
     }).then(function (res) {
       console.log("SUCCESS")
       console.log(res)
-      _this.setState({ stopOnNextClick: false });
+      _this.setState({
+        stopOnNextClick: false,
+        running: false
+      });
     }).catch(function (err) {
       console.log("ERROR")
       console.log(err)
@@ -119,20 +127,25 @@ export default class RequestButton extends React.Component {
     console.log(shouldShow ? "Showing menu" : "Hiding menu")
   }
 
+  toggleMenu() {
+    this.setState({ menuVisible: !this.state.menuVisible });
+  }
+
   // TODO make the menu look prettier
   render() {
     return (
       <div>
-        <button onMouseEnter={() => this.showMenu(true)}>
+        <button onClick={() => this.toggleMenu()}>
           {this.props.name}
         </button>
         {this.state.menuVisible && (
           // TODO refactor style attr into CSS
-          <div class="arg-menu" onMouseLeave={() => this.showMenu(false)}
-            style={{ "background-color": "orange" }}>
+          <div class="arg-menu" style={{ "backgroundColor": "orange" }}>
             {this.makeArgFields(this.props.args.required, true)}
             {this.makeArgFields(this.props.args.optional, false)}
-            <button onClick={((e) => this.clicked(e))}>Go</button>
+            <button onClick={((e) => this.clicked(e))}>
+              {this.state.running ? "Stop" : "Go"}
+            </button>
           </div>)
         }
       </div>

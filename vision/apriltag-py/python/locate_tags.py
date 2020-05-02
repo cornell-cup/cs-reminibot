@@ -122,7 +122,8 @@ def main():
                         status_code))
                 else:
                     num_frames += 1
-                    print("FPS: {}".format(num_frames / (time.time() - past_time)))
+                    print("Vision FPS (Vision System outflow): {}".format(
+                        num_frames / (time.time() - past_time)))
     pass
 
 
