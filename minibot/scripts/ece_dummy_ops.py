@@ -112,12 +112,28 @@ def LineFollow():
     acquire_lock()
     # The T stands for tape follow
     execute('T')
-
     
-def SetPorts():
-    pass
 
+def SetPorts(ports):
+    acquire_lock()
+    ports = ports.split()
+    portname = ports[0]
+    portnumber = str(ports[1])
+    portsdict = {
+        "LMOTOR" : "LM",
+        "RMOTOR" : "RM",
+        "MOTOR3" : "M",
+        "LINE" : "L",
+        "INFARED" : "I",
+        "RFID" : "R",
+        "ULTRASONIC" : "U"
+    }
+    arr = ['\n'] + list(portnumber) + list(portsdict[portname]) + ['\r']
+    for x in arr:
+        print(x)
 
+        
 def ObjectDetection():
     acquire_lock()
     execute('O')
+
