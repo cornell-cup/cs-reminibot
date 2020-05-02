@@ -149,7 +149,7 @@ npm install npm@latest -g
 1. Click on Start (or press *Windows Key + S*) to open the Windows Search Bar, and search for "Windows Features".  Select "Turn Windows Features on or off".
 2. Select **Windows Subsystem for Linux** and click OK.  You will be prompted to restart your computer.  Please do so.  
 3. Open the Microsoft Store app and search for Ubuntu 18.04 LTS.  Please install it.  (If this doesn't work look at the steps after step 6)
-4. After installation, click launch.  You will be prompted to *"press any key to continue"* and then to create a username and password.  Please do these things.  
+4. After installation, click launch.  You will be prompted to *"press any key to continue"* and then to create a username and password.  Please do these things.  Your username can only consist of lowercase alphabetical characters.
 5. You now have WSL (Windows Subsystem for Linux) installed.  Please run:
 ```
 lsb_release -a

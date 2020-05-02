@@ -91,6 +91,11 @@ def execute(cmd):
     print(cmd)
     transmit(cmd)
 
+def execute_once(cmd):
+    setSlave(1)
+    print(cmd)
+    spi.writebytes([ord(cmd)])
+    tlock.end_transmit()
 
 def fwd(power):
     acquire_lock()
@@ -133,12 +138,28 @@ def LineFollow():
     acquire_lock()
     # The T stands for tape follow
     execute('T')
-
+    
     
 def SetPorts():
-    pass
+    acquire_lock()
+    ports = ports.split()
+    portname = ports[0]
+    portnumber = str(ports[1])
+    portsdict = {
+        "LMOTOR" : "LM",
+        "RMOTOR" : "RM",
+        "MOTOR3" : "M",
+        "LINE" : "L",
+        "INFARED" : "I",
+        "RFID" : "R",
+        "ULTRASONIC" : "U"
+    }
+    arr = ['\n'] + list(portnumber) + list(portsdict[portname]) + ['\r']
+    for x in arr:
+        execute_once(x)
 
 
 def ObjectDetection():
     acquire_lock()
     execute('O')
+
