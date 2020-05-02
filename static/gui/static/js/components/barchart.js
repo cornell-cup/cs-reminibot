@@ -36,7 +36,7 @@ export default class BarChartComponent extends PureComponent {
 
     render() {
         return (
-            <ResponsiveContainer width="100%" height={600}>
+            <ResponsiveContainer width="100%" height={300}>
                 <BarChart
                     data={data}
                     margin={{
