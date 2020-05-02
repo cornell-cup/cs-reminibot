@@ -414,6 +414,24 @@ var miniblocks = {
     tooltip: "",
     helpUrl: ""
   },
+
+  read_ultrasonic: {
+    type: "read_ultrasonic",
+    message0: "ultrasonic sensor detects object within %1",
+    args0: [
+      {
+        type: "field_number",
+        name: "input",
+        value: 1,
+        min: 1
+      }
+    ],
+    output: "Boolean",
+    colour: 180,
+    tooltip: "",
+    helpUrl: ""
+  },
+
   sees_color: {
     type: "sees_color",
     message0: "color sensor %1 sees %2",

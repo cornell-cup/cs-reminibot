@@ -88,6 +88,7 @@ def parse_command(cmd, tcpInstance):
                     file_dir + "/scripts/" + script_name, 'w+')
                 file.write(program)
                 file.close()
+                print("hello")
                 return_value = spawn_script_process(script_name)
                 return return_value
             except Exception as exception:
@@ -138,12 +139,12 @@ def run_script(scriptname):
 
     # Cache invalidation and module refreshes are needed to ensure
     # the most recent script is executed
-    index = scriptname.find(".")
-    importlib.invalidate_caches()
-    script_name = "scripts." + scriptname[0: index]
-    script = importlib.import_module(script_name)
-    importlib.reload(script)
     try:
+        index = scriptname.find(".")
+        importlib.invalidate_caches()
+        script_name = "scripts." + scriptname[0: index]
+        script = importlib.import_module(script_name)
+        importlib.reload(script)
         script.run()
         return "Successful execution"
     except Exception as exception:

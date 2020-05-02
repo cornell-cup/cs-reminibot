@@ -212,7 +212,8 @@ class ClientHandler(tornado.web.RequestHandler):
             "stop": "stop",
             "set_wheel_power": "ECE_wheel_pwr",
             "turn_clockwise": "right",
-            "turn_counter_clockwise": "left"
+            "turn_counter_clockwise": "left",
+            "read_ultrasonic": "read_ultrasonic",
         }
 
         # Regex is for bot-specific functions (move forward, stop, etc)

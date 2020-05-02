@@ -282,6 +282,23 @@ Blockly.Python['while_wait_for_commands'] = function (block) {
   return code + FCN_ENDING;
 };
 
+// ================ ULTRASONIC BLOCKS ================ //
+
+Blockly.Blocks['read_ultrasonic'] = {
+  init: function() {
+    this.jsonInit(miniblocks.read_ultrasonic)
+  }
+}
+
+Blockly.Python['read_ultrasonic'] = function (block) {
+  var lowerBound = "0 < ";
+  var upperLimit = block.getFieldValue('input');
+  var upperBound = " <= " + upperLimit;
+  var funcName = "read_ultrasonic()";
+
+  return [lowerBound + BOT_HEADER + funcName + upperBound, Blockly.Python.ORDER_NONE]; 
+}
+
 // ================ COLOR SENSING BLOCKS ================ //
 
 Blockly.Blocks['sees_color'] = {
