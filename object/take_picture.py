@@ -1,3 +1,22 @@
+"""
+Script to take pictures of the object shown by the user. It currently
+requires the user to constantly press the space bar to take images once the script is
+running. After quiting the script, there will be a new folder (default name images).
+There will be the following file structure:
+
+object/images
+├── training
+    └── True
+    └── False
+├── validation
+    └── True
+    └── False
+
+This file structure is required to use tensorflow's flow_from_directory function
+in augmentation.
+"""
+
+#packages
 import cv2
 import sys
 import os
@@ -66,8 +85,11 @@ if __name__=="__main__":
         help="Specifies the dimensions of the output images in px (accepts exactly two args)")
     parser.add_argument("-window", "-w", nargs='*', action="store", dest="window_dim", type=int, default=[600,600],
         help="Specifies the dimensions of the webcame feed window in px (accepts exactly two args)")
+
+    #may want to keep it as images
     parser.add_argument("-folder", "-f", action="store", dest="folder", default="images",
         help="Specifies the folder that the images should be stored in")
+        
     parser.add_argument("-category", "-c", action="store", dest="category", default="True",
         help="Specifies the category of the images")
     parser.add_argument("-ratio", "-r", action="store", dest="ratio", default=.2, type=float,
