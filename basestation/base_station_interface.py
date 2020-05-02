@@ -14,6 +14,7 @@ import time
 import re  # regex import
 import requests
 import threading
+import subprocess
 
 # Minibot imports.
 from base_station import BaseStation
@@ -235,18 +236,41 @@ class ClientHandler(tornado.web.RequestHandler):
         bot.sendKV("SCRIPTS", parsed_program_string)
 
 
+'''
+Static vars for the Vision Handler to track FPS. initialize() is called each time
+a request is made to the VisionHandler, so I leave this out to be
+defined "statically".
+
+Elements:
+    :count  The number of vision system coordinates received from the start time
+    :start_time The time to begin counting coordinates. If None, the system has
+                not yet started counting. The system starts counting when the first
+                VisionHandler is initialized.
+'''
+vision_handler_props = {
+    'count': 0,
+    'start_time': None
+}
+
+
 class VisionHandler(tornado.websocket.WebSocketHandler):
     """ Class that handles requests to /vision """
 
     def initialize(self, base_station):
         self.base_station = base_station
+        self.props = vision_handler_props
+        if self.props['start_time'] == None:
+            self.props['start_time'] = time.time()
 
     def get(self):
         self.write(json.dumps(self.base_station.get_vision_data()).encode())
 
     def post(self):
+        self.props['count'] += 1
         info = json.loads(self.request.body.decode())
         self.base_station.update_vision_log(info)
+        print("Vision FPS (Basestation inflow): {}".format(self.props['count'] /
+                                                           (time.time() - self.props['start_time'])))
 
 
 class HeartbeatHandler(tornado.websocket.WebSocketHandler):
@@ -260,28 +284,27 @@ class HeartbeatHandler(tornado.websocket.WebSocketHandler):
         self.write(json.dumps(heartbeat_json).encode())
 
 
-class StoppableThread(threading.Thread):
-    # TODO merge this with Rachel's code - this is her Stoppable Thread implementation
-    """Thread class with a stop() method. The thread itself has to check
-    regularly for the stopped() condition."""
+'''
+Static vars for the Built-In Script Handler. initialize() is called each time
+a request is made to the BuiltInScriptHandler, so I leave this out to be
+defined "statically".
 
-    def __init__(self,  *args, **kwargs):
-        super(StoppableThread, self).__init__(*args, **kwargs)
-        self._stop_event = threading.Event()
-
-    def stop(self):
-        self._stop_event.set()
-
-    def stopped(self):
-        return self._stop_event.is_set()
+Elements:
+    :procs  The processes as a mapping from
+            (request_id : str) => (subprocess.Popen object)
+    :next_req_id The next request_id to add a new process to the procs list.
+'''
+script_handler_props = {
+    "procs": dict(),
+    "next_req_id": 0
+}
 
 
 class BuiltinScriptHandler(tornado.web.RequestHandler):
 
     def initialize(self, base_station):
         self.base_station = base_station
-        self.threads = {}
-        self.next_req_id = 0
+        self.props = script_handler_props
 
     def set_default_headers(self):
         return self.set_header("Content-Type", 'application/json')
@@ -303,10 +326,11 @@ class BuiltinScriptHandler(tornado.web.RequestHandler):
     def make_cmd_str(self, req):
         # paths start from root directory
         script_name = "../" + req['path'] + "/" + req['script_name'] + " "
+        args = ""
         for k in req['args'].keys():
             # add on any args
-            script_name += "-{} {} ".format(k, req['args'][k])
-        return script_name
+            args += "-{} {} ".format(k, req['args'][k])
+        return script_name + args
 
     def post(self):
         req = json.loads(self.request.body.decode())
@@ -318,35 +342,47 @@ class BuiltinScriptHandler(tornado.web.RequestHandler):
         elif req['op'] != 'START' and req['op'] != "STOP":
             self.set_status(400, reason="op must be START or STOP")
         elif req['op'] == 'START':
-            cmd = "python3 " + self.make_cmd_str(req)
-            # TODO make the thread stoppable
+            # Start the requested script
+            # TODO test for speed
 
-            # TODO is this too slow? Running locate_tags seems to only capture
-            # at 15 FPS now - maybe I'm just running a lot of stuff today?
+            # Prep next id and command for new process to execute
+            n = self.props['next_req_id']
+            py_cmd_str = ("python3 " + self.make_cmd_str(req))
+            py_cmd = list(filter(lambda x: x != "", py_cmd_str.split(" ")))
+            print("ARGS: {}".format(py_cmd))
+            print("Starting process: " + py_cmd_str)
 
-            # This is still a good thing to have for
-            script_thread = StoppableThread(
-                target=os.system, args=[cmd], daemon=True)
-            self.threads[str(self.next_req_id)] = script_thread
-            self.next_req_id += 1
-            print("Threads: {}".format(self.threads))
-            script_thread.start()
+            # Create the requested script's own process, and add it to the list
+            # of procs.
+            self.props['procs'][str(
+                n)] = subprocess.Popen(py_cmd)
+
+            # Respond to the client
             res = {
                 "status": "OK",
-                "handle": self.next_req_id - 1
+                "handle": self.props['next_req_id']
             }
-            print("Sending {}".format(res))
+            self.props['next_req_id'] += 1
             self.write(json.dumps(res).encode())
             self.set_status(200)
+
         elif req['op'] == 'STOP':
-            # TODO do something to kill an existing thread
+            # Stop a script
             script_name = "../" + req['path'] + "/" + req['script_name']
-            print("Stopping script " + script_name)
-            self.set_status(200)
+
+            if req['handle'] == None:
+                self.set_status(400, reason="missing handle")
+            elif str(req['handle']) not in self.props['procs'].keys():
+                print(
+                    "Cannot stop non-existent process at handle {}".format(req['handle']))
+                self.set_status(404, reason="Handle does not exist")
+            else:
+                self.props['procs'][str(req['handle'])].kill()
+                print("Stopped process with handle {} running {}".format(
+                    req['handle'], script_name))
+                self.set_status(200)
         else:
             self.set_status(400)
-
-        print(req)
 
 
 if __name__ == "__main__":
