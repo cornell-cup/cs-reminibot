@@ -31,8 +31,6 @@ def readDirectories(args):
 
 
 
-
-
 def model(arguments):
     #Define model here
     pass

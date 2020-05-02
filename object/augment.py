@@ -51,7 +51,7 @@ def augmentation(args):
 
     #flowing in data from the respective directories using the instances created above
     train_generator = training_datagen.flow_from_directory(
-            './images/train',  # training directory inside images
+            './images/training',  # training directory inside images
             target_size=(300, 300),  # Resize images to 300 x 300
             batch_size=128,   #batch size
             class_mode='binary') # class_mode is the type of classification
@@ -76,6 +76,5 @@ if __name__=="__main__":
     parser.add_argument('horizontal_flip', type=bool, help='')
     parser.add_argument('vertical_flip', type=bool, help='')
     args = vars(parser.parse_args())
-
 
     augmentation(args)
