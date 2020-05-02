@@ -68,13 +68,21 @@ def augmentation(args):
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser(description='Augmentation parameters')
-    parser.add_argument('rotation_range', type=float, help='Degree range for random rotations of the image')
-    parser.add_argument('width_shift_range', type=float, help='')
-    parser.add_argument('height_shift_range', type=float, help='')
-    parser.add_argument('shear_range', type=float, help='')
-    parser.add_argument('zoom_range', type=float, help='')
-    parser.add_argument('horizontal_flip', type=bool, help='')
-    parser.add_argument('vertical_flip', type=bool, help='')
+    parser.add_argument('-rot', action="store", type=float, dest="rotation_range",
+                        default=40, help='Degree range for random rotations of the image')
+    parser.add_argument('-width', action="store", type=float, dest="width_shift_range",
+                        default=0.2, help='Width shift range')
+    parser.add_argument('-height', action="store", type=float, dest="height_shift_range",
+                        default=0.2, help='Height shift range')
+    parser.add_argument('-shear', action="store", type=float, dest="shear_range",
+                        default=0.2, help='Shear range')
+    parser.add_argument('-zoom', action="store", type=float, dest="zoom_range",
+                        default=0.2, help='Zoom range')
+    parser.add_argument('-hflip', action="store", type=bool, dest="horizontal_flip",
+                        default=True, help='Horizontal flip')
+    parser.add_argument('-vflip', action="store", type=bool, dest="vertical_flip",
+                        default=True, help='Vertical flip')
     args = vars(parser.parse_args())
+
 
     augmentation(args)
