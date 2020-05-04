@@ -54,6 +54,7 @@ def take_pictures(args):
 
         #Takes a picture on space
         if key & 0xFF == ord(' '):
+        # for image_counter in range(1000):
             # Determines whether image is for training or validation
             rand = random()
             if rand < args.ratio:
@@ -67,6 +68,8 @@ def take_pictures(args):
             # Writes the capture to file
             cv2.imwrite(path + '/' + args.image_name + '_' + str(image_counter) + '.jpg', frame)
             image_counter += 1
+
+
         # Quits on escape or 'q'
         if key & 0xFF in [27, 1048603, ord('q')]:
             break
@@ -81,9 +84,9 @@ if __name__=="__main__":
         help="Specifies whether the pictures taken should be in color")
     parser.add_argument("-name", "-n", action="store", dest="image_name", default="img",
         help="Specifies the names of the images to generate")
-    parser.add_argument("-dim", "-d", nargs='*', action="store", dest="image_dim", type=int, default=[600,600],
+    parser.add_argument("-dim", "-d", nargs='*', action="store", dest="image_dim", type=int, default=[300,300],
         help="Specifies the dimensions of the output images in px (accepts exactly two args)")
-    parser.add_argument("-window", "-w", nargs='*', action="store", dest="window_dim", type=int, default=[600,600],
+    parser.add_argument("-window", "-w", nargs='*', action="store", dest="window_dim", type=int, default=[300,300],
         help="Specifies the dimensions of the webcame feed window in px (accepts exactly two args)")
 
     #may want to keep it as images

@@ -54,17 +54,17 @@ def augmentation(args):
     train_generator = training_datagen.flow_from_directory(
             './images/training',  # training directory inside images
             target_size=(300, 300),  # Resize images to 300 x 300
-            batch_size=128,   #batch size
+            batch_size=32,   #batch size
             class_mode='binary') # class_mode is the type of classification
 
 
     validation_generator = validation_datagen.flow_from_directory(
             './images/validation',  # validation directory inside images
             target_size=(300, 300),  # Resize images to 300 x 300
-            batch_size=32, #batch size - tend to keep smaller than the train_generator batch size
+            batch_size=16, #batch size - tend to keep smaller than the train_generator batch size
             class_mode='binary') # class_mode is the type of classification
 
-    print("works")
+    return train_generator, validation_generator
 
 
 if __name__=="__main__":
