@@ -51,7 +51,8 @@ class BaseInterface:
                 send_blockly_remote_server=send_blockly_remote_server,
             )),
             ("/vision", VisionHandler, dict(base_station=self.base_station)),
-            ("/heartbeat", HeartbeatHandler, dict(base_station=self.base_station))
+            ("/heartbeat", HeartbeatHandler, dict(base_station=self.base_station)),
+            ("/result", ErrorMessageHandler, dict(base_station=self.base_station))
         ]
 
     def start(self):
@@ -141,7 +142,6 @@ class ClientHandler(tornado.web.RequestHandler):
             value = data['value']
             print(value)
             bot_name = data['bot_name']
-            print(bot_name)
 
             params = {'bot_name': bot_name, 'value': value}
 
@@ -275,12 +275,29 @@ class HeartbeatHandler(tornado.websocket.WebSocketHandler):
         self.write(json.dumps(heartbeat_json).encode())
 
 
+class ErrorMessageHandler(tornado.websocket.WebSocketHandler):
+    def initialize(self, base_station):
+        self.base_station = base_station
+
+    def post(self):
+        data = json.loads(self.request.body.decode())
+        bot_name = data['bot_name']
+        error_message = self.base_station.get_error_message(bot_name)
+        print("error_message is:")
+        print(error_message)
+        while (error_message is None):
+            # print("error_message is: ")
+            # print(error_message)
+            error_message = self.base_station.get_error_message(bot_name)
+        error_json = {"error": error_message}
+        print("error_json is: ")
+        print(error_json)
+        self.write(json.dumps(error_json).encode())
+
+
 if __name__ == "__main__":
     """
     Main method for running base station Server.
     """
-    if len(sys.argv) == 2:
-        base_station = BaseInterface(8080, send_blockly_remote_server=True)
-    else:
-        base_station = BaseInterface(8080)
-    base_station.start()
+    base_station_server = BaseInterface(8080, send_blockly_remote_server=True)
+    base_station_server.start()

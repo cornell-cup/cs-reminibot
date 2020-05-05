@@ -49,7 +49,7 @@ class TCP(object):
         Sends information back to the basestation. can only execute if the
         connection is active
         """
-        print(self.active)
+        # print(self.active)
         if self.active:
             # connection is active, send
             message = "<<<<" + key + "," + value + ">>>>"
