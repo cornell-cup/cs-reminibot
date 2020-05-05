@@ -104,7 +104,7 @@ class Voice extends React.Component {
           }
           return (
               <div>
-                  <button className="btn btn-primary" onClick={this.toggle}>Hi</button>
+                  <button className="btn btn-primary" onClick={this.toggle}>{x}</button>
               </div>
           );
       }
