@@ -142,7 +142,6 @@ class ClientHandler(tornado.web.RequestHandler):
             value = data['value']
             print(value)
             bot_name = data['bot_name']
-            print(bot_name)
 
             params = {'bot_name': bot_name, 'value': value}
 
@@ -300,8 +299,5 @@ if __name__ == "__main__":
     """
     Main method for running base station Server.
     """
-    if len(sys.argv) == 2:
-        base_station = BaseInterface(8080, send_blockly_remote_server=True)
-    else:
-        base_station = BaseInterface(8080)
-    base_station.start()
+    base_station_server = BaseInterface(8080, send_blockly_remote_server=True)
+    base_station_server.start()
