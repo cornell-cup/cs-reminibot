@@ -12,6 +12,7 @@ import augment
 """
 very important - needed to prevent the epochs from getting cancelled.
 Found github issues related to this, still figuring out...
+https://stackoverflow.com/questions/47068709/your-cpu-supports-instructions-that-this-tensorflow-binary-was-not-compiled-to-u
 """
 # Just disables the warning, doesn't enable AVX/FMA
 import os

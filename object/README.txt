@@ -25,4 +25,17 @@ object/images
 2. python3 model.py
 
 (currently no need for flags as it takes default values for augmentation)
-As of now, it is a standard CNN model. Will add user customization gradually. 
+As of now, it is a standard CNN model. Will add user customization gradually.
+
+
+POTENTIAL ERRORS:
+
+ERROR:
+[libprotobuf ERROR google/protobuf/descriptor_database.cc:394] Invalid file descriptor data passed to EncodedDescriptorDatabase::Add().
+[libprotobuf FATAL google/protobuf/descriptor.cc:1356] CHECK failed: GeneratedDatabase()->Add(encoded_file_descriptor, size):
+libc++abi.dylib: terminating with uncaught exception of type google::protobuf::FatalException: CHECK failed: GeneratedDatabase()->Add(encoded_file_descriptor, size):
+Abort trap: 6
+
+SOLUTION:
+pip3 uninstall protobuf
+pip3 install protobuf
