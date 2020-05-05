@@ -58,42 +58,40 @@ function Ports(props) {
 
 
 
-  class Voice extends React.Component {
-      constructor(props) {
-          super(props);
-          this.state = {
-              on: false
-          }
-          this.toggle = this.toggle.bind(this);
-          this.getVoice = this.getVoice.bind(this);
-      }
+class Voice extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            on: false
+        }
+        this.toggle = this.toggle.bind(this);
+        this.getVoice = this.getVoice.bind(this);
+    }
 
-      toggle() {
-          this.getVoice(this.state.on);
-          this.setState({
-              on: !this.state.on
-          })
-      }
+    toggle() {
+        this.getVoice(this.state.on);
+        this.setState({
+            on: !this.state.on
+        });
+    }
 
-      getVoice(isOn) {
-          const _this = this;
-          console.log(isOn ? "STOP VOICE" : "START VOICE")
-          axios({
-              method: 'POST',
-              url: '/voice',
-              data: JSON.stringify({
-                  key: isOn ? "STOP VOICE" : "START VOICE",
-                  bot_name: this.props.selected_bot
-              })
-          })
-              .then(function (response) {
-                  if (response.data) {
-                      console.log(response.data);
-                  }
-              })
-              .catch(function (error) {
-                  // console.log(error);
-              })
+    getVoice(isOn) {
+        const _this = this;
+        console.log(isOn ? "STOP VOICE" : "START VOICE")
+        axios({
+            method: 'POST',
+            url: '/voice',
+            data: JSON.stringify({
+                key: isOn ? "STOP VOICE" : "START VOICE",
+                bot_name: this.props.selected_bot
+            })
+        }).then(function (response) {
+            if (response.data) {
+                console.log(response.data);
+            }
+        }).catch(function (error) {
+            // console.log(error);
+        })
       }
 
       render() {
@@ -106,9 +104,9 @@ function Ports(props) {
           }
           return (
               <div>
-                  <button className="btn btn-primary" onClick={this.toggle}>{x}</button>
+                  <button className="btn btn-primary" onClick={this.toggle}>Hi</button>
               </div>
-          )
+          );
       }
   }
 
@@ -129,7 +127,7 @@ class Toggle extends React.Component {
         this.getOnBotVision(this.state.on);
         this.setState({
             on: !this.state.on
-        })
+        });
     }
 
     getOnBotVision(isOn) {
@@ -604,12 +602,14 @@ export default class AddBot extends React.Component {
                             Power:
                           <input type="text" defaultValue="50" name="wheel_power" onChange={evt => this.updatePowerValue(evt)} />
                         </label>
-                         <Voice selected_bot={this.props.selected_bot} float="right" />
                     </form>
                 </div>
                 {/* button-wrapper is a custom class to add padding
                     the rest is bootstrap css */}
                 <div className="row button-wrapper">
+                    <div className="col-md-3">
+                         <Voice selected_bot={this.props.selected_bot} float="right" />
+                    </div>
                     <div className="col-md-3">
                         <button type="button" className="btn btn-primary" onClick={() => this.lineFollowOnClick()}>Line Follow</button>
                     </div>

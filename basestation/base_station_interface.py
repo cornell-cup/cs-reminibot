@@ -281,8 +281,6 @@ class HeartbeatHandler(tornado.websocket.WebSocketHandler):
         self.write(json.dumps(heartbeat_json).encode())
 
 class VoiceHandler(tornado.websocket.WebSocketHandler):
-    flag = False
-
     def initialize(self, base_station):
         self.base_station = base_station
 
@@ -304,16 +302,15 @@ class VoiceHandler(tornado.websocket.WebSocketHandler):
                 if (bot):
                     print("starting voiceServer thread")
                     VoiceHandler.flag = True
-                    voiceServer = StoppableThread(
-                        target=VoiceHandler.voice_recognition(self), daemon=True)
-                    voiceServer.start()
+                    self.base_station.voice_server = StoppableThread(
+                        target=self.voice_recognition, daemon=True)
+                    self.base_station.voice_server.start()
                 else:
                     print("no bot found")
             elif key == "STOP VOICE":
                 print("ending onBotVisionServer thread")
-                VoiceHandler.flag = False
-                if (onBotVisionServer):
-                    voiceServer.stop()
+                if (VoiceHandler.flag):
+                    self.base_station.voice_server.stop()
                 else:
                     print("ERROR: No on bot vision server started")
             else:
@@ -367,8 +364,6 @@ class StoppableThread(threading.Thread):
         return self._stop_event.is_set()
 
 
-# global var for onBotVisionServer
-onBotVisionServer = None
 
 if __name__ == "__main__":
     """
