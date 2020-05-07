@@ -339,7 +339,6 @@ class VoiceHandler(tornado.websocket.WebSocketHandler):
                         print(commands[words])
                     else:
                         print("Invalid command")
-                # TODO get specific exception
                 except sr.WaitTimeoutError:
                     print("timed out")
                 except sr.UnknownValueError:
