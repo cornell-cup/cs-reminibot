@@ -22,6 +22,7 @@ function LabeledTextBox(props) {
         value={props.value}
         placeholder={props.placeholder}
         onChange={props.onChange}
+        // options={props.options}
       />
     </div>
   );
@@ -68,6 +69,7 @@ class PythonTextBox extends React.Component {
     this.handleFileNameChange = this.handleFileNameChange.bind(this);
     this.handleFunctionNameChange = this.handleFunctionNameChange.bind(this);
     this.handleScriptChange = this.handleScriptChange.bind(this);
+    this.handleTab = this.handleTab.bind(this);
     this.run_script = this.run_script.bind(this);
     this.upload = this.upload.bind(this);
     this.view_history = this.view_history.bind(this);
@@ -96,6 +98,12 @@ class PythonTextBox extends React.Component {
   }
 
   handleFunctionNameChange(event) {
+    var _this = this;
+    var item = _this.props.customBlockList.find(element => element[0] === event.target.value); 
+    if (item != undefined) {
+      document.getElementById("textarea").value = item[1];
+      _this.setState({ pythonTextBoxCode: item[1]});
+    }
     this.setState({ function_name: event.target.value });
   }
 
@@ -108,6 +116,14 @@ class PythonTextBox extends React.Component {
      Update this.state with the current text. */
   handleScriptChange(event) {
     this.setState({ pythonTextBoxCode: event.target.value });
+  }
+
+  handleTab(event) {
+    if (event.keyCode==9){
+      event.preventDefault();
+      document.getElementById("textarea").value = this.state.pythonTextBoxCode+'    ';
+      this.setState({ pythonTextBoxCode: event.target.value });
+    }
   }
 
   upload(event) {
@@ -153,7 +169,14 @@ class PythonTextBox extends React.Component {
       <div id="Python">
         <p id="title"> <b>Python </b> </p>
         {/* Python  */}
-        <div> <textarea id="textarea" rows="10" cols="98" onChange={this.handleScriptChange} />
+        <div>
+        <textarea
+          id="textarea"
+          rows="10"
+          cols="98"
+          onChange={this.handleScriptChange}
+          onKeyDown={this.handleTab}
+          />
         </div>
         {/* Custom blockly button and textbox */}
         <div id="UpdateCustomFunction" className="horizontalDiv">
@@ -331,18 +354,10 @@ export default class MinibotBlockly extends React.Component {
         // get currently selected function in drop down menu
         var currentFunc = field.getText();
         var item = _this.props.customBlockList.find(element => element[0] === currentFunc); 
-        console.log("before if");
-        console.log(item);
         if (item === undefined) {
-          console.log("if");
-          console.log(this.props.customBlockList[0][0]);
-          console.log(this.props.customBlockList.join());
           field.setText(this.props.customBlockList[0][0]);
           field.setValue(_this.props.customBlockList[0][1]);
         } else {
-          console.log("else");
-          console.log(item[0]);
-          console.log(this.props.customBlockList.join());
           field.setText(item[0]);
           field.setValue(item[1]);
         }
@@ -719,6 +734,7 @@ export default class MinibotBlockly extends React.Component {
             custom_block={this.custom_block}
             dblock={this.dblock}
             dblockAll={this.dblockAll}
+            customBlockList={this.props.customBlockList}
           />
         </div>
         <div id="generatedPythonFromBlocklyBox" style={dataStyle} className="col-md-5"></div>
