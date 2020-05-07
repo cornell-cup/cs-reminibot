@@ -166,12 +166,17 @@ class PythonTextBox extends React.Component {
           <Button
             id={"CBlock"}
             onClick={() => this.props.custom_block(this.state.function_name, this.state.pythonTextBoxCode)}
-            name={"Update Custom Function"}
+            name={"Update Custom Block"}
           />
           <Button
             id={"DBlock"}
-            onClick={() => this.props.dblock(this.state.function_name)}
-            name={"Delete Custom Function"}
+            onClick={() => { if (window.confirm('You Are Deleting Custom Block: '+this.state.function_name)) this.props.dblock(this.state.function_name) } }
+            name={"Delete Custom Block"}
+          />
+          <Button
+            id={"DBlockAll"}
+            onClick={() => { if (window.confirm('You Are Deleting All Custom Blocks')) this.props.dblockAll() } }
+            name={"Delete All Custom Blocks"}
           />
         </div>
         <div id="PythonDownload" className="horizontalDiv">
@@ -222,6 +227,7 @@ export default class MinibotBlockly extends React.Component {
       loginSuccessLabel: "",
       registerErrorLabel: "",
       registerSuccessLabel: "",
+      emptyFunctionName: "Create Custom Block",
       // updated in componentDidMount
       workspace: null,
     };
@@ -230,6 +236,7 @@ export default class MinibotBlockly extends React.Component {
     this.download = this.download.bind(this);
     this.run_blockly = this.run_blockly.bind(this);
     this.dblock = this.dblock.bind(this);
+    this.dblockAll = this.dblockAll.bind(this);
     this.login = this.login.bind(this);
     this.register = this.register.bind(this);
     this.scriptToCode = this.scriptToCode.bind(this);
@@ -247,22 +254,16 @@ export default class MinibotBlockly extends React.Component {
      and if there are no custom function already defined in the customBlocklyList
 
      Deletes default function from customBlocklyList if addOrDelete == false */
-  manageDefaultCustomBlocklyFunction(addOrDelete) {
-    const defaultFunction = ["none", "# Please create custom function"];
-    if (addOrDelete) {
-      if (this.props.customBlockList.length == 0) {
+  manageDefaultCustomBlocklyFunction() {
+    const defaultFunction = [this.state.emptyFunctionName, " "];
+    if (this.props.customBlockList.length == 0) {
         this.props.customBlockList.push(defaultFunction);
-      }
-    // default function can only exist if only one element in array
-    } else if (this.props.customBlockList.length == 1) {
-      const eqCheck = (
-        item => item[0] === defaultFunction[0] && item[1] === defaultFunction[1]
-      );
-      if (this.props.customBlockList.some(eqCheck)) {
-        // delete first element
-        this.props.customBlockList.shift();
-      }
     }
+    // default function can only exist if only one element in array
+    else if (this.props.customBlockList[0][0]===this.state.emptyFunctionName && this.props.customBlockList.length>1) {
+        // delete first element
+        this.props.customBlockList.splice(0, 1);
+      }
   }
 
   update_custom_blocks() {
@@ -290,7 +291,8 @@ export default class MinibotBlockly extends React.Component {
     var _this = this;
     const blockType = "custom_block";
     const fieldName = "function_content";
-    this.manageDefaultCustomBlocklyFunction(true);
+    this.manageDefaultCustomBlocklyFunction();
+    // var toolbox = document.getElementsByClassName("blocklyToolboxDiv")[0];
 
     Blockly.Blocks[blockType] = {
       init: function () {
@@ -313,7 +315,6 @@ export default class MinibotBlockly extends React.Component {
       }
     };
 
-
     // Unfortunately the code above only updates the drop down menu 
     // when the block's drop down menu is clicked.  To update the currently 
     // selected function's python code value without making 
@@ -326,15 +327,22 @@ export default class MinibotBlockly extends React.Component {
     for (let i = 0; i < allBlocks.length; i++) {
       // only need to update custom blocks
       if (allBlocks[i].type === blockType) {
-        console.log("Entered_here");
         var field = allBlocks[i].getField(fieldName);
         // get currently selected function in drop down menu
         var currentFunc = field.getText();
         var item = _this.props.customBlockList.find(element => element[0] === currentFunc); 
-        if (item == undefined) {
+        console.log("before if");
+        console.log(item);
+        if (item === undefined) {
+          console.log("if");
+          console.log(this.props.customBlockList[0][0]);
+          console.log(this.props.customBlockList.join());
           field.setText(this.props.customBlockList[0][0]);
           field.setValue(_this.props.customBlockList[0][1]);
         } else {
+          console.log("else");
+          console.log(item[0]);
+          console.log(this.props.customBlockList.join());
           field.setText(item[0]);
           field.setValue(item[1]);
         }
@@ -344,10 +352,11 @@ export default class MinibotBlockly extends React.Component {
     Blockly.Python[blockType] = function (block) {
       return block.getFieldValue(fieldName);
     };
+    // console.log(toolbox);
+    // toolbox.refreshSelection();
   }
 
  custom_block(function_name, pythonTextBoxCode) {
-    this.manageDefaultCustomBlocklyFunction(false);
     var _this = this;
     var item = _this.props.customBlockList.find(element => element[0] === function_name); 
     if (item == undefined) {
@@ -363,9 +372,23 @@ export default class MinibotBlockly extends React.Component {
     var _this = this;
     var item = _this.props.customBlockList.find(element => element[0] === function_name)
     const index = _this.props.customBlockList.indexOf(item);
-    if (index > -1) {
-      _this.props.customBlockList.splice(index, 1);
+    if (index === -1) {
+      window.alert('Custom Block - '+function_name+' - Does Not Exist');
+      return;
     }
+    _this.props.customBlockList.splice(index, 1);
+    this.redefine_custom_blocks();
+    this.update_custom_blocks();
+
+  }
+
+  dblockAll() {
+    var _this = this;
+    if(_this.props.customBlockList[0][0]===_this.state.emptyFunctionName){
+      window.alert('There Are No Custom Blocks');
+      return;
+    }
+    _this.props.customBlockList.splice(0, _this.props.customBlockList.length);
     this.redefine_custom_blocks();
     this.update_custom_blocks();
 
@@ -402,6 +425,7 @@ export default class MinibotBlockly extends React.Component {
           reflected in actual code view) */
     _this.workspace.addChangeListener(function (event) {
       _this.scriptToCode();
+      _this.redefine_custom_blocks();
     });
 
     /* Loads blockly state from parent component */
@@ -582,6 +606,9 @@ export default class MinibotBlockly extends React.Component {
   handleLogin(event) {
     const _this = this;
     var formData = new FormData(document.getElementById("loginForm"));
+    var temp = _this.props.customBlockList;
+    console.log("before login");
+    console.log(_this.props.customBlockList);
     axios({
       method: 'post',
       url: 'http://127.0.0.1:5000/login/',
@@ -599,6 +626,18 @@ export default class MinibotBlockly extends React.Component {
           loginErrorLabel: "",
           isLoggedIn: true,
         });
+        // _this.props.customBlockList.push(JSON.parse(response.data.custom_function))[0];
+        if(temp[0][0]!==_this.state.emptyFunctionName && _this.props.customBlockList[0][0]!==_this.state.emptyFunctionName){
+          _this.props.customBlockList.push.apply(_this.props.customBlockList, temp);
+        }
+        if(temp[0][0]!==_this.state.emptyFunctionName && _this.props.customBlockList[0][0]===_this.state.emptyFunctionName){
+          _this.props.customBlockList.splice(0, 1);
+          _this.props.customBlockList.push.apply(_this.props.customBlockList[0], temp);
+        }
+        console.log("login");
+        console.log(_this.props.customBlockList);
+        _this.redefine_custom_blocks();
+        _this.update_custom_blocks();
       })
       .catch((error) => {
         console.log("fail");
@@ -679,6 +718,7 @@ export default class MinibotBlockly extends React.Component {
             botName={this.props.bot_name}
             custom_block={this.custom_block}
             dblock={this.dblock}
+            dblockAll={this.dblockAll}
           />
         </div>
         <div id="generatedPythonFromBlocklyBox" style={dataStyle} className="col-md-5"></div>
