@@ -104,7 +104,7 @@ class Voice extends React.Component {
           }
           return (
               <div>
-                  <button className="btn btn-primary" onClick={this.toggle}>{x}</button>
+                  <button className="btn btn-primary element-wrapper" onClick={this.toggle}>{x}</button>
               </div>
           );
       }
@@ -611,19 +611,16 @@ export default class AddBot extends React.Component {
                          <Voice selected_bot={this.props.selected_bot} float="right" />
                     </div>
                     <div className="col-md-3">
-                        <button type="button" className="btn btn-primary" onClick={() => this.lineFollowOnClick()}>Line Follow</button>
-                    </div>
-                    <div className="divider" />
-                    <div className="col-md-3">
-                        <button type="button" className="btn btn-success" onClick={() => this.objectDetectionOnClick()}>Object Detection</button>
-                    </div>
-                    <div className="divider" />
-                    <div className="col-md-3">
                         <Toggle selected_bot={this.props.selected_bot} />
-                        {/* <button type="button" className="btn btn-primary" onClick={() => this.getOnBotVision()}>On-Bot Vision</button> */}
                     </div>
-                    <div className="col-md-6">
-
+                    <div className="divider" />
+                </div>
+                <div className="row button-wrapper">
+                    <div className="col-md-3">
+                        <button type="button" className="btn btn-success element-wrapper" onClick={() => this.objectDetectionOnClick()}>Object Detection</button>
+                    </div>
+                    <div className="col-md-3">
+                        <button type="button" className="btn btn-primary" onClick={() => this.lineFollowOnClick()}>Line Follow</button>
                     </div>
                 </div>
             </div>
