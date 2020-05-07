@@ -78,6 +78,7 @@ class PiBot(BaseStationBot, object):
             """
             parse incoming data
             """
+            print("REACHES TCP_PARSE_INCOMING")
             start = data.find("<<<<")
             end = data.find(">>>>")
             comma = data.find(",")

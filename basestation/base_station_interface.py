@@ -52,7 +52,8 @@ class BaseInterface:
             )),
             ("/vision", VisionHandler, dict(base_station=self.base_station)),
             ("/heartbeat", HeartbeatHandler, dict(base_station=self.base_station)),
-            ("/result", ErrorMessageHandler, dict(base_station=self.base_station))
+            ("/result", ErrorMessageHandler, dict(base_station=self.base_station)),
+            ("/stop", StopHandler, dict(base_station=self.base_station)),
         ]
 
     def start(self):
@@ -161,7 +162,7 @@ class ClientHandler(tornado.web.RequestHandler):
                 print(type(bot))
                 if len(value) == 0:
                     print("GETTING SCRIPTS")
-                    bot.sendKV("SCRIPTS", '')
+                    bot.sendKV("SCRIPTS", "")
                 elif len(value) == 1:
                     print("SENDING SCRIPTS")
                     bot.sendKV("SCRIPTS", value[0])
@@ -169,6 +170,7 @@ class ClientHandler(tornado.web.RequestHandler):
                     print("SAVING SCRIPTS")
                     bot.sendKV("SCRIPTS", ",".join(value))
                 else:
+        
                     # TODO check if a "long enough" program
                     # is supposed to be sent over
                     print("RUNNING SCRIPT")
@@ -286,6 +288,21 @@ class ErrorMessageHandler(tornado.websocket.WebSocketHandler):
         else:
             error_json = {"error": error_message, "code": 0}
         self.write(json.dumps(error_json).encode())
+
+
+class StopHandler(tornado.websocket.WebSocketHandler):
+    def initialize(self, base_station):
+        self.base_station = base_station
+
+    def post(self):
+        data = json.loads(self.request.body.decode())
+        bot_name = data['bot_name']
+
+        print("REACHES STOP HANDLER!!!")
+        bot_id = self.base_station.bot_name_to_bot_id(bot_name)
+        bot = self.base_station.get_bot(bot_id)
+        if bot:
+            bot.sendKV("STOP", "")
 
 
 if __name__ == "__main__":

@@ -70,6 +70,7 @@ class PythonTextBox extends React.Component {
     this.handleFunctionNameChange = this.handleFunctionNameChange.bind(this);
     this.handleScriptChange = this.handleScriptChange.bind(this);
     this.run_script = this.run_script.bind(this);
+    this.stop = this.stop.bind(this);
     this.upload = this.upload.bind(this);
     this.view_history = this.view_history.bind(this);
   }
@@ -181,6 +182,46 @@ class PythonTextBox extends React.Component {
 
   }
 
+  stop(event) {
+    console.log('sent stop command');
+    // axios({
+    //   method: 'POST',
+    //   url: '/stop',
+    //   data: JSON.stringify({
+    //     bot_name: this.props.botName
+    //   }),
+    // })
+    //   .then(function (response) {
+    //     // console.log(blockly.value);
+    //     console.log('get response');
+    //   })
+    //   .catch(function (error) {
+    //     console.warn(error);
+    //   });
+
+    // axios({
+    //   method: 'POST',
+    //   url: '/result',
+    //   data: JSON.stringify({
+    //     bot_name: this.props.botName
+    //   }),
+    // })
+    //   .then((response) => {
+    //     document.getElementById("errormessage").value = response.data["error"];
+    //     if (response.data["code"] === 1) {
+    //       // lime green 
+    //       document.getElementById("errormessage").style.color="#32CD32";
+    //     }
+    //     else {
+    //       // red
+    //       document.getElementById("errormessage").style.color="#FF0000";
+    //     }
+    //   })
+    //   .catch((err) => {
+    //     console.log(err)
+    //   })
+  }
+
   render() {
     return (
       <div id="Python">
@@ -218,6 +259,7 @@ class PythonTextBox extends React.Component {
         </div>
         <div id="AdditionalButtons" className="horizontalDiv">
           <Button id={"run"} onClick={this.run_script} name={"Run"} />
+          <Button id={"stop"} onClick={this.stop} name={"Stop"} />
           <Button id={"history"} onClick={this.view_history} name={"View History"} />
           <Button id={"copy"} onClick={this.copy} name={"Copy Code From Blockly"} />
           <div> <textarea id = "errormessage" rows="1" cols="60" /></div>

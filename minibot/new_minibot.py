@@ -9,6 +9,8 @@ import importlib
 import ast
 import os
 import concurrent.futures
+from multiprocessing import Process, Manager, Value
+from ctypes import c_char_p
 
 # Create a UDP socket
 sock = socket(AF_INET, SOCK_DGRAM)
@@ -34,6 +36,8 @@ else:
     import scripts.PiArduino as ece
     BOT_LIB_FUNCS = "PiArduino"
 
+p = "Empty process"
+stop = False
 
 def parse_command(cmd, tcpInstance):
     """
@@ -93,6 +97,17 @@ def parse_command(cmd, tcpInstance):
             except Exception as exception:
                 print("Exception occurred")
 
+    elif key == "STOP":
+        global p
+        global stop
+        if (type(p) != str):
+            p.terminate()
+        p = "Empty process"
+        stop = True
+        print("Called inside parse_command from new_minibot.py, will print the value of stop in the next line")
+        print(stop)
+        return "Terminate by command!!!!!"
+
 
 def process_string(value):
     """
@@ -121,13 +136,26 @@ def spawn_script_process(scriptname):
     """
     time.sleep(0.1)
 
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        future = executor.submit(run_script, scriptname)
-        return_value = future.result()
-        return return_value
+    # with concurrent.futures.ThreadPoolExecutor() as executor:
+    #     future = executor.submit(run_script, scriptname)
+    #     return_value = future.result()
+    #     return return_value
+    global p
+    global stop
+    stop == False
+    manager = Manager()
+    output = manager.Value(c_char_p, "")
+    p = Process(target=run_script, args=(scriptname, output))
+    print("Called inside spawn_script_process from new_minibot.py, will do p.start() next")
+    p.start()
+    while stop == False:
+        if (output.value != ""):
+            p = "Empty process"
+            return output.value
+    print("Called inside spawn_script_process from new_minibot.py, means escape the while loop because stop = True")
+    return "Terminate by command"
 
-
-def run_script(scriptname):
+def run_script(scriptname, output):
     """
     Loads a script and runs it.
     Args:
@@ -137,16 +165,18 @@ def run_script(scriptname):
     # Cache invalidation and module refreshes are needed to ensure
     # the most recent script is executed
     try:
+        print("REACHES RUN_SCRIPT TRY")
         index = scriptname.find(".")
         importlib.invalidate_caches()
         script_name = "scripts." + scriptname[0: index]
         script = importlib.import_module(script_name)
         importlib.reload(script)
         script.run()
-        return "Successful execution"
+        output.value = "Successful execution"
     except Exception as exception:
+        print("REACHES RUN_SCRIPT EXCEPTION")
         str_exception = str(type(exception)) + ": " + str(exception)
-        return str_exception
+        output.value = str_exception
 
 
 def start_base_station_heartbeat(ip_address):
@@ -213,8 +243,9 @@ def main():
         while True:
             time.sleep(0.01)
             return_value = parse_command(tcp_instance.get_command(), tcp_instance)
-            # print("return_value is:")
-            # print(return_value)
+            if return_value is not None:
+                print("return_value is:")
+                print(return_value)
             if return_value is not None:
                 tcp_instance.send_to_basestation("RESULT", return_value)
 
