@@ -14,7 +14,8 @@ import re  # regex import
 import requests
 import threading
 import pyaudio
-import speech_recognition  as sr
+import speech_recognition as sr
+from util.stoppable_thread import StoppableThread
 
 # Minibot imports.
 from base_station import BaseStation
@@ -290,80 +291,60 @@ class VoiceHandler(tornado.websocket.WebSocketHandler):
     def post(self):
         data = json.loads(self.request.body.decode())
         key = data['key']
+        
+        bot_name = data['bot_name']
+        bot_id = self.base_station.bot_name_to_bot_id(bot_name)
+        bot = self.base_station.get_bot(bot_id)
+        if not bot:
+            return
 
-        session_id = self.get_secure_cookie("user_id")
-        if session_id:
-            session_id = session_id.decode("utf-8")
-            bot_name = data['bot_name']
-            bot_id = self.base_station.bot_name_to_bot_id(bot_name)
-            bot = self.base_station.get_bot(bot_id)
-
-            if key == "START VOICE":  # start listening
-                if (bot):
-                    print("starting voiceServer thread")
-                    VoiceHandler.flag = True
-                    self.base_station.voice_server = StoppableThread(
-                        target=self.voice_recognition, daemon=True)
-                    self.base_station.voice_server.start()
-                else:
-                    print("no bot found")
-            elif key == "STOP VOICE":
-                print("ending onBotVisionServer thread")
-                if (VoiceHandler.flag):
-                    self.base_station.voice_server.stop()
-                else:
-                    print("ERROR: No on bot vision server started")
+        if key == "START VOICE":  # start listening
+            print("starting voiceServer thread")
+            VoiceHandler.flag = True
+            self.base_station.voice_server = StoppableThread(self.voice_recognition)
+            self.base_station.voice_server.start()
+        elif key == "STOP VOICE":
+            print("ending onBotVisionServer thread")
+            if (VoiceHandler.flag):
+                print("About to call base_station.voice_server.stop()")
+                self.base_station.voice_server.stop()
             else:
-                print("Invalid key")
+                print("ERROR: No on bot vision server started")
     
-    def voice_recognition(self):
+    def voice_recognition(self, thread_safe_condition):
+        RECORDING_TIME_LIMIT = 5
+        commands = {
+            "forward" : "Minibot moves forward",
+            "backward" : "Minibot moves backwards",
+            "left" : "Minibot moves left",
+            "right" : "Minibot moves right",
+            "stop" : "Minibot stops",
+            "object detection" : "Minibot starts object detection mode",
+            "line follow" : "Minibot starts line follow mode"
+        }
         print("entered base_station.py")
-        with sr.Microphone() as source:
+        # open the Microphone as variable microphone
+        with sr.Microphone() as microphone:
             print("mic works")
             r = sr.Recognizer()
-            while VoiceHandler.flag:
-                with sr.Microphone() as source:
-                    print("Say something!")
-                    audio = None
-                    try:
-                        audio = r.listen(source, 5)
-                        print("Processing...")
-                    except BaseException:
-                        print("timed out")
+            while thread_safe_condition.read():
+                print("Say something!")
+                try:
+                    # listen for 5 seconds
+                    audio = r.listen(microphone, RECORDING_TIME_LIMIT)
+                    print("Converting from speech to text ...")
+                    words = r.recognize_google(audio)
+                    print("You said: " + words)
+                    if words in commands:
+                        print(commands[words])
                     else:
-                        words = None
-                        try:
-                            words = r.recognize_google(audio)
-                        except BaseException:
-                            print("words not recognized")
-                        else:
-                            print("You said: " + words)
-                            if words == "forward":
-                                print("Minibot moves forward...")
-                            elif words == "stop":
-                                print("Minibot stops...")
-                            elif words == "object detection":
-                                print("Minibot starts object detection mode...")
-                            #can add more commands here
-                            else:
-                                print("Not a valid command")
+                        print("Invalid command")
+                # TODO get specific exception
+                except sr.WaitTimeoutError:
+                    print("timed out")
+                except sr.UnknownValueError:
+                    print("words not recognized")
     
-
-class StoppableThread(threading.Thread):
-    """Thread class with a stop() method. The thread itself has to check
-    regularly for the stopped() condition."""
-
-    def __init__(self,  *args, **kwargs):
-        super(StoppableThread, self).__init__(*args, **kwargs)
-        self._stop_event = threading.Event()
-
-    def stop(self):
-        self._stop_event.set()
-
-    def stopped(self):
-        return self._stop_event.is_set()
-
-
 
 if __name__ == "__main__":
     """
