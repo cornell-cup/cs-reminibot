@@ -102,6 +102,7 @@ def parse_command(cmd, tcpInstance):
         if (botVisionClient):
             print("Stop on bot vision w/ server ip: " + server_ip)
             vs.stop()
+            # TODO: very important! this is not working, thus preventing the resource from being closed on the pi
             vs.stream.stream.release()
 
 
