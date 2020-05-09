@@ -10,19 +10,21 @@ export default class Dashboard extends React.Component {
     constructor() {
         super();
         this.state = {
-            nprogramsweek: 0
+            nprogramsweek: "database error",
+            nprogramsmonth: "database error"
         };
     }
 
     componentWillMount() {
-        fetch('http://127.0.0.1:5000/nprogramsweek/').
+        fetch('http://127.0.0.1:5000/nprograms/').
             then((response) => {
                 return response.json()
             })
             .then((data) => {
                 console.log(data)
                 this.setState({
-                    nprogramsweek: data["n"]
+                    nprogramsweek: data["week"],
+                    nprogramsmonth: data["month"]
                 });
             })
             .catch((error) => {
@@ -55,7 +57,7 @@ export default class Dashboard extends React.Component {
                         <div class="card border-left-primary shadow h-100 py-2">
                             <div class="card-body">
                                 <div class="text-xs text-danger font-weight-bold text-primary text-uppercase mb-1">Numer of programs written this month</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">20</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{this.state.nprogramsmonth}</div>
                             </div>
                         </div>
                     </div>

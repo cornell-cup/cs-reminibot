@@ -241,16 +241,18 @@ def update_custom_function():
     return json.dumps({'custom_function': custom_function}), 201
 
 
-@app.route('/nprogramsweek/', methods=['GET'])
+@app.route('/nprograms/', methods=['GET'])
 def number_programs():
-    global nprogramsweek
     nprogramsweek = 0
+    nprogramsmonth = 0
     programs = Program.query.all()
     for program in programs:
         diff = program.datetime - datetime.now()
         if (diff.days <= 7):
             nprogramsweek += 1
-    return json.dumps({'n': nprogramsweek}), 201
+        if (program.datetime.month == datetime.now().month):
+            nprogramsmonth += 1
+    return json.dumps({'week': nprogramsweek, 'month': nprogramsmonth}), 201
 
 
 if __name__ == "__main__":
