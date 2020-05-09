@@ -9,6 +9,26 @@ import PieChartComponent from './piechart';
 export default class Dashboard extends React.Component {
     constructor() {
         super();
+        this.state = {
+            nprogramsweek: 0
+        };
+    }
+
+    componentWillMount() {
+        fetch('http://127.0.0.1:5000/nprogramsweek/').
+            then((response) => {
+                return response.json()
+            })
+            .then((data) => {
+                console.log(data)
+                this.setState({
+                    nprogramsweek: data["n"]
+                });
+            })
+            .catch((error) => {
+                console.log("fail");
+                console.log(error);
+            })
     }
 
     render() {
@@ -21,7 +41,7 @@ export default class Dashboard extends React.Component {
                                 <div class="row no-gutters align-items-center">
                                     <div class="col mr-2">
                                         <div class="text-xs text-danger font-weight-bold text-primary text-uppercase mb-1">Numer of programs written this week</div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800">10</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{this.state.nprogramsweek}</div>
                                     </div>
                                     <div class="col-auto">
                                         <i class="fas fa-calendar fa-2x text-gray-300"></i>

@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime_CAPI
 import bcrypt
 import datetime
 import hashlib
@@ -11,19 +12,27 @@ class Program(db.Model):
     __tablename__ = 'program'
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String, nullable=False)
+    datetime = db.Column(db.DateTime,
+                         default=datetime.datetime.utcnow(),
+                         nullable=False)
     time = db.Column(db.Integer, nullable=False)
     email = db.Column(db.String, nullable=False)
 
     def __init__(self, **kwargs):
         self.code = kwargs.get('code', '')
         self.time = kwargs.get('time', '')
+        self.datetime = kwargs.get('datetime', '')
         self.email = kwargs.get('email', '')
 
     def serialize(self):
+        dt_string = self.datetime.strftime(
+            "%m/%d/%Y, %H:%M:%S")
+        print(dt_string)
         return {
             'id': self.id,
             'code': self.code,
             'time': self.time,
+            'datetime': dt_string,
             'email': self.email
         }
 

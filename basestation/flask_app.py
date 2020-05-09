@@ -1,4 +1,5 @@
 import time
+from datetime import datetime
 import json
 from flask import Flask, request, redirect
 from flask_db import db, Program, User
@@ -18,6 +19,7 @@ with app.app_context():
     db.create_all()
 
 login_email = ""
+nprogramsweek = 0
 
 
 def get_user_by_email(email):
@@ -30,6 +32,7 @@ def get_user_by_session_token(session_token):
 
 def get_user_by_update_token(update_token):
     return User.query.filter(User.update_token == update_token).first()
+
 
 def update_custom_function_by_session_token(session_token, custom_function):
     user = get_user_by_session_token(session_token)
@@ -109,13 +112,16 @@ def post_code():
     data = request.get_json()
     t = time.localtime()
     current_time = time.strftime("%H:%M:%S", t)
+    current_date = datetime.now()
     print(data)
     print(current_time)
+    print(current_date)
     print(login_email)
     program = Program(
         code=data.get('value'),
         time=current_time,
-        email=login_email
+        datetime=current_date,
+        email=login_email,
     )
     db.session.add(program)
     db.session.commit()
@@ -216,6 +222,7 @@ def update_session():
         'update_token': user.update_token
     })
 
+
 @app.route('/custom_function/', methods=['POST'])
 def update_custom_function():
     session_token = request.form['session_token']
@@ -225,12 +232,26 @@ def update_custom_function():
         print("error: Missing session_token or custom_function")
         return json.dumps({'error': 'Missing session_token or custom_function'}), 404
 
-    success, res = update_custom_function_by_session_token(session_token, custom_function)
+    success, res = update_custom_function_by_session_token(
+        session_token, custom_function)
 
     if not success:
         print("error: invalid session_token")
         return json.dumps({'error': 'invalid session_token'}), 404
     return json.dumps({'custom_function': custom_function}), 201
+
+
+@app.route('/nprogramsweek/', methods=['GET'])
+def number_programs():
+    global nprogramsweek
+    nprogramsweek = 0
+    programs = Program.query.all()
+    for program in programs:
+        diff = program.datetime - datetime.now()
+        if (diff.days <= 7):
+            nprogramsweek += 1
+    return json.dumps({'n': nprogramsweek}), 201
+
 
 if __name__ == "__main__":
     app.run()
