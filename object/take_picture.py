@@ -61,7 +61,10 @@ def take_pictures(args):
                 type = "training"
             else:
                 type = "validation"
-            path = os.getcwd() + '/' + args.folder + '/' + type + '/' + args.category + '/'
+            if args.test:
+                path = os.getcwd() + '/test/'
+            else:
+                path = os.getcwd() + '/' + args.folder + '/' + type + '/' + args.category + '/'
             # Makes directorties for given path
             if not os.path.isdir(path):
                 os.makedirs(path)
@@ -92,11 +95,14 @@ if __name__=="__main__":
     #may want to keep it as images
     parser.add_argument("-folder", "-f", action="store", dest="folder", default="images",
         help="Specifies the folder that the images should be stored in")
-
     parser.add_argument("-category", "-c", action="store", dest="category", default="True",
         help="Specifies the category of the images")
     parser.add_argument("-ratio", "-r", action="store", dest="ratio", default=.2, type=float,
         help="Specifies the ratio of images to be store as training images to all taken (0 < ratio < 1)")
+
+    #Puts images in 'test' if specified
+    parser.add_argument("-test","-t",dest="test", action="store_true")
+
     args = parser.parse_args()
 
     # Additional constrainst on arguments
