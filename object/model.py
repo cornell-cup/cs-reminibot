@@ -4,6 +4,7 @@ import os
 import argparse
 import numpy as np
 import warnings
+import cv2
 warnings.filterwarnings("ignore")
 #modules
 import augment
@@ -86,7 +87,27 @@ def train_model(args):
       verbose=1,
       validation_data = validation_generator,
       validation_steps=4)
+    return model
 
+def prediction(args):
+    model = train_model(args)
+    print('\n')
+    print('Predictions\n')
+    path = './test/'
+    for image_path in os.listdir(path):
+        input_path = os.path.join(path, image_path)
+        img_width, img_height = 300, 300
+        img = tf.keras.preprocessing.image.load_img(input_path, target_size = (img_width, img_height))
+        img = tf.keras.preprocessing.image.img_to_array(img)
+        img = img/255
+        img = np.expand_dims(img, axis = 0)
+        prob = model.predict(img)
+        if prob[0]>0.5:
+            label = 'TRUE'
+            print("Image {} belongs to the {} class".format(image_path, label))
+        else:
+            label = 'FALSE'
+            print("Image {} belongs to the {} class".format(image_path, label))
 
 
 if __name__=="__main__":
@@ -109,7 +130,8 @@ if __name__=="__main__":
                         default=True, help='Vertical flip')
 
     args = vars(parser.parse_args())
-    train_model(args)
+    prediction(args)
+
 
 
     """

@@ -66,7 +66,6 @@ def augmentation(args):
 
     return train_generator, validation_generator
 
-
 if __name__=="__main__":
     parser = argparse.ArgumentParser(description='Augmentation parameters')
     parser.add_argument('-rot', action="store", type=float, dest="rotation_range",
