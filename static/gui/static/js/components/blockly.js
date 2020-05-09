@@ -129,6 +129,14 @@ class PythonTextBox extends React.Component {
   /* Target function for the button "Run Code". Send python code
      in the editing box to backend. */
   run_script(event) {
+    var _this = this;
+    var start_time = this.state.coding_start;
+    if (start_time != -1) {
+      var time = (new Date().getTime() - start_time) / 1000
+      document.getElementById("time").value = time.toString() + "s";
+      this.setState({ coding_start: -1 })
+    }
+
     axios({
       method: 'POST',
       url: '/start',
@@ -139,13 +147,12 @@ class PythonTextBox extends React.Component {
       }),
     })
       .then(function (response) {
-        console.log(blockly.value);
+        // console.log(blockly.value);
         console.log('sent script');
       })
       .catch(function (error) {
         console.warn(error);
       });
-
   }
 
   render() {
@@ -187,6 +194,8 @@ class PythonTextBox extends React.Component {
           <Button id={"run"} onClick={this.run_script} name={"Run"} />
           <Button id={"history"} onClick={this.view_history} name={"View History"} />
           <Button id={"copy"} onClick={this.copy} name={"Copy Code From Blockly"} />
+          <div> <textarea style={{ color: 'red' }} id="errormessage" rows="1" cols="40" /></div>
+          <div> <textarea style={{ color: 'green' }} id="time" rows="1" cols="20" /></div>
         </div>
         <div id="PythonUpload" className="horizontalDiv">
           <form>
@@ -488,57 +497,6 @@ export default class MinibotBlockly extends React.Component {
       })
   }
 
-
-  /* Target function for the button "Run Code". Send python code
-     in the editing box to backend. */
-  run_script(event) {
-    var start_time = this.state.coding_start;
-    if (start_time != -1) {
-      var time = (new Date().getTime() - start_time) / 1000
-      document.getElementById("time").value = time.toString() + "s";
-      this.setState({ coding_start: -1 })
-    }
-
-    axios({
-      method: 'POST',
-      url: '/start',
-      data: JSON.stringify({
-        key: "WHEELS",
-        bot_name: this.props.bot_name,
-        direction: "stop",
-        power: 0,
-      })
-    })
-      .then(function (response) {
-        // console.log(blockly.value);
-        console.log('sent script');
-      })
-      .catch(function (error) {
-        console.warn(error);
-      });
-
-    axios({
-      method: 'POST',
-      url: '/result',
-      data: JSON.stringify({
-        bot_name: this.props.bot_name
-      }),
-    })
-      .then((response) => {
-        console.log("The error message is: !!!")
-        console.log(response);
-        document.getElementById("errormessage").value = response.data["error"];
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-
-  }
-
-  view_history(event) {
-    window.open("http://127.0.0.1:5000/program/")
-  }
-
   login(event) {
     const modal = document.getElementById("loginModal")
     const closeBtn = document.getElementById("loginClose")
@@ -718,50 +676,7 @@ export default class MinibotBlockly extends React.Component {
             custom_block={this.custom_block}
             dblock={this.dblock}
           />
-          {/* </form> */}
-          <br />
-
-          <div id="Python">
-            <p id="title"> <b>Python </b> </p>
-            <div> <textarea id="textarea" rows="10" cols="98" onChange={this.handleScriptChange} /></div>
-      Function Name:
-      <input
-              type="text"
-              name="function_name"
-              value={this.state.function_name}
-              onChange={this.handleFunctionNameChange}
-            />&nbsp;&nbsp;
-      <button id="CBlock" onClick={this.custom_block}>Update Custom Function</button>&nbsp;&nbsp;
-      <br />
-      Python File Name:
-      <input
-              type="text"
-              name="filename"
-              value={this.state.filename}
-              onChange={this.handleFileNameChange}
-            />&nbsp;&nbsp;
-        <br />
-            <button id="submit" onClick={this.download_python}>Download</button>&nbsp;&nbsp;
-      <button id="run" onClick={this.run_script}>Run</button>&nbsp;&nbsp;
-      <button id="history" onClick={this.view_history}>View History</button>&nbsp;&nbsp;
-      <button id="copy" onClick={this.copy}>Copy Code From Blockly</button>
-            <div> <textarea style={{ color: 'red' }} id="errormessage" rows="1" cols="40" /></div>
-            <div> <textarea style={{ color: 'green' }} id="time" rows="1" cols="20" /></div>
-            <br />
-            <form>
-              <input
-                type="file"
-                id="upload"
-                multiplesize="1"
-                accept=".py"
-                onChange={this.upload}
-              />
-            </form>
-            <br />
-            <br />
-          </div>
         </div>
-        <div id="generatedPythonFromBlocklyBox" style={dataStyle} className="col-md-5"></div>
       </div>
     );
   }
