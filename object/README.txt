@@ -30,6 +30,21 @@ As of now, it is a standard CNN model. Will add user customization gradually.
 
 POTENTIAL ERRORS:
 
+
+ERROR:
+tensorflow: Your input ran out of data; interrupting training. Make sure
+that your dataset or generator can generate at least `steps_per_epoch * epochs`
+batches (in this case, 40 batches). You may need to use the repeat()
+function when building your dataset.
+(or something like this)
+
+SOLUTION:
+basically you haven't taken enough pictures for the currently hardcoded values of
+steps_per_epoch and epochs in model.py. Look at the documented part of model.py.
+It explains how you can take enough. 
+
+
+
 ERROR:
 [libprotobuf ERROR google/protobuf/descriptor_database.cc:394] Invalid file descriptor data passed to EncodedDescriptorDatabase::Add().
 [libprotobuf FATAL google/protobuf/descriptor.cc:1356] CHECK failed: GeneratedDatabase()->Add(encoded_file_descriptor, size):
