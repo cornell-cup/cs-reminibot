@@ -269,7 +269,6 @@ class OnBotVisionHandler(tornado.websocket.WebSocketHandler):
 
     def initialize(self, base_station):
         self.base_station = base_station
-        # TODO: make this a class var somehow
 
     def get(self):
         pass  # TODO
@@ -284,26 +283,25 @@ class OnBotVisionHandler(tornado.websocket.WebSocketHandler):
             bot_name = data['bot_name']
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             bot = self.base_station.get_bot(bot_id)
-
-            if key == "STARTBOTVISION":  # start the on bot vision
-                if (bot):
+            if (bot):
+                if key == "STARTBOTVISION":  # start the on bot vision
                     print("starting onBotVisionServer process")
                     OnBotVisionHandler.bot_vision_server = subprocess.Popen(
                         ['python3', 'piVision/server.py'])
+                    bot.sendKV(key, '')
 
-                    bot.sendKV(key, '')
+                elif key == "STOPBOTVISION":
+                    print("ending onBotVisionServer thread")
+                    if (OnBotVisionHandler.bot_vision_server):
+                        OnBotVisionHandler.bot_vision_server.kill()
+                        # onBotVisionServer.terminate()
+                        bot.sendKV(key, '')
+                    else:
+                        print("ERROR: No on bot vision server started")
                 else:
-                    print("no bot found")
-            elif key == "STOPBOTVISION":
-                print("ending onBotVisionServer thread")
-                if (OnBotVisionHandler.bot_vision_server):
-                    OnBotVisionHandler.bot_vision_server.kill()
-                    # onBotVisionServer.terminate()
-                    bot.sendKV(key, '')
-                else:
-                    print("ERROR: No on bot vision server started")
+                    print("Invalid key")
             else:
-                print("Invalid key")
+                print("No bot is connected")
 
 
 if __name__ == "__main__":

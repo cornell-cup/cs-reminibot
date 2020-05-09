@@ -101,7 +101,9 @@ def parse_command(cmd, tcpInstance):
     elif key == "STOPBOTVISION":
         if (botVisionClient):
             print("Stop on bot vision w/ server ip: " + server_ip)
+            vs.stop()
             vs.stream.stream.release()
+
 
 def process_string(value):
     """

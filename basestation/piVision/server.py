@@ -145,6 +145,7 @@ while True:
     for (i, montage) in enumerate(montages):
         cv2.imshow("On-Bot Video Stream ({})".format(i),
                    montage)
+        #print(i, datetime.now())
 
     # detect any kepresses
     key = cv2.waitKey(1) & 0xFF
