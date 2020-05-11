@@ -334,24 +334,17 @@ var miniblocks = {
     tooltip: "",
     helpUrl: ""
   },
+
   move_servo: {
     type: "move_servo",
-    message0: "move sero to %1 angle",
+    message0: "move servo to %1 angle",
     args0: [
       {
-        type: "field_dropdown",
-        name: "direction",
-        options: [
-          ["right", "turn_clockwise"],
-          ["left", "turn_counter_clockwise"]
-        ]
-      },
-      {
         type: "field_number",
-        name: "percent",
-        value: 100,
+        name: "angle",
+        value: 360,
         min: 0,
-        max: 100
+        max: 360
       }
     ],
     previousStatement: null,
@@ -360,6 +353,7 @@ var miniblocks = {
     tooltip: "",
     helpUrl: ""
   },
+
   wait_seconds: {
     type: "wait_seconds",
     message0: "wait %1 seconds",

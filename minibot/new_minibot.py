@@ -88,7 +88,6 @@ def parse_command(cmd, tcpInstance):
                     file_dir + "/scripts/" + script_name, 'w+')
                 file.write(program)
                 file.close()
-                print("hello")
                 return_value = spawn_script_process(script_name)
                 return return_value
             except Exception as exception:

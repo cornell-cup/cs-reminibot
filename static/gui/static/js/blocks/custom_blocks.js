@@ -286,15 +286,15 @@ Blockly.Python['while_wait_for_commands'] = function (block) {
 
 Blockly.Blocks['move_servo'] = {
   init: function() {
-    this.jsonInit(miniblocks.move_servo)
+    this.jsonInit(miniblocks.move_servo);
   }
 }
 
 Blockly.Python['move_servo'] = function (block) {
   var angle = block.getFieldValue('angle');
-  var funcName = "move_servo(" + angle + ")";
+  var funcCall = "move_servo(" + angle + ")";
 
-  return [BOT_HEADER + funcCall]; 
+  return BOT_HEADER + funcCall + FCN_ENDING; 
 }
 
 // ================ ULTRASONIC BLOCKS ================ //

@@ -105,7 +105,6 @@ def read_once(cmd):
     values = []
     for _ in range(NUM_READS):
         values += spi.readbytes(1)
-        print(values)
     val = median(values)
     tlock.end_transmit()
     return val
@@ -150,10 +149,16 @@ def stop():
 
 def read_ultrasonic():
     acquire_lock()
-    arr_cmds="\ndu"
+    arr_cmds = "\ndu"
     for cmd in arr_cmds:
         execute_once(cmd)
     return read_once('SU')
+
+
+def move_servo(angle):
+    acquire_lock()
+    execute_once("M")
+    execute_once(str(angle))
 
 
 def LineFollow():

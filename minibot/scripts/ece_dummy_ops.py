@@ -145,6 +145,12 @@ def read_ultrasonic():
     return read_once('SU')
 
 
+def move_servo(angle):
+    acquire_lock()
+    execute_once("M")
+    execute_once(str(angle))
+
+
 def LineFollow():
     acquire_lock()
     # The T stands for tape follow

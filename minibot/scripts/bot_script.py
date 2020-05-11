@@ -1,9 +1,12 @@
-from scripts.PiArduino import *
+from scripts.ece_dummy_ops import *
 import time
 from threading import *
 def run():
-    if 0 < read_ultrasonic() <= 10:
-      Thread(target=fwd, args=[100]).start()
-      time.sleep(2)
+    for count in range(5):
+      time.sleep(5)
       Thread(target=stop, args=[]).start()
+      if 0 < read_ultrasonic() <= 20:
+        move_servo(360)
+      else:
+        move_servo(180)
     
