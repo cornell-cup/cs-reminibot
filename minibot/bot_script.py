@@ -6,4 +6,4 @@ def run():
       Thread(target=fwd, args=[100]).start()
       time.sleep(2)
       Thread(target=stop, args=[]).start()
-    
+run()    
