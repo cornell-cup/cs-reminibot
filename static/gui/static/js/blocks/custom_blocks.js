@@ -282,6 +282,21 @@ Blockly.Python['while_wait_for_commands'] = function (block) {
   return code + FCN_ENDING;
 };
 
+// ================ SERVO BLOCKS ================ //
+
+Blockly.Blocks['move_servo'] = {
+  init: function() {
+    this.jsonInit(miniblocks.move_servo)
+  }
+}
+
+Blockly.Python['move_servo'] = function (block) {
+  var angle = block.getFieldValue('angle');
+  var funcName = "move_servo(" + angle + ")";
+
+  return [BOT_HEADER + funcCall]; 
+}
+
 // ================ ULTRASONIC BLOCKS ================ //
 
 Blockly.Blocks['read_ultrasonic'] = {

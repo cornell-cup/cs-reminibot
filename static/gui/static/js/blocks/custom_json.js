@@ -334,6 +334,32 @@ var miniblocks = {
     tooltip: "",
     helpUrl: ""
   },
+  move_servo: {
+    type: "move_servo",
+    message0: "move sero to %1 angle",
+    args0: [
+      {
+        type: "field_dropdown",
+        name: "direction",
+        options: [
+          ["right", "turn_clockwise"],
+          ["left", "turn_counter_clockwise"]
+        ]
+      },
+      {
+        type: "field_number",
+        name: "percent",
+        value: 100,
+        min: 0,
+        max: 100
+      }
+    ],
+    previousStatement: null,
+    nextStatement: null,
+    colour: 230,
+    tooltip: "",
+    helpUrl: ""
+  },
   wait_seconds: {
     type: "wait_seconds",
     message0: "wait %1 seconds",
