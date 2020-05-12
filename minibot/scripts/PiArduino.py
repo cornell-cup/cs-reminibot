@@ -98,12 +98,19 @@ def execute_once(cmd):
     spi.writebytes([ord(cmd)])
     tlock.end_transmit()
 
+def send_integer_once(num):
+    setSlave(1)
+    print(num)
+    spi.xfer([num])
+    tlock.end_transmit()
+
+
 def read_once(cmd):
-    NUM_READS = 20
+    num_reads = 20
     setSlave(1)
     print(cmd)
     values = []
-    for _ in range(NUM_READS):
+    for _ in range(num_reads):
         values += spi.readbytes(1)
     val = median(values)
     tlock.end_transmit()
@@ -157,8 +164,12 @@ def read_ultrasonic():
 
 def move_servo(angle):
     acquire_lock()
-    execute_once("M")
-    execute_once(str(angle))
+    end_cmd = "\r"
+    arr_cmds = "\nss"
+    for cmd in arr_cmds:
+        execute_once(cmd)
+    send_integer_once(int(angle))
+    execute_once(end_cmd)
 
 
 def LineFollow():
