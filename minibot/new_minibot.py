@@ -148,6 +148,8 @@ def run_script(scriptname):
         return "Successful execution"
     except Exception as exception:
         print("Exception occurred at run time")
+        print(type(exception))
+        print(str(exception))
         str_exception = str(type(exception)) + ": " + str(exception)
         return str_exception
 
