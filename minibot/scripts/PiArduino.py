@@ -175,6 +175,7 @@ def move_servo(angle):
         execute_once(cmd)
     print("Servo should move to {} angle".format(angle))
     send_integer_once(int(angle))
+    execute_once(end_cmd) 
 
 
 def LineFollow():
