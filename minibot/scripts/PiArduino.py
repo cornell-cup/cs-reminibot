@@ -161,7 +161,7 @@ def read_ultrasonic():
     arr_cmds = "\ndu"
     for cmd in arr_cmds:
         execute_once(cmd)
-    return read_once('SU')
+    return read_once()
 
 
 def move_servo(angle):
