@@ -113,6 +113,7 @@ def read_once(cmd):
     for _ in range(num_reads):
         values += spi.readbytes(1)
     val = median(values)
+    print("Value read is {}".format(val))
     tlock.end_transmit()
     return val
     
