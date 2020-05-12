@@ -105,12 +105,13 @@ def send_integer_once(num):
     tlock.end_transmit()
 
 
-def read_once(cmd):
+def read_once():
     num_reads = 20
     setSlave(1)
-    print(cmd)
+    print("Reading from sensor")
     values = []
     for _ in range(num_reads):
+        print("Individual value read: {}".format(spi.readbytes(1)))
         values += spi.readbytes(1)
     val = median(values)
     print("Value read is {}".format(val))
