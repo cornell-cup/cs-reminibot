@@ -114,7 +114,7 @@ def read_once():
         print("Individual value read: {}".format(spi.readbytes(1)[0]))
         values += spi.readbytes(1)
     val = median(values)
-    print("Value read is {}".format(val))
+    print("Median value read is {}".format(val))
     tlock.end_transmit()
     return val
     
@@ -158,10 +158,13 @@ def stop():
 
 def read_ultrasonic():
     acquire_lock()
+    end_cmd = "\r"
     arr_cmds = "\ndu"
     for cmd in arr_cmds:
         execute_once(cmd)
-    return read_once()
+    return_val = read_once()
+    execute_once(end_cmd) 
+    return return_val
 
 
 def move_servo(angle):
