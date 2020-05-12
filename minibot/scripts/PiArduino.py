@@ -112,6 +112,7 @@ def read_once():
     values = []
     for _ in range(num_reads):
         values += spi.readbytes(1)
+        print("Original values: {}".format(values))
     values = [num for num in values if num != 0]
     values = [0] if not values else values
     val = median(values)
