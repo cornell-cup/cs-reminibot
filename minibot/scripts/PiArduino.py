@@ -173,6 +173,7 @@ def move_servo(angle):
     arr_cmds = "\nss"
     for cmd in arr_cmds:
         execute_once(cmd)
+    print("Servo should move to {} angle".format(angle))
     send_integer_once(int(angle))
     execute_once(end_cmd)
 
