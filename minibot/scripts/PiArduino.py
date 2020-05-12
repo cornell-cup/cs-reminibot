@@ -111,7 +111,7 @@ def read_once():
     print("Reading from sensor")
     values = []
     for _ in range(num_reads):
-        print("Individual value read: {}".format(spi.readbytes(1)))
+        print("Individual value read: {}".format(spi.readbytes(1)[0]))
         values += spi.readbytes(1)
     val = median(values)
     print("Value read is {}".format(val))
