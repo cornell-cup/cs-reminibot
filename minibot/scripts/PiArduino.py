@@ -148,9 +148,11 @@ def stop():
     # print b
     try:
         print(cmd)
-        for i in range(500):
+        for i in range(10):
             print(cmd)
             tx = spi.writebytes([cmd])
+        end_cmd = "\r"
+        execute_once(end_cmd) 
         tlock.end_transmit()
     finally:
         spi.close()
@@ -175,7 +177,7 @@ def move_servo(angle):
         execute_once(cmd)
     print("Servo should move to {} angle".format(angle))
     send_integer_once(int(angle))
-    execute_once(end_cmd) 
+    execute_once(end_cmd)
 
 
 def LineFollow():
