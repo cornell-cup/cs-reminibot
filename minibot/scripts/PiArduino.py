@@ -111,10 +111,9 @@ def read_once():
     print("Reading from sensor")
     values = []
     for _ in range(num_reads):
+        print(spi.readbytes(1)[0])
         values += spi.readbytes(1)
-        print("Original values: {}".format(values))
-    values = [num for num in values if num != 0]
-    values = [0] if not values else values
+    print("Original values: {}".format(values))
     val = median(values)
     print("Median value read is {}".format(val))
     tlock.end_transmit()
