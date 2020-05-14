@@ -1,4 +1,4 @@
-from scripts.ece_dummy_ops import *
+from scripts.PiArduino import *
 import time
 from threading import *
 def run():
@@ -11,4 +11,6 @@ def run():
       else:
         # move_servo(0)
         pass
+
+run()
     
