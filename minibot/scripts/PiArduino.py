@@ -186,7 +186,7 @@ def LineFollow():
     execute('T')
     
     
-def SetPorts():
+def SetPorts(ports):
     acquire_lock()
     ports = ports.split()
     portname = ports[0]
