@@ -6,7 +6,9 @@ def run():
       time.sleep(5)
       Thread(target=stop, args=[]).start()
       if 0 < read_ultrasonic() <= 10:
-        move_servo(90)
+        # move_servo(90)
+        pass
       else:
-        move_servo(0)
+        # move_servo(0)
+        pass
     
