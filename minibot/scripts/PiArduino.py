@@ -106,13 +106,13 @@ def send_integer_once(num):
 
 
 def read_once():
-    num_reads = 20
+    num_reads = 10
     setSlave(1)
     print("Reading from sensor")
     values = []
     for _ in range(num_reads):
         values += spi.readbytes(1)
-        time.sleep(0.1)
+        time.sleep(0.02)
     print("Original values: {}".format(values))
     val = median(values)
     print("Median value read is {}".format(val))
@@ -163,7 +163,7 @@ def read_ultrasonic():
     acquire_lock()
     end_cmd = "\r"
     arr_cmds = "\ndu"
-    time.sleep(0.1)
+    time.sleep(0.05)
     for cmd in arr_cmds:
         execute_once(cmd)
     return_val = read_once()
