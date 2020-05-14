@@ -162,6 +162,7 @@ def read_ultrasonic():
     acquire_lock()
     end_cmd = "\r"
     arr_cmds = "\ndu"
+    time.sleep(0.1)
     for cmd in arr_cmds:
         execute_once(cmd)
     return_val = read_once()
