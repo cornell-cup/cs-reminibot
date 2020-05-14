@@ -1,6 +1,11 @@
 import React from 'react';
 import axios from 'axios';
 
+/** 
+ * A RequestButton sends HTTP requests to the base station's
+ * built-in script handler, capable of starting and stopping
+ * scripts that exist in the base station's directory.
+*/
 export default class RequestButton extends React.Component {
 
   /**
@@ -28,7 +33,7 @@ export default class RequestButton extends React.Component {
     this.clicked = this.clicked.bind(this);
     this.runScript = this.runScript.bind(this);
     this.stopScript = this.stopScript.bind(this);
-    this.showMenu = this.showMenu.bind(this);
+    this.filterArgs = this.filterArgs.bind(this);
   }
 
   clicked(event) {
@@ -72,6 +77,7 @@ export default class RequestButton extends React.Component {
 
   }
 
+  // Send an HTTP request asking the base station to stop a script
   stopScript() {
     const _this = this;
     console.log("Stopping script with");
@@ -90,7 +96,7 @@ export default class RequestButton extends React.Component {
         path: this.props.path,
         script_name: this.props.script_name,
         handle: this.state.handle,
-        args: this.state.args
+        args: _this.filterArgs(this.state.args)
       })
     }).then(function (res) {
       console.log("SUCCESS")
@@ -105,6 +111,21 @@ export default class RequestButton extends React.Component {
     });
   }
 
+  filterArgs(args, schema) {
+    var ret = JSON.parse(JSON.stringify(this.state.args));
+    for (var key in ret) {
+      if (ret[key] == "" || ret[key] == null || ret[key] == undefined) {
+        delete ret[key];
+      }
+    }
+    return ret;
+  }
+
+  /** 
+   * Make arg fields, parsing `obj` (a JSON describing args). 
+   * `isRequired` should be true if all args in `obj` should be marked
+   *  as required. This DOES NOT perform / guarantee any validation.
+  */
   makeArgFields(obj, isRequired) {
     return Object.entries(obj).map(([k, v]) => {
       return (
@@ -122,11 +143,7 @@ export default class RequestButton extends React.Component {
     })
   }
 
-  showMenu(shouldShow) {
-    this.setState({ menuVisible: shouldShow });
-    console.log(shouldShow ? "Showing menu" : "Hiding menu")
-  }
-
+  /** Toggle menu visibility */
   toggleMenu() {
     this.setState({ menuVisible: !this.state.menuVisible });
   }

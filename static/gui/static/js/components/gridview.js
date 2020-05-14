@@ -232,7 +232,7 @@ export default class GridView extends React.Component {
                     args={this.getArgs("Calibrate Camera")}
                 ></RequestButton>
                 <RequestButton name="Calibrate Axes"
-                    script_name="locate_camera.py"
+                    script_name="locate_cameras.py"
                     path="vision/apriltag-py/python"
                     args={this.getArgs("Calibrate Axes")}></RequestButton>
                 <RequestButton name="Locate tags"
