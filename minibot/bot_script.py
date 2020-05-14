@@ -1,4 +1,4 @@
-from scripts.ece_dummy_ops import *
+from scripts.PiArduino import *
 import time
 from threading import *
 def run():
