@@ -23,7 +23,11 @@ class TransmitLock():
         self.is_transmitting = 0
         self.timestamp = 0
 
-    def can_transmit(self):
+    def can_continue_transmitting(self):
+        """ Whether the thread that has currently acquired the lock
+        can to transmit or not because another thread is waiting to 
+        acquire the lock
+        """
         with self.lock:
             return self.is_transmitting == 1
 
@@ -98,7 +102,7 @@ def transmit_continuously(cmd):
     Arguments: 
         cmd: (str) The command to be sent to the Arduino
     """
-    while tlock.can_transmit():
+    while tlock.can_continue_transmitting():
         transmit_once(cmd)
     spi.writebytes([ord(STOP_CMD)])
 
@@ -206,7 +210,10 @@ def read_ultrasonic():
 
 
 def move_servo(angle):
+    """ Tell the Arduino to move its servo motor to a specific angle """
     acquire_lock()
+    # "ss" tells the Arduino that the next byte sent will correspond to 
+    # the servo_motor's angle
     transmit_once("ss")
     print("Servo should move to {} angle".format(angle))
     send_integer_once(int(angle))
@@ -226,6 +233,13 @@ def object_detection():
     release_lock()
 
 def set_ports(ports):
+    """ Tell minibot which motors and sensor correspond to
+    which ports.
+    
+    Arguments:
+        ports: ([str, int]) List where the first element is a port name
+            and the second element is the corresponding port number
+    """
     acquire_lock()
     ports = ports.split()
     port_name = ports[0]
@@ -242,5 +256,3 @@ def set_ports(ports):
     arr = list(port_number) + list(ports_dict[port_name])
     transmit_once(arr)
     release_lock()
-
-
