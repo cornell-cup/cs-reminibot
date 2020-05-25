@@ -25,7 +25,7 @@ class TransmitLock():
 
     def can_continue_transmitting(self):
         """ Whether the thread that has currently acquired the lock
-        can to transmit or not because another thread is waiting to 
+        can continue to transmit, or not because another thread is waiting to 
         acquire the lock
         """
         with self.lock:
@@ -69,6 +69,12 @@ class TransmitLock():
             elif self.is_transmitting == 1:
                 self.is_transmitting = -1
                 self.timestamp = timestamp
+            # otherwise if self.is_transmitting == -1, don't do anything
+            # just return False, this is because some other thread has already
+            # told the currently transmitting thread to stop transmitting,
+            # and that other thread has already saved its timestamp in 
+            # self.timestamp so the other thread will acquire the lock before
+            # you can. 
         return False
 
 
