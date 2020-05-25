@@ -46,6 +46,17 @@ class RefreshingList extends React.Component {
     }
 }
 
+function Ports(props) {
+    const ports = ["2","3","4","5","6","7","8","9","10","11","12","13"];
+    let buttonList = [];
+
+    for (let i = 0; i < 12; i++) {
+        buttonList.push(<li><button className="btn_ports" onClick={() => props.motorPorts(props.portName, ports[i])}>{ports[i]}</button></li>);
+    }
+    return buttonList;
+  };
+
+
 export default class AddBot extends React.Component {
     constructor(props) {
         super(props);
@@ -342,6 +353,7 @@ export default class AddBot extends React.Component {
     }
 
 
+
     render() {
         var styles = {
             Select: {
@@ -381,95 +393,46 @@ export default class AddBot extends React.Component {
                           				<li>
                           					<a href="">Motor Ports</a>
                           					<ul>
-                          						<li>
+                          				<li>
                                         <a href="">Left Motor</a>
                                         <ul>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("LMOTOR", 1)}>J1</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("LMOTOR", 2)}>J2</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("LMOTOR", 3)}>J3</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("LMOTOR", 4)}>J4</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("LMOTOR", 5)}>J5</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("LMOTOR", 6)}>J6</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("LMOTOR", 7)}>J7</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("LMOTOR", 8)}>J8</button></li>
+                                            <Ports portName={"LMOTOR"} motorPorts = {this.motorPorts}/>
                                         </ul>
                                       </li>
                                       <li>
                                         <a href="">Right Motor</a>
                                         <ul>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("RMOTOR", 1)}>J1</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("RMOTOR", 2)}>J2</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("RMOTOR", 3)}>J3</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("RMOTOR", 4)}>J4</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("RMOTOR", 5)}>J5</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("RMOTOR", 6)}>J6</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("RMOTOR", 7)}>J7</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("RMOTOR", 8)}>J8</button></li>
+                                            <Ports portName={"RMOTOR"} motorPorts = {this.motorPorts}/>
                                         </ul>
                                       </li>
                                       <li>
                                         <a href="">Motor 3</a>
                                         <ul>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("MOTOR3", 1)}>J1</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("MOTOR3", 2)}>J2</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("MOTOR3", 3)}>J3</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("MOTOR3", 4)}>J4</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("MOTOR3", 5)}>J5</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("MOTOR3", 6)}>J6</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("MOTOR3", 7)}>J7</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("MOTOR3", 8)}>J8</button></li>
+                                            <Ports portName={"MOTOR3"} motorPorts = {this.motorPorts}/>
                                         </ul>
                                       </li>
                                       <li>
                                         <a href="">Line Follower</a>
                                         <ul>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("LINE", 1)}>J1</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("LINE", 2)}>J2</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("LINE", 3)}>J3</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("LINE", 4)}>J4</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("LINE", 5)}>J5</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("LINE", 6)}>J6</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("LINE", 7)}>J7</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("LINE", 8)}>J8</button></li>
+                                            <Ports portName={"LINE"} motorPorts = {this.motorPorts}/>
                                         </ul>
                                       </li>
                                       <li>
                                         <a href="">Infrared</a>
                                         <ul>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("INFRARED", 1)}>J1</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("INFRARED", 2)}>J2</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("INFRARED", 3)}>J3</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("INFRARED", 4)}>J4</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("INFRARED", 5)}>J5</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("INFRARED", 6)}>J6</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("INFRARED", 7)}>J7</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("INFRARED", 8)}>J8</button></li>
+                                            <Ports portName={"INFARED"} motorPorts = {this.motorPorts}/>
                                         </ul>
                                       </li>
                                       <li>
                                         <a href="">RFID</a>
                                         <ul>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("RFID", 1)}>J1</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("RFID", 2)}>J2</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("RFID", 3)}>J3</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("RFID", 4)}>J4</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("RFID", 5)}>J5</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("RFID", 6)}>J6</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("RFID", 7)}>J7</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("RFID", 8)}>J8</button></li>
+                                            <Ports portName={"RFID"} motorPorts = {this.motorPorts}/>
                                         </ul>
                                       </li>
                                       <li>
                                         <a href="">Ultrasonic</a>
                                         <ul>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("ULTRASONIC", 1)}>J1</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("ULTRASONIC", 2)}>J2</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("ULTRASONIC", 3)}>J3</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("ULTRASONIC", 4)}>J4</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("ULTRASONIC", 5)}>J5</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("ULTRASONIC", 6)}>J6</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("ULTRASONIC", 7)}>J7</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("ULTRASONIC", 8)}>J8</button></li>
+                                            <Ports portName={"ULTRASONIC"} motorPorts = {this.motorPorts}/>
                                         </ul>
                                       </li>
                           					</ul>
