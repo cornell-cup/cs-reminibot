@@ -42,6 +42,7 @@ class Platform extends React.Component {
     this.setBlockly = this.setBlockly.bind(this);
     this.setBotList = this.setBotList.bind(this);
     this.setSelectedBot = this.setSelectedBot.bind(this);
+    this.redefineCustomBlockList = this.redefineCustomBlockList.bind(this);
   }
 
   updateBotName(value) {
@@ -62,6 +63,10 @@ class Platform extends React.Component {
 
   setSelectedBot(bot) {
     this.setState({ selected_bot: bot });
+  }
+
+  redefineCustomBlockList(newCustomBlockList) {
+    this.setState({customBlockList: newCustomBlockList});
   }
 
   render() {
@@ -90,6 +95,7 @@ class Platform extends React.Component {
               setBlockly={this.setBlockly}
               bot_name={this.state.bot_name}
               customBlockList={this.state.customBlockList}
+              redefineCustomBlockList={this.redefineCustomBlockList}
             />
           </TabPanel>
           <TabPanel>
