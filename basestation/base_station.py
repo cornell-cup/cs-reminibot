@@ -416,6 +416,15 @@ class BaseStation:
             session_id (str): a unique id
             bot_id (str): a unique id
         """
+
+        print("session_id is:")
+        print(session_id)
+        print("bot_name is: ")
+        print(bot_name)
+
+        print("kobe bryant kobe kobe")
+        print(self.active_bots)
+
         bot_id = self.bot_name_to_bot_id(bot_name)
         if bot_id in self.active_bots:
             bot = self.active_bots[bot_id]
@@ -497,3 +506,12 @@ class BaseStation:
                 + "Port:^ " + str(bot.get_port()) + "\n" \
                 + "Sessions:^ " + str(sessions) + "\n" + "\n"
         return bot_info
+
+    
+
+    def get_error_message(self, bot_name):
+        bot_id = self.bot_name_to_bot_id(bot_name)
+        bot = self.active_bots[bot_id]
+        if (bot.get_result() is not None):
+            print(bot.get_result())
+        return bot.get_result()

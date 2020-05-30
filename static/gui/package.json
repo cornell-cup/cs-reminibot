@@ -10,7 +10,8 @@
     "jest": "^22.4.3",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
-    "react-tabs": "^2.0.0"
+    "react-tabs": "^2.0.0",
+    "recharts": "^1.8.5"
   },
   "babel": {
     "presets": [

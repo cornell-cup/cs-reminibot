@@ -8,6 +8,7 @@ import time
 import importlib
 import ast
 import os
+import concurrent.futures
 
 # Create a UDP socket
 sock = socket(AF_INET, SOCK_DGRAM)
@@ -27,7 +28,7 @@ BOT_LIB_FUNCS = "PiArduino"
 # Load the ECE Dummy ops if testing, real bot-level function library otherwise.
 # ECE dummy ops replace physical bot outputs with print statements.
 if (len(sys.argv) == 2) and (sys.argv[1] == "-t"):
-    import scripts.ece_dummy_ops as ece
+    import scriptss.ece_dummy_ops as ece
     BOT_LIB_FUNCS = "ece_dummy_ops"
 else:
     import scripts.PiArduino as ece
@@ -84,12 +85,13 @@ def parse_command(cmd, tcpInstance):
                 # file_dir is the path to folder this file is in
                 file_dir = os.path.dirname(os.path.realpath(__file__))
                 file = open(
-                    file_dir + "/scripts/" + script_name, 'w+')
+                    file_dir + "/scriptss/" + script_name, 'w+')
                 file.write(program)
                 file.close()
-                spawn_script_process(script_name)
+                return_value = spawn_script_process(script_name)
+                return return_value
             except Exception as e:
-                print("Exception occured")
+                print("Exception occurred")
                 print(e)
 
 
@@ -102,7 +104,7 @@ def process_string(value):
         value (:obj:`str`): The program to format.
     """
     cmds = value.splitlines()
-    program = "from scripts." + BOT_LIB_FUNCS + " import *\n"
+    program = "from scriptss." + BOT_LIB_FUNCS + " import *\n"
     program += "import time\n"
     program += "from threading import *\n"
     program += "def run():\n"
@@ -119,7 +121,13 @@ def spawn_script_process(scriptname):
         scriptname (:obj:`str`): The name of the script to run.
     """
     time.sleep(0.1)
-    Thread(target=run_script, args=[scriptname], daemon=True).start()
+
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        future = executor.submit(run_script, scriptname)
+        return_value = future.result()
+        print("if the following line work i will be fucking happy")
+        print(return_value)
+        return return_value
 
 
 def run_script(scriptname):
@@ -133,10 +141,84 @@ def run_script(scriptname):
     # the most recent script is executed
     index = scriptname.find(".")
     importlib.invalidate_caches()
-    script_name = "scripts." + scriptname[0: index]
+    script_name = "scriptss." + scriptname[0: index]
     script = importlib.import_module(script_name)
     importlib.reload(script)
-    script.run()
+    try:
+        script.run()
+        return "Successful execution"
+    except StopIteration as exception:
+        print("Exception occurred")
+        str_exception = "StopIteration: " + str(exception)
+        return str_exception
+    except StopAsyncIteration as exception:
+        print("Exception occurred")
+        str_exception = "StopAsyncIteration: " + str(exception)
+        return str_exception
+    except ArithmeticError as exception:
+        print("Exception occurred")
+        str_exception = "ArithmeticError: " + str(exception)
+        return str_exception
+    except AssertionError as exception:
+        print("Exception occurred")
+        str_exception = "AssertionError: " + str(exception)
+        return str_exception
+    except AttributeError as exception:
+        print("Exception occurred")
+        str_exception = "AttributeError: " + str(exception)
+        return str_exception
+    except BufferError as exception:
+        print("Exception occurred")
+        str_exception = "BufferError: " + str(exception)
+        return str_exception
+    except EOFError as exception:
+        print("Exception occurred")
+        str_exception = "EOFError: " + str(exception)
+        return str_exception
+    except ImportError as exception:
+        print("Exception occurred")
+        str_exception = "ImportError: " + str(exception)
+        return str_exception
+    except LookupError as exception:
+        print("Exception occurred")
+        str_exception = "LookupError: " + str(exception)
+        return str_exception
+    except MemoryError as exception:
+        print("Exception occurred")
+        str_exception = "MemoryError: " + str(exception)
+        return str_exception
+    except NameError as exception:
+        print("Exception occurred")
+        str_exception = "NameError: " + str(exception)
+        return str_exception
+    except OSError as exception:
+        print("Exception occurred")
+        str_exception = "OSError: " + str(exception)
+        return str_exception
+    except ReferenceError as exception:
+        print("Exception occurred")
+        str_exception = "ReferenceError: " + str(exception)
+        return str_exception
+    except RuntimeError as exception:
+        print("Exception occurred")
+        str_exception = "RuntimeError: " + str(exception)
+        return str_exception
+    except SyntaxError as exception:
+        print("Exception occurred")
+        str_exception = "SyntaxError: " + str(exception)
+        return str_exception
+    except SystemError as exception:
+        print("Exception occurred")
+        str_exception = "SystemError: " + str(exception)
+        return str_exception
+    except TypeError as exception:
+        print("Exception occurred")
+        str_exception = "TypeError: " + str(exception)
+        return str_exception
+    except ValueError as exception:
+        print("Exception occurred")
+        str_exception = "ValueError: " + str(exception)
+        return str_exception
 
 
 def start_base_station_heartbeat(ip_address):
@@ -202,7 +284,11 @@ def main():
         tcp_instance = TCP()
         while True:
             time.sleep(0.01)
-            parse_command(tcp_instance.get_command(), tcp_instance)
+            return_value = parse_command(tcp_instance.get_command(), tcp_instance)
+            # print("return_value is:")
+            # print(return_value)
+            if return_value is not None:
+                tcp_instance.send_to_basestation("RESULT", return_value)
 
     finally:
         sock.close()

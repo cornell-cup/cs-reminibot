@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import axios from 'axios';
 
 /* Returns a button with padding around it */
@@ -180,7 +180,7 @@ class PythonTextBox extends React.Component {
         </div>
         {/* Custom blockly button and textbox */}
         <div id="UpdateCustomFunction" className="horizontalDiv">
-        <LabeledTextBox
+          <LabeledTextBox
             type={"text"}
             name={"function_name"}
             placeholder={"default_function"}
@@ -244,6 +244,12 @@ export default class MinibotBlockly extends React.Component {
       pyblock: "",
       showPopup: false,
       login_email: "",
+      login_error_label: "",
+      login_success_label: "",
+      register_error_label: "",
+      register_success_label: "",
+      function_name: "default_function",
+      coding_start: -1,
       isLoggedIn: false,
       sessionToken: "",
       loginErrorLabel: "",
@@ -420,6 +426,22 @@ export default class MinibotBlockly extends React.Component {
     });
   }
 
+  /* Target function for detected text changes in the editing box.
+     Update this.state with the current text. */
+  handleScriptChange(event) {
+    this.setState({ data: event.target.value });
+    if (this.state.coding_start == -1) {
+      this.setState({ coding_start: new Date().getTime() })
+    }
+  }
+
+  handleFileNameChange(event) {
+    this.setState({ filename: event.target.value });
+  }
+  handleFunctionNameChange(event) {
+    this.setState({ function_name: event.target.value });
+  }
+
   /* Runs after component loads - this generates the blockly stuff */
   componentDidMount() {
     var _this = this;
@@ -538,6 +560,57 @@ export default class MinibotBlockly extends React.Component {
       .catch(function (error) {
         console.log(error);
       })
+  }
+
+
+  /* Target function for the button "Run Code". Send python code
+     in the editing box to backend. */
+  run_script(event) {
+    var start_time = this.state.coding_start;
+    if (start_time != -1) {
+      var time = (new Date().getTime() - start_time) / 1000
+      document.getElementById("time").value = time.toString() + "s";
+      this.setState({ coding_start: -1 })
+    }
+
+    axios({
+      method: 'POST',
+      url: '/start',
+      data: JSON.stringify({
+        key: "WHEELS",
+        bot_name: this.props.bot_name,
+        direction: "stop",
+        power: 0,
+      })
+    })
+      .then(function (response) {
+        // console.log(blockly.value);
+        console.log('sent script');
+      })
+      .catch(function (error) {
+        console.warn(error);
+      });
+
+    axios({
+      method: 'POST',
+      url: '/result',
+      data: JSON.stringify({
+        bot_name: this.props.bot_name
+      }),
+    })
+      .then((response) => {
+        console.log("The error message is: !!!")
+        console.log(response);
+        document.getElementById("errormessage").value = response.data["error"];
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+
+  }
+
+  view_history(event) {
+    window.open("http://127.0.0.1:5000/program/")
   }
 
   login(event) {
@@ -736,6 +809,48 @@ export default class MinibotBlockly extends React.Component {
             dblockAll={this.dblockAll}
             customBlockList={this.props.customBlockList}
           />
+          {/* </form> */}
+          <br />
+
+          <div id="Python">
+            <p id="title"> <b>Python </b> </p>
+            <div> <textarea id="textarea" rows="10" cols="98" onChange={this.handleScriptChange} /></div>
+      Function Name:
+      <input
+              type="text"
+              name="function_name"
+              value={this.state.function_name}
+              onChange={this.handleFunctionNameChange}
+            />&nbsp;&nbsp;
+      <button id="CBlock" onClick={this.custom_block}>Update Custom Function</button>&nbsp;&nbsp;
+      <br />
+      Python File Name:
+      <input
+              type="text"
+              name="filename"
+              value={this.state.filename}
+              onChange={this.handleFileNameChange}
+            />&nbsp;&nbsp;
+        <br />
+            <button id="submit" onClick={this.download_python}>Download</button>&nbsp;&nbsp;
+      <button id="run" onClick={this.run_script}>Run</button>&nbsp;&nbsp;
+      <button id="history" onClick={this.view_history}>View History</button>&nbsp;&nbsp;
+      <button id="copy" onClick={this.copy}>Copy Code From Blockly</button>
+            <div> <textarea style={{ color: 'red' }} id="errormessage" rows="1" cols="40" /></div>
+            <div> <textarea style={{ color: 'green' }} id="time" rows="1" cols="20" /></div>
+            <br />
+            <form>
+              <input
+                type="file"
+                id="upload"
+                multiplesize="1"
+                accept=".py"
+                onChange={this.upload}
+              />
+            </form>
+            <br />
+            <br />
+          </div>
         </div>
         <div id="generatedPythonFromBlocklyBox" style={dataStyle} className="col-md-5"></div>
       </div>
