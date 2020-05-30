@@ -6,6 +6,7 @@ import ReactDOM from 'react-dom';
 import GridView from './components/gridview.js';
 import Blockly from './components/blockly.js';
 import AddBot from './components/AddBot.js';
+import Dashboard from './components/dashboard.js'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 
 /**
@@ -41,6 +42,7 @@ class Platform extends React.Component {
     this.setBlockly = this.setBlockly.bind(this);
     this.setBotList = this.setBotList.bind(this);
     this.setSelectedBot = this.setSelectedBot.bind(this);
+    this.redefineCustomBlockList = this.redefineCustomBlockList.bind(this);
   }
 
   updateBotName(value) {
@@ -63,6 +65,10 @@ class Platform extends React.Component {
     this.setState({ selected_bot: bot });
   }
 
+  redefineCustomBlockList(newCustomBlockList) {
+    this.setState({customBlockList: newCustomBlockList});
+  }
+
   render() {
     return (
       <div id="platform">
@@ -70,6 +76,7 @@ class Platform extends React.Component {
           <TabList>
             <Tab>Setup</Tab>
             <Tab>Coding/Control</Tab>
+            <Tab>Analytics</Tab>
           </TabList>
 
           <TabPanel>
@@ -88,7 +95,13 @@ class Platform extends React.Component {
               setBlockly={this.setBlockly}
               bot_name={this.state.bot_name}
               customBlockList={this.state.customBlockList}
+              redefineCustomBlockList={this.redefineCustomBlockList}
             />
+          </TabPanel>
+          <TabPanel>
+            <Dashboard>
+
+            </Dashboard>
           </TabPanel>
         </Tabs>
       </div>

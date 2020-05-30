@@ -50,10 +50,10 @@ def verify_credentials(email, password):
 
 
 def create_user(email, password):
-    already_exisiting_user = get_user_by_email(email)
+    already_existing_user = get_user_by_email(email)
 
-    if already_exisiting_user:
-        return False, optional_user
+    if already_existing_user:
+        return False, already_existing_user
 
     user = User(
         email=email,
