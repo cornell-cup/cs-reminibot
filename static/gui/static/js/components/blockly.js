@@ -62,6 +62,7 @@ class PythonTextBox extends React.Component {
       pythonTextBoxCode: "",
       filename: "myPythonCode.py",
       function_name: "default_function",
+      coding_start: -1
     }
 
     this.copy = this.copy.bind(this);
@@ -116,6 +117,9 @@ class PythonTextBox extends React.Component {
      Update this.state with the current text. */
   handleScriptChange(event) {
     this.setState({ pythonTextBoxCode: event.target.value });
+    if (this.state.coding_start == -1) {
+      this.setState({ coding_start: new Date().getTime()})
+    }
   }
 
   handleTab(event) {
@@ -145,6 +149,13 @@ class PythonTextBox extends React.Component {
   /* Target function for the button "Run Code". Send python code
      in the editing box to backend. */
   run_script(event) {
+    var start_time = this.state.coding_start;
+    if (start_time != -1) {
+      var time = (new Date().getTime() - start_time) / 1000
+      document.getElementById("time").value = time.toString() + "s";
+      this.setState({coding_start : -1})
+    }
+
     axios({
       method: 'POST',
       url: '/start',
@@ -155,12 +166,37 @@ class PythonTextBox extends React.Component {
       }),
     })
       .then(function (response) {
-        console.log(blockly.value);
+        // console.log(blockly.value);
         console.log('sent script');
       })
       .catch(function (error) {
         console.warn(error);
       });
+
+    axios({
+      method: 'POST',
+      url: '/result',
+      data: JSON.stringify({
+        bot_name: this.props.botName
+      }),
+    })
+      .then((response) => {
+        console.log("The error message is: !!!")
+        console.log(response);
+        document.getElementById("errormessage").value = response.data["error"];
+        console.log(document.get)
+        if (response.data["code"] === 1) {
+          // lime green 
+          document.getElementById("errormessage").style.color="#32CD32";
+        }
+        else {
+          // red
+          document.getElementById("errormessage").style.color="#FF0000";
+        }
+      })
+      .catch((err) => {
+        console.log(err)
+      })
 
   }
 
@@ -215,6 +251,8 @@ class PythonTextBox extends React.Component {
           <Button id={"run"} onClick={this.run_script} name={"Run"} />
           <Button id={"history"} onClick={this.view_history} name={"View History"} />
           <Button id={"copy"} onClick={this.copy} name={"Copy Code From Blockly"} />
+          <div> <textarea id = "errormessage" rows="1" cols="60" /></div>
+          <div> <textarea style={{ color: 'blue' }} id = "time" rows="1" cols="20" /></div>
         </div>
         <div id="PythonUpload" className="horizontalDiv">
           <form>
@@ -238,7 +276,6 @@ class PythonTextBox extends React.Component {
 export default class MinibotBlockly extends React.Component {
   constructor(props) {
     super(props);
-
     this.state = {
       blockly_filename: 'myXmlBlocklyCode.xml',
       pyblock: "",
@@ -276,7 +313,6 @@ export default class MinibotBlockly extends React.Component {
     this.update_custom_blocks = this.update_custom_blocks.bind(this)
     this.custom_block = this.custom_block.bind(this)
     this.manageDefaultCustomBlocklyFunction = this.manageDefaultCustomBlocklyFunction.bind(this)
-
   }
 
   /* Populates the customBlocklyList with a default function if addOrDelete == true

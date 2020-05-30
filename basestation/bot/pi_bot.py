@@ -34,8 +34,8 @@ class PiBot(BaseStationBot, object):
         return self.port
 
     def get_result(self):
-        print("result is: ")
-        print(self.result)
+        # print("result is: ")
+        # print(self.result)
         return self.result
 
     def set_result(self, result):
@@ -85,12 +85,6 @@ class PiBot(BaseStationBot, object):
                 key = data[start + 4: comma]
                 value = data[comma+1: end]
                 self.tcp_act_on_incoming(key, value)
-
-            print("???????????????????????")
-            print("key")
-            print(key)
-            print("value")
-            print(value)
             return True
 
         def tcp_act_on_incoming(self, key, value):
@@ -101,7 +95,4 @@ class PiBot(BaseStationBot, object):
                 self.status = value
             # print("key: " + key + ", value:" + value)
             elif key == "RESULT":
-                print("yeyeyeyeyeyeyeyeyeyey")
-                print("self.outerclass.get_result is: ")
                 self.outerClass.set_result(value)
-                print(self.outerClass.get_result())

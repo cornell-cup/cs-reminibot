@@ -422,7 +422,6 @@ class BaseStation:
         print("bot_name is: ")
         print(bot_name)
 
-        print("kobe bryant kobe kobe")
         print(self.active_bots)
 
         bot_id = self.bot_name_to_bot_id(bot_name)
@@ -512,6 +511,4 @@ class BaseStation:
     def get_error_message(self, bot_name):
         bot_id = self.bot_name_to_bot_id(bot_name)
         bot = self.active_bots[bot_id]
-        if (bot.get_result() is not None):
-            print(bot.get_result())
         return bot.get_result()
