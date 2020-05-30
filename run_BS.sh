@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+trap "kill 0" EXIT
 
 echo "================= MINIBOT CLIENT GUI ================="
 cd static
@@ -11,8 +12,6 @@ cd ..
 cd basestation
 echo "================= STARTING BLOCKLY USER PROGRAM DATABASE ================="
 python3 flask_app.py &
-DATABASEPID=$!
 echo "=========== STARTING BASESTATION ==============="
 python3 base_station_interface.py 
-kill -9 $DATABASEPID 
 
