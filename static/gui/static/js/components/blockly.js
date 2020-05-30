@@ -767,7 +767,8 @@ export default class MinibotBlockly extends React.Component {
             </div>
 
             <div>
-              <label> Login as: {this.state.login_email} </label>
+              {this.state.isLoggedIn ? <label> Login as: {this.state.login_email} </label> : null}
+
             </div>
 
             <p id="title"><b>Blockly </b> </p>
