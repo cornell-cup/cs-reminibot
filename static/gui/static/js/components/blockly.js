@@ -727,8 +727,6 @@ export default class MinibotBlockly extends React.Component {
           <br />
           <br />
           <br />
-          <br />
-          <br />
           Blockly File Name:{' '}
           <input
             type="text"
@@ -760,6 +758,7 @@ export default class MinibotBlockly extends React.Component {
             customBlockList={this.props.customBlockList}
           />
         </div>
+        <div id="generatedPythonFromBlocklyBox" style={dataStyle} className="col-md-5"></div>
       </div>
     );
   }
