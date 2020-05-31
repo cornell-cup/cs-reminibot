@@ -670,7 +670,7 @@ export default class MinibotBlockly extends React.Component {
         this.setState({
           login_email: "",
           registerSuccessLabel: "",
-          registerErrorLabel: "Account already exist or empty input"
+          registerErrorLabel: error.response.data['error']
         });
         console.log(error);
       });
@@ -717,7 +717,7 @@ export default class MinibotBlockly extends React.Component {
         this.setState({
           login_email: "",
           loginSuccessLabel: "",
-          loginErrorLabel: "Incorrect password or account doesn't exist or empty input"
+          loginErrorLabel: error.response.data['error']
         });
         console.log(error);
       });
