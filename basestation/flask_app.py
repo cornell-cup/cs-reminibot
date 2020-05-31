@@ -128,14 +128,14 @@ def register_account():
     email = request.form['email']
     password = request.form['password']
 
-    if email is None or password is None:
-        print("error: Invalid email or password")
-        return json.dumps({'error': 'Invalid email or password'}), 404
+    if not email:
+        return json.dumps({'error': 'Invalid email'}), 404
+    if not password:
+        return json.dumps({'error': 'Invalid password'}), 404
 
     created, user = create_user(email, password)
 
     if not created:
-        print("error: User already exists")
         return json.dumps({'error': 'User already exists'}), 404
 
     print("session_token: " + user.session_token)
@@ -163,15 +163,15 @@ def login():
     email = request.form['email']
     password = request.form['password']
 
-    if email is None or password is None:
-        print("fail1")
-        return json.dumps({'error': 'Invalid email or password'}), 404
+    if not email:
+        return json.dumps({'error': 'Invalid email'}), 404
 
-    print("Reached Here!")
+    if not password:
+        return json.dumps({'error': 'Invalid password'}), 404
+
     success, user = verify_credentials(email, password)
 
     if not success:
-        print("fail2")
         return json.dumps({'error': 'Incorrect email or password'}), 404
 
     print("success" + email)
