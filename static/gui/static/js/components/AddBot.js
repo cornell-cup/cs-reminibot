@@ -379,7 +379,7 @@ export default class AddBot extends React.Component {
                                     <RefreshingList ref={this.refreshingBotListRef}></RefreshingList>
                                 </label>
                             </td>
-                            <td><td>&nbsp;</td><button style={styles.Button} onClick={this.addBotListener}>Add Bot</button></td>
+                            <td><button style={styles.Button} onClick={this.addBotListener}>Add Bot</button></td>
                             <div className="led-box">&nbsp;&nbsp;
                               <div id="led-red"></div>
                             </div>
@@ -387,7 +387,6 @@ export default class AddBot extends React.Component {
                             <td>
                             <label>
                               Ports:
-                              <td>
                               <nav id="main_nav">
                           			<ul>
                           				<li>
@@ -439,7 +438,6 @@ export default class AddBot extends React.Component {
                           				</li>
                           			</ul>
                           		</nav>
-                              </td>
                             </label>
                             </td>
                         </tr>
@@ -458,7 +456,7 @@ export default class AddBot extends React.Component {
                                     </select>
                                 </label>
                             </td>
-                            <td><td>&nbsp;</td><button style={styles.Button} bot_list={this.props.bot_list}
+                            <td><button style={styles.Button} bot_list={this.props.bot_list}
                                 onClick={() => _this.deleteBotListener()}>Remove</button></td>
                         </tr>
                         <tr>
