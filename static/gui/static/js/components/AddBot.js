@@ -50,11 +50,43 @@ function Ports(props) {
     const ports = ["2","3","4","5","6","7","8","9","10","11","12","13"];
     let buttonList = [];
 
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < ports.length; i++) {
         buttonList.push(<li><button className="btn_ports" onClick={() => props.motorPorts(props.portName, ports[i])}>{ports[i]}</button></li>);
     }
-    return buttonList;
+    return (<ul> {buttonList} </ul>);
   };
+
+function PortsList(props) {
+    const portNames = [
+        "LMOTOR", "RMOTOR", "MOTOR3", "LINE", "INFRARED", "RFID", "ULTRASONIC"
+    ]
+
+    const portLabels = [
+        "Left Motor", "Right Motor", "Motor 3", "Line Follower", 
+        "Infrared", "RFID", "Ultrasonic"
+    ]
+
+    console.assert(portNames.length == portLabels.length);
+    let allListElements = [];
+
+    for (let i = 0; i < portNames.length; i++) {
+        let link = <a href="">{portLabels[i]}</a>
+        let ports = <Ports portName={portNames[i]} motorPorts={props.motorPorts}/>
+        let listElement = <li> {link} {ports} </li>
+        allListElements.push(listElement);
+    }
+
+    return (
+        <nav id="main_nav">
+        <ul>
+        <li>
+            <a href="">Motor Ports</a>
+            <ul> {allListElements} </ul>
+        </li>
+        </ul>
+        </nav>
+    );
+}
 
 
 export default class AddBot extends React.Component {
@@ -386,58 +418,7 @@ export default class AddBot extends React.Component {
                             <td></td>
                             <td>
                             <label>
-                              Ports:
-                              <nav id="main_nav">
-                          			<ul>
-                          				<li>
-                          					<a href="">Motor Ports</a>
-                          					<ul>
-                          				<li>
-                                        <a href="">Left Motor</a>
-                                        <ul>
-                                            <Ports portName={"LMOTOR"} motorPorts = {this.motorPorts}/>
-                                        </ul>
-                                      </li>
-                                      <li>
-                                        <a href="">Right Motor</a>
-                                        <ul>
-                                            <Ports portName={"RMOTOR"} motorPorts = {this.motorPorts}/>
-                                        </ul>
-                                      </li>
-                                      <li>
-                                        <a href="">Motor 3</a>
-                                        <ul>
-                                            <Ports portName={"MOTOR3"} motorPorts = {this.motorPorts}/>
-                                        </ul>
-                                      </li>
-                                      <li>
-                                        <a href="">Line Follower</a>
-                                        <ul>
-                                            <Ports portName={"LINE"} motorPorts = {this.motorPorts}/>
-                                        </ul>
-                                      </li>
-                                      <li>
-                                        <a href="">Infrared</a>
-                                        <ul>
-                                            <Ports portName={"INFARED"} motorPorts = {this.motorPorts}/>
-                                        </ul>
-                                      </li>
-                                      <li>
-                                        <a href="">RFID</a>
-                                        <ul>
-                                            <Ports portName={"RFID"} motorPorts = {this.motorPorts}/>
-                                        </ul>
-                                      </li>
-                                      <li>
-                                        <a href="">Ultrasonic</a>
-                                        <ul>
-                                            <Ports portName={"ULTRASONIC"} motorPorts = {this.motorPorts}/>
-                                        </ul>
-                                      </li>
-                          					</ul>
-                          				</li>
-                          			</ul>
-                          		</nav>
+                              Ports: <PortsList motorPorts={this.motorPorts} />
                             </label>
                             </td>
                         </tr>
