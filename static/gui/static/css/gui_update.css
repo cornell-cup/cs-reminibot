@@ -24,7 +24,7 @@
 }
 
 .element-wrapper {
-    padding-right: 10px;
+    padding-right: 15px;
 }
 
 .horizontalDiv {
@@ -32,8 +32,18 @@
     padding-top: 10px;
 }
 
+.horizontalDivCenter {
+    clear: both;
+    padding-top: 10px;
+    text-align: center;
+}
+
 .horizontalDiv div {
     float: left;
+}
+
+.horizontalDivCenter div {
+    display: inline-block; 
 }
 
 .main-body {
@@ -46,10 +56,6 @@
     size: 5em;
     background: #323232;
     color: white;
-}
-
-.newDiv {
-    padding-top: 15px;
 }
 
 .logo {
@@ -74,8 +80,6 @@ table {
 
 
 /*SETUP TAB*/
-
-#setuptab {}
 
 #view {
     min-height: 0;
@@ -208,8 +212,6 @@ table {
 .led-box {
     height: 30px;
     width: 25%;
-    margin: 10px 0;
-    float: left;
 }
 
 .led-box p {
@@ -301,6 +303,11 @@ h1 {
 #main_nav li:hover>ul {
     visibility: visible;
     opacity: 1;
+}
+
+.in-front-of-other-elems {
+    position: relative;
+    z-index: 10;
 }
 
 .btn_ports {
