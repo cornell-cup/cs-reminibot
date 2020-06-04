@@ -1,32 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import {Button, LabeledTextBox} from './Util.js'
 
-/* Returns a button with padding around it */
-function Button(props) {
-  return (
-    <div className="element-wrapper">
-      <button id={props.id} onClick={props.onClick}>
-        {props.name}
-      </button>
-    </div>
-  );
-}
-
-/* Returns a textbox with a placeholder value in it.  Has padding around it */
-function LabeledTextBox(props) {
-  return (
-    <div className="element-wrapper">
-      <input
-        name={props.name}
-        type={props.type}
-        value={props.value}
-        placeholder={props.placeholder}
-        onChange={props.onChange}
-        // options={props.options}
-      />
-    </div>
-  );
-}
 
 function UserAccountModal(props) {
   const s = props.modalType;
