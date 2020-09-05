@@ -26,6 +26,7 @@ class BaseStation:
         self.active_sessions = {}
         self.active_playgrounds = {}
         self.vision_log = []
+        self.voice_server = None
 
         self.__udp_connection = UDPConnection()
         self.__udp_connection.start()

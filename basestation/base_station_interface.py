@@ -12,9 +12,15 @@ import sys
 import time
 import re  # regex import
 import requests
+import threading
+import pyaudio
+import speech_recognition as sr
+from util.stoppable_thread import StoppableThread
 
 # Minibot imports.
 from base_station import BaseStation
+# from piVision import *
+# from piVision.server import startBotVisionServer
 
 
 class BaseInterface:
@@ -51,8 +57,13 @@ class BaseInterface:
                 send_blockly_remote_server=send_blockly_remote_server,
             )),
             ("/vision", VisionHandler, dict(base_station=self.base_station)),
+<<<<<<< HEAD
             ("/heartbeat", HeartbeatHandler, dict(base_station=self.base_station)),
             ("/result", ErrorMessageHandler, dict(base_station=self.base_station))
+=======
+            ("/voice", VoiceHandler, dict(base_station=self.base_station)),
+            ("/heartbeat", HeartbeatHandler, dict(base_station=self.base_station))
+>>>>>>> eda82ced5361e3ea35f582ae5b65597b38983fe1
         ]
 
     def start(self):
@@ -288,6 +299,69 @@ class HeartbeatHandler(tornado.websocket.WebSocketHandler):
         heartbeat_json = {"is_heartbeat": is_heartbeat}
         self.write(json.dumps(heartbeat_json).encode())
 
+class VoiceHandler(tornado.websocket.WebSocketHandler):
+    def initialize(self, base_station):
+        self.base_station = base_station
+
+    def get(self):
+        pass #not sure what's supposed to happen here
+
+    def post(self):
+        data = json.loads(self.request.body.decode())
+        key = data['key']
+        
+        bot_name = data['bot_name']
+        bot_id = self.base_station.bot_name_to_bot_id(bot_name)
+        bot = self.base_station.get_bot(bot_id)
+        if not bot:
+            return
+
+        if key == "START VOICE":  # start listening
+            print("starting voiceServer thread")
+            VoiceHandler.flag = True
+            self.base_station.voice_server = StoppableThread(self.voice_recognition)
+            self.base_station.voice_server.start()
+        elif key == "STOP VOICE":
+            print("ending onBotVisionServer thread")
+            if (VoiceHandler.flag):
+                print("About to call base_station.voice_server.stop()")
+                self.base_station.voice_server.stop()
+            else:
+                print("ERROR: No on bot vision server started")
+    
+    def voice_recognition(self, thread_safe_condition):
+        RECORDING_TIME_LIMIT = 5
+        commands = {
+            "forward" : "Minibot moves forward",
+            "backward" : "Minibot moves backwards",
+            "left" : "Minibot moves left",
+            "right" : "Minibot moves right",
+            "stop" : "Minibot stops",
+            "object detection" : "Minibot starts object detection mode",
+            "line follow" : "Minibot starts line follow mode"
+        }
+        print("entered base_station.py")
+        # open the Microphone as variable microphone
+        with sr.Microphone() as microphone:
+            print("mic works")
+            r = sr.Recognizer()
+            while thread_safe_condition.read():
+                print("Say something!")
+                try:
+                    # listen for 5 seconds
+                    audio = r.listen(microphone, RECORDING_TIME_LIMIT)
+                    print("Converting from speech to text ...")
+                    words = r.recognize_google(audio)
+                    print("You said: " + words)
+                    if words in commands:
+                        print(commands[words])
+                    else:
+                        print("Invalid command")
+                except sr.WaitTimeoutError:
+                    print("timed out")
+                except sr.UnknownValueError:
+                    print("words not recognized")
+    
 
 class ErrorMessageHandler(tornado.websocket.WebSocketHandler):
     def initialize(self, base_station):
