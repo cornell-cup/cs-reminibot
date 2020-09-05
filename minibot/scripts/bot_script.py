@@ -1,10 +1,10 @@
 from scripts.ece_dummy_ops import *
 import time
 from threading import *
-
-
 def run():
-    for count in range(2):
-        Thread(target=right, args=[0]).start()
-        time.sleep(0)
-        Thread(target=stop, args=[]).start()
+    if 0 < read_ultrasonic() <= 1:
+      Thread(target=fwd, args=[100]).start()
+      time.sleep(0)
+      Thread(target=stop, args=[]).start()
+      move_servo(360)
+    

@@ -1,9 +1,10 @@
 import binascii
+import spidev
 import time
 import threading
 from statistics import median
 
-# spi = spidev.SpiDev()
+spi = spidev.SpiDev()
 STOP_CMD = "S"
 START_TRASMISSION_CMD = "\n"
 END_TRASMISSION_CMD = "\r"
@@ -84,11 +85,10 @@ def setSlave(pi_bus):
     """
     set which arduino to talk to. slave(0) for arduino 1 and slave(1) for arduino 2
     """
-    pass
-    # device = 0
-    # spi.open(device, pi_bus)
-    # spi.mode = 0
-    # spi.max_speed_hz = 115200
+    device = 0
+    spi.open(device, pi_bus)
+    spi.mode = 0
+    spi.max_speed_hz = 115200
 
 def transmit_once(cmd):
     """ Sends each character in the cmd to the Arduino
@@ -100,7 +100,7 @@ def transmit_once(cmd):
     """
     for char in cmd:
         print(char)
-        # spi.writebytes([ord(char)])
+        spi.writebytes([ord(char)])
 
 def transmit_continuously(cmd):
     """ Transmits the cmd continuously to the Arduino 
@@ -110,7 +110,7 @@ def transmit_continuously(cmd):
     """
     while tlock.can_continue_transmitting():
         transmit_once(cmd)
-    # spi.writebytes([ord(STOP_CMD)])
+    spi.writebytes([ord(STOP_CMD)])
 
 def send_integer_once(num):
     """ Sends a numerical value to the Arduino
@@ -119,7 +119,7 @@ def send_integer_once(num):
         num: (int) The integer to be sent to the Arduino
     """
     print(num)
-    # spi.xfer([num])
+    spi.xfer([num])
 
 def read_once():
     """ Reads from the Arduino multiple times and then returns the
@@ -133,8 +133,7 @@ def read_once():
     print("Reading from Arduino")
     values = []
     for _ in range(num_reads):
-        # values += spi.readbytes(1)
-        values += [20]
+        values += spi.readbytes(1)
         # Need a short delay between each read from the Arduino
         # Without the delay, the Arduino will return 0
         time.sleep(0.02)
@@ -165,7 +164,7 @@ def release_lock():
     will stop receiving commands from the Raspberry Pi
     """
     transmit_once(END_TRASMISSION_CMD)
-    # spi.close()
+    spi.close()
     tlock.end_transmit()
     
 

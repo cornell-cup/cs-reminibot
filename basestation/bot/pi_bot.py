@@ -14,10 +14,11 @@ class PiBot(BaseStationBot, object):
         self.port = port
         self.ip = ip
         self.tcp_connection = TCPConnection(ip, port=port)
-        self.tcp_listener_thread = self.TCPListener(self.tcp_connection)
+        self.tcp_listener_thread = self.TCPListener(self, self.tcp_connection)
         self.tcp_listener_thread.start()
 
         self.scripts = []
+        self.result = None
         return
 
     def get_ip(self):
@@ -32,6 +33,14 @@ class PiBot(BaseStationBot, object):
         """
         return self.port
 
+    def get_result(self):
+        # print("result is: ")
+        # print(self.result)
+        return self.result
+
+    def set_result(self, result):
+        self.result = result
+
     def is_active(self):
         """
         check if tcp connection is alive
@@ -45,8 +54,9 @@ class PiBot(BaseStationBot, object):
         return self.tcp_connection.sendKV(key, value)
 
     class TCPListener(threading.Thread):
-        def __init__(self, t):
+        def __init__(self, outerClass, t):
             super().__init__()
+            self.outerClass = outerClass
             self.tcp_connection = t
             self.status = ""
 
@@ -84,3 +94,5 @@ class PiBot(BaseStationBot, object):
             elif key == "BOTSTATUS":
                 self.status = value
             # print("key: " + key + ", value:" + value)
+            elif key == "RESULT":
+                self.outerClass.set_result(value)

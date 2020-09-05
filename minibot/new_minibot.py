@@ -8,6 +8,7 @@ import time
 import importlib
 import ast
 import os
+import concurrent.futures
 
 # Create a UDP socket
 sock = socket(AF_INET, SOCK_DGRAM)
@@ -30,8 +31,8 @@ if (len(sys.argv) == 2) and (sys.argv[1] == "-t"):
     import scripts.ece_dummy_ops as ece
     BOT_LIB_FUNCS = "ece_dummy_ops"
 else:
-    import scripts.PiArduino as ece
-    BOT_LIB_FUNCS = "PiArduino"
+    import scripts.pi_arduino as ece
+    BOT_LIB_FUNCS = "pi_arduino"
 
 
 def parse_command(cmd, tcpInstance):
@@ -65,13 +66,13 @@ def parse_command(cmd, tcpInstance):
     elif key == "MODE":
         if value == "object_detection":
             print("Object Detection")
-            Thread(target=ece.ObjectDetection).start()
+            Thread(target=ece.object_detection).start()
         elif value == "line_follow":
             print("Line Follow")
-            Thread(target=ece.LineFollow).start()
+            Thread(target=ece.line_follow).start()
 
     elif key == "PORTS":
-        ece.SetPorts(value)
+        ece.set_ports(value)
         print("Set Ports")    
 
     elif key == "SCRIPTS":
@@ -87,10 +88,12 @@ def parse_command(cmd, tcpInstance):
                     file_dir + "/scripts/" + script_name, 'w+')
                 file.write(program)
                 file.close()
-                spawn_script_process(script_name)
-            except Exception as e:
-                print("Exception occured")
-                print(e)
+                return_value = spawn_script_process(script_name)
+                return return_value
+            except Exception as exception:
+                print("Exception occurred at compile time")
+                str_exception = str(type(exception)) + ": " + str(exception)
+                return str_exception
 
 
 def process_string(value):
@@ -119,7 +122,11 @@ def spawn_script_process(scriptname):
         scriptname (:obj:`str`): The name of the script to run.
     """
     time.sleep(0.1)
-    Thread(target=run_script, args=[scriptname], daemon=True).start()
+
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        future = executor.submit(run_script, scriptname)
+        return_value = future.result()
+        return return_value
 
 
 def run_script(scriptname):
@@ -131,12 +138,20 @@ def run_script(scriptname):
 
     # Cache invalidation and module refreshes are needed to ensure
     # the most recent script is executed
-    index = scriptname.find(".")
-    importlib.invalidate_caches()
-    script_name = "scripts." + scriptname[0: index]
-    script = importlib.import_module(script_name)
-    importlib.reload(script)
-    script.run()
+    try:
+        index = scriptname.find(".")
+        importlib.invalidate_caches()
+        script_name = "scripts." + scriptname[0: index]
+        script = importlib.import_module(script_name)
+        importlib.reload(script)
+        script.run()
+        return "Successful execution"
+    except Exception as exception:
+        print("Exception occurred at run time")
+        print(type(exception))
+        print(str(exception))
+        str_exception = str(type(exception)) + ": " + str(exception)
+        return str_exception
 
 
 def start_base_station_heartbeat(ip_address):
@@ -202,7 +217,11 @@ def main():
         tcp_instance = TCP()
         while True:
             time.sleep(0.01)
-            parse_command(tcp_instance.get_command(), tcp_instance)
+            return_value = parse_command(tcp_instance.get_command(), tcp_instance)
+            # print("return_value is:")
+            # print(return_value)
+            if return_value is not None:
+                tcp_instance.send_to_basestation("RESULT", return_value)
 
     finally:
         sock.close()

@@ -23,7 +23,7 @@ class BaseInterface:
     base station GUI.
     """
 
-    def __init__(self, port, send_blockly_remote_server=False):
+    def __init__(self, port, send_blockly_remote_server=True):
         """
         Initializes base station
         :param port: Port number from which basestation runs (usually 8080)
@@ -51,7 +51,8 @@ class BaseInterface:
                 send_blockly_remote_server=send_blockly_remote_server,
             )),
             ("/vision", VisionHandler, dict(base_station=self.base_station)),
-            ("/heartbeat", HeartbeatHandler, dict(base_station=self.base_station))
+            ("/heartbeat", HeartbeatHandler, dict(base_station=self.base_station)),
+            ("/result", ErrorMessageHandler, dict(base_station=self.base_station))
         ]
 
     def start(self):
@@ -138,11 +139,10 @@ class ClientHandler(tornado.web.RequestHandler):
                 self.base_station.get_active_bots_names()).encode())
         # Receives the Blockly Generated Python scripts sent from the GUI.
         elif key == "SCRIPTS":
+            print('data is:')
+            print(data)
             value = data['value']
-            print(value)
             bot_name = data['bot_name']
-            print(bot_name)
-
             params = {'bot_name': bot_name, 'value': value}
 
             if self.send_blockly_remote_server:
@@ -159,6 +159,9 @@ class ClientHandler(tornado.web.RequestHandler):
 
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             bot = self.base_station.get_bot(bot_id)
+            # reset the previous script's error message, so we can get the new error message
+            # of the new script
+            bot.set_result(None)
             if bot:
                 print("Code len = " + str(len(value)))
                 print(type(bot))
@@ -175,7 +178,6 @@ class ClientHandler(tornado.web.RequestHandler):
                     # TODO check if a "long enough" program
                     # is supposed to be sent over
                     print("RUNNING SCRIPT")
-                    print(value)
                     self.send_program(bot, value)
 
         elif key == "DISCONNECTBOT":
@@ -210,37 +212,49 @@ class ClientHandler(tornado.web.RequestHandler):
             "stop": "stop",
             "set_wheel_power": "ECE_wheel_pwr",
             "turn_clockwise": "right",
-            "turn_counter_clockwise": "left"
+            "turn_counter_clockwise": "left",
+            "read_ultrasonic": "read_ultrasonic",
+            "move_servo": "move_servo",
         }
+
+        # functions that run continuously, and hence need to be started
+        # in a new thread on the Minibot otherwise the Minibot will get 
+        # stuck in an infinite loop and will be unable to receive 
+        # other commands
+        threaded_functions = [
+            "fwd",
+            "back",
+            "stop",
+            "ECE_wheel_pwr",
+            "right",
+            "left",
+        ]
 
         # Regex is for bot-specific functions (move forward, stop, etc)
         # 1st group is the whitespace (useful for def, for, etc),
-        # 2nd group is for func name, 3rd group is for args.
-        pattern = "(\s*)bot.(\w*)\((.*)\)"
+        # 2nd group is for func name, 3rd group is for args,
+        # 4th group is for anything else (additional whitespace, 
+        # ":" for end of if condition, etc)
+        pattern = r"(.*)bot.(\w*)\((.*)\)(.*)"
         regex = re.compile(pattern)
-
-        # TODO what to do after a function bound to a wait is done?
-        # Do we do whatever we did before? Do we stop?
-
         program_lines = program.split('\n')
         parsed_program = []
         for line in program_lines:
             match = regex.match(line)
-            if match == None:
+            if not match:
                 parsed_program.append(line + '\n')  # "normal" python
             else:
                 func = function_map[match.group(2)]
                 args = match.group(3)
                 whitespace = match.group(1)
-                if whitespace == None:
+                if not whitespace:
                     whitespace = ""
-                # parsed_program.append(whitespace + func + "(" + args + ")\n")
                 parsed_line = whitespace
-                if func != "time.sleep":
+                if func in threaded_functions:
                     parsed_line += "Thread(target={}, args=[{}]).start()\n".format(
                         func, args)
                 else:
-                    parsed_line += func + "(" + args + ")\n"
+                    parsed_line += func + "(" + args + ")" + match.group(4) + "\n"
                 parsed_program.append(parsed_line)
 
         parsed_program_string = "".join(parsed_program)
@@ -275,12 +289,28 @@ class HeartbeatHandler(tornado.websocket.WebSocketHandler):
         self.write(json.dumps(heartbeat_json).encode())
 
 
+class ErrorMessageHandler(tornado.websocket.WebSocketHandler):
+    def initialize(self, base_station):
+        self.base_station = base_station
+
+    def post(self):
+        data = json.loads(self.request.body.decode())
+        bot_name = data['bot_name']
+        error_message = self.base_station.get_error_message(bot_name)
+        while not error_message:
+            error_message = self.base_station.get_error_message(bot_name)
+        if error_message == "Successful execution":
+            error_json = {"error": error_message, "code": 1}
+        else:
+            error_json = {"error": error_message, "code": 0}
+        print("error_json is: ")
+        print(error_json)
+        self.write(json.dumps(error_json).encode())
+
+
 if __name__ == "__main__":
     """
     Main method for running base station Server.
     """
-    if len(sys.argv) == 2:
-        base_station = BaseInterface(8080, send_blockly_remote_server=True)
-    else:
-        base_station = BaseInterface(8080)
-    base_station.start()
+    base_station_server = BaseInterface(8080, send_blockly_remote_server=True)
+    base_station_server.start()
