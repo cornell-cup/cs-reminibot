@@ -41,13 +41,13 @@ class BaseStation:
             target=self.discover_and_create_bots, daemon=True
         )
 
-        self.vision_monitior_thread = threading.Thread(
-            target=self.vision_monitior, daemon=True
+        self.vision_monitor_thread = threading.Thread(
+            target=self.vision_monitor, daemon=True
         )
 
         self.broadcast_ip_thread.start()
         self.bot_discover_thread.start()
-        self.vision_monitior_thread.start()
+        self.vision_monitor_thread.start()
         # self.connections = BaseConnection()
 
         self.basestation_key = ""
@@ -87,7 +87,7 @@ class BaseStation:
         else:
             return None
 
-    def vision_monitior(self):
+    def vision_monitor(self):
         """
         Checks if the len of the vision log is growing.
         """
@@ -232,8 +232,6 @@ class BaseStation:
                 return bot_id
         return None
 
-    
-
     def move_wheels_bot(self, session_id, bot_id, direction, power):
         """
         Gives wheels power based on user input
@@ -350,7 +348,7 @@ class BaseStation:
     def set_position_of_bot(self, bot_id, pos):
         pass
 
-    def set_ports( self, ports, session_id, bot_id ):
+    def set_ports(self, ports, session_id, bot_id):
         if not session_id or not bot_id:
             return False
 
@@ -359,12 +357,12 @@ class BaseStation:
             return False
         for x in ports:
             print(x)
-        
+
         portsstr = " ".join([str(l) for l in ports])
 
         self.active_bots[bot_id].sendKV("PORTS", portsstr)
-        
-        #do something
+
+        # do something
 
         return True
 
@@ -506,8 +504,6 @@ class BaseStation:
                 + "Port:^ " + str(bot.get_port()) + "\n" \
                 + "Sessions:^ " + str(sessions) + "\n" + "\n"
         return bot_info
-
-    
 
     def get_error_message(self, bot_name):
         bot_id = self.bot_name_to_bot_id(bot_name)
