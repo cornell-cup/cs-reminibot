@@ -26,10 +26,11 @@ class StoppableThread:
     as a parameter which stops its main while loop.
     """
 
-    def __init__(self, target_function):
+    def __init__(self, target_function, *args):
         self.func = target_function
         self.condition = ThreadSafeCondition()
         self.is_running = False
+        self.target_func_args = list(args)
 
     def start(self):
         # don't start thread if thread is already running
@@ -38,7 +39,9 @@ class StoppableThread:
         self.condition.set_val(True)
         # start the function and pass in the thread safe condition
         # variable as an argument
-        Thread(target=self.func, args=[self.condition]).start()
+        Thread(
+            target=self.func, args=[self.condition] + self.target_func_args
+        ).start()
         self.is_running = True
 
     def stop(self):

@@ -310,6 +310,10 @@ class VoiceHandler(tornado.websocket.WebSocketHandler):
         bot_name = data['bot_name']
         bot_id = self.base_station.bot_name_to_bot_id(bot_name)
         bot = self.base_station.get_bot(bot_id)
+        session_id = self.get_secure_cookie("user_id")
+        if session_id:
+            session_id = session_id.decode("utf-8")
+
         if not bot:
             return
 
@@ -317,7 +321,7 @@ class VoiceHandler(tornado.websocket.WebSocketHandler):
             print("starting voiceServer thread")
             VoiceHandler.flag = True
             self.base_station.voice_server = StoppableThread(
-                self.voice_recognition)
+                self.voice_recognition, session_id, bot_id)
             self.base_station.voice_server.start()
         elif key == "STOP VOICE":
             print("ending onBotVisionServer thread")
@@ -327,7 +331,7 @@ class VoiceHandler(tornado.websocket.WebSocketHandler):
             else:
                 print("ERROR: No on bot vision server started")
 
-    def voice_recognition(self, thread_safe_condition):
+    def voice_recognition(self, thread_safe_condition, session_id, bot_id):
         RECORDING_TIME_LIMIT = 5
         commands = {
             "forward": "Minibot moves forward",
@@ -353,6 +357,8 @@ class VoiceHandler(tornado.websocket.WebSocketHandler):
                     print("You said: " + words)
                     if words in commands:
                         print(commands[words])
+                        # TODO
+                        self.base_station.move_wheels_bot(session_id, bot_id, words, 100)
                     else:
                         print("Invalid command")
                 except sr.WaitTimeoutError:

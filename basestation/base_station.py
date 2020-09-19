@@ -19,6 +19,23 @@ from connection.udp_connection import UDPConnection
 
 MAX_VISION_LOG_LENGTH = 1000
 
+def make_thread_safe(func):
+    """ Decorator which wraps the specified function with an acquire and 
+    release call to the lock
+
+    Arguments:
+         func: The function that will become thread safe
+    """ 
+    def decorated_func(*args, **kwargs):
+        #args[0] is self
+        assert isinstance(args[0], BaseStation)
+        lock = args[0].lock
+        lock.acquire()
+        val = func(*args, **kwargs)
+        lock.release()
+        return val
+    return decorated_func
+
 
 class BaseStation:
     def __init__(self):
@@ -27,6 +44,7 @@ class BaseStation:
         self.active_playgrounds = {}
         self.vision_log = []
         self.voice_server = None
+        self.lock = threading.Lock()
 
         self.__udp_connection = UDPConnection()
         self.__udp_connection.start()
@@ -219,6 +237,7 @@ class BaseStation:
         del self.active_bots[bot_id]
         return bot_id not in self.active_bots
 
+    @make_thread_safe
     def bot_name_to_bot_id(self, bot_name):
         """
         Returns bot id corresponding to bot name
@@ -232,6 +251,7 @@ class BaseStation:
                 return bot_id
         return None
 
+    @make_thread_safe
     def move_wheels_bot(self, session_id, bot_id, direction, power):
         """
         Gives wheels power based on user input
