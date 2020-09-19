@@ -1,6 +1,6 @@
 import React from 'react';
 import axios from 'axios';
-import {Button} from './Util.js'
+import { Button } from './Util.js'
 
 /*
  *  A RefreshingList is a list designed to refresh when its update()
@@ -48,22 +48,22 @@ class RefreshingList extends React.Component {
 }
 
 function Ports(props) {
-    const ports = ["2","3","4","5","6","7","8","9","10","11","12","13"];
+    const ports = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"];
     let buttonList = [];
 
     for (let i = 0; i < ports.length; i++) {
         buttonList.push(<li><button className="btn_ports" onClick={() => props.motorPorts(props.portName, ports[i])}>{ports[i]}</button></li>);
     }
     return (<ul> {buttonList} </ul>);
-  };
+};
 
 function PortsList(props) {
     const portNames = [
-        "LMOTOR", "RMOTOR", "MOTOR3", "LINE", "INFRARED", "RFID", "ULTRASONIC"
+        "MOTOR1", "MOTOR2", "MOTOR3", "LINE", "INFRARED", "RFID", "ULTRASONIC"
     ]
 
     const portLabels = [
-        "Left Motor", "Right Motor", "Motor 3", "Line Follower", 
+        "Motor 1", "Motor 2", "Motor 3", "Line Follower",
         "Infrared", "RFID", "Ultrasonic"
     ]
 
@@ -72,19 +72,19 @@ function PortsList(props) {
 
     for (let i = 0; i < portNames.length; i++) {
         let link = <a href="">{portLabels[i]}</a>
-        let ports = <Ports portName={portNames[i]} motorPorts={props.motorPorts}/>
+        let ports = <Ports portName={portNames[i]} motorPorts={props.motorPorts} />
         let listElement = <li> {link} {ports} </li>
         allListElements.push(listElement);
     }
 
     return (
         <nav id="main_nav">
-        <ul>
-        <li>
-            <a href="">Motor Ports</a>
-            <ul> {allListElements} </ul>
-        </li>
-        </ul>
+            <ul>
+                <li>
+                    <a href="">Motor Ports</a>
+                    <ul> {allListElements} </ul>
+                </li>
+            </ul>
         </nav>
     );
 }
@@ -253,25 +253,25 @@ export default class AddBot extends React.Component {
     }
 
     /*motor ports*/
-    motorPorts(name, port1){
-      const _this = this;
-      console.log(name);
-      console.log(port1);
+    motorPorts(name, port1) {
+        const _this = this;
+        console.log(name);
+        console.log(port1);
 
-      axios({
-          method: 'POST',
-          url: '/start',
-          data: JSON.stringify({
-              key: "PORTS",
-              ports: [name, String(port1)],
-              bot_name: _this.props.selected_bot,
-          })
-      })
-          .then(function (response) {
-          })
-          .catch(function (error) {
-              console.log(error);
-          })
+        axios({
+            method: 'POST',
+            url: '/start',
+            data: JSON.stringify({
+                key: "PORTS",
+                ports: [name, String(port1)],
+                bot_name: _this.props.selected_bot,
+            })
+        })
+            .then(function (response) {
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
     }
 
     /* removes selected object from list*/
@@ -401,7 +401,7 @@ export default class AddBot extends React.Component {
                 </div>
                 <div className="row">
                     <div className="col horizontalDivCenter">
-                        <div className="element-wrapper"> 
+                        <div className="element-wrapper">
                             <label> Bot List: </label>
                             <select onChange={this.selectBotListener}>
                                 {this.props.bot_list.map(
@@ -413,7 +413,7 @@ export default class AddBot extends React.Component {
                                 )}
                             </select>
                         </div>
-                        <Button id="remove_bot" name="Remove" onClick={()=>_this.deleteBotListener()} bot_list={this.props.bot_list} />
+                        <Button id="remove_bot" name="Remove" onClick={() => _this.deleteBotListener()} bot_list={this.props.bot_list} />
                         <div className="led-box element-wrapper">
                             <div id="led-red"></div>
                         </div>
@@ -447,8 +447,8 @@ export default class AddBot extends React.Component {
                             <div>
                                 <label> Power: </label>
                             </div>
-                            <input id="custom-range-1" class="custom-range" name="wheel_power" type="range" min="0" max="100" 
-                                step="5" onChange={evt => this.updatePowerValue(evt)}/>
+                            <input id="custom-range-1" class="custom-range" name="wheel_power" type="range" min="0" max="100"
+                                step="5" onChange={evt => this.updatePowerValue(evt)} />
                         </form>
                     </div>
                 </div>
