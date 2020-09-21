@@ -301,7 +301,7 @@ class VoiceHandler(tornado.websocket.WebSocketHandler):
         self.base_station = base_station
 
     def get(self):
-        pass  # not sure what's supposed to happen here
+        self.write(self.base_station.voice_server.message.get_val())
 
     def post(self):
         data = json.loads(self.request.body.decode())
@@ -331,7 +331,7 @@ class VoiceHandler(tornado.websocket.WebSocketHandler):
             else:
                 print("ERROR: No on bot vision server started")
 
-    def voice_recognition(self, thread_safe_condition, session_id, bot_id):
+    def voice_recognition(self, thread_safe_condition, thread_safe_message, session_id, bot_id):
         RECORDING_TIME_LIMIT = 5
         commands = {
             "forward": "Minibot moves forward",
@@ -342,29 +342,37 @@ class VoiceHandler(tornado.websocket.WebSocketHandler):
             "object detection": "Minibot starts object detection mode",
             "line follow": "Minibot starts line follow mode"
         }
-        print("entered base_station.py")
         # open the Microphone as variable microphone
         with sr.Microphone() as microphone:
             print("mic works")
             r = sr.Recognizer()
-            while thread_safe_condition.read_val():
+            while thread_safe_condition.get_val():
+                thread_safe_message.set_val("Say something!")
                 print("Say something!")
                 try:
                     # listen for 5 seconds
                     audio = r.listen(microphone, RECORDING_TIME_LIMIT)
+                    thread_safe_message.set_val(
+                        "Converting from speech to text")
                     print("Converting from speech to text ...")
                     words = r.recognize_google(audio)
+                    thread_safe_message.set_val("You said: " + words)
                     print("You said: " + words)
                     if words in commands:
+                        thread_safe_message.set_val(commands[words])
                         print(commands[words])
-                        # TODO
-                        self.base_station.move_wheels_bot(session_id, bot_id, words, 100)
+                        self.base_station.move_wheels_bot(
+                            session_id, bot_id, words, 100)
                     else:
+                        thread_safe_message.set_val("Invalid command")
                         print("Invalid command")
                 except sr.WaitTimeoutError:
                     print("timed out")
+                    thread_safe_message.set_val("timed out")
                 except sr.UnknownValueError:
+                    thread_safe_message.set_val("words not recognized")
                     print("words not recognized")
+                time.sleep(2)
 
 
 class ErrorMessageHandler(tornado.websocket.WebSocketHandler):

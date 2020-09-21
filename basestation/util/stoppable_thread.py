@@ -1,7 +1,7 @@
 from threading import Lock, Thread
 
 
-class ThreadSafeCondition:
+class ThreadSafeVariable:
     """ Represents a thread safe boolean variable.  All accesses
     are protected by a lock using the Python "with" statement
     """
@@ -10,7 +10,7 @@ class ThreadSafeCondition:
         self.lock = Lock()
         self.val = False
 
-    def read_val(self):
+    def get_val(self):
         with self.lock:
             return self.val
 
@@ -28,7 +28,8 @@ class StoppableThread:
 
     def __init__(self, target_function, *args):
         self.func = target_function
-        self.condition = ThreadSafeCondition()
+        self.condition = ThreadSafeVariable()
+        self.message = ThreadSafeVariable()
         self.is_running = False
         self.target_func_args = list(args)
 
@@ -40,7 +41,8 @@ class StoppableThread:
         # start the function and pass in the thread safe condition
         # variable as an argument
         Thread(
-            target=self.func, args=[self.condition] + self.target_func_args
+            target=self.func, args=[self.condition,
+                                    self.message] + self.target_func_args
         ).start()
         self.is_running = True
 

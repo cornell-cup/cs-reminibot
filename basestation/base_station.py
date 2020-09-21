@@ -19,13 +19,14 @@ from connection.udp_connection import UDPConnection
 
 MAX_VISION_LOG_LENGTH = 1000
 
+
 def make_thread_safe(func):
     """ Decorator which wraps the specified function with an acquire and 
     release call to the lock
 
     Arguments:
          func: The function that will become thread safe
-    """ 
+    """
     def decorated_func(*args, **kwargs):
         #args[0] is self
         assert isinstance(args[0], BaseStation)
