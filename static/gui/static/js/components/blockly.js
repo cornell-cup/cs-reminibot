@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import {Button, LabeledTextBox} from './Util.js';
 import CodeMirror from 'react-codemirror';
+require('codemirror/mode/python/python');
 
 
 function UserAccountModal(props) {
@@ -38,16 +39,20 @@ class PythonEditor extends React.Component {
   }
 
   updateCode(code)  {
-    console.log(code);
     this.setState({code});
   }
 
   render() {
     var options = {
       lineNumbers: true,
+      mode: 'python'
     };
     return (
-      <CodeMirror value={this.state.code} onChange={this.handleScriptChange} options={options} />
+      <CodeMirror
+        value={this.state.code}
+        onChange={(code) => this.updateCode(code)}
+        options={options}
+      />
     )
   }
 }
@@ -107,7 +112,7 @@ class PythonTextBox extends React.Component {
     }
     this.setState({ function_name: event.target.value });
   }
-  
+
   /* Function to handle changing the file name in the Download Python textbox */
   handleFileNameChange(event) {
     this.setState({ filename: event.target.value });
