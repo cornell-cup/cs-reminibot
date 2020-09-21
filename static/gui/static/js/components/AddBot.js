@@ -48,7 +48,7 @@ class RefreshingList extends React.Component {
 }
 
 function Ports(props) {
-    const ports = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"];
+    const ports = props.usable; // ["2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"];
     let buttonList = [];
 
     for (let i = 0; i < ports.length; i++) {
@@ -67,12 +67,20 @@ function PortsList(props) {
         "Infrared", "RFID", "Ultrasonic"
     ]
 
+    const usableMotorPorts = ["2", "3", "4", "5", "6", "7"]
+    const usableSensorPorts = ["8", "9", "10", "11"]
+
+    const usablePorts = [
+        usableMotorPorts, usableMotorPorts, usableMotorPorts,
+        usableSensorPorts, usableSensorPorts, usableSensorPorts, usableSensorPorts
+    ]
+
     console.assert(portNames.length == portLabels.length);
     let allListElements = [];
 
     for (let i = 0; i < portNames.length; i++) {
         let link = <a href="">{portLabels[i]}</a>
-        let ports = <Ports portName={portNames[i]} motorPorts={props.motorPorts} />
+        let ports = <Ports portName={portNames[i]} motorPorts={props.motorPorts} usable={usablePorts[i]} />
         let listElement = <li> {link} {ports} </li>
         allListElements.push(listElement);
     }
@@ -81,7 +89,7 @@ function PortsList(props) {
         <nav id="main_nav">
             <ul>
                 <li>
-                    <a href="">Motor Ports</a>
+                    <a href="">Configure Ports</a>
                     <ul> {allListElements} </ul>
                 </li>
             </ul>
