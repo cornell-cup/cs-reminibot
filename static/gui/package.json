@@ -7,8 +7,10 @@
     "axios": "^0.19.2",
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
+    "codemirror": "^5.58.0",
     "jest": "^22.4.3",
     "react": "^16.0.0",
+    "react-codemirror": "^1.0.0",
     "react-dom": "^16.0.0",
     "react-tabs": "^2.0.0",
     "recharts": "^1.8.5"

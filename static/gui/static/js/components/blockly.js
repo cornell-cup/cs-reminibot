@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import {Button, LabeledTextBox} from './Util.js'
+import {Button, LabeledTextBox} from './Util.js';
+import CodeMirror from 'react-codemirror';
 
 
 function UserAccountModal(props) {
@@ -25,6 +26,30 @@ function UserAccountModal(props) {
       </form>
     </div>
   )
+}
+
+class PythonEditor extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      code: "",
+    }
+  }
+
+  updateCode(code)  {
+    console.log(code);
+    this.setState({code});
+  }
+
+  render() {
+    var options = {
+      lineNumbers: true,
+    };
+    return (
+      <CodeMirror value={this.state.code} onChange={this.handleScriptChange} options={options} />
+    )
+  }
 }
 
 //////////////////////////////////////////////////
@@ -75,14 +100,14 @@ class PythonTextBox extends React.Component {
 
   handleFunctionNameChange(event) {
     var _this = this;
-    var item = _this.props.customBlockList.find(element => element[0] === event.target.value); 
+    var item = _this.props.customBlockList.find(element => element[0] === event.target.value);
     if (item != undefined) {
       document.getElementById("textarea").value = item[1];
       _this.setState({ pythonTextBoxCode: item[1]});
     }
     this.setState({ function_name: event.target.value });
   }
-
+  
   /* Function to handle changing the file name in the Download Python textbox */
   handleFileNameChange(event) {
     this.setState({ filename: event.target.value });
@@ -161,7 +186,7 @@ class PythonTextBox extends React.Component {
         document.getElementById("errormessage").value = response.data["error"];
         console.log(document.get)
         if (response.data["code"] === 1) {
-          // lime green 
+          // lime green
           document.getElementById("errormessage").style.color="#32CD32";
         }
         else {
@@ -355,12 +380,12 @@ export default class MinibotBlockly extends React.Component {
       }
     };
 
-    // Unfortunately the code above only updates the drop down menu 
-    // when the block's drop down menu is clicked.  To update the currently 
-    // selected function's python code value without making 
+    // Unfortunately the code above only updates the drop down menu
+    // when the block's drop down menu is clicked.  To update the currently
+    // selected function's python code value without making
     // the user click on the menu, we need to use the setFieldValue function
-    // for the custom block.  Then in the code after this, we can set the 
-    // Blockly.Python["custom_block"] to be the value of the currently 
+    // for the custom block.  Then in the code after this, we can set the
+    // Blockly.Python["custom_block"] to be the value of the currently
     // selected function in the drop down menu and everything will be updated
     // instantly :)
     var allBlocks = _this.workspace.getAllBlocks();
@@ -370,7 +395,7 @@ export default class MinibotBlockly extends React.Component {
         var field = allBlocks[i].getField(fieldName);
         // get currently selected function in drop down menu
         var currentFunc = field.getText();
-        var item = _this.props.customBlockList.find(element => element[0] === currentFunc); 
+        var item = _this.props.customBlockList.find(element => element[0] === currentFunc);
         if (item === undefined) {
           field.setText(this.props.customBlockList[0][0]);
           field.setValue(_this.props.customBlockList[0][1]);
@@ -390,7 +415,7 @@ export default class MinibotBlockly extends React.Component {
 
  custom_block(function_name, pythonTextBoxCode) {
     var _this = this;
-    var item = _this.props.customBlockList.find(element => element[0] === function_name); 
+    var item = _this.props.customBlockList.find(element => element[0] === function_name);
     if (item == undefined) {
       _this.props.customBlockList.push([function_name, pythonTextBoxCode]);
     } else {
@@ -425,7 +450,7 @@ export default class MinibotBlockly extends React.Component {
     this.update_custom_blocks();
 
   }
-  
+
 
   /* handles input change for file name and coding textboxes */
   handleInputChange(event) {
@@ -761,13 +786,14 @@ export default class MinibotBlockly extends React.Component {
             />
           </form>
           <br />
-          <PythonTextBox
+          {/* <PythonTextBox
             botName={this.props.bot_name}
             custom_block={this.custom_block}
             dblock={this.dblock}
             dblockAll={this.dblockAll}
             customBlockList={this.props.customBlockList}
-          />
+          /> */}
+          <PythonEditor />
         </div>
         <div id="generatedPythonFromBlocklyBox" style={dataStyle} className="col-md-5"></div>
       </div>
