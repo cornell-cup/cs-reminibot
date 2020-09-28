@@ -297,11 +297,16 @@ class HeartbeatHandler(tornado.websocket.WebSocketHandler):
 
 
 class VoiceHandler(tornado.websocket.WebSocketHandler):
+    flag = False
+
     def initialize(self, base_station):
         self.base_station = base_station
 
     def get(self):
-        self.write(self.base_station.voice_server.message.get_val())
+        message = self.base_station.voice_server.message.get_val()
+        if message is None:
+            message = ""
+        self.write(message)
 
     def post(self):
         data = json.loads(self.request.body.decode())

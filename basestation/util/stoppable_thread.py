@@ -8,7 +8,7 @@ class ThreadSafeVariable:
 
     def __init__(self):
         self.lock = Lock()
-        self.val = False
+        self.val = None
 
     def get_val(self):
         with self.lock:

@@ -96,23 +96,33 @@ class Voice extends React.Component {
         }
         this.toggle = this.toggle.bind(this);
         this.getVoice = this.getVoice.bind(this);
+        this.voiceInterval = null;
     }
 
     toggle() {
-        this.getVoice(this.state.on);
         this.setState({
             on: !this.state.on
         });
+        // state doesn't change until after toggle()
+        this.getVoice(!this.state.on);
     }
 
     getVoice(isOn) {
         const _this = this;
-        console.log(isOn ? "STOP VOICE" : "START VOICE")
+        console.log(isOn ? "START VOICE" : "STOP VOICE")
+
+        if (isOn) {
+            this.voiceInterval = setInterval(this.getVoiceData.bind(this), 500);
+        }
+        else {
+            clearInterval(this.voiceInterval);
+        }
+
         axios({
             method: 'POST',
             url: '/voice',
             data: JSON.stringify({
-                key: isOn ? "STOP VOICE" : "START VOICE",
+                key: isOn ? "START VOICE" : "STOP VOICE",
                 bot_name: this.props.selected_bot
             })
         }).then(function (response) {
@@ -122,6 +132,26 @@ class Voice extends React.Component {
         }).catch(function (error) {
             // console.log(error);
         })
+
+    }
+
+    getVoiceData() {
+        const _this = this;
+        axios.get('/voice')
+            .then(function (response) {
+                console.log(response.data)
+                // if (response.data["is_heartbeat"]) {
+                //     document.getElementById('led-red').style.animation = "blinkRed 4s 2";
+                //     var delayInMilliseconds = 2000; //1 second
+
+                //     setTimeout(function () {
+                //         document.getElementById('led-red').style.animation = "none";
+                //     }, delayInMilliseconds);
+                // }
+            })
+            .catch(function (error) {
+                // console.log(error);
+            });
     }
 
     render() {
