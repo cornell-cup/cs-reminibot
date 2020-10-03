@@ -361,7 +361,10 @@ class VoiceHandler(tornado.websocket.WebSocketHandler):
                         "Converting from speech to text")
                     print("Converting from speech to text ...")
                     words = r.recognize_google(audio)
+                    regex = re.compile('[^a-zA-Z]')  # removing punctuation
+                    regex.sub('', words)
                     thread_safe_message.set_val("You said: " + words)
+                    thread_safe_message.set_val(words)
                     print("You said: " + words)
                     if words in commands:
                         thread_safe_message.set_val(commands[words])

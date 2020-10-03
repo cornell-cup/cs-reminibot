@@ -139,7 +139,7 @@ class Voice extends React.Component {
         const _this = this;
         axios.get('/voice')
             .then(function (response) {
-                console.log(response.data)
+                document.getElementById('Voice Feedback').innerHTML = response.data;
                 // if (response.data["is_heartbeat"]) {
                 //     document.getElementById('led-red').style.animation = "blinkRed 4s 2";
                 //     var delayInMilliseconds = 2000; //1 second
@@ -166,6 +166,7 @@ class Voice extends React.Component {
             <div>
                 <button className="btn btn-primary element-wrapper" onClick={this.toggle}>{x}</button>
             </div>
+
         );
     }
 }
@@ -221,7 +222,7 @@ class Toggle extends React.Component {
         }
         return (
             <div>
-                <button className="btn btn-primary" onClick={this.toggle}>{x}</button>
+                <button className="btn btn-primary element-wrapper mr-1" onClick={this.toggle}>{x}</button>
             </div>
         )
     }
@@ -589,23 +590,27 @@ export default class AddBot extends React.Component {
                         </form>
                     </div>
                 </div>
+                <div className="row">
+                    <div className="col horizontalDivCenter">
+                        <p id="small_title">Voice </p>
+                    </div>
+                </div>
                 {/* button-wrapper is a custom class to add padding
                     the rest is bootstrap css */}
-                <div className="row button-wrapper">
-                    <div className="col-md-3">
-                        <Voice selected_bot={this.props.selected_bot} float="right" />
-                    </div>
-                    <div className="col-md-3">
-                        <Toggle selected_bot={this.props.selected_bot} />
-                    </div>
-                    <div className="divider" />
+                <div className="col horizontalDivCenter">
+                    <Voice selected_bot={this.props.selected_bot} float="right" />
                 </div>
-                <div className="row button-wrapper">
-                    <div className="col-md-3">
-                        <button type="button" className="btn btn-success element-wrapper" onClick={() => this.objectDetectionOnClick()}>Object Detection</button>
-                    </div>
-                    <div className="col-md-3">
-                        <button type="button" className="btn btn-primary" onClick={() => this.lineFollowOnClick()}>Line Follow</button>
+                <div className="col horizontalDivCenter">
+                    <label id="Voice Feedback">
+                    </label>
+                </div>
+                <br />
+                <br />
+                <div className="row">
+                    <div className="col horizontalDivCenter">
+                        <Toggle selected_bot={this.props.selected_bot} />
+                        <button className="btn btn-success element-wrapper mr-1" onClick={() => this.objectDetectionOnClick()}>Object Detection</button>
+                        <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.lineFollowOnClick()}>Line Follow</button>
                     </div>
                 </div>
             </div >
