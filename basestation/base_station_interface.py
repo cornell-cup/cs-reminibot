@@ -303,7 +303,9 @@ class VoiceHandler(tornado.websocket.WebSocketHandler):
         self.base_station = base_station
 
     def get(self):
-        message = self.base_station.voice_server.message.get_val()
+        voice_server = self.base_station.voice_server
+        message = voice_server.message.get_val() if voice_server else None
+        # could be None because get_val can return None too
         if message is None:
             message = ""
         self.write(message)

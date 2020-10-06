@@ -97,6 +97,9 @@ class Voice extends React.Component {
         this.toggle = this.toggle.bind(this);
         this.getVoice = this.getVoice.bind(this);
         this.voiceInterval = null;
+        this.max_messages = 4;
+        this.queue_color_index = 0;
+        this.queue = [""];
     }
 
     toggle() {
@@ -139,17 +142,27 @@ class Voice extends React.Component {
         const _this = this;
         axios.get('/voice')
             .then(function (response) {
-                document.getElementById('Voice Feedback').innerHTML = response.data;
-                // if (response.data["is_heartbeat"]) {
-                //     document.getElementById('led-red').style.animation = "blinkRed 4s 2";
-                //     var delayInMilliseconds = 2000; //1 second
-
-                //     setTimeout(function () {
-                //         document.getElementById('led-red').style.animation = "none";
-                //     }, delayInMilliseconds);
-                // }
-            })
-            .catch(function (error) {
+                // only add to the message queue if the message is a new message
+                if (_this.queue[_this.queue.length - 1] !== response.data) {
+                    // keep the message a fixed length
+                    if (_this.queue.length == _this.max_messages) {
+                        _this.queue.shift();
+                    }
+                    _this.queue.push(response.data);
+                    // flips the value of the index from 0 to 1 and vice-versa
+                    _this.queue_color_index = 1 - _this.queue_color_index;
+                }
+                document.getElementById('voice_feedback').innerHTML = "";
+                for (let i = _this.queue.length - 1; i >= 0; i--) {
+                    // make the first message bold
+                    let bold = (i == _this.queue.length - 1) ? "font-weight: bold;" : "";
+                    // make new messages alternate colors
+                    let color = (i % 2 == _this.queue_color_index) ? "#000080" : "black";
+                    let p_start = "<p style=\"" + bold + "margin: 0; color:" + color + ";\">";
+                    let p_end = "</p>";
+                    document.getElementById('voice_feedback').innerHTML += p_start + _this.queue[i] + p_end;
+                }
+            }).catch(function (error) {
                 // console.log(error);
             });
     }
@@ -592,7 +605,7 @@ export default class AddBot extends React.Component {
                 </div>
                 <div className="row">
                     <div className="col horizontalDivCenter">
-                        <p id="small_title">Voice </p>
+                        <p id="small_title"> Speech Recognition </p>
                     </div>
                 </div>
                 {/* button-wrapper is a custom class to add padding
@@ -601,8 +614,7 @@ export default class AddBot extends React.Component {
                     <Voice selected_bot={this.props.selected_bot} float="right" />
                 </div>
                 <div className="col horizontalDivCenter">
-                    <label id="Voice Feedback">
-                    </label>
+                    <label id="voice_feedback" />
                 </div>
                 <br />
                 <br />
