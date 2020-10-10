@@ -35,80 +35,36 @@ class PythonEditor extends React.Component {
     super(props);
     this.state = {
       code: "",
+      filename: "myPythonCode.py",
+      function_name: "default_function"
     }
+
+    this.copy = this.copy.bind(this);
+//    this.download_python = this.download_python.bind(this);
+    this.handleFileNameChange = this.handleFileNameChange.bind(this);
+    this.handleFunctionNameChange = this.handleFunctionNameChange.bind(this);
+    // this.run_script = this.run_script.bind(this);
+    this.upload = this.upload.bind(this);
+    this.view_history = this.view_history.bind(this);
   }
 
   updateCode(code)  {
     this.setState({code});
   }
 
-  render() {
-    var options = {
-      lineNumbers: true,
-      mode: 'python'
-    };
-    return (
-      <CodeMirror
-        value={this.state.code}
-        onChange={(code) => this.updateCode(code)}
-        options={options}
-      />
-    )
+  getEditor() {
+    return this.refs.editor.getCodeMirror();
   }
-}
 
-//////////////////////////////////////////////////
-// PYTHON CODING TEXT BOX AND BUTTONS COMPONENT
-//////////////////////////////////////////////////
-class PythonTextBox extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      pythonTextBoxCode: "",
-      filename: "myPythonCode.py",
-      function_name: "default_function",
-      coding_start: -1
-    }
-
-    this.copy = this.copy.bind(this);
-    this.download_python = this.download_python.bind(this);
-    this.handleFileNameChange = this.handleFileNameChange.bind(this);
-    this.handleFunctionNameChange = this.handleFunctionNameChange.bind(this);
-    this.handleScriptChange = this.handleScriptChange.bind(this);
-    this.handleTab = this.handleTab.bind(this);
-    this.run_script = this.run_script.bind(this);
-    this.upload = this.upload.bind(this);
-    this.view_history = this.view_history.bind(this);
-  }
-  /* Target function for the button "Cope Code". Set the text
-     in the editing box according to blockly. */
   copy(event) {
-    document.getElementById("textarea").value = generatedPythonFromBlocklyBox.innerText;
-    this.setState({ pythonTextBoxCode: generatedPythonFromBlocklyBox.innerText });
-  }
-
-  download_python(event) {
-    console.log("download listener");
-    event.preventDefault();
-    var element = document.createElement('a');
-    var filename = this.state.filename;
-    if (filename.substring(filename.length - 3) != ".py") {
-      filename += ".py";
-    }
-    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(this.state.pythonTextBoxCode));
-    element.setAttribute('download', filename);
-    element.style.display = 'none';
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
+    this.getEditor().setValue(generatedPythonFromBlocklyBox.innerText);
   }
 
   handleFunctionNameChange(event) {
     var _this = this;
     var item = _this.props.customBlockList.find(element => element[0] === event.target.value);
     if (item != undefined) {
-      document.getElementById("textarea").value = item[1];
-      _this.setState({ pythonTextBoxCode: item[1]});
+      this.getEditor().setValue(item[1]);
     }
     this.setState({ function_name: event.target.value });
   }
@@ -118,32 +74,13 @@ class PythonTextBox extends React.Component {
     this.setState({ filename: event.target.value });
   }
 
-  /* Target function for detected text changes in the editing box.
-     Update this.state with the current text. */
-  handleScriptChange(event) {
-    this.setState({ pythonTextBoxCode: event.target.value });
-    if (this.state.coding_start == -1) {
-      this.setState({ coding_start: new Date().getTime()})
-    }
-  }
-
-  handleTab(event) {
-    if (event.keyCode==9){
-      event.preventDefault();
-      document.getElementById("textarea").value = this.state.pythonTextBoxCode+'    ';
-      this.setState({ pythonTextBoxCode: event.target.value });
-    }
-  }
-
   upload(event) {
     var _this = this;
     var file = event.target.files[0];
     var reader = new FileReader();
     reader.onload = function (event) {
-      _this.state.pythonTextBoxCode = event.target.result;
-      document.getElementById("textarea").value = event.target.result;
+      _this.getEditor().setValue(event.target.result);
     };
-    this.setState({ pythonTextBoxCode: generatedPythonFromBlocklyBox.innerText });
     reader.readAsText(file);
   }
 
@@ -151,75 +88,91 @@ class PythonTextBox extends React.Component {
     window.open("http://127.0.0.1:5000/program/")
   }
 
-  /* Target function for the button "Run Code". Send python code
-     in the editing box to backend. */
-  run_script(event) {
-    var start_time = this.state.coding_start;
-    if (start_time != -1) {
-      var time = (new Date().getTime() - start_time) / 1000
-      document.getElementById("time").value = time.toString() + "s";
-      this.setState({coding_start : -1})
-    }
 
-    axios({
-      method: 'POST',
-      url: '/start',
-      data: JSON.stringify({
-        key: 'SCRIPTS',
-        value: this.state.pythonTextBoxCode,
-        bot_name: this.props.botName
-      }),
-    })
-      .then(function (response) {
-        // console.log(blockly.value);
-        console.log('sent script');
-      })
-      .catch(function (error) {
-        console.warn(error);
-      });
-
-    axios({
-      method: 'POST',
-      url: '/result',
-      data: JSON.stringify({
-        bot_name: this.props.botName
-      }),
-    })
-      .then((response) => {
-        console.log("The error message is: !!!")
-        console.log(response);
-        document.getElementById("errormessage").value = response.data["error"];
-        console.log(document.get)
-        if (response.data["code"] === 1) {
-          // lime green
-          document.getElementById("errormessage").style.color="#32CD32";
-        }
-        else {
-          // red
-          document.getElementById("errormessage").style.color="#FF0000";
-        }
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-
-  }
+  // download_python(event) {
+  //   console.log("download listener");
+  //   event.preventDefault();
+  //   var element = document.createElement('a');
+  //   var filename = this.state.filename;
+  //   if (filename.substring(filename.length - 3) != ".py") {
+  //     filename += ".py";
+  //   }
+  //   element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(this.state.pythonTextBoxCode));
+  //   element.setAttribute('download', filename);
+  //   element.style.display = 'none';
+  //   document.body.appendChild(element);
+  //   element.click();
+  //   document.body.removeChild(element);
+  // }
+  //
+  // /* Target function for the button "Run Code". Send python code
+  //    in the editing box to backend. */
+  // run_script(event) {
+  //   var start_time = this.state.coding_start;
+  //   if (start_time != -1) {
+  //     var time = (new Date().getTime() - start_time) / 1000
+  //     document.getElementById("time").value = time.toString() + "s";
+  //     this.setState({coding_start : -1})
+  //   }
+  //
+  //   axios({
+  //     method: 'POST',
+  //     url: '/start',
+  //     data: JSON.stringify({
+  //       key: 'SCRIPTS',
+  //       value: this.state.pythonTextBoxCode,
+  //       bot_name: this.props.botName
+  //     }),
+  //   })
+  //     .then(function (response) {
+  //       // console.log(blockly.value);
+  //       console.log('sent script');
+  //     })
+  //     .catch(function (error) {
+  //       console.warn(error);
+  //     });
+  //
+  //   axios({
+  //     method: 'POST',
+  //     url: '/result',
+  //     data: JSON.stringify({
+  //       bot_name: this.props.botName
+  //     }),
+  //   })
+  //     .then((response) => {
+  //       console.log("The error message is: !!!")
+  //       console.log(response);
+  //       document.getElementById("errormessage").value = response.data["error"];
+  //       console.log(document.get)
+  //       if (response.data["code"] === 1) {
+  //         // lime green
+  //         document.getElementById("errormessage").style.color="#32CD32";
+  //       }
+  //       else {
+  //         // red
+  //         document.getElementById("errormessage").style.color="#FF0000";
+  //       }
+  //     })
+  //     .catch((err) => {
+  //       console.log(err)
+  //     })
+  //
+  // }
 
   render() {
+    var options = {
+      lineNumbers: true,
+      mode: 'python'
+    };
     return (
       <div id="Python">
-        <p id="title"> <b>Python </b> </p>
-        {/* Python  */}
-        <div>
-        <textarea
-          id="textarea"
-          rows="10"
-          cols="98"
-          onChange={this.handleScriptChange}
-          onKeyDown={this.handleTab}
-          />
-        </div>
-        {/* Custom blockly button and textbox */}
+        <CodeMirror
+          ref="editor"
+          value={this.state.code}
+          onChange={(code) => this.updateCode(code)}
+          options={options}
+          style={{width: '1200px'}}
+        />
         <div id="UpdateCustomFunction" className="horizontalDiv">
           <LabeledTextBox
             type={"text"}
@@ -229,7 +182,7 @@ class PythonTextBox extends React.Component {
           />
           <Button
             id={"CBlock"}
-            onClick={() => this.props.custom_block(this.state.function_name, this.state.pythonTextBoxCode)}
+            onClick={() => this.props.custom_block(this.state.function_name, this.state.code)}
             name={"Update Custom Block"}
           />
           <Button
@@ -271,7 +224,7 @@ class PythonTextBox extends React.Component {
           </form>
         </div>
       </div>
-    );
+    )
   }
 }
 
@@ -791,14 +744,13 @@ export default class MinibotBlockly extends React.Component {
             />
           </form>
           <br />
-          {/* <PythonTextBox
+          <PythonEditor
             botName={this.props.bot_name}
             custom_block={this.custom_block}
             dblock={this.dblock}
             dblockAll={this.dblockAll}
             customBlockList={this.props.customBlockList}
-          /> */}
-          <PythonEditor />
+          />
         </div>
         <div id="generatedPythonFromBlocklyBox" style={dataStyle} className="col-md-5"></div>
       </div>
