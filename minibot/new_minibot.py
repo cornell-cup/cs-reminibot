@@ -99,12 +99,9 @@ def parse_command(cmd, tcpInstance):
                 print("Exception occurred")
 
     elif key == "STOP":
-        print("Michael Scott is the best boss???")
         if current_process is not None:
             current_process.terminate()
         stop = True
-        print("Called inside parse_command from new_minibot.py, will print the value of stop in the next line")
-        print(stop)
 
 
 def process_string(value):
@@ -143,12 +140,7 @@ def spawn_script_process(scriptname, tcpInstance):
     output = manager.Value(c_char_p, "")
     global current_process 
     current_process = Process(target=run_script, args=(scriptname, tcpInstance))
-    print("Called inside spawn_script_process from new_minibot.py, will do p.start() next")
     current_process.start()
-    # while stop == False:
-    #     if (output.value != ""):
-    #         current_process = None
-    print("Called inside spawn_script_process from new_minibot.py, means escape the while loop because stop = True")
 
 
 def run_script(scriptname, tcp_instance):
@@ -161,7 +153,6 @@ def run_script(scriptname, tcp_instance):
     # Cache invalidation and module refreshes are needed to ensure
     # the most recent script is executed
     try:
-        print("REACHES RUN_SCRIPT TRY")
         index = scriptname.find(".")
         importlib.invalidate_caches()
         script_name = "scripts." + scriptname[0: index]
@@ -170,15 +161,12 @@ def run_script(scriptname, tcp_instance):
         script.run()
         # output.value = "Successful execution"
         result = "Successful execution"
-        print("LA LA")
-        print("result is: " + result)
         tcp_instance.send_to_basestation("RESULT", result)
     except Exception as exception:
         print("REACHES RUN_SCRIPT EXCEPTION")
         str_exception = str(type(exception)) + ": " + str(exception)
         # output.value = str_exception
         result = str_exception
-        print("result is: " + result)
         tcp_instance.send_to_basestation("RESULT", result)
 
 
@@ -246,9 +234,6 @@ def main():
         while True:
             time.sleep(0.01)
             parse_command(tcp_instance.get_command(), tcp_instance)
-            # if result is not None:
-            #     print("Dwight schrute identity theft")
-                # tcp_instance.send_to_basestation("RESULT", result)
 
     finally:
         sock.close()
