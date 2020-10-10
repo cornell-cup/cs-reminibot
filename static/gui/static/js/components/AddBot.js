@@ -67,6 +67,7 @@ export default class AddBot extends React.Component {
         this.addBotListener = this.addBotListener.bind(this);
         this.selectBotListener = this.selectBotListener.bind(this);
         this.buttonMapListener = this.buttonMapListener.bind(this);
+        this.killPythonListener = this.killPythonListener.bind(this);
         this.motorPorts = this.motorPorts.bind(this);
     }
 
@@ -205,6 +206,23 @@ export default class AddBot extends React.Component {
                 bot_name: _this.props.selected_bot,
                 direction: value,
                 power: _this.state.power,
+            })
+        })
+            .then(function (response) {
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+    }
+
+    killPythonListener() {
+        console.log("killPythonListener");
+        const _this = this;
+        axios({
+            method: 'POST',
+            url: '/stop', 
+            data: JSON.stringify({
+                bot_name: _this.props.selected_bot
             })
         })
             .then(function (response) {
@@ -516,6 +534,7 @@ export default class AddBot extends React.Component {
                                 <td><button className="btn_btn-dir_movement" onClick={() => this.buttonMapListener("left")}>left</button></td>
                                 <td><button className="btn_btn-dir_movement" onClick={() => this.buttonMapListener("stop")}>stop</button></td>
                                 <td><button className="btn_btn-dir_movement" onClick={() => this.buttonMapListener("right")}>right</button></td>
+                                <td><button className="btn_btn-dir_movement" onClick={() => this.killPythonListener()}>kill</button></td>
                             </tr>
                             <tr>
                                 <td></td>

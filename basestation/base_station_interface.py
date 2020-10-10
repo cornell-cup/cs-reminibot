@@ -287,8 +287,10 @@ class ErrorMessageHandler(tornado.websocket.WebSocketHandler):
         if not error_message:
             error_json = {"error": "", "code": -1}
         elif error_message == "Successful execution":
+            print("BBBBB")
             error_json = {"error": error_message, "code": 1}
         else:
+            print("CCCCC")
             error_json = {"error": error_message, "code": 0}
         self.write(json.dumps(error_json).encode())
 

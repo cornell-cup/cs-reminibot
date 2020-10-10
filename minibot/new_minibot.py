@@ -39,6 +39,7 @@ else:
 current_process = None
 stop = False
 
+
 def parse_command(cmd, tcpInstance):
     """
     Parses command sent by SendKV via TCP to the bot.
@@ -58,6 +59,7 @@ def parse_command(cmd, tcpInstance):
     # our code execution pointer would get stuck in the infinite loop.
     if key == "WHEELS":
         if value == "forward":
+            print("Pam is moving forward???")
             Thread(target=ece.fwd, args=[50]).start()
         elif value == "backward":
             Thread(target=ece.back, args=[50]).start()
@@ -92,21 +94,17 @@ def parse_command(cmd, tcpInstance):
                     file_dir + "/scripts/" + script_name, 'w+')
                 file.write(program)
                 file.close()
-                return_value = spawn_script_process(script_name)
-                return return_value
+                spawn_script_process(script_name, tcpInstance)
             except Exception as exception:
                 print("Exception occurred")
 
     elif key == "STOP":
-        global current_process
-        global stop
-        if current_process:
+        print("Michael Scott is the best boss???")
+        if current_process is not None:
             current_process.terminate()
-        process = None 
         stop = True
         print("Called inside parse_command from new_minibot.py, will print the value of stop in the next line")
         print(stop)
-        return "Terminate by command!!!!!"
 
 
 def process_string(value):
@@ -128,7 +126,7 @@ def process_string(value):
     return program
 
 
-def spawn_script_process(scriptname):
+def spawn_script_process(scriptname, tcpInstance):
     """
     Creates a new thread to run the script process on.
     Args:
@@ -140,22 +138,20 @@ def spawn_script_process(scriptname):
     #     future = executor.submit(run_script, scriptname)
     #     return_value = future.result()
     #     return return_value
-    global current_process
-    global stop
     stop == False
     manager = Manager()
     output = manager.Value(c_char_p, "")
-    current_process = Process(target=run_script, args=(scriptname, output))
+    global current_process 
+    current_process = Process(target=run_script, args=(scriptname, tcpInstance))
     print("Called inside spawn_script_process from new_minibot.py, will do p.start() next")
     current_process.start()
-    while stop == False:
-        if (output.value != ""):
-            current_process = None
-            return output.value
+    # while stop == False:
+    #     if (output.value != ""):
+    #         current_process = None
     print("Called inside spawn_script_process from new_minibot.py, means escape the while loop because stop = True")
-    return "Terminate by command"
 
-def run_script(scriptname, output):
+
+def run_script(scriptname, tcp_instance):
     """
     Loads a script and runs it.
     Args:
@@ -172,11 +168,18 @@ def run_script(scriptname, output):
         script = importlib.import_module(script_name)
         importlib.reload(script)
         script.run()
-        output.value = "Successful execution"
+        # output.value = "Successful execution"
+        result = "Successful execution"
+        print("LA LA")
+        print("result is: " + result)
+        tcp_instance.send_to_basestation("RESULT", result)
     except Exception as exception:
         print("REACHES RUN_SCRIPT EXCEPTION")
         str_exception = str(type(exception)) + ": " + str(exception)
-        output.value = str_exception
+        # output.value = str_exception
+        result = str_exception
+        print("result is: " + result)
+        tcp_instance.send_to_basestation("RESULT", result)
 
 
 def start_base_station_heartbeat(ip_address):
@@ -242,12 +245,10 @@ def main():
         tcp_instance = TCP()
         while True:
             time.sleep(0.01)
-            return_value = parse_command(tcp_instance.get_command(), tcp_instance)
-            if return_value is not None:
-                print("return_value is:")
-                print(return_value)
-            if return_value is not None:
-                tcp_instance.send_to_basestation("RESULT", return_value)
+            parse_command(tcp_instance.get_command(), tcp_instance)
+            # if result is not None:
+            #     print("Dwight schrute identity theft")
+                # tcp_instance.send_to_basestation("RESULT", result)
 
     finally:
         sock.close()
