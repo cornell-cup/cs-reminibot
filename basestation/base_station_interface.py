@@ -120,6 +120,7 @@ class ClientHandler(tornado.web.RequestHandler):
             bot_name = data['bot_name']
             direction = data['direction']
             power = str(data['power'])
+            print("virsain wheels")
 
 
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
@@ -276,14 +277,16 @@ class HeartbeatHandler(tornado.websocket.WebSocketHandler):
 class ErrorMessageHandler(tornado.websocket.WebSocketHandler):
     def initialize(self, base_station):
         self.base_station = base_station
+    
 
     def post(self):
         data = json.loads(self.request.body.decode())
         bot_name = data['bot_name']
         error_message = self.base_station.get_error_message(bot_name)
-        while not error_message:
-            error_message = self.base_station.get_error_message(bot_name)
-        if error_message == "Successful execution":
+        # no message yet
+        if not error_message:
+            error_json = {"error": "", "code": -1}
+        elif error_message == "Successful execution":
             error_json = {"error": error_message, "code": 1}
         else:
             error_json = {"error": error_message, "code": 0}

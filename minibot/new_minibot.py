@@ -36,7 +36,7 @@ else:
     import scripts.PiArduino as ece
     BOT_LIB_FUNCS = "PiArduino"
 
-p = "Empty process"
+current_process = None
 stop = False
 
 def parse_command(cmd, tcpInstance):
@@ -98,11 +98,11 @@ def parse_command(cmd, tcpInstance):
                 print("Exception occurred")
 
     elif key == "STOP":
-        global p
+        global current_process
         global stop
-        if (type(p) != str):
-            p.terminate()
-        p = "Empty process"
+        if current_process:
+            current_process.terminate()
+        process = None 
         stop = True
         print("Called inside parse_command from new_minibot.py, will print the value of stop in the next line")
         print(stop)
@@ -140,17 +140,17 @@ def spawn_script_process(scriptname):
     #     future = executor.submit(run_script, scriptname)
     #     return_value = future.result()
     #     return return_value
-    global p
+    global current_process
     global stop
     stop == False
     manager = Manager()
     output = manager.Value(c_char_p, "")
-    p = Process(target=run_script, args=(scriptname, output))
+    current_process = Process(target=run_script, args=(scriptname, output))
     print("Called inside spawn_script_process from new_minibot.py, will do p.start() next")
-    p.start()
+    current_process.start()
     while stop == False:
         if (output.value != ""):
-            p = "Empty process"
+            current_process = None
             return output.value
     print("Called inside spawn_script_process from new_minibot.py, means escape the while loop because stop = True")
     return "Terminate by command"
