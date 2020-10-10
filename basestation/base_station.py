@@ -269,7 +269,6 @@ class BaseStation:
         # TODO remove print
         print("Active bot " + str(type(self.active_bots[bot_id])))
         self.active_bots[bot_id].sendKV("WHEELS", direction)
-        print("Jim is moving wheel!!!")
         return True
 
     # def move_wings_bot(self, session_id, bot_id, power):

@@ -287,10 +287,8 @@ class ErrorMessageHandler(tornado.websocket.WebSocketHandler):
         if not error_message:
             error_json = {"error": "", "code": -1}
         elif error_message == "Successful execution":
-            print("BBBBB")
             error_json = {"error": error_message, "code": 1}
         else:
-            print("CCCCC")
             error_json = {"error": error_message, "code": 0}
         self.write(json.dumps(error_json).encode())
 
@@ -303,7 +301,6 @@ class StopHandler(tornado.websocket.WebSocketHandler):
         data = json.loads(self.request.body.decode())
         bot_name = data['bot_name']
 
-        print("REACHES STOP HANDLER!!!")
         bot_id = self.base_station.bot_name_to_bot_id(bot_name)
         bot = self.base_station.get_bot(bot_id)
         if bot:
