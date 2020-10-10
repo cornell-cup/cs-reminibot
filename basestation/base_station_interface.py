@@ -296,13 +296,16 @@ class HeartbeatHandler(tornado.websocket.WebSocketHandler):
         self.write(json.dumps(heartbeat_json).encode())
 
 
-class VoiceHandler(tornado.websocket.WebSocketHandler):
-    flag = False
-
+class SpeechRecognitionHandler(tornado.websocket.WebSocketHandler):
+    """ Handles start speech recognition and stop speech recognition 
+    requests from the WebGUI. """
     def initialize(self, base_station):
         self.base_station = base_station
 
     def get(self):
+        """ Gets the current status from the Speech Recognition system,
+        to be displayed on the WebGUI.  
+        """
         voice_server = self.base_station.voice_server
         message = voice_server.message.get_val() if voice_server else None
         # could be None because get_val can return None too
@@ -311,6 +314,8 @@ class VoiceHandler(tornado.websocket.WebSocketHandler):
         self.write(message)
 
     def post(self):
+        """ 
+        """
         data = json.loads(self.request.body.decode())
         key = data['key']
 
@@ -325,63 +330,49 @@ class VoiceHandler(tornado.websocket.WebSocketHandler):
             return
 
         if key == "START VOICE":  # start listening
-            print("starting voiceServer thread")
-            VoiceHandler.flag = True
             self.base_station.voice_server = StoppableThread(
-                self.voice_recognition, session_id, bot_id)
+                self.voice_recognition, session_id, bot_id
+            )
             self.base_station.voice_server.start()
         elif key == "STOP VOICE":
-            print("ending onBotVisionServer thread")
-            if (VoiceHandler.flag):
-                print("About to call base_station.voice_server.stop()")
+            if self.base_station.voice_server:
                 self.base_station.voice_server.stop()
-            else:
-                print("ERROR: No on bot vision server started")
 
     def voice_recognition(self, thread_safe_condition, thread_safe_message, session_id, bot_id):
         RECORDING_TIME_LIMIT = 5
+        # dictionary of commmands
         commands = {
             "forward": "Minibot moves forward",
             "backward": "Minibot moves backwards",
             "left": "Minibot moves left",
             "right": "Minibot moves right",
             "stop": "Minibot stops",
-            "object detection": "Minibot starts object detection mode",
-            "line follow": "Minibot starts line follow mode"
         }
         # open the Microphone as variable microphone
         with sr.Microphone() as microphone:
-            print("mic works")
             r = sr.Recognizer()
             while thread_safe_condition.get_val():
                 thread_safe_message.set_val("Say something!")
-                print("Say something!")
                 try:
                     # listen for 5 seconds
                     audio = r.listen(microphone, RECORDING_TIME_LIMIT)
                     thread_safe_message.set_val(
                         "Converting from speech to text")
-                    print("Converting from speech to text ...")
                     words = r.recognize_google(audio)
                     regex = re.compile('[^a-zA-Z]')  # removing punctuation
                     regex.sub('', words)
                     thread_safe_message.set_val("You said: " + words)
                     thread_safe_message.set_val(words)
-                    print("You said: " + words)
                     if words in commands:
                         thread_safe_message.set_val(commands[words])
-                        print(commands[words])
                         self.base_station.move_wheels_bot(
                             session_id, bot_id, words, 100)
                     else:
                         thread_safe_message.set_val("Invalid command")
-                        print("Invalid command")
                 except sr.WaitTimeoutError:
-                    print("timed out")
                     thread_safe_message.set_val("timed out")
                 except sr.UnknownValueError:
                     thread_safe_message.set_val("words not recognized")
-                    print("words not recognized")
                 time.sleep(2)
 
 
