@@ -59,7 +59,8 @@ class BaseInterface:
             ("/vision", VisionHandler, dict(base_station=self.base_station)),
             ("/heartbeat", HeartbeatHandler, dict(base_station=self.base_station)),
             ("/result", ErrorMessageHandler, dict(base_station=self.base_station)),
-            ("/voice", VoiceHandler, dict(base_station=self.base_station)),
+            ("/voice", SpeechRecognitionHandler,
+             dict(base_station=self.base_station)),
         ]
 
     def start(self):
@@ -299,6 +300,7 @@ class HeartbeatHandler(tornado.websocket.WebSocketHandler):
 class SpeechRecognitionHandler(tornado.websocket.WebSocketHandler):
     """ Handles start speech recognition and stop speech recognition 
     requests from the WebGUI. """
+
     def initialize(self, base_station):
         self.base_station = base_station
 
