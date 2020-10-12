@@ -21,14 +21,20 @@ MAX_VISION_LOG_LENGTH = 1000
 
 
 def make_thread_safe(func):
-    """ Decorator which wraps the specified function with an acquire and 
-    release call to the lock
+    """ Decorator which wraps the specified function with a lock.  This makes
+    sure that there aren't concurrent calls to the basestation functions.  The
+    reason we need this is because both SpeechRecognition and the regular 
+    movement buttons call basestation functions to make the Minibot move.  The
+    SpeechRecognition function runs in its own background thread.  We 
+    do not want the SpeechRecognition function calling the basestation functions
+    while the movement button requests are calling them.  Hence we protect 
+    the necessary basestation functions with a lock that is owned by the basestation
 
     Arguments:
          func: The function that will become thread safe
     """
     def decorated_func(*args, **kwargs):
-        #args[0] is self
+        # args[0] is self for any basestation member function
         assert isinstance(args[0], BaseStation)
         lock = args[0].lock
         lock.acquire()
