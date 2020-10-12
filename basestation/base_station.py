@@ -44,7 +44,7 @@ class BaseStation:
         self.active_sessions = {}
         self.active_playgrounds = {}
         self.vision_log = []
-        self.voice_server = None
+        self.speech_recog_thread = None
         self.lock = threading.Lock()
 
         self.__udp_connection = UDPConnection()

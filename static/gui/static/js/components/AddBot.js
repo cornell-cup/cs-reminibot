@@ -88,156 +88,135 @@ function PortsList(props) {
         </nav>
     );
 }
-class Voice extends React.Component {
+
+class SpeechRecognition extends React.Component {
+    /** Implements the SpeechRecognition Toggle button */
     constructor(props) {
-        super(props);
+        super();
         this.state = {
-            on: false
+            on: false // Indicates if button is on or off
         }
+        this.getSpeechRecognitionData = this.getSpeechRecognitionData.bind(this);
         this.toggle = this.toggle.bind(this);
-        this.getVoice = this.getVoice.bind(this);
-        this.voiceInterval = null;
-        this.max_messages = 4;
-        this.queue_color_index = 0;
+        // Number of messages to display in GUI
+        this.maxMessages = 4;
+        // Want to alternate the colors between odd and even messages
+        this.queueColorIndex = 0;
         this.queue = [""];
+        // Interval function to poll server backend
+        // TODO: Replace polling with WebSockets at some point
+        this.speechRecognitionInterval = null;
+
+        // colors for the messages in the feedback box
+        this.colors = ["#000080", "black"]
     }
 
+    /** Turns the button on or off */
     toggle() {
-        this.setState({
-            on: !this.state.on
-        });
-        // state doesn't change until after toggle()
-        this.getVoice(!this.state.on);
-    }
-
-    getVoice(isOn) {
         const _this = this;
-        console.log(isOn ? "START VOICE" : "STOP VOICE")
+        // If button was previously off, turn_on should be True.
+        let turnOn = !this.state.on;
 
-        if (isOn) {
-            this.voiceInterval = setInterval(this.getVoiceData.bind(this), 500);
+        // If we are turning the speech recognition service on, 
+        // start polling the backend server for status messages to be 
+        // displayed on the GUI
+        if (turnOn) {
+            this.speechRecognitionInterval = setInterval(
+                this.getSpeechRecognitionData.bind(this), 500
+            );
         }
+        // If we are turning the speech recognition service off, stop polling
+        // the backend
         else {
-            clearInterval(this.voiceInterval);
+            clearInterval(this.speechRecognitionInterval);
+            let feedbackBox = document.getElementById(
+                'speech_recognition_feedback_box'
+            );
+            feedbackBox.innerHTML = "";
+            this.queue = [""];
         }
 
+        // Tell the backend server to start / stop the speech recognition service 
         axios({
             method: 'POST',
-            url: '/voice',
+            url: '/speech_recognition',
             data: JSON.stringify({
-                key: isOn ? "START VOICE" : "STOP VOICE",
-                bot_name: this.props.selected_bot
+                command: turnOn ? "START" : "STOP",
+                bot_name: _this.props.selected_bot
             })
         }).then(function (response) {
             if (response.data) {
-                console.log(response.data);
+                console.log("Speech Recognition", response.data);
             }
         }).catch(function (error) {
-            // console.log(error);
+            console.log("Speech Recognition", error);
         })
 
+        this.setState({on: turnOn});
     }
 
-    getVoiceData() {
+    /** Get the messages from the speech recognition service from the
+     * backend server.
+     */
+    getSpeechRecognitionData() {
         const _this = this;
-        axios.get('/voice')
+        axios.get('/speech_recognition')
             .then(function (response) {
                 // only add to the message queue if the message is a new message
-                if (_this.queue[_this.queue.length - 1] !== response.data) {
+                // and is not an empty string
+                if (_this.queue[_this.queue.length - 1] !== response.data &&
+                    response.data !== "") {
                     // keep the message a fixed length
-                    if (_this.queue.length == _this.max_messages) {
+                    if (_this.queue.length == _this.maxMessages) {
                         _this.queue.shift();
                     }
                     _this.queue.push(response.data);
                     // flips the value of the index from 0 to 1 and vice-versa
-                    _this.queue_color_index = 1 - _this.queue_color_index;
+                    // to alternate the colors (see constructor for more
+                    // detailed documentation)
+                    _this.queueColorIndex = 1 - _this.queueColorIndex;
                 }
-                document.getElementById('voice_feedback').innerHTML = "";
+                let feedbackBox = document.getElementById(
+                    'speech_recognition_feedback_box'
+                );
+                feedbackBox.innerHTML = "";
+
+                // Iterate through the queue, adding each message to the 
+                // feedback box as a separate html paragraph (so that we can 
+                // style each message differently).  Iterate through the queue
+                // backwards so that the most recent messages show up first
                 for (let i = _this.queue.length - 1; i >= 0; i--) {
                     // make the first message bold
-                    let bold = (i == _this.queue.length - 1) ? "font-weight: bold;" : "";
+                    let bold = "font-weight: bold;";
                     // make new messages alternate colors
-                    let color = (i % 2 == _this.queue_color_index) ? "#000080" : "black";
-                    let p_start = "<p style=\"" + bold + "margin: 0; color:" + color + ";\">";
-                    let p_end = "</p>";
-                    document.getElementById('voice_feedback').innerHTML += p_start + _this.queue[i] + p_end;
+                    let color = (i % 2 == _this.queueColorIndex) ? 
+                        _this.colors[0] : _this.colors[1];
+
+                    // pargraph style
+                    let pFontWeight = (i == _this.queue.length - 1) ? bold : "";
+                    let pColor = "color: " + color + ";";
+                    let pMargin = "margin: 0;";
+                    let pStyle = pFontWeight + pMargin + pColor;
+                    let pStart = "<p style=\"" + pStyle + "\">";
+                    let pEnd = "</p>";
+                    let paragraph = pStart + _this.queue[i] + pEnd;
+                    feedbackBox.innerHTML += paragraph;
                 }
             }).catch(function (error) {
-                // console.log(error);
+                console.log("Speech Recognition", error);
             });
     }
 
     render() {
-        var x = "";
-        if (this.state.on) {
-            x = "Stop Voice";
-        }
-        else {
-            x = "Start Voice";
-        }
+        let x = (this.state.on) ? 
+            "Stop Speech Recognition" : "Start Speech Recognition";
         return (
             <div>
-                <button className="btn btn-primary element-wrapper" onClick={this.toggle}>{x}</button>
+                <button className="btn btn-primary element-wrapper" 
+                    onClick={this.toggle}>{x}</button>
             </div>
 
         );
-    }
-}
-
-/*
- *  A toggle button to turn on/off the on-bot vision system
- */
-class Toggle extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            on: false
-        }
-        this.toggle = this.toggle.bind(this);
-        this.getOnBotVision = this.getOnBotVision.bind(this);
-    }
-
-    toggle() {
-        this.getOnBotVision(this.state.on);
-        this.setState({
-            on: !this.state.on
-        });
-    }
-
-    getOnBotVision(isOn) {
-        const _this = this;
-        console.log(isOn ? "STOPBOTVISION" : "STARTBOTVISION")
-        axios({
-            method: 'POST',
-            url: '/onbotvision',
-            data: JSON.stringify({
-                key: isOn ? "STOPBOTVISION" : "STARTBOTVISION",
-                bot_name: this.props.selected_bot
-            })
-        })
-            .then(function (response) {
-                if (response.data) {
-                    console.log(response.data);
-                }
-            })
-            .catch(function (error) {
-                // console.log(error);
-            })
-    }
-
-    render() {
-        var x = "";
-        if (this.state.on) {
-            x = "Stop On-Bot Vision";
-        }
-        else {
-            x = "Start On-Bot Vision";
-        }
-        return (
-            <div>
-                <button className="btn btn-primary element-wrapper mr-1" onClick={this.toggle}>{x}</button>
-            </div>
-        )
     }
 }
 
@@ -611,16 +590,16 @@ export default class AddBot extends React.Component {
                 {/* button-wrapper is a custom class to add padding
                     the rest is bootstrap css */}
                 <div className="col horizontalDivCenter">
-                    <Voice selected_bot={this.props.selected_bot} float="right" />
+                    <SpeechRecognition selected_bot={this.props.selected_bot} 
+                        float="right" />
                 </div>
                 <div className="col horizontalDivCenter">
-                    <label id="voice_feedback" />
+                    <label id="speech_recognition_feedback_box" />
                 </div>
                 <br />
                 <br />
                 <div className="row">
                     <div className="col horizontalDivCenter">
-                        <Toggle selected_bot={this.props.selected_bot} />
                         <button className="btn btn-success element-wrapper mr-1" onClick={() => this.objectDetectionOnClick()}>Object Detection</button>
                         <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.lineFollowOnClick()}>Line Follow</button>
                     </div>
