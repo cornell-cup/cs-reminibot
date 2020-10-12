@@ -100,7 +100,15 @@ class SpeechRecognition extends React.Component {
         this.toggle = this.toggle.bind(this);
         // Number of messages to display in GUI
         this.maxMessages = 4;
-        // Want to alternate the colors between odd and even messages
+        // Used to alternate the colors between odd and even messages.  This is 
+        // so that when the messages are scrolling, the messages retain the 
+        // same color.  For example, let's say we have the messages ["a", b", 
+        // "c", "d"] and "a" and "c" are blue and "b" and "d" are black.  Hence,
+        // the odd-index messages are blue and the even-index are black. When we
+        // add "e" to the queue and pop "a", the queue will look like ["b", "c",
+        // "d", "e"].  We still want "b" and "d" to be black and "c" to be blue.
+        // Hence now we must make the even-index messages blue and the odd-index
+        // messages black. 
         this.queueColorIndex = 0;
         this.queue = [""];
         // Interval function to poll server backend
