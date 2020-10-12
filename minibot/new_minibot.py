@@ -37,7 +37,6 @@ else:
     BOT_LIB_FUNCS = "PiArduino"
 
 current_process = None
-stop = False
 
 
 def parse_command(cmd, tcpInstance):
@@ -48,6 +47,8 @@ def parse_command(cmd, tcpInstance):
          cmd (:obj:`str`): The command name.
          tcpInstance (:obj:`str`): Payload or contents of command.
     """
+    global current_process 
+
     comma = cmd.find(",")
     start = cmd.find("<<<<")
     end = cmd.find(">>>>")
@@ -59,7 +60,6 @@ def parse_command(cmd, tcpInstance):
     # our code execution pointer would get stuck in the infinite loop.
     if key == "WHEELS":
         if value == "forward":
-            print("Pam is moving forward???")
             Thread(target=ece.fwd, args=[50]).start()
         elif value == "backward":
             Thread(target=ece.back, args=[50]).start()
@@ -69,6 +69,9 @@ def parse_command(cmd, tcpInstance):
             Thread(target=ece.right, args=[50]).start()
         else:
             Thread(target=ece.stop).start()
+            if current_process is not None:
+                current_process.terminate()
+
     elif key == "MODE":
         if value == "object_detection":
             print("Object Detection")
@@ -94,14 +97,16 @@ def parse_command(cmd, tcpInstance):
                     file_dir + "/scripts/" + script_name, 'w+')
                 file.write(program)
                 file.close()
-                spawn_script_process(script_name, tcpInstance)
-            except Exception as exception:
-                print("Exception occurred")
-
-    elif key == "STOP":
-        if current_process is not None:
-            current_process.terminate()
-        stop = True
+                """
+                Run the Python program in a different process so that we don't
+                need to wait for it to terminate and we can kill it whenever 
+                we want.
+                """
+                time.sleep(0.1)
+                current_process = Process(target=run_script, args=(script_name, tcpInstance))
+                current_process.start()
+            except Exception:
+                pass
 
 
 def process_string(value):
@@ -123,26 +128,6 @@ def process_string(value):
     return program
 
 
-def spawn_script_process(scriptname, tcpInstance):
-    """
-    Creates a new thread to run the script process on.
-    Args:
-        scriptname (:obj:`str`): The name of the script to run.
-    """
-    time.sleep(0.1)
-
-    # with concurrent.futures.ThreadPoolExecutor() as executor:
-    #     future = executor.submit(run_script, scriptname)
-    #     return_value = future.result()
-    #     return return_value
-    stop == False
-    manager = Manager()
-    output = manager.Value(c_char_p, "")
-    global current_process 
-    current_process = Process(target=run_script, args=(scriptname, tcpInstance))
-    current_process.start()
-
-
 def run_script(scriptname, tcp_instance):
     """
     Loads a script and runs it.
@@ -159,13 +144,10 @@ def run_script(scriptname, tcp_instance):
         script = importlib.import_module(script_name)
         importlib.reload(script)
         script.run()
-        # output.value = "Successful execution"
         result = "Successful execution"
         tcp_instance.send_to_basestation("RESULT", result)
     except Exception as exception:
-        print("REACHES RUN_SCRIPT EXCEPTION")
         str_exception = str(type(exception)) + ": " + str(exception)
-        # output.value = str_exception
         result = str_exception
         tcp_instance.send_to_basestation("RESULT", result)
 

@@ -52,8 +52,7 @@ class BaseInterface:
             )),
             ("/vision", VisionHandler, dict(base_station=self.base_station)),
             ("/heartbeat", HeartbeatHandler, dict(base_station=self.base_station)),
-            ("/result", ErrorMessageHandler, dict(base_station=self.base_station)),
-            ("/stop", StopHandler, dict(base_station=self.base_station)),
+            ("/result", ErrorMessageHandler, dict(base_station=self.base_station))
         ]
 
     def start(self):
@@ -121,7 +120,6 @@ class ClientHandler(tornado.web.RequestHandler):
             direction = data['direction']
             power = str(data['power'])
             print("virsain wheels")
-
 
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             self.base_station.move_wheels_bot(
@@ -278,8 +276,12 @@ class ErrorMessageHandler(tornado.websocket.WebSocketHandler):
     def initialize(self, base_station):
         self.base_station = base_station
     
-
     def post(self):
+        """
+        Called by blockly.js to send Python error message back to the GUI.
+        For each Python program entered, blockly.js will repeatedly call
+        this function until error_json has code != -1.
+        """
         data = json.loads(self.request.body.decode())
         bot_name = data['bot_name']
         error_message = self.base_station.get_error_message(bot_name)
@@ -291,20 +293,6 @@ class ErrorMessageHandler(tornado.websocket.WebSocketHandler):
         else:
             error_json = {"error": error_message, "code": 0}
         self.write(json.dumps(error_json).encode())
-
-
-class StopHandler(tornado.websocket.WebSocketHandler):
-    def initialize(self, base_station):
-        self.base_station = base_station
-
-    def post(self):
-        data = json.loads(self.request.body.decode())
-        bot_name = data['bot_name']
-
-        bot_id = self.base_station.bot_name_to_bot_id(bot_name)
-        bot = self.base_station.get_bot(bot_id)
-        if bot:
-            bot.sendKV("STOP", "")
 
 
 if __name__ == "__main__":
