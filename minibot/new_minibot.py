@@ -1,7 +1,8 @@
 from hardware.communication.TCP import TCP
 
-from socket import *
+import socket
 from threading import Thread
+from typing import Tuple
 import struct
 import sys
 import time
@@ -11,15 +12,15 @@ import os
 import concurrent.futures
 
 # Create a UDP socket
-sock = socket(AF_INET, SOCK_DGRAM)
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 # can bind to the same port using the same ip address
-sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 # can broadcast messages to all
-sock.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
+sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
 # address 255.255.255.255 allows you to broadcast to all
 # ip addresses on the network
-server_address = ('255.255.255.255', 9434)
+port_address = ('255.255.255.255', 9434)
 message = 'i_am_a_minibot'
 
 # Bot library name is stored here
@@ -162,7 +163,7 @@ def start_base_station_heartbeat(ip_address):
         ip_address (:obj:`str`): The IP address of the server to contact
     """
     # Define broadcasting address and message
-    server_address = (ip_address, 5001)
+    port_address = (ip_address, 5001)
     heartbeat_message = 'Hello, I am a minibot!'
 
     # Send message and resend every 9 seconds
@@ -170,45 +171,50 @@ def start_base_station_heartbeat(ip_address):
         try:
             # Send data
             print('sending broadcast: "%s"' % heartbeat_message)
-            sent = sock.sendto(message.encode(), server_address)
+            sent = sock.sendto(message.encode(), port_address)
         except Exception as err:
             print(err)
         time.sleep(9)
 
+def ping_base_station(message: str) -> Tuple[bytes, Tuple[str, int]]:
+    """ Broadcasts a message to let the basestation know that
+    the Minibot is awake.  
+
+    Arguments:
+        message:  Message which informs the basestation that this is 
+            minibot.  TODO: NOT SECURE, need a better encryption service
+    """
+    print('sending: ' + message)
+    # broadcast message to everyone listening on the port
+    sock.sendto(message.encode(), port_address)
+    # Receive response
+    print('waiting to receive')
+    data, server = sock.recvfrom(4096)
+    return data, server
 
 def main():
     try:
         server_ip = None
 
         # continuously try to connect to the base station
-        isTimeOut = True
         while True:
             # try connecting to the basestation every sec until connection is made
-            sock.settimeout(1.0)
+            sock.settimeout(2.0)
 
-            # keep trying to connect even if the connection is timing out.
-            # isTimeOut only becomes False if the connection is successfully
-            # established.
-            while (isTimeOut):
-                try:
-                    # Send data
-                    print('sending: ' + message)
-                    sent = sock.sendto(message.encode(), server_address)
-                    # Receive response
-                    print('waiting to receive')
-                    data, server = sock.recvfrom(4096)
-                    isTimeOut = False
-                except Exception as err:
-                    print(err)
+            data = ""
+            try:
+                data, server = ping_base_station(message)
+            except socket.timeout as err:
+                print(err)
 
-            if data.decode('UTF-8') == 'i_am_the_base_station':
-                print('Received confirmation')
+            if not data:
+                continue
+            elif data.decode('UTF-8') == 'i_am_the_base_station':
                 server_ip = str(server[0])
                 print('Server ip: ' + server_ip)
                 break
             else:
-                print('Verification failed')
-                print('Trying again...')
+                print('Verification failed\n Trying again')
 
         base_station_thread = Thread(
             target=start_base_station_heartbeat, args=(server_ip,), daemon=True
