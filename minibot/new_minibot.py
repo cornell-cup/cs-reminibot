@@ -155,27 +155,6 @@ def run_script(scriptname):
         return str_exception
 
 
-def start_base_station_heartbeat(ip_address):
-    """
-    Starts the heartbeat messages to signal to the server that
-    a bot is still connected.
-    Args:
-        ip_address (:obj:`str`): The IP address of the server to contact
-    """
-    # Define broadcasting address and message
-    port_address = (ip_address, 5001)
-    heartbeat_message = 'Hello, I am a minibot!'
-
-    # Send message and resend every 9 seconds
-    while True:
-        try:
-            # Send data
-            print('sending broadcast: "%s"' % heartbeat_message)
-            sent = sock.sendto(message.encode(), port_address)
-        except Exception as err:
-            print(err)
-        time.sleep(9)
-
 def ping_base_station(message: str) -> Tuple[bytes, Tuple[str, int]]:
     """ Broadcasts a message to let the basestation know that
     the Minibot is awake.  
@@ -207,6 +186,7 @@ def main():
             except socket.timeout as err:
                 print(err)
 
+            # if no data was sent
             if not data:
                 continue
             elif data.decode('UTF-8') == 'i_am_the_base_station':
@@ -216,10 +196,6 @@ def main():
             else:
                 print('Verification failed\n Trying again')
 
-        base_station_thread = Thread(
-            target=start_base_station_heartbeat, args=(server_ip,), daemon=True
-        )
-        base_station_thread.start()
         tcp_instance = TCP()
         while True:
             time.sleep(0.01)
