@@ -36,14 +36,15 @@ class PythonEditor extends React.Component {
     this.state = {
       code: "",
       filename: "myPythonCode.py",
-      function_name: "default_function"
+      function_name: "default_function",
+      coding_start: -1
     }
 
     this.copy = this.copy.bind(this);
-//    this.download_python = this.download_python.bind(this);
+    this.download_python = this.download_python.bind(this);
     this.handleFileNameChange = this.handleFileNameChange.bind(this);
     this.handleFunctionNameChange = this.handleFunctionNameChange.bind(this);
-    // this.run_script = this.run_script.bind(this);
+    this.run_script = this.run_script.bind(this);
     this.upload = this.upload.bind(this);
     this.view_history = this.view_history.bind(this);
   }
@@ -56,6 +57,8 @@ class PythonEditor extends React.Component {
     return this.refs.editor.getCodeMirror();
   }
 
+  /* Target function for the button "Cope Code". Set the text
+       in the editing box according to blockly. */
   copy(event) {
     this.getEditor().setValue(generatedPythonFromBlocklyBox.innerText);
   }
@@ -89,75 +92,77 @@ class PythonEditor extends React.Component {
   }
 
 
-  // download_python(event) {
-  //   console.log("download listener");
-  //   event.preventDefault();
-  //   var element = document.createElement('a');
-  //   var filename = this.state.filename;
-  //   if (filename.substring(filename.length - 3) != ".py") {
-  //     filename += ".py";
-  //   }
-  //   element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(this.state.pythonTextBoxCode));
-  //   element.setAttribute('download', filename);
-  //   element.style.display = 'none';
-  //   document.body.appendChild(element);
-  //   element.click();
-  //   document.body.removeChild(element);
-  // }
-  //
-  // /* Target function for the button "Run Code". Send python code
-  //    in the editing box to backend. */
-  // run_script(event) {
-  //   var start_time = this.state.coding_start;
-  //   if (start_time != -1) {
-  //     var time = (new Date().getTime() - start_time) / 1000
-  //     document.getElementById("time").value = time.toString() + "s";
-  //     this.setState({coding_start : -1})
-  //   }
-  //
-  //   axios({
-  //     method: 'POST',
-  //     url: '/start',
-  //     data: JSON.stringify({
-  //       key: 'SCRIPTS',
-  //       value: this.state.pythonTextBoxCode,
-  //       bot_name: this.props.botName
-  //     }),
-  //   })
-  //     .then(function (response) {
-  //       // console.log(blockly.value);
-  //       console.log('sent script');
-  //     })
-  //     .catch(function (error) {
-  //       console.warn(error);
-  //     });
-  //
-  //   axios({
-  //     method: 'POST',
-  //     url: '/result',
-  //     data: JSON.stringify({
-  //       bot_name: this.props.botName
-  //     }),
-  //   })
-  //     .then((response) => {
-  //       console.log("The error message is: !!!")
-  //       console.log(response);
-  //       document.getElementById("errormessage").value = response.data["error"];
-  //       console.log(document.get)
-  //       if (response.data["code"] === 1) {
-  //         // lime green
-  //         document.getElementById("errormessage").style.color="#32CD32";
-  //       }
-  //       else {
-  //         // red
-  //         document.getElementById("errormessage").style.color="#FF0000";
-  //       }
-  //     })
-  //     .catch((err) => {
-  //       console.log(err)
-  //     })
-  //
-  // }
+  download_python(event) {
+    console.log("download listener");
+    event.preventDefault();
+    var element = document.createElement('a');
+    var filename = this.state.filename;
+    if (filename.substring(filename.length - 3) != ".py") {
+      filename += ".py";
+    }
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(this.state.code));
+    element.setAttribute('download', filename);
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  }
+
+  /* Target function for the button "Run Code". Send python code
+     in the editing box to backend. */
+  run_script(event) {
+    var start_time = this.state.coding_start;
+    if (start_time != -1) {
+      var time = (new Date().getTime() - start_time) / 1000
+      document.getElementById("time").value = time.toString() + "s";
+      this.setState({coding_start : -1})
+    }
+
+    console.log("called");
+
+    axios({
+      method: 'POST',
+      url: '/start',
+      data: JSON.stringify({
+        key: 'SCRIPTS',
+        value: this.state.code,
+        bot_name: this.props.botName
+      }),
+    })
+      .then(function (response) {
+        // console.log(blockly.value);
+        console.log('sent script');
+      })
+      .catch(function (error) {
+        console.warn(error);
+      });
+
+    axios({
+      method: 'POST',
+      url: '/result',
+      data: JSON.stringify({
+        bot_name: this.props.botName
+      }),
+    })
+      .then((response) => {
+        console.log("The error message is: !!!")
+        console.log(response);
+        document.getElementById("errormessage").value = response.data["error"];
+        console.log(document.get)
+        if (response.data["code"] === 1) {
+          // lime green
+          document.getElementById("errormessage").style.color="#32CD32";
+        }
+        else {
+          // red
+          document.getElementById("errormessage").style.color="#FF0000";
+        }
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+
+  }
 
   render() {
     var options = {
@@ -165,63 +170,66 @@ class PythonEditor extends React.Component {
       mode: 'python'
     };
     return (
-      <div id="Python">
-        <CodeMirror
-          ref="editor"
-          value={this.state.code}
-          onChange={(code) => this.updateCode(code)}
-          options={options}
-          style={{width: '1200px'}}
-        />
-        <div id="UpdateCustomFunction" className="horizontalDiv">
-          <LabeledTextBox
-            type={"text"}
-            name={"function_name"}
-            placeholder={"default_function"}
-            onChange={(event) => this.handleFunctionNameChange(event)}
-          />
-          <Button
-            id={"CBlock"}
-            onClick={() => this.props.custom_block(this.state.function_name, this.state.code)}
-            name={"Update Custom Block"}
-          />
-          <Button
-            id={"DBlock"}
-            onClick={() => { if (window.confirm('You Are Deleting Custom Block: '+this.state.function_name)) this.props.dblock(this.state.function_name) } }
-            name={"Delete Custom Block"}
-          />
-          <Button
-            id={"DBlockAll"}
-            onClick={() => { if (window.confirm('You Are Deleting All Custom Blocks')) this.props.dblockAll() } }
-            name={"Delete All Custom Blocks"}
+      <div id="Python" style={{display: "flex", flexDirection: "row"}}>
+        <div style={{"min-width": '600px', "border": "2px solid grey", "margin-right": "10px"}}>
+          <CodeMirror
+            ref="editor"
+            value={this.state.code}
+            onChange={(code) => this.updateCode(code)}
+            options={options}
           />
         </div>
-        <div id="PythonDownload" className="horizontalDiv">
-          <Button id={"download_python"} onClick={this.download_python} name={"Download"} />
-          <LabeledTextBox
-            type={"text"}
-            name={"filename"}
-            placeholder={"FileName.py"}
-            onChange={(event) => this.handleFileNameChange(event)}
-          />
-        </div>
-        <div id="AdditionalButtons" className="horizontalDiv">
-          <Button id={"run"} onClick={this.run_script} name={"Run"} />
-          <Button id={"history"} onClick={this.view_history} name={"View History"} />
-          <Button id={"copy"} onClick={this.copy} name={"Copy Code From Blockly"} />
-          <div> <textarea id = "errormessage" rows="1" cols="60" /></div>
-          <div> <textarea style={{ color: 'blue' }} id = "time" rows="1" cols="20" /></div>
-        </div>
-        <div id="PythonUpload" className="horizontalDiv">
-          <form>
-            <input
-              type="file"
-              id="upload"
-              multiplesize="1"
-              accept=".py"
-              onChange={this.upload}
+        <div style={{"min-width": '600px'}}>
+          <div id="UpdateCustomFunction" className="horizontalDiv">
+            <LabeledTextBox
+              type={"text"}
+              name={"function_name"}
+              placeholder={"default_function"}
+              onChange={(event) => this.handleFunctionNameChange(event)}
             />
-          </form>
+            <Button
+              id={"CBlock"}
+              onClick={() => this.props.custom_block(this.state.function_name, this.state.code)}
+              name={"Update Custom Block"}
+            />
+            <Button
+              id={"DBlock"}
+              onClick={() => { if (window.confirm('You Are Deleting Custom Block: '+this.state.function_name)) this.props.dblock(this.state.function_name) } }
+              name={"Delete Custom Block"}
+            />
+            <Button
+              id={"DBlockAll"}
+              onClick={() => { if (window.confirm('You Are Deleting All Custom Blocks')) this.props.dblockAll() } }
+              name={"Delete All Custom Blocks"}
+            />
+          </div>
+          <div id="PythonDownload" className="horizontalDiv">
+            <Button id={"download_python"} onClick={this.download_python} name={"Download"} />
+            <LabeledTextBox
+              type={"text"}
+              name={"filename"}
+              placeholder={"FileName.py"}
+              onChange={(event) => this.handleFileNameChange(event)}
+            />
+          </div>
+          <div id="AdditionalButtons" className="horizontalDiv">
+            <Button id={"run"} onClick={this.run_script} name={"Run"} />
+            <Button id={"history"} onClick={this.view_history} name={"View History"} />
+            <Button id={"copy"} onClick={this.copy} name={"Copy Code From Blockly"} />
+            <div> <textarea id = "errormessage" rows="1" cols="60" /></div>
+            <div> <textarea style={{ color: 'blue' }} id = "time" rows="1" cols="20" /></div>
+          </div>
+          <div id="PythonUpload" className="horizontalDiv">
+            <form>
+              <input
+                type="file"
+                id="upload"
+                multiplesize="1"
+                accept=".py"
+                onChange={this.upload}
+              />
+            </form>
+          </div>
         </div>
       </div>
     )
