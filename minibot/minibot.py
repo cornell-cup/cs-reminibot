@@ -25,13 +25,19 @@ else:
 class Minibot: 
     """ Represents a minibot.  Handles all communication with the basestation
     as well as executing commands sent by the basestation.
-    Note: sock stands for socket throughout this file
+
+    Note: sock stands for socket throughout this file.  A socket is one endpoint
+        of a communication channel. 
     """
 
     # address refers to ip_address and port
     BROADCAST_ADDRESS = ('255.255.255.255', 9434)
     MINIBOT_MESSAGE = "i_am_a_minibot"
     BASESTATION_MESSAGE = "i_am_the_basestation"
+    # 1024 bytes
+    SOCKET_BUFFER_SIZE = 1024
+    START_CMD_TOKEN = "<<<<"
+    END_CMD_TOKEN = ">>>>"
 
     def __init__(self):
         # Create a UDP socket.  We want to establish a TCP (reliable) connection
@@ -73,18 +79,23 @@ class Minibot:
         self.readable_socks.append(self.listener_sock)
         self.errorable_socks.append(self.listener_sock)
         while True:
+            # if the listener socket is the only socket alive, we need to 
+            # broadcast a message to the basestation to set up a new connection
+            # with us (the minibot)
             if len(self.readable_socks) == 1:
                 self.broadcast_to_base_station()
-            # select returns the list of sockets that are read ready (have
+            # select returns new lists of sockets that are read ready (have
             # received data), write ready (have initialized their buffers, and
             # are ready to be written to), or errored out (have thrown an error) 
             # select returns as soon as it detects some activity on one or more
-            # of these sockets, or if the timeout time has elapsed
+            # of the sockets in the lists passed to it, or if the timeout time 
+            # has elapsed
+            time.sleep(1)
             read_ready_socks, write_ready_socks, errored_out_socks = select(
                 self.readable_socks, 
                 self.writable_socks, 
                 self.errorable_socks, 
-                1, # timeout
+                1, # timeout time
             )
             self.handle_readable_socks(read_ready_socks)
             self.handle_writable_socks(write_ready_socks)
@@ -163,13 +174,13 @@ class Minibot:
             # If its a connection socket, receive the data and execute the
             # necessary command
             else:
-                data = sock.recv(1024).decode("utf-8")
+                data = sock.recv(Minibot.SOCKET_BUFFER_SIZE).decode("utf-8")
                 print(f"Data {data}")
                 # if the socket receives "", it means the socket was closed
                 # from the other end, so close this endpoint too
                 if not data:
                     self.close_sock(sock)
-                Minibot.parse_command(data)
+                Minibot.parse_and_execute_commands(data)
                 # TODO need to write back saying that the command executed
                 # successfully
 
@@ -194,20 +205,42 @@ class Minibot:
     
 
     @staticmethod
-    def parse_command(cmd):
-        """
-        Parses command sent by SendKV via TCP to the bot.
-        Sent from BaseStation.
-        Args:
-             cmd (:obj:`str`): The command name.
-             tcpInstance (:obj:`str`): Payload or contents of command.
-        """
-        comma = cmd.find(",")
-        start = cmd.find("<<<<")
-        end = cmd.find(">>>>")
-        key = cmd[start + 4:comma]
-        value = cmd[comma + 1:end]
+    def parse_and_execute_commands(data_str: str):
+        """ Parses the data string into individual commands.  
 
+        Arguments: 
+            data_str: The raw data that we receive from the socket.
+
+        Example: 
+            If the data_str is 
+            "<<<<WHEELS,forward>>>><<<<WHEELS,backward>>>><<<<WHEELS,stop>>>>"
+            the commands will be parsed and executed as:
+
+            1. WHEELS, forward
+            2. WHEELS, backward
+            3. WHEELS, stop
+        """
+        while len(data_str) > 0:
+            comma = data_str.find(",")
+            start = data_str.find(Minibot.START_CMD_TOKEN)
+            end = data_str.find(Minibot.END_CMD_TOKEN)
+
+            token_len = len(Minibot.START_CMD_TOKEN)
+            key = data_str[start + token_len:comma]
+            value = data_str[comma + 1:end]
+            # executes command with key,value
+            Minibot.execute_command(key, value) 
+            # shrink the data_str with the remaining portion of the commands
+            data_str = data_str[end + token_len:]
+
+    @staticmethod
+    def execute_command(key: str, value: str ):
+        """ Executes a command using the given key-value pair 
+
+        Arguments:
+                key: type of the command
+                value: command to be executed
+        """
         # All ECE commands need to be called under separate threads because each
         # ECE function contains an infinite loop.  This is because there was 
         # data loss between the Raspberry Pi and the Arduino which is why the 
@@ -216,17 +249,18 @@ class Minibot:
         # is fixed, we can implement a regular solution. If we did not have the 
         # threads, our code execution pointer would get stuck in the infinite loop.
         if key == "WHEELS":
-            # TODO implement the code below using dictionaries
-            if value == "forward":
-                Thread(target=ece.fwd, args=[50]).start()
-            elif value == "backward":
-                Thread(target=ece.back, args=[50]).start()
-            elif value == "left":
-                Thread(target=ece.left, args=[50]).start()
-            elif value == "right":
-                Thread(target=ece.right, args=[50]).start()
+            cmds_functions_map = {
+                "forward": ece.fwd, 
+                "backward": ece.back, 
+                "left": ece.left,
+                "right": ece.right,
+            }
+            if value in cmds_functions_map:
+                # TODO use the appropriate power arg instead of 50 when that's implemented
+                Thread(target=cmds_functions_map[value], args=[50]).start()
             else:
                 Thread(target=ece.stop).start()
+            
         elif key == "MODE":
             if value == "object_detection":
                 print("Object Detection")
@@ -258,6 +292,7 @@ class Minibot:
                     print("Exception occurred at compile time")
                     str_exception = str(type(exception)) + ": " + str(exception)
                     return str_exception
+
 
     @staticmethod
     def process_string(value):

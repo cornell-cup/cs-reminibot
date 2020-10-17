@@ -27,15 +27,15 @@ class BaseStation:
 
         # Send a message on a specific port so that the minibots can discover the ip address
         # of the computer that the BaseStation is running on.
-        self.broadcast_ip_thread = threading.Thread(
-            target=self.broadcast_ip, daemon=True
+        self.listen_for_minibot_broadcast_thread = threading.Thread(
+            target=self.listen_for_minibot_broadcast, daemon=True
         )
 
         self.vision_monitior_thread = threading.Thread(
             target=self.vision_monitior, daemon=True
         )
 
-        self.broadcast_ip_thread.start()
+        self.listen_for_minibot_broadcast_thread.start()
         self.vision_monitior_thread.start()
         self.basestation_key = ""
     # ==================== ID GENERATOR ====================
@@ -95,17 +95,13 @@ class BaseStation:
 
     # ==================== BOTS ====================
 
-    def broadcast_ip(self):
-        """ Broadcasts ip address of the computer that the BaseStation is running on
-        so that other minibots can connect to the BaseStation.
-
-        Returns: None
+    def listen_for_minibot_broadcast(self):
+        """ Listens for the Minibot to broadcast a message to figure out the 
+        Minibot's ip address.
 
         Author: virenvshah (code taken from link below)
             https://github.com/jholtmann/ip_discovery
         """
-        print("IP broadcast starting")
-
         # initialize the socket, AF_INET for IPv4 addresses,
         # SOCK_DGRAM for UDP connections
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
