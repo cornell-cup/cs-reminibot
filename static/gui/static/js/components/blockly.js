@@ -49,20 +49,23 @@ class PythonEditor extends React.Component {
     this.view_history = this.view_history.bind(this);
   }
 
+  /* Updates this class's state to contain the code specified in the parameter*/
   updateCode(code)  {
     this.setState({code});
   }
 
+  /* Returns the CodeMirror editor object */
   getEditor() {
     return this.refs.editor.getCodeMirror();
   }
 
-  /* Target function for the button "Cope Code". Set the text
+  /* Target function for the button "Copy Code". Set the text
        in the editing box according to blockly. */
   copy(event) {
     this.getEditor().setValue(generatedPythonFromBlocklyBox.innerText);
   }
 
+  /* Function called whenver the custom function name is changed. */
   handleFunctionNameChange(event) {
     var _this = this;
     var item = _this.props.customBlockList.find(element => element[0] === event.target.value);
@@ -77,6 +80,8 @@ class PythonEditor extends React.Component {
     this.setState({ filename: event.target.value });
   }
 
+  /* Target function for the button "Choose File". Uploads the file specified
+        and updates the editor-code. */
   upload(event) {
     var _this = this;
     var file = event.target.files[0];
@@ -91,7 +96,8 @@ class PythonEditor extends React.Component {
     window.open("http://127.0.0.1:5000/program/")
   }
 
-
+  /* Target function for the button "Download". Downlaods the code in the
+      editor as a python file with name as specified */
   download_python(event) {
     console.log("download listener");
     event.preventDefault();
