@@ -5,6 +5,7 @@ Base Station for the MiniBot.
 # external
 from random import choice
 from string import digits, ascii_lowercase, ascii_uppercase
+from bot import Bot
 import socket
 import sys
 import time
@@ -12,8 +13,6 @@ import threading
 
 # internal
 # from connection.base_connection import BaseConnection
-from bot.pi_bot import PiBot
-from bot.sim_bot import SimBot
 from session.session import Session
 
 MAX_VISION_LOG_LENGTH = 1000
@@ -129,7 +128,7 @@ class BaseStation:
             if data == request_password:
                 # Tell the minibot that you are the base station
                 sock.sendto(response.encode(), address)
-                self.add_bot(port=10000, type="PIBOT", ip=address[0])
+                self.add_bot(port=10000, ip_address=address[0])
 
     def get_active_bots_names(self):
         """
@@ -138,9 +137,9 @@ class BaseStation:
         Returns:
             (list<str>): List of IDs of all active bots.
         """
-        return list([bot.get_name() for _, bot in self.active_bots.items()])
+        return list([bot.name for _, bot in self.active_bots.items()])
 
-    def add_bot(self, port, type, ip=None, bot_name=None):
+    def add_bot(self, port, ip_address, bot_name=None):
         """
         Adds a bot to the list of active bots, if the connection
         is established successfully.
@@ -155,21 +154,11 @@ class BaseStation:
         """
         bot_id = self.generate_id()
         if not bot_name:
-            bot_name = "minibot" + ip[len(ip)-3:].replace('.', '')
+            bot_name = "minibot" + ip_address[len(ip_address)-3:].replace('.', '')
 
-        if type == "PIBOT":
-            new_bot = PiBot(bot_id, bot_name, True, ip, port)
-        elif type == "SIMBOT":
-            new_bot = SimBot()
-
+        new_bot = Bot(bot_id, bot_name, ip_address, port)
         self.active_bots[bot_id] = new_bot
 
-        if new_bot.is_active():
-            return new_bot.get_id()
-        else:
-            del new_bot
-            raise Exception("The connection was not active. Not adding the "
-                            + "bot.")
 
     def remove_bot(self, bot_id):
         """
@@ -194,7 +183,7 @@ class BaseStation:
 
         """
         for bot_id, bot in self.active_bots.items():
-            if bot.get_name() == bot_name:
+            if bot.name == bot_name:
                 return bot_id
         return None
 
@@ -240,7 +229,7 @@ class BaseStation:
         """
         Returns a list of the ip addresses of all active bots.
         """
-        return {bot.get_ip(): bot.get_id() for _, bot in self.active_bots.items()}
+        return {bot.get_ip(): bot.id for _, bot in self.active_bots.items()}
 
     def get_bot_sessions(self, bot_id):
         """
@@ -301,16 +290,6 @@ class BaseStation:
         self.active_sessions[session_id] = Session(session_id)
         return session_id
 
-    def remove_session(self, session_id):
-        """
-        Removes a session from active_sessions
-
-        Args:
-            session_id (str): a unique id
-        """
-        del self.active_sessions[session_id]
-        return session_id not in self.active_sessions
-
     def add_bot_to_session(self, session_id, bot_name):
         """
         Adds bot id to session given session id and bot name.
@@ -330,7 +309,7 @@ class BaseStation:
         bot_id = self.bot_name_to_bot_id(bot_name)
         if bot_id in self.active_bots:
             bot = self.active_bots[bot_id]
-            return self.active_sessions[session_id].add_bot_id_to_session(bot.get_id())
+            return self.active_sessions[session_id].add_bot_id_to_session(bot.id)
         else:
             return False
 
@@ -354,28 +333,6 @@ class BaseStation:
         if self.basestation_key == "":
             self.basestation_key = self.generate_id()
         return self.basestation_key
-
-    def get_bots_info(self):
-        """
-        Returns information on every active bot with newline
-        """
-        bot_info = ""
-        for bot_id, bot in self.active_bots.items():
-            # "^" used for split function on frontend
-            sessions = []
-            for session_id in self.get_bot_sessions(bot_id):
-                sessions.append((session_id, "Connected " +
-                                 self.active_sessions[session_id].get_time_connected_to_bot_id(bot_id)))
-
-            bot_info = bot_info + "Name:^ " + str(bot.get_name()) + "\n" \
-                + "Id:^ " + str(bot.get_id()) + "\n" \
-                + "Private?:^ " + str(bot.get_is_private()) + "\n" \
-                + "IP:^ " + str(bot.get_ip()) + "\n" \
-                + "Port:^ " + str(bot.get_port()) + "\n" \
-                + "Sessions:^ " + str(sessions) + "\n" + "\n"
-        return bot_info
-
-    
 
     def get_error_message(self, bot_name):
         bot_id = self.bot_name_to_bot_id(bot_name)

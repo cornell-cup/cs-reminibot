@@ -1,8 +1,7 @@
-from TCP import MinibotTCPConnection as TCP
 from select import select
 from socket import socket, timeout, AF_INET, SOCK_STREAM, SOCK_DGRAM 
 from socket import SOL_SOCKET, SO_REUSEADDR, SO_BROADCAST
-from typing import Tuple
+from typing import List, Tuple
 import struct
 import sys
 import time
@@ -24,6 +23,11 @@ else:
 
 
 class Minibot: 
+    """ Represents a minibot.  Handles all communication with the basestation
+    as well as executing commands sent by the basestation.
+    Note: sock stands for socket throughout this file
+    """
+
     # address refers to ip_address and port
     BROADCAST_ADDRESS = ('255.255.255.255', 9434)
     MINIBOT_MESSAGE = "i_am_a_minibot"
@@ -40,6 +44,10 @@ class Minibot:
         # listens for a TCP connection from the basestation
         self.listener_sock = None
 
+        # Note:  The same socket can be in the readable_socks, writeable_socks
+        # and errorable_socks i.e. the intersection of these lists does not need
+        # to be (and will almost never be) the empty set
+
         # contains sockets which we are expecting to receive some data on
         self.readable_socks = []
         # contains sockets which we want to send some data on
@@ -50,6 +58,140 @@ class Minibot:
         self.sock_lists = [
             self.readable_socks, self.writable_socks, self.errorable_socks
         ]
+
+    def main(self):
+        """ Implements the main activity loop for the Minibot.  This activity 
+        loop continuously listens for commands from the basestation, and 
+        connects/reconnects to the basestation if there is no connection.
+        """
+        self.create_listener_sock()
+        # Add listener sock to input_socks so that we are alerted if any connections
+        # are trying to be created and add listener sock to errorable_socks so that 
+        # we are alerted if an error gets thrown by this listener sock.  No need to 
+        # add the listener sock to writable socks because we won't be writing to 
+        # this socket, only listening.
+        self.readable_socks.append(self.listener_sock)
+        self.errorable_socks.append(self.listener_sock)
+        while True:
+            if len(self.readable_socks) == 1:
+                self.broadcast_to_base_station()
+            # select returns the list of sockets that are read ready (have
+            # received data), write ready (have initialized their buffers, and
+            # are ready to be written to), or errored out (have thrown an error) 
+            # select returns as soon as it detects some activity on one or more
+            # of these sockets, or if the timeout time has elapsed
+            read_ready_socks, write_ready_socks, errored_out_socks = select(
+                self.readable_socks, 
+                self.writable_socks, 
+                self.errorable_socks, 
+                timeout=1,
+            )
+            self.handle_readable_socks(read_ready_socks)
+            self.handle_writable_socks(write_ready_socks)
+            self.handle_errorable_socks(errored_out_socks)
+
+    def create_listener_sock(self):
+        """ Creates a socket that listens for TCP connections from the 
+        basestation.
+        """
+        self.listener_sock = socket(AF_INET, SOCK_STREAM)
+        # "" means bind to all addresses on this device.  Port 10000 was 
+        # randomly chosen as the port to bind to
+        self.listener_sock.bind(("", 10000))
+        # Make socket start listening
+        print("Waiting for TCP connection from basestation")
+        self.listener_sock.listen()
+
+    def broadcast_to_base_station(self):
+        """ Establishes a TCP connection to the basestation.  This connection is 
+        used to receive commands from the basestation, and send replies if necessary
+        """
+        print("Broadcasting message to basestation.")
+        # try connecting to the basestation every 2 sec until connection is made
+        self.broadcast_sock.settimeout(2.0)
+        data = ""
+        # broadcast message to basestation
+        try:
+            message_byte_str = Minibot.MINIBOT_MESSAGE.encode()
+            # use sendto() instead of send() for UDP
+            self.broadcast_sock.sendto(
+                message_byte_str, Minibot.BROADCAST_ADDRESS
+            )
+            data = self.broadcast_sock.recv(4096)
+        except timeout:
+            print("Timed out")
+            
+        # TODO this security policy is stupid.  We should be doing 
+        # authentication after we create the TCP connection and also we should
+        # be using some service like WebAuth to obtain a shared key to encrypt
+        # messages.  Might be a fun project to work on at some point but not
+        # necessary for a functional Minibot system, but necessary for a secure
+        # Minibot system.
+        if data:
+            if data.decode('UTF-8') == 'i_am_the_base_station':
+                print("Basestation replied!")
+            else:
+                # if verification fails we just print but don't do anything
+                # about the fact that verification failed.  Please fix when
+                # rewriting the security policy
+                print('Verification failed.')
+
+    def handle_readable_socks(self, read_ready_socks: List[socket]):
+        """ Reads from each of the sockets that have received some data.  
+        If a listener socket received data, we accept the incoming connection.
+        If a connection socket received data, we parse and execute, 
+        the incoming command.
+
+        Arguments:
+            read_ready_socks: All sockets that have received data and are ready
+                to be read from.
+        """
+        for sock in read_ready_socks:
+            # If its a listener socket, accept the incoming connection
+            if sock is self.listener_sock:
+                connection, base_station_addr = sock.accept()
+                print(
+                    f"Connected to base station with address {base_station_addr}"
+                )
+                # set to non-blocking reads (when we call connection.recv, 
+                # should read whatever is in its buffer and return immediately)
+                connection.setblocking(0)
+                # we don't need to write anything right now, so don't add to 
+                # writable socks
+                self.readable_socks.append(connection)
+                self.errorable_socks.append(connection)
+            # If its a connection socket, receive the data and execute the
+            # necessary command
+            else:
+                data = sock.recv(1024).decode("utf-8")
+                print(f"Data {data}")
+                # if the socket receives "", it means the socket was closed
+                # from the other end, so close this endpoint too
+                if not data:
+                    self.close_sock(sock)
+                Minibot.parse_command(data)
+                # TODO need to write back saying that the command executed
+                # successfully
+
+    def handle_writable_socks(self, write_ready_socks):
+        """ TODO
+        """
+        for sock in write_ready_socks:
+            pass # TODO
+
+    def handle_errorable_socks(self, errored_out_socks):
+        """ TODO
+        """
+        for sock in errored_out_socks:
+            self.close_sock(sock) # TODO handle more conditions instead of just
+            # closing the socket
+
+    def close_sock(self, sock):
+        for sock_list in self.sock_lists:
+            if sock in sock_list:
+                sock_list.remove(sock)
+        sock.close()
+    
 
     @staticmethod
     def parse_command(cmd):
@@ -102,7 +244,7 @@ class Minibot:
             if len(value) > 0:
                 try:
                     script_name = "bot_script.py"
-                    program = process_string(value)
+                    program = Minibot.process_string(value)
 
                     # file_dir is the path to folder this file is in
                     file_dir = os.path.dirname(os.path.realpath(__file__))
@@ -110,7 +252,7 @@ class Minibot:
                         file_dir + "/scripts/" + script_name, 'w+')
                     file.write(program)
                     file.close()
-                    return_value = spawn_script_process(script_name)
+                    return_value = Minibot.spawn_script_process(script_name)
                     return return_value
                 except Exception as exception:
                     print("Exception occurred at compile time")
@@ -118,7 +260,7 @@ class Minibot:
                     return str_exception
 
     @staticmethod
-    def process_string(self, value):
+    def process_string(value):
         """
         Function from /minibot/main.py. Encases programs in a function
         called run(), which can later be ran when imported via the
@@ -144,6 +286,7 @@ class Minibot:
             scriptname (:obj:`str`): The name of the script to run.
         """
         time.sleep(0.1)
+        run_script = None # TODO merge with Ruiqi's branch for his fix
 
         with concurrent.futures.ThreadPoolExecutor() as executor:
             future = executor.submit(run_script, scriptname)
@@ -174,110 +317,6 @@ class Minibot:
             print(str(exception))
             str_exception = str(type(exception)) + ": " + str(exception)
             return str_exception
-
-    def broadcast_to_base_station(self):
-        """ Establishes a TCP connection to the basestation.  This connection is 
-        used to receive commands from the basestation, and send replies if necessary
-        """
-        print("Broadcasting message to basestation.")
-        # try connecting to the basestation every 2 sec until connection is made
-        self.broadcast_sock.settimeout(2.0)
-        data = ""
-        # broadcast message to basestation
-        try:
-            message_byte_str = Minibot.MINIBOT_MESSAGE.encode()
-            # use sendto() instead of send() for UDP
-            self.broadcast_sock.sendto(
-                message_byte_str, Minibot.BROADCAST_ADDRESS
-            )
-            data = self.broadcast_sock.recv(4096)
-        except timeout:
-            print("Timed out")
-            
-        # TODO this security policy is stupid.  We should be doing 
-        # authentication after we create the TCP connection and also we should
-        # be using some service like WebAuth to obtain a shared key to encrypt
-        # messages.  Might be a fun project to work on at some point but not
-        # necessary for a functional Minibot system, but necessary for a secure
-        # Minibot system.
-        if data:
-            if data.decode('UTF-8') == 'i_am_the_base_station':
-                print("Basestation replied!")
-            else:
-                # if verification fails we just print but don't do anything
-                # about the fact that verification failed.  Please fix when
-                # rewriting the security policy
-                print('Verification failed.')
-
-    def create_listener_sock(self):
-        self.listener_sock = socket(AF_INET, SOCK_STREAM)
-        # "" means bind to all addresses on this device.  Port 10000 was 
-        # randomly chosen as the port to bind to
-        self.listener_sock.bind(("", 10000))
-        # Make socket start listening
-        print("Waiting for TCP connection from basestation")
-        self.listener_sock.listen()
-    
-    def close_sock(self, sock):
-        for sock_list in self.sock_lists:
-            if sock in sock_list:
-                sock_list.remove(sock)
-        sock.close()
-
-
-    def handle_readable_socks(self, read_ready_socks):
-        for sock in read_ready_socks:
-            if sock is self.listener_sock:
-                connection, base_station_addr = sock.accept()
-                print(
-                    f"Connected to base station with address {base_station_addr}"
-                )
-                # set to non-blocking reads
-                connection.setblocking(0)
-                self.readable_socks.append(connection)
-                self.errorable_socks.append(connection)
-            # If its a connection socket, receive the data from 
-            else:
-                data = sock.recv(1024).decode("utf-8")
-                print(f"Data {data}")
-                # if the socket receives "", it means the socket was closed
-                # from the other end, so close this endpoint too
-                if not data:
-                    self.close_sock(sock)
-                Minibot.parse_command(data)
-                # TODO need to write back saying that the command executed
-                # successfully
-    
-    def handle_writable_socks(self, write_ready_socks):
-        for sock in write_ready_socks:
-            pass
-    
-    def handle_errorable_socks(self, errored_out_socks):
-        for sock in errored_out_socks:
-            self.close_sock(sock)
-
-    def main(self):
-        # Note: sock stands for socket
-        self.create_listener_sock()
-        # Add listener sock to input_socks so that we are alerted if any connections
-        # are trying to be created and add listener sock to errorable_socks so that 
-        # we are alerted if an error gets thrown by this listener sock.  No need to 
-        # add the listener sock to writable socks because we won't be writing to 
-        # this socket, only listening.
-        self.readable_socks.append(self.listener_sock)
-        self.errorable_socks.append(self.listener_sock)
-        while True:
-            if len(self.readable_socks) == 1:
-                self.broadcast_to_base_station()
-            # select returns the list of sockets that are read ready, write ready,
-            # or have thrown an error as soon as it detects some activity on any
-            # of these sockets
-            read_ready_socks, write_ready_socks, errored_out_socks = select(
-                self.readable_socks, self.writable_socks, self.errorable_socks, 1
-            )
-            self.handle_readable_socks(read_ready_socks)
-            self.handle_writable_socks(write_ready_socks)
-            self.handle_errorable_socks(errored_out_socks)
 
 
 if __name__ == "__main__":

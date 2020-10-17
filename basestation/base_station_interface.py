@@ -189,7 +189,7 @@ class ClientHandler(tornado.web.RequestHandler):
             bot = self.base_station.get_bot(bot_id)
             if bot:
                 bot.sendKV("BOTSTATUS", '')
-                self.write(json.dumps(bot.tcp_listener_thread.status).encode())
+                #TODO: implement a fix here
 
     def send_program(self, bot, program):
         """
