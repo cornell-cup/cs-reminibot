@@ -84,7 +84,7 @@ class Minibot:
                 self.readable_socks, 
                 self.writable_socks, 
                 self.errorable_socks, 
-                timeout=1,
+                1, # timeout
             )
             self.handle_readable_socks(read_ready_socks)
             self.handle_writable_socks(write_ready_socks)
