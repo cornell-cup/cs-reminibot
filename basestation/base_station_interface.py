@@ -51,7 +51,6 @@ class BaseInterface:
                 send_blockly_remote_server=send_blockly_remote_server,
             )),
             ("/vision", VisionHandler, dict(base_station=self.base_station)),
-            ("/heartbeat", HeartbeatHandler, dict(base_station=self.base_station)),
             ("/result", ErrorMessageHandler, dict(base_station=self.base_station))
         ]
 
@@ -276,17 +275,6 @@ class VisionHandler(tornado.websocket.WebSocketHandler):
     def post(self):
         info = json.loads(self.request.body.decode())
         self.base_station.update_vision_log(info)
-
-
-class HeartbeatHandler(tornado.websocket.WebSocketHandler):
-    def initialize(self, base_station):
-        self.base_station = base_station
-
-    def get(self):
-        time_interval = 1
-        is_heartbeat = self.base_station.is_heartbeat_recent(time_interval)
-        heartbeat_json = {"is_heartbeat": is_heartbeat}
-        self.write(json.dumps(heartbeat_json).encode())
 
 
 class ErrorMessageHandler(tornado.websocket.WebSocketHandler):
