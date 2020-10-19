@@ -67,8 +67,8 @@ class PythonEditor extends React.Component {
 
   /* Function called whenver the custom function name is changed. */
   handleFunctionNameChange(event) {
-    var _this = this;
-    var item = _this.props.customBlockList.find(element => element[0] === event.target.value);
+    const _this = this;
+    const item = _this.props.customBlockList.find(element => element[0] === event.target.value);
     if (item != undefined) {
       this.getEditor().setValue(item[1]);
     }
@@ -83,9 +83,9 @@ class PythonEditor extends React.Component {
   /* Target function for the button "Choose File". Uploads the file specified
         and updates the editor-code. */
   upload(event) {
-    var _this = this;
-    var file = event.target.files[0];
-    var reader = new FileReader();
+    const _this = this;
+    const file = event.target.files[0];
+    const reader = new FileReader();
     reader.onload = function (event) {
       _this.getEditor().setValue(event.target.result);
     };
@@ -96,13 +96,13 @@ class PythonEditor extends React.Component {
     window.open("http://127.0.0.1:5000/program/")
   }
 
-  /* Target function for the button "Download". Downlaods the code in the
+  /* Target function for the button "Download". Downloads the code in the
       editor as a python file with name as specified */
   download_python(event) {
     console.log("download listener");
     event.preventDefault();
-    var element = document.createElement('a');
-    var filename = this.state.filename;
+    const element = document.createElement('a');
+    let filename = this.state.filename;
     if (filename.substring(filename.length - 3) != ".py") {
       filename += ".py";
     }
@@ -117,14 +117,12 @@ class PythonEditor extends React.Component {
   /* Target function for the button "Run Code". Send python code
      in the editing box to backend. */
   run_script(event) {
-    var start_time = this.state.coding_start;
+    const start_time = this.state.coding_start;
     if (start_time != -1) {
       var time = (new Date().getTime() - start_time) / 1000
       document.getElementById("time").value = time.toString() + "s";
       this.setState({coding_start : -1})
     }
-
-    console.log("called");
 
     axios({
       method: 'POST',
@@ -136,7 +134,6 @@ class PythonEditor extends React.Component {
       }),
     })
       .then(function (response) {
-        // console.log(blockly.value);
         console.log('sent script');
       })
       .catch(function (error) {
