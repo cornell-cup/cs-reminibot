@@ -303,7 +303,7 @@ export default class AddBot extends React.Component {
                 })
         }
     }
-
+    
     checkBotStatus() {
         const _this = this;
         axios({
