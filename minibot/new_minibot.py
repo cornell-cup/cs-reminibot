@@ -33,8 +33,8 @@ if (len(sys.argv) == 2) and (sys.argv[1] == "-t"):
     import scripts.ece_dummy_ops as ece
     BOT_LIB_FUNCS = "ece_dummy_ops"
 else:
-    import scripts.PiArduino as ece
-    BOT_LIB_FUNCS = "PiArduino"
+    import scripts.pi_arduino as ece
+    BOT_LIB_FUNCS = "pi_arduino"
 
 current_process = None
 
@@ -75,13 +75,13 @@ def parse_command(cmd, tcpInstance):
     elif key == "MODE":
         if value == "object_detection":
             print("Object Detection")
-            Thread(target=ece.ObjectDetection).start()
+            Thread(target=ece.object_detection).start()
         elif value == "line_follow":
             print("Line Follow")
-            Thread(target=ece.LineFollow).start()
+            Thread(target=ece.line_follow).start()
 
     elif key == "PORTS":
-        ece.SetPorts(value)
+        ece.set_ports(value)
         print("Set Ports")    
 
     elif key == "SCRIPTS":

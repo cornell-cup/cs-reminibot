@@ -140,7 +140,7 @@ class ClientHandler(tornado.web.RequestHandler):
             print(data)
             value = data['value']
             bot_name = data['bot_name']
-            params = {'bot_name': bot_name, 'value': value, 'duration': ''}
+            params = {'bot_name': bot_name, 'value': value}
 
             if self.send_blockly_remote_server:
                 url = 'http://127.0.0.1:5000/code/'
@@ -200,36 +200,49 @@ class ClientHandler(tornado.web.RequestHandler):
             "stop": "stop",
             "set_wheel_power": "ECE_wheel_pwr",
             "turn_clockwise": "right",
-            "turn_counter_clockwise": "left"
+            "turn_counter_clockwise": "left",
+            "read_ultrasonic": "read_ultrasonic",
+            "move_servo": "move_servo",
         }
+
+        # functions that run continuously, and hence need to be started
+        # in a new thread on the Minibot otherwise the Minibot will get 
+        # stuck in an infinite loop and will be unable to receive 
+        # other commands
+        threaded_functions = [
+            "fwd",
+            "back",
+            "stop",
+            "ECE_wheel_pwr",
+            "right",
+            "left",
+        ]
 
         # Regex is for bot-specific functions (move forward, stop, etc)
         # 1st group is the whitespace (useful for def, for, etc),
-        # 2nd group is for func name, 3rd group is for args.
-        pattern = "(\s*)bot.(\w*)\((.*)\)"
+        # 2nd group is for func name, 3rd group is for args,
+        # 4th group is for anything else (additional whitespace, 
+        # ":" for end of if condition, etc)
+        pattern = r"(.*)bot.(\w*)\((.*)\)(.*)"
         regex = re.compile(pattern)
-
-        # TODO what to do after a function bound to a wait is done?
-        # Do we do whatever we did before? Do we stop?
-
         program_lines = program.split('\n')
         parsed_program = []
         for line in program_lines:
             match = regex.match(line)
-            if match == None:
+            if not match:
                 parsed_program.append(line + '\n')  # "normal" Python
             else:
                 func = function_map[match.group(2)]
                 args = match.group(3)
                 whitespace = match.group(1)
-                if whitespace == None:
+                if not whitespace:
                     whitespace = ""
                 parsed_line = whitespace
-                if func != "time.sleep":
+                if func in threaded_functions:
                     parsed_line += "Thread(target={}, args=[{}]).start()\n".format(
                         func, args)
                 else:
-                    parsed_line += func + "(" + args + ")\n"
+                    parsed_line += func + "(" + args + ")" + match.group(4) + "\n"
                 parsed_program.append(parsed_line)
 
         parsed_program_string = "".join(parsed_program)
@@ -293,8 +306,5 @@ if __name__ == "__main__":
     """
     Main method for running base station Server.
     """
-    if len(sys.argv) == 2:
-        base_station = BaseInterface(8080, send_blockly_remote_server=True)
-    else:
-        base_station = BaseInterface(8080)
-    base_station.start()
+    base_station_server = BaseInterface(8080, send_blockly_remote_server=True)
+    base_station_server.start()

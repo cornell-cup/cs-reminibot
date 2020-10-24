@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+import {Button} from './Util.js'
 
 /*
  *  A RefreshingList is a list designed to refresh when its update()
@@ -45,6 +46,49 @@ class RefreshingList extends React.Component {
         </select>
     }
 }
+
+function Ports(props) {
+    const ports = ["2","3","4","5","6","7","8","9","10","11","12","13"];
+    let buttonList = [];
+
+    for (let i = 0; i < ports.length; i++) {
+        buttonList.push(<li><button className="btn_ports" onClick={() => props.motorPorts(props.portName, ports[i])}>{ports[i]}</button></li>);
+    }
+    return (<ul> {buttonList} </ul>);
+  };
+
+function PortsList(props) {
+    const portNames = [
+        "LMOTOR", "RMOTOR", "MOTOR3", "LINE", "INFRARED", "RFID", "ULTRASONIC"
+    ]
+
+    const portLabels = [
+        "Left Motor", "Right Motor", "Motor 3", "Line Follower", 
+        "Infrared", "RFID", "Ultrasonic"
+    ]
+
+    console.assert(portNames.length == portLabels.length);
+    let allListElements = [];
+
+    for (let i = 0; i < portNames.length; i++) {
+        let link = <a href="">{portLabels[i]}</a>
+        let ports = <Ports portName={portNames[i]} motorPorts={props.motorPorts}/>
+        let listElement = <li> {link} {ports} </li>
+        allListElements.push(listElement);
+    }
+
+    return (
+        <nav id="main_nav">
+        <ul>
+        <li>
+            <a href="">Motor Ports</a>
+            <ul> {allListElements} </ul>
+        </li>
+        </ul>
+        </nav>
+    );
+}
+
 
 export default class AddBot extends React.Component {
     constructor(props) {
@@ -152,32 +196,26 @@ export default class AddBot extends React.Component {
 
     /*adds bot name to list*/
     addBotListener(event) {
-        // let li = this.state.bot_list;
         let li = this.props.bot_list;
         let bot_name = (this.refreshingBotListRef.current == null) ?
             "" : this.refreshingBotListRef.current.state.current_bot;
-        this.props.setSelectedBot(bot_name);
-        // this.state.selected_bot = bot_name; // TODO check
         const _this = this;
         axios({
             method: 'POST',
             url: '/start',
             data: JSON.stringify({
                 key: "CONNECTBOT",
-                bot_name: _this.props.selected_bot
+                bot_name: bot_name,
             })
         })
             .then(function (response) {
                 console.log("Trying to add bot to list")
-                console.log(response.data)
                 if (response.data && !li.includes(bot_name)) {
                     console.log("Bot" + bot_name + " added successfully")
                     li.push(bot_name);
                     _this.props.updateBotName(bot_name);
-                    // _this.setState({ bot_list: li, selected_bot: bot_name });
                     _this.props.setBotList(li);
                     _this.props.setSelectedBot(bot_name)
-                    // _this.setState({ selected_bot: bot_name });
                 } else {
                     console.log("Failed to add " + bot_name)
                 }
@@ -342,207 +380,85 @@ export default class AddBot extends React.Component {
     }
 
 
+
     render() {
-        var styles = {
-            Select: {
-                marginLeft: '10px',
-                marginRight: '10px'
-            },
-            Button: {
-                marginLeft: '10px',
-                marginRight: '10px',
-                float: 'left'
-            }
-        }
         var _this = this;
         return (
-            <div className="control">
-                <p id="small_title">Minibot Setup </p>
-                <table>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <label>
-                                    Available Bots:
-                                    <RefreshingList ref={this.refreshingBotListRef}></RefreshingList>
-                                </label>
-                            </td>
-                            <td><td>&nbsp;</td><button style={styles.Button} onClick={this.addBotListener}>Add Bot</button></td>
-                            <div className="led-box">&nbsp;&nbsp;
-                              <div id="led-red"></div>
+            <div className="container-fluid control">
+                <div className="row">
+                    <div className="col text-center">
+                        <p id="small_title">Minibot Setup </p>
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col horizontalDivCenter">
+                        <div className="element-wrapper">
+                            <label> Available Bots: </label>
+                            <RefreshingList ref={this.refreshingBotListRef} />
+                        </div>
+                        <Button id="add-bot" name="Add Bot" onClick={this.addBotListener} />
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col horizontalDivCenter">
+                        <div className="element-wrapper"> 
+                            <label> Bot List: </label>
+                            <select onChange={this.selectBotListener}>
+                                {this.props.bot_list.map(
+                                    function (bot_name, idx) {
+                                        return (
+                                            <option key={idx} value={bot_name}> {bot_name} </option>
+                                        );
+                                    }
+                                )}
+                            </select>
+                        </div>
+                        <Button id="remove_bot" name="Remove" onClick={()=>_this.deleteBotListener()} bot_list={this.props.bot_list} />
+                        <div className="led-box element-wrapper">
+                            <div id="led-red"></div>
+                        </div>
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col horizontalDivCenter">
+                        <div className="element-wrapper in-front-of-other-elems">
+                            <PortsList motorPorts={this.motorPorts} />
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <div className="row">
+                    <div className="col horizontalDivCenter">
+                        <p id="small_title">Movement </p>
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col text-center">
+                        <button className="btn_btn-dir_movement" onClick={() => this.buttonMapListener("forward")}>forward</button>
+                        <br />
+                        <button className="btn_btn-dir_movement" onClick={() => this.buttonMapListener("left")}>left</button>
+                        <button className="btn_btn-dir_movement" onClick={() => this.buttonMapListener("stop")}>stop</button>
+                        <button className="btn_btn-dir_movement" onClick={() => this.buttonMapListener("right")}>right</button>
+                        <br />
+                        <button className="btn_btn-dir_movement" onClick={() => this.buttonMapListener("backward")}>backward</button>
+                        <br />
+                        <br />
+                        <form className="horizontalDivCenter">
+                            <div>
+                                <label> Power: </label>
                             </div>
-                            <td></td>
-                            <td>
-                            <label>
-                              Ports:
-                              <td>
-                              <nav id="main_nav">
-                          			<ul>
-                          				<li>
-                          					<a href="">Motor Ports</a>
-                          					<ul>
-                          						<li>
-                                        <a href="">Left Motor</a>
-                                        <ul>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("LMOTOR", 1)}>J1</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("LMOTOR", 2)}>J2</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("LMOTOR", 3)}>J3</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("LMOTOR", 4)}>J4</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("LMOTOR", 5)}>J5</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("LMOTOR", 6)}>J6</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("LMOTOR", 7)}>J7</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("LMOTOR", 8)}>J8</button></li>
-                                        </ul>
-                                      </li>
-                                      <li>
-                                        <a href="">Right Motor</a>
-                                        <ul>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("RMOTOR", 1)}>J1</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("RMOTOR", 2)}>J2</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("RMOTOR", 3)}>J3</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("RMOTOR", 4)}>J4</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("RMOTOR", 5)}>J5</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("RMOTOR", 6)}>J6</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("RMOTOR", 7)}>J7</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("RMOTOR", 8)}>J8</button></li>
-                                        </ul>
-                                      </li>
-                                      <li>
-                                        <a href="">Motor 3</a>
-                                        <ul>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("MOTOR3", 1)}>J1</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("MOTOR3", 2)}>J2</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("MOTOR3", 3)}>J3</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("MOTOR3", 4)}>J4</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("MOTOR3", 5)}>J5</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("MOTOR3", 6)}>J6</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("MOTOR3", 7)}>J7</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("MOTOR3", 8)}>J8</button></li>
-                                        </ul>
-                                      </li>
-                                      <li>
-                                        <a href="">Line Follower</a>
-                                        <ul>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("LINE", 1)}>J1</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("LINE", 2)}>J2</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("LINE", 3)}>J3</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("LINE", 4)}>J4</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("LINE", 5)}>J5</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("LINE", 6)}>J6</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("LINE", 7)}>J7</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("LINE", 8)}>J8</button></li>
-                                        </ul>
-                                      </li>
-                                      <li>
-                                        <a href="">Infrared</a>
-                                        <ul>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("INFRARED", 1)}>J1</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("INFRARED", 2)}>J2</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("INFRARED", 3)}>J3</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("INFRARED", 4)}>J4</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("INFRARED", 5)}>J5</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("INFRARED", 6)}>J6</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("INFRARED", 7)}>J7</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("INFRARED", 8)}>J8</button></li>
-                                        </ul>
-                                      </li>
-                                      <li>
-                                        <a href="">RFID</a>
-                                        <ul>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("RFID", 1)}>J1</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("RFID", 2)}>J2</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("RFID", 3)}>J3</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("RFID", 4)}>J4</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("RFID", 5)}>J5</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("RFID", 6)}>J6</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("RFID", 7)}>J7</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("RFID", 8)}>J8</button></li>
-                                        </ul>
-                                      </li>
-                                      <li>
-                                        <a href="">Ultrasonic</a>
-                                        <ul>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("ULTRASONIC", 1)}>J1</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("ULTRASONIC", 2)}>J2</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("ULTRASONIC", 3)}>J3</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("ULTRASONIC", 4)}>J4</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("ULTRASONIC", 5)}>J5</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("ULTRASONIC", 6)}>J6</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("ULTRASONIC", 7)}>J7</button></li>
-                                          <li><button className="btn_ports" onClick={() => this.motorPorts("ULTRASONIC", 8)}>J8</button></li>
-                                        </ul>
-                                      </li>
-                          					</ul>
-                          				</li>
-                          			</ul>
-                          		</nav>
-                              </td>
-                            </label>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <label>
-                                    Bot List:
-                          <select style={styles.Select} onChange={this.selectBotListener}>
-                                        {this.props.bot_list.map(function (bot_name, idx) {
-                                            return <option
-                                                key={idx}
-                                                value={bot_name}>
-                                                {bot_name}</option>
-                                        })
-                                        }
-                                    </select>
-                                </label>
-                            </td>
-                            <td><td>&nbsp;</td><button style={styles.Button} bot_list={this.props.bot_list}
-                                onClick={() => _this.deleteBotListener()}>Remove</button></td>
-                        </tr>
-                        <tr>
-                        </tr>
-
-                    </tbody>
-                </table>
-                <div className="newDiv">
-                    <p id="small_title">Movement </p>
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td></td>
-                                <td><button className="btn_btn-dir_movement" onClick={() => this.buttonMapListener("forward")}>forward</button></td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td><button className="btn_btn-dir_movement" onClick={() => this.buttonMapListener("left")}>left</button></td>
-                                <td><button className="btn_btn-dir_movement" onClick={() => this.buttonMapListener("stop")}>stop</button></td>
-                                <td><button className="btn_btn-dir_movement" onClick={() => this.buttonMapListener("right")}>right</button></td>
-                            </tr>
-                            <tr>
-                                <td></td>
-                                <td><button className="btn_btn-dir_movement" onClick={() => this.buttonMapListener("backward")}>backward</button></td>
-                                <td></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <form className="newDiv">
-                        <label>
-                            Power:
-                          <input type="text" defaultValue="50" name="wheel_power" onChange={evt => this.updatePowerValue(evt)} />
-                        </label>
-                    </form>
+                            <input id="custom-range-1" class="custom-range" name="wheel_power" type="range" min="0" max="100" 
+                                step="5" onChange={evt => this.updatePowerValue(evt)}/>
+                        </form>
+                    </div>
                 </div>
                 {/* button-wrapper is a custom class to add padding
                     the rest is bootstrap css */}
                 <div className="row button-wrapper">
-                    <div className="col-md-3">
+                    <div className="col horizontalDivCenter">
                         <button type="button" className="btn btn-primary" onClick={() => this.lineFollowOnClick()}>Line Follow</button>
-                    </div>
-                    <div className="divider" />
-                    <div className="col-md-3">
+                        <div className="divider" />
                         <button type="button" className="btn btn-success" onClick={() => this.objectDetectionOnClick()}>Object Detection</button>
-                    </div>
-                    <div className="col-md-6">
-
                     </div>
                 </div>
             </div>

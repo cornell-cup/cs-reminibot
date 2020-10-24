@@ -237,17 +237,6 @@ var miniblocks = {
     helpUrl: ""
   },
 
-  custom_block: {
-    type: "custom_block",
-    message0: "custom block",
-    args0: [],
-    previousStatement: null,
-    nextStatement: null,
-    colour: 230,
-    tooltip: "",
-    helpUrl: ""
-  },
-
   set_power: {
     type: "set_power",
     message0: "set left motor to %1 %% power %2 set right motor to %3 %% power",
@@ -334,6 +323,26 @@ var miniblocks = {
     tooltip: "",
     helpUrl: ""
   },
+
+  move_servo: {
+    type: "move_servo",
+    message0: "move servo to %1 angle",
+    args0: [
+      {
+        type: "field_number",
+        name: "angle",
+        value: 360,
+        min: 0,
+        max: 360
+      }
+    ],
+    previousStatement: null,
+    nextStatement: null,
+    colour: 230,
+    tooltip: "",
+    helpUrl: ""
+  },
+
   wait_seconds: {
     type: "wait_seconds",
     message0: "wait %1 seconds",
@@ -414,6 +423,24 @@ var miniblocks = {
     tooltip: "",
     helpUrl: ""
   },
+
+  read_ultrasonic: {
+    type: "read_ultrasonic",
+    message0: "ultrasonic sensor detects object within %1",
+    args0: [
+      {
+        type: "field_number",
+        name: "input",
+        value: 1,
+        min: 1
+      }
+    ],
+    output: "Boolean",
+    colour: 180,
+    tooltip: "",
+    helpUrl: ""
+  },
+
   sees_color: {
     type: "sees_color",
     message0: "color sensor %1 sees %2",

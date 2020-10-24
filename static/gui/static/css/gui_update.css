@@ -7,12 +7,48 @@
     width: 560px;
 }
 
-.slightly_larger_text {
-    size: 5em;
+.button-wrapper {
+    padding-top: 10px;
+    padding-bottom: 10px;
 }
 
+.control {
+    padding-left: 15px;
+    padding-top: 15px;
+}
 
-/* NAVBAR */
+.divider {
+    width: 100px;
+    height: auto;
+    display: inline-block;
+}
+
+.element-wrapper {
+    padding-right: 15px;
+}
+
+.horizontalDiv {
+    clear: both;
+    padding-top: 10px;
+}
+
+.horizontalDivCenter {
+    clear: both;
+    padding-top: 10px;
+    text-align: center;
+}
+
+.horizontalDiv div {
+    float: left;
+}
+
+.horizontalDivCenter div {
+    display: inline-block; 
+}
+
+.main-body {
+    background: white;
+}
 
 .navbar {
     width: 100vw;
@@ -29,38 +65,10 @@
     text-align: right;
 }
 
-.control {
-    padding-left: 15px;
-    padding-top: 15px;
+.slightly_larger_text {
+    size: 5em;
 }
 
-.newDiv {
-    padding-top: 15px;
-}
-
-.horizontalDiv div {
-    float: left;
-}
-
-.horizontalDiv {
-    clear: both;
-    padding-top: 10px;
-}
-
-.button-wrapper {
-    padding-top: 10px;
-    padding-bottom: 10px;
-}
-
-.element-wrapper {
-    padding-right: 10px;
-}
-
-.divider {
-    width: 100px;
-    height: auto;
-    display: inline-block;
-}
 
 table {
     text-align: center;
@@ -72,8 +80,6 @@ table {
 
 
 /*SETUP TAB*/
-
-#setuptab {}
 
 #view {
     min-height: 0;
@@ -187,7 +193,7 @@ table {
 .btn_btn-dir_movement {
     background: #d1150c;
     color: white;
-    border-radius: 15px;
+    border-radius: 30px;
     height: 40px;
     width: 120px;
     font-weight: 650;
@@ -206,8 +212,6 @@ table {
 .led-box {
     height: 30px;
     width: 25%;
-    margin: 10px 0;
-    float: left;
 }
 
 .led-box p {
@@ -299,6 +303,11 @@ h1 {
 #main_nav li:hover>ul {
     visibility: visible;
     opacity: 1;
+}
+
+.in-front-of-other-elems {
+    position: relative;
+    z-index: 10;
 }
 
 .btn_ports {
