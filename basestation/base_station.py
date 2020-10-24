@@ -499,9 +499,13 @@ class BaseStation:
                 + "Sessions:^ " + str(sessions) + "\n" + "\n"
         return bot_info
 
-    
-
     def get_error_message(self, bot_name):
+        """
+        Retrieve Python error message from pi_bot.py.
+
+        Args:
+            bot_name (str): Name of the bot that run the Python program
+        """
         bot_id = self.bot_name_to_bot_id(bot_name)
         bot = self.active_bots[bot_id]
-        return bot.get_result()
+        return bot.get_error_message()

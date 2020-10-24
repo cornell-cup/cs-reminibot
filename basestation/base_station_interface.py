@@ -108,10 +108,8 @@ class ClientHandler(tornado.web.RequestHandler):
             else:
                 print("No bot received, or bot name empty.")
         if key == "MODE":
-            print("Reached MODE")
             bot_name = data['bot_name']
             mode_type = data['value']
-            print("here!")
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             bot = self.base_station.get_bot(bot_id)
             bot.sendKV(key, str(mode_type))
@@ -119,7 +117,6 @@ class ClientHandler(tornado.web.RequestHandler):
             bot_name = data['bot_name']
             direction = data['direction']
             power = str(data['power'])
-            print("virsain wheels")
 
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             self.base_station.move_wheels_bot(
@@ -155,7 +152,7 @@ class ClientHandler(tornado.web.RequestHandler):
             bot = self.base_station.get_bot(bot_id)
             # reset the previous script's error message, so we can get the new error message
             # of the new script
-            bot.set_result(None)
+            bot.set_error_message(None)
             if bot:
                 print("Code len = " + str(len(value)))
                 print(type(bot))
@@ -169,7 +166,6 @@ class ClientHandler(tornado.web.RequestHandler):
                     print("SAVING SCRIPTS")
                     bot.sendKV("SCRIPTS", ",".join(value))
                 else:
-        
                     # TODO check if a "long enough" program
                     # is supposed to be sent over
                     print("RUNNING SCRIPT")
@@ -193,12 +189,9 @@ class ClientHandler(tornado.web.RequestHandler):
         into ECE-supplied functions.
 
         Args:
-            bot: The pi_bot to send to
-            program: The string containing the python code generated
-            from blockly
-
+            bot: the pi_bot to send to
+            program: the string containing the python code generated
         """
-
         # function_map : Blockly functions -> ECE functions
         function_map = {
             "move_forward": "fwd",
@@ -224,14 +217,13 @@ class ClientHandler(tornado.web.RequestHandler):
         for line in program_lines:
             match = regex.match(line)
             if match == None:
-                parsed_program.append(line + '\n')  # "normal" python
+                parsed_program.append(line + '\n')  # "normal" Python
             else:
                 func = function_map[match.group(2)]
                 args = match.group(3)
                 whitespace = match.group(1)
                 if whitespace == None:
                     whitespace = ""
-                # parsed_program.append(whitespace + func + "(" + args + ")\n")
                 parsed_line = whitespace
                 if func != "time.sleep":
                     parsed_line += "Thread(target={}, args=[{}]).start()\n".format(
@@ -241,7 +233,6 @@ class ClientHandler(tornado.web.RequestHandler):
                 parsed_program.append(parsed_line)
 
         parsed_program_string = "".join(parsed_program)
-        print(parsed_program_string)
 
         # Now actually send to the bot
         bot.sendKV("SCRIPTS", parsed_program_string)
@@ -273,9 +264,12 @@ class HeartbeatHandler(tornado.websocket.WebSocketHandler):
 
 
 class ErrorMessageHandler(tornado.websocket.WebSocketHandler):
+    """
+    Class for handling Python error messages.
+    """
     def initialize(self, base_station):
         self.base_station = base_station
-    
+
     def post(self):
         """
         Called by blockly.js to send Python error message back to the GUI.
@@ -285,13 +279,13 @@ class ErrorMessageHandler(tornado.websocket.WebSocketHandler):
         data = json.loads(self.request.body.decode())
         bot_name = data['bot_name']
         error_message = self.base_station.get_error_message(bot_name)
-        # no message yet
         if not error_message:
             error_json = {"error": "", "code": -1}
         elif error_message == "Successful execution":
             error_json = {"error": error_message, "code": 1}
         else:
             error_json = {"error": error_message, "code": 0}
+        # Send back to GUI
         self.write(json.dumps(error_json).encode())
 
 

@@ -97,11 +97,9 @@ def parse_command(cmd, tcpInstance):
                     file_dir + "/scripts/" + script_name, 'w+')
                 file.write(program)
                 file.close()
-                """
-                Run the Python program in a different process so that we don't
-                need to wait for it to terminate and we can kill it whenever 
-                we want.
-                """
+                # Run the Python program in a different process so that we 
+                # don't need to wait for it to terminate and we can kill it
+                # whenever we want.
                 time.sleep(0.1)
                 current_process = Process(target=run_script, args=(script_name, tcpInstance))
                 current_process.start()
@@ -132,7 +130,8 @@ def run_script(scriptname, tcp_instance):
     """
     Loads a script and runs it.
     Args:
-        scriptname (:obj:`str`): The name of the script to run.
+        scriptname (str): The name of the script to run.
+        tcp_instance (object): TCP object for communication.
     """
 
     # Cache invalidation and module refreshes are needed to ensure
@@ -145,11 +144,11 @@ def run_script(scriptname, tcp_instance):
         importlib.reload(script)
         script.run()
         result = "Successful execution"
-        tcp_instance.send_to_basestation("RESULT", result)
+        tcp_instance.send_to_basestation("ERRORMESSAGE", result)
     except Exception as exception:
         str_exception = str(type(exception)) + ": " + str(exception)
         result = str_exception
-        tcp_instance.send_to_basestation("RESULT", result)
+        tcp_instance.send_to_basestation("ERRORMESSAGE", result)
 
 
 def start_base_station_heartbeat(ip_address):

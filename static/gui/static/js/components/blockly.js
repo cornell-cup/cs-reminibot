@@ -157,8 +157,10 @@ class PythonTextBox extends React.Component {
       .catch(function (error) {
         console.warn(error);
       });
-    /* Repeatedly call the ErrorMessageHandler in base_station_interface.py
-    until a non-empty execution result of the Python program is received. */
+    /* 
+     * Repeatedly call the ErrorMessageHandler in base_station_interface.py
+     * until a non-empty execution result of the Python program is received. 
+     */
     let interval = setInterval(function() {
       axios({
         method: 'POST',
