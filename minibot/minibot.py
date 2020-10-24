@@ -182,10 +182,10 @@ class Minibot:
                 print(f"Data {data_str}")
                 # if the socket receives "", it means the socket was closed
                 # from the other end, so close this endpoint too
-                if not data_str:
-                    self.close_sock(sock)
-                else:
+                if data_str:
                     self.parse_and_execute_commands(sock, data_str)
+                else:
+                    self.close_sock(sock)
                 # TODO need to write back saying that the command executed
                 # successfully
 
@@ -199,9 +199,13 @@ class Minibot:
         for sock in write_ready_socks:
             message_queue = self.writable_sock_message_queue_map[sock]
             all_messages = "".join(message_queue)
-            sock.sendall(all_messages.encode())
-            self.writable_sock_message_queue_map[sock] = deque()
-            write_ready_socks.remove(sock)
+            try:
+                sock.sendall(all_messages.encode())
+                self.writable_sock_message_queue_map[sock] = deque()
+                write_ready_socks.remove(sock)
+            except:
+                continue
+
 
     def handle_errorable_socks(self, errored_out_socks):
         """ TODO

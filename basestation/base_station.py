@@ -168,6 +168,7 @@ class BaseStation:
         if bot.is_connected():
             status = "ACTIVE"
         else:
+            print("REMOVING BOT")
             self.remove_bot(bot._id)
             status = "INACTIVE"
         return status

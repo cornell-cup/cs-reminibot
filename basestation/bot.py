@@ -26,7 +26,10 @@ class Bot:
         """
         # TODO change this protocol
         data = f"<<<<{key},{value}>>>>".encode()
-        self.sock.sendall(data)
+        try:
+            self.sock.sendall(data)
+        except:
+            pass
     
     def readKV(self):
         """

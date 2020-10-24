@@ -22,8 +22,8 @@ s = socket.create_connection((minibot_address[0], 10000))
 
 # sending commands over TCP
 s.sendall("<<<<BOTSTATUS,>>>>".encode())
-# s.sendall("<<<<BOTSTATUS,>>>>".encode())
-# s.sendall("<<<<BOTSTATUS,>>>>".encode())
+s.sendall("<<<<BOTSTATUS,>>>>".encode())
+s.sendall("<<<<BOTSTATUS,>>>>".encode())
 # s.sendall("<<<<WHEELS,forward>>>>".encode()) 
 # time.sleep(1)
 # s.sendall("<<<<WHEELS,right>>>>".encode())

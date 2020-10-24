@@ -304,6 +304,29 @@ export default class AddBot extends React.Component {
         }
     }
 
+    checkBotStatus() {
+        const _this = this;
+        axios({
+            method: 'GET',
+            url: '/start',
+            data: JSON.stringify({
+                key: "BOTSTATUS",
+            })
+        })
+            .then(function (response) {
+                if (response.data = "ACTIVE") {
+                    console.log(response.data);
+                }
+                else{
+                    let bot_name = this.props.selected_bot;
+                    let li = this.props.bot_list;
+                }
+            })
+            .catch(function (error) {
+                // console.log(error);
+            })
+    }
+
     getVisionData() {
         const _this = this;
         axios({
