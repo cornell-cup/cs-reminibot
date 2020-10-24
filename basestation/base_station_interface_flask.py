@@ -32,6 +32,9 @@ to the front-end which maybe is not what we want'''
 # @app.route('/setcookie', methods = ['POST', 'GET'])
 # def set_cookie():
 #   if request.method == 'POST':
+
+# temporary session_id valud
+session_id = "temp"
       
 @app.route('/start',methods=['POST'])
 def post():
@@ -66,6 +69,7 @@ def post():
       bot_id = base_station.bot_name_to_bot_id(bot_name)
       base_station.move_wheels_bot(
           session_id, bot_id, direction, power)
+    #   print(f"direction: {direction}, power: {power}")
   elif key == "PORTS":
       # leftmotor = data['leftmotor']
       bot_id = base_station.bot_name_to_bot_id(data['bot_name'])
