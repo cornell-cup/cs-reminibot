@@ -188,9 +188,10 @@ class ClientHandler(tornado.web.RequestHandler):
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             bot = self.base_station.get_bot(bot_id)
             if bot:
-                bot.sendKV("BOTSTATUS", '')
-                #TODO: implement a fix here
-
+                status = self.base_station.get_bot_status(bot)
+                json_reply = {"BOTSTATUS": status}
+                self.write(json.dumps(json_reply).encode())
+    
     def send_program(self, bot, program):
         """
         Sends the program received from Blockly to the bot, translated

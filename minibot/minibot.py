@@ -10,6 +10,7 @@ import ast
 import os
 import concurrent.futures
 from threading import Thread
+from collections import deque
 
 # TODO: use argparser to handle the -t
 # Load the ECE Dummy ops if testing, real bot-level function library otherwise.
@@ -55,12 +56,15 @@ class Minibot:
         # to be (and will almost never be) the empty set
 
         # contains sockets which we are expecting to receive some data on
-        self.readable_socks = []
+        self.readable_socks = set()
         # contains sockets which we want to send some data on
-        self.writable_socks = []
+        self.writable_socks = set()
         # contains sockets that throw errors that we care about and want to 
         # react to
-        self.errorable_socks = []
+        self.errorable_socks = set()
+        # TODO: All message queues should have a max limit of messages that they
+        # store, implement custom class at some point
+        self.writable_sock_message_queue_map = {}
         self.sock_lists = [
             self.readable_socks, self.writable_socks, self.errorable_socks
         ]
@@ -76,8 +80,8 @@ class Minibot:
         # we are alerted if an error gets thrown by this listener sock.  No need to 
         # add the listener sock to writable socks because we won't be writing to 
         # this socket, only listening.
-        self.readable_socks.append(self.listener_sock)
-        self.errorable_socks.append(self.listener_sock)
+        self.readable_socks.add(self.listener_sock)
+        self.errorable_socks.add(self.listener_sock)
         while True:
             # if the listener socket is the only socket alive, we need to 
             # broadcast a message to the basestation to set up a new connection
@@ -169,26 +173,35 @@ class Minibot:
                 connection.setblocking(0)
                 # we don't need to write anything right now, so don't add to 
                 # writable socks
-                self.readable_socks.append(connection)
-                self.errorable_socks.append(connection)
+                self.readable_socks.add(connection)
+                self.errorable_socks.add(connection)
             # If its a connection socket, receive the data and execute the
             # necessary command
             else:
-                data = sock.recv(Minibot.SOCKET_BUFFER_SIZE).decode("utf-8")
-                print(f"Data {data}")
+                data_str = sock.recv(Minibot.SOCKET_BUFFER_SIZE).decode("utf-8")
+                print(f"Data {data_str}")
                 # if the socket receives "", it means the socket was closed
                 # from the other end, so close this endpoint too
-                if not data:
+                if not data_str:
                     self.close_sock(sock)
-                Minibot.parse_and_execute_commands(data)
+                else:
+                    self.parse_and_execute_commands(sock, data_str)
                 # TODO need to write back saying that the command executed
                 # successfully
 
     def handle_writable_socks(self, write_ready_socks):
-        """ TODO
+        """ TODO 
         """
+        print(f"\n\nWrite ready socks: {write_ready_socks}")
+        print(f"Writable socks: {self.writable_socks}\n\n")
+        # iterate through all the sockets in the write_ready_socks and 
+        # send over all messages in the socket's message_queue
         for sock in write_ready_socks:
-            pass # TODO
+            message_queue = self.writable_sock_message_queue_map[sock]
+            all_messages = "".join(message_queue)
+            sock.sendall(all_messages.encode())
+            self.writable_sock_message_queue_map[sock] = deque()
+            write_ready_socks.remove(sock)
 
     def handle_errorable_socks(self, errored_out_socks):
         """ TODO
@@ -203,12 +216,11 @@ class Minibot:
                 sock_list.remove(sock)
         sock.close()
     
-
-    @staticmethod
-    def parse_and_execute_commands(data_str: str):
+    def parse_and_execute_commands(self, sock: socket, data_str: str):
         """ Parses the data string into individual commands.  
 
         Arguments: 
+            sock: The socket that we just read the command from
             data_str: The raw data that we receive from the socket.
 
         Example: 
@@ -229,12 +241,11 @@ class Minibot:
             key = data_str[start + token_len:comma]
             value = data_str[comma + 1:end]
             # executes command with key,value
-            Minibot.execute_command(key, value) 
+            self.execute_command(sock, key, value) 
             # shrink the data_str with the remaining portion of the commands
             data_str = data_str[end + token_len:]
 
-    @staticmethod
-    def execute_command(key: str, value: str ):
+    def execute_command(self, sock: socket, key: str, value: str ):
         """ Executes a command using the given key-value pair 
 
         Arguments:
@@ -248,18 +259,15 @@ class Minibot:
         # so that some of the commands get through.  Once the data loss issue
         # is fixed, we can implement a regular solution. If we did not have the 
         # threads, our code execution pointer would get stuck in the infinite loop.
-        if key == "WHEELS":
-            cmds_functions_map = {
-                "forward": ece.fwd, 
-                "backward": ece.back, 
-                "left": ece.left,
-                "right": ece.right,
-            }
-            if value in cmds_functions_map:
-                # TODO use the appropriate power arg instead of 50 when that's implemented
-                Thread(target=cmds_functions_map[value], args=[50]).start()
+        if key == "BOTSTATUS":
+            # we want to write to the socket we received data on, so add
+            # it to the writable socks
+            self.writable_socks.add(sock)
+            message = "<<<<BOTSTATUS,ACTIVE>>>>"
+            if sock in self.writable_sock_message_queue_map:
+                self.writable_sock_message_queue_map[sock].append(message)
             else:
-                Thread(target=ece.stop).start()
+                self.writable_sock_message_queue_map[sock] = deque([message])
             
         elif key == "MODE":
             if value == "object_detection":
@@ -292,6 +300,21 @@ class Minibot:
                     print("Exception occurred at compile time")
                     str_exception = str(type(exception)) + ": " + str(exception)
                     return str_exception
+        elif key == "WHEELS":
+            cmds_functions_map = {
+                "forward": ece.fwd, 
+                "backward": ece.back, 
+                "left": ece.left,
+                "right": ece.right,
+            }
+            if value in cmds_functions_map:
+                # TODO use the appropriate power arg instead of 50 when that's implemented
+                Thread(target=cmds_functions_map[value], args=[50]).start()
+            else:
+                Thread(target=ece.stop).start()
+
+        
+            
 
 
     @staticmethod

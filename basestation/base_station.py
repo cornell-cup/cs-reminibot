@@ -155,7 +155,26 @@ class BaseStation:
         new_bot = Bot(bot_id, bot_name, ip_address, port)
         self.active_bots[bot_id] = new_bot
 
+    def get_bot_status(self, bot):
+        """ Gets whether the Minibot is currently connected or has been 
+        disconnected.  This is done by di
+        1. Send Minibot BOTSTATUS
+        2. read from Minibot whatever Minibot has sent us.
+        3. check when was the last time Minibot sent us "I'm alive"
+        4. Return if Minibot is connected or not
+        """
+        bot.sendKV("BOTSTATUS", "ALIVE")
+        bot.readKV()
+        if bot.is_connected():
+            status = "ACTIVE"
+        else:
+            self.remove_bot(bot._id)
+            status = "INACTIVE"
+        return status
+        
 
+        
+        
     def remove_bot(self, bot_id):
         """
         Removes minibot from list of active bots by name.
@@ -167,7 +186,7 @@ class BaseStation:
             True if bot was successfully removed
             False otherwise
         """
-        del self.active_bots[bot_id]
+        self.active_bots.pop(bot_id)
         return bot_id not in self.active_bots
 
     def bot_name_to_bot_id(self, bot_name):
