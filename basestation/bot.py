@@ -24,12 +24,11 @@ class Bot:
         """
         send command with specified key and value
         """
-        # TODO change this protocol
         data = f"<<<<{key},{value}>>>>".encode()
-        try:
+        line = self.sock.recv(Bot.SOCKET_BUFFER_SIZE, socket.MSG_PEEK).decode("utf-8")
+        print(f"Line {line}")
+        if len(line) > 0:
             self.sock.sendall(data)
-        except:
-            pass
     
     def readKV(self):
         """
@@ -37,6 +36,7 @@ class Bot:
         <<<<BOTSTATUS,ACTIVE>>>>
         """
         data_str = self.sock.recv(Bot.SOCKET_BUFFER_SIZE).decode("utf-8")
+        print(f"Data str {data_str}")
         
         # parse the data by removing the angular brackets
         comma = data_str.find(",")

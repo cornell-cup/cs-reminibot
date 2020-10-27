@@ -66,7 +66,7 @@ class BaseInterface:
         """
         Creates the application object (via Tornado).
         """
-        return tornado.web.Application(self.handlers, **self.settings)
+        return tornado.web.Application(self.handlers, **self.settings, debug=True)
 
 
 class ClientHandler(tornado.web.RequestHandler):
