@@ -101,9 +101,14 @@ class Minibot:
                 self.errorable_socks, 
                 1, # timeout time
             )
-            self.handle_readable_socks(read_ready_socks)
-            self.handle_writable_socks(write_ready_socks)
+            # WARNING!! Be careful about closing sockets in any of these functions
+            # because the local lists read_ready_socks, write_ready_socks
+            # and errored_out_socks will still contain the closed socket.
+            # Hence, if you do this removal, make sure the socket is removed 
+            # from these local lists too!!!
             self.handle_errorable_socks(errored_out_socks)
+            self.handle_writable_socks(write_ready_socks)
+            self.handle_readable_socks(read_ready_socks)
 
     def create_listener_sock(self):
         """ Creates a socket that listens for TCP connections from the 
@@ -179,7 +184,6 @@ class Minibot:
             # necessary command
             else:
                 data_str = sock.recv(Minibot.SOCKET_BUFFER_SIZE).decode("utf-8")
-                print(f"Data {data_str}")
                 # if the socket receives "", it means the socket was closed
                 # from the other end, so close this endpoint too
                 if data_str:
@@ -192,19 +196,14 @@ class Minibot:
     def handle_writable_socks(self, write_ready_socks):
         """ TODO 
         """
-        print(f"\n\nWrite ready socks: {write_ready_socks}")
-        print(f"Writable socks: {self.writable_socks}\n\n")
         # iterate through all the sockets in the write_ready_socks and 
         # send over all messages in the socket's message_queue
         for sock in write_ready_socks:
             message_queue = self.writable_sock_message_queue_map[sock]
             all_messages = "".join(message_queue)
-            try:
-                sock.sendall(all_messages.encode())
-                self.writable_sock_message_queue_map[sock] = deque()
-                write_ready_socks.remove(sock)
-            except:
-                continue
+            sock.sendall(all_messages.encode())
+            self.writable_sock_message_queue_map[sock] = deque()
+            self.writable_socks.remove(sock)
 
 
     def handle_errorable_socks(self, errored_out_socks):

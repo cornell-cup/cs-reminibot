@@ -31,4 +31,5 @@ s.sendall("<<<<BOTSTATUS,>>>>".encode())
 # s.sendall("<<<<WHEELS,stop>>>>".encode())
 time.sleep(2)
 print(s.recv(1024))
+time.sleep(2)
 
