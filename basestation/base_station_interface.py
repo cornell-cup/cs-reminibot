@@ -12,9 +12,15 @@ import sys
 import time
 import re  # regex import
 import requests
+import threading
+import pyaudio
+import speech_recognition as sr
+from util.stoppable_thread import StoppableThread
 
 # Minibot imports.
 from base_station import BaseStation
+# from piVision import *
+# from piVision.server import startBotVisionServer
 
 
 class BaseInterface:
@@ -52,7 +58,8 @@ class BaseInterface:
             )),
             ("/vision", VisionHandler, dict(base_station=self.base_station)),
             ("/heartbeat", HeartbeatHandler, dict(base_station=self.base_station)),
-            ("/result", ErrorMessageHandler, dict(base_station=self.base_station))
+            ("/result", ErrorMessageHandler, dict(base_station=self.base_station)),
+            ("/voice", VoiceHandler, dict(base_station=self.base_station)),
         ]
 
     def start(self):
@@ -120,14 +127,13 @@ class ClientHandler(tornado.web.RequestHandler):
             direction = data['direction']
             power = str(data['power'])
 
-
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             self.base_station.move_wheels_bot(
                 session_id, bot_id, direction, power)
         elif key == "PORTS":
             # leftmotor = data['leftmotor']
             bot_id = self.base_station.bot_name_to_bot_id(data['bot_name'])
-            
+
             portarray = data['ports']
             for x in portarray:
                 print(x)
@@ -218,8 +224,8 @@ class ClientHandler(tornado.web.RequestHandler):
         }
 
         # functions that run continuously, and hence need to be started
-        # in a new thread on the Minibot otherwise the Minibot will get 
-        # stuck in an infinite loop and will be unable to receive 
+        # in a new thread on the Minibot otherwise the Minibot will get
+        # stuck in an infinite loop and will be unable to receive
         # other commands
         threaded_functions = [
             "fwd",
@@ -233,7 +239,7 @@ class ClientHandler(tornado.web.RequestHandler):
         # Regex is for bot-specific functions (move forward, stop, etc)
         # 1st group is the whitespace (useful for def, for, etc),
         # 2nd group is for func name, 3rd group is for args,
-        # 4th group is for anything else (additional whitespace, 
+        # 4th group is for anything else (additional whitespace,
         # ":" for end of if condition, etc)
         pattern = r"(.*)bot.(\w*)\((.*)\)(.*)"
         regex = re.compile(pattern)
@@ -254,7 +260,8 @@ class ClientHandler(tornado.web.RequestHandler):
                     parsed_line += "Thread(target={}, args=[{}]).start()\n".format(
                         func, args)
                 else:
-                    parsed_line += func + "(" + args + ")" + match.group(4) + "\n"
+                    parsed_line += func + \
+                        "(" + args + ")" + match.group(4) + "\n"
                 parsed_program.append(parsed_line)
 
         parsed_program_string = "".join(parsed_program)
@@ -287,6 +294,86 @@ class HeartbeatHandler(tornado.websocket.WebSocketHandler):
         is_heartbeat = self.base_station.is_heartbeat_recent(time_interval)
         heartbeat_json = {"is_heartbeat": is_heartbeat}
         self.write(json.dumps(heartbeat_json).encode())
+
+
+class SpeechRecognitionHandler(tornado.websocket.WebSocketHandler):
+    """ Handles start speech recognition and stop speech recognition 
+    requests from the WebGUI. """
+    def initialize(self, base_station):
+        self.base_station = base_station
+
+    def get(self):
+        """ Gets the current status from the Speech Recognition system,
+        to be displayed on the WebGUI.  
+        """
+        voice_server = self.base_station.voice_server
+        message = voice_server.message.get_val() if voice_server else None
+        # could be None because get_val can return None too
+        if message is None:
+            message = ""
+        self.write(message)
+
+    def post(self):
+        """ 
+        """
+        data = json.loads(self.request.body.decode())
+        key = data['key']
+
+        bot_name = data['bot_name']
+        bot_id = self.base_station.bot_name_to_bot_id(bot_name)
+        bot = self.base_station.get_bot(bot_id)
+        session_id = self.get_secure_cookie("user_id")
+        if session_id:
+            session_id = session_id.decode("utf-8")
+
+        if not bot:
+            return
+
+        if key == "START VOICE":  # start listening
+            self.base_station.voice_server = StoppableThread(
+                self.voice_recognition, session_id, bot_id
+            )
+            self.base_station.voice_server.start()
+        elif key == "STOP VOICE":
+            if self.base_station.voice_server:
+                self.base_station.voice_server.stop()
+
+    def voice_recognition(self, thread_safe_condition, thread_safe_message, session_id, bot_id):
+        RECORDING_TIME_LIMIT = 5
+        # dictionary of commmands
+        commands = {
+            "forward": "Minibot moves forward",
+            "backward": "Minibot moves backwards",
+            "left": "Minibot moves left",
+            "right": "Minibot moves right",
+            "stop": "Minibot stops",
+        }
+        # open the Microphone as variable microphone
+        with sr.Microphone() as microphone:
+            r = sr.Recognizer()
+            while thread_safe_condition.get_val():
+                thread_safe_message.set_val("Say something!")
+                try:
+                    # listen for 5 seconds
+                    audio = r.listen(microphone, RECORDING_TIME_LIMIT)
+                    thread_safe_message.set_val(
+                        "Converting from speech to text")
+                    words = r.recognize_google(audio)
+                    regex = re.compile('[^a-zA-Z]')  # removing punctuation
+                    regex.sub('', words)
+                    thread_safe_message.set_val("You said: " + words)
+                    thread_safe_message.set_val(words)
+                    if words in commands:
+                        thread_safe_message.set_val(commands[words])
+                        self.base_station.move_wheels_bot(
+                            session_id, bot_id, words, 100)
+                    else:
+                        thread_safe_message.set_val("Invalid command")
+                except sr.WaitTimeoutError:
+                    thread_safe_message.set_val("timed out")
+                except sr.UnknownValueError:
+                    thread_safe_message.set_val("words not recognized")
+                time.sleep(2)
 
 
 class ErrorMessageHandler(tornado.websocket.WebSocketHandler):

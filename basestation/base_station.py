@@ -20,12 +20,32 @@ from connection.udp_connection import UDPConnection
 MAX_VISION_LOG_LENGTH = 1000
 
 
+def make_thread_safe(func):
+    """ Decorator which wraps the specified function with an acquire and 
+    release call to the lock
+
+    Arguments:
+         func: The function that will become thread safe
+    """
+    def decorated_func(*args, **kwargs):
+        #args[0] is self
+        assert isinstance(args[0], BaseStation)
+        lock = args[0].lock
+        lock.acquire()
+        val = func(*args, **kwargs)
+        lock.release()
+        return val
+    return decorated_func
+
+
 class BaseStation:
     def __init__(self):
         self.active_bots = {}
         self.active_sessions = {}
         self.active_playgrounds = {}
         self.vision_log = []
+        self.voice_server = None
+        self.lock = threading.Lock()
 
         self.__udp_connection = UDPConnection()
         self.__udp_connection.start()
@@ -40,13 +60,13 @@ class BaseStation:
             target=self.discover_and_create_bots, daemon=True
         )
 
-        self.vision_monitior_thread = threading.Thread(
-            target=self.vision_monitior, daemon=True
+        self.vision_monitor_thread = threading.Thread(
+            target=self.vision_monitor, daemon=True
         )
 
         self.broadcast_ip_thread.start()
         self.bot_discover_thread.start()
-        self.vision_monitior_thread.start()
+        self.vision_monitor_thread.start()
         # self.connections = BaseConnection()
 
         self.basestation_key = ""
@@ -86,7 +106,7 @@ class BaseStation:
         else:
             return None
 
-    def vision_monitior(self):
+    def vision_monitor(self):
         """
         Checks if the len of the vision log is growing.
         """
@@ -218,6 +238,7 @@ class BaseStation:
         del self.active_bots[bot_id]
         return bot_id not in self.active_bots
 
+    @make_thread_safe
     def bot_name_to_bot_id(self, bot_name):
         """
         Returns bot id corresponding to bot name
@@ -231,8 +252,7 @@ class BaseStation:
                 return bot_id
         return None
 
-    
-
+    @make_thread_safe
     def move_wheels_bot(self, session_id, bot_id, direction, power):
         """
         Gives wheels power based on user input
@@ -349,7 +369,7 @@ class BaseStation:
     def set_position_of_bot(self, bot_id, pos):
         pass
 
-    def set_ports( self, ports, session_id, bot_id ):
+    def set_ports(self, ports, session_id, bot_id):
         if not session_id or not bot_id:
             return False
 
@@ -358,12 +378,12 @@ class BaseStation:
             return False
         for x in ports:
             print(x)
-        
+
         portsstr = " ".join([str(l) for l in ports])
 
         self.active_bots[bot_id].sendKV("PORTS", portsstr)
-        
-        #do something
+
+        # do something
 
         return True
 
@@ -505,8 +525,6 @@ class BaseStation:
                 + "Port:^ " + str(bot.get_port()) + "\n" \
                 + "Sessions:^ " + str(sessions) + "\n" + "\n"
         return bot_info
-
-    
 
     def get_error_message(self, bot_name):
         bot_id = self.bot_name_to_bot_id(bot_name)

@@ -73,7 +73,7 @@ def parse_command(cmd, tcpInstance):
 
     elif key == "PORTS":
         ece.set_ports(value)
-        print("Set Ports")    
+        print("Set Ports")
 
     elif key == "SCRIPTS":
         # The script is always named bot_script.py.
@@ -217,7 +217,8 @@ def main():
         tcp_instance = TCP()
         while True:
             time.sleep(0.01)
-            return_value = parse_command(tcp_instance.get_command(), tcp_instance)
+            return_value = parse_command(
+                tcp_instance.get_command(), tcp_instance)
             # print("return_value is:")
             # print(return_value)
             if return_value is not None:
