@@ -1,6 +1,7 @@
-import socket 
+import socket
 import time
 from typing import Optional
+
 
 class Bot:
     """ Represents a Minibot that the Basestation is connected to, it is a 
@@ -15,7 +16,7 @@ class Bot:
     def __init__(self, bot_id, bot_name, ip_address, port=10000):
         self.port = port
         self.ip_address = ip_address
-        # the basestation's endpoint socket with the 
+        # the basestation's endpoint socket with the
         self.sock = socket.create_connection((ip_address, port))
         # an arbitrarily small time
         self.sock.settimeout(0.01)
@@ -23,8 +24,8 @@ class Bot:
         self._id = bot_id
         self.last_status_time = time.time()
         self.is_socket_connected = True
-    
-    def try_receive_data(self, peek: bool=False) -> Optional[str]:
+
+    def try_receive_data(self, peek: bool = False) -> Optional[str]:
         """ Tries to receive data from the Minibot. 
 
         Arguments:
@@ -33,7 +34,7 @@ class Bot:
         Returns:  The data, or None if it cannot receive data 
         """
         line = None
-        try: 
+        try:
             if peek:
                 data = self.sock.recv(Bot.SOCKET_BUFFER_SIZE, socket.MSG_PEEK)
             else:
@@ -44,8 +45,11 @@ class Bot:
                 self.is_socket_connected = False
         except socket.timeout:
             pass
+        except ConnectionResetError:
+            print("Connection Reset Error")
+            line = ""
+            self.is_socket_connected = False
         return line
-
 
     def sendKV(self, key, value):
         """
@@ -53,13 +57,15 @@ class Bot:
         """
         if not self.is_socket_connected:
             return
-        
+
         data = f"<<<<{key},{value}>>>>".encode()
         line = self.try_receive_data(peek=True)
         print(f"Line {line}")
+        print(f"Data {data}")
         if line is None or len(line) > 0:
+
             self.sock.sendall(data)
-    
+
     def readKV(self):
         """
         Reads from the socket connection between the basesation and the Minibot
@@ -84,14 +90,14 @@ class Bot:
         if key == "BOTSTATUS" and value == "ACTIVE":
             # set to current time in seconds
             self.last_status_time = time.time()
-    
+
     def is_connected(self) -> bool:
         """ Checks whether the Minibot has sent a heartbeat message recently 
         """
         time_diff = time.time() - self.last_status_time
         print(f"Time diff {time_diff}")
         return time_diff < Bot.TIMEOUT_LIMIT and self.is_socket_connected
-   
+
     @property
     def name(self):
         return self._name

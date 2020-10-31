@@ -150,7 +150,8 @@ class BaseStation:
         """
         bot_id = self.generate_id()
         if not bot_name:
-            bot_name = "minibot" + ip_address[len(ip_address)-3:].replace('.', '')
+            bot_name = "minibot" + \
+                ip_address[len(ip_address)-3:].replace('.', '')
 
         new_bot = Bot(bot_id, bot_name, ip_address, port)
         self.active_bots[bot_id] = new_bot
@@ -169,12 +170,10 @@ class BaseStation:
             status = "ACTIVE"
         else:
             self.remove_bot(bot._id)
+            # self.remove_bot_from_session(self.session, bot._id)
             status = "INACTIVE"
         return status
-        
 
-        
-        
     def remove_bot(self, bot_id):
         """
         Removes minibot from list of active bots by name.
@@ -256,7 +255,7 @@ class BaseStation:
                 sessions.append(session_id)
         return sessions
 
-    def set_ports( self, ports, session_id, bot_id ):
+    def set_ports(self, ports, session_id, bot_id):
         if not session_id or not bot_id:
             return False
 
@@ -265,12 +264,12 @@ class BaseStation:
             return False
         for x in ports:
             print(x)
-        
+
         portsstr = " ".join([str(l) for l in ports])
 
         self.active_bots[bot_id].sendKV("PORTS", portsstr)
-        
-        #do something
+
+        # do something
 
         return True
 
