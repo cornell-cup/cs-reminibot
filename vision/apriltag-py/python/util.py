@@ -1,6 +1,6 @@
 from cv2 import *
 import numpy as np
-
+import json
 """
 Utility module for common actions in this module and in OpenCV.
 """
@@ -228,3 +228,39 @@ def undistort_image(frame, camera_matrix, dist_coeffs):
     x, y, w, h = roi
     dst = dst[y:y+h, x:x+w]
     return dst
+
+def read_calib_json(filename):
+    calib_file = None
+    try:
+        calib_file = open(filename)
+    except FileNotFoundError:
+        print("Could not find file: " + filename)
+        exit(0)
+    assert calib_file
+
+    return calib_file, json.load(calib_file)
+
+def get_camera(idx):
+    camera = cv2.VideoCapture(idx)
+    if not cv2.VideoCapture.isOpened(camera):
+        raise Exception("Unable to open camera: {}".format(idx))
+    camera.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+    camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+    camera.set(cv2.CAP_PROP_FPS, 30)
+    return camera
+
+def get_numpy_matrix(src, name):
+    """
+    Get a numpy matrix from a data source (i.e. calib data dict)
+    """
+    return np.asarray(src[name])
+
+def get_tag_angle(corners):
+    tr = corners[1] # top right
+    br = corners[2] # bottom right
+    X, Y = 0,1 # constants for better naming
+    side_length = np.sqrt((tr[X]-br[X])**2 + (tr[Y] - br[Y])**2)
+    print(side_length)
+    if tr[Y] > br[Y]:
+        return (2*np.pi) - np.arccos( (tr[X] - br[X]) / side_length)
+    return np.arccos( (tr[X] - br[X]) / side_length)
