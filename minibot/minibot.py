@@ -186,6 +186,7 @@ class Minibot:
                 data_str = sock.recv(Minibot.SOCKET_BUFFER_SIZE).decode("utf-8")
                 # if the socket receives "", it means the socket was closed
                 # from the other end, so close this endpoint too
+                print(f"Data string from basestation {data_str}")
                 if data_str:
                     self.parse_and_execute_commands(sock, data_str)
                 else:
@@ -201,6 +202,7 @@ class Minibot:
         for sock in write_ready_socks:
             message_queue = self.writable_sock_message_queue_map[sock]
             all_messages = "".join(message_queue)
+            print(f"Messages getting sent {all_messages}")
             sock.sendall(all_messages.encode())
             self.writable_sock_message_queue_map[sock] = deque()
             self.writable_socks.remove(sock)
@@ -262,7 +264,9 @@ class Minibot:
         # so that some of the commands get through.  Once the data loss issue
         # is fixed, we can implement a regular solution. If we did not have the 
         # threads, our code execution pointer would get stuck in the infinite loop.
+        print(f"Key {key}")
         if key == "BOTSTATUS":
+            print("RECEIVED BOTSTATUS!!!!!")
             # we want to write to the socket we received data on, so add
             # it to the writable socks
             self.writable_socks.add(sock)

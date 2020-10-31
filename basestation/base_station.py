@@ -163,12 +163,11 @@ class BaseStation:
         3. check when was the last time Minibot sent us "I'm alive"
         4. Return if Minibot is connected or not
         """
-        bot.sendKV("BOTSTATUS", "ALIVE")
+        bot.sendKV("BOTSTATUS", "ACTIVE")
         bot.readKV()
         if bot.is_connected():
             status = "ACTIVE"
         else:
-            print("REMOVING BOT")
             self.remove_bot(bot._id)
             status = "INACTIVE"
         return status

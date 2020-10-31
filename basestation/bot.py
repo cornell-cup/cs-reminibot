@@ -1,5 +1,6 @@
 import socket 
 import time
+from typing import Optional
 
 class Bot:
     """ Represents a Minibot that the Basestation is connected to, it is a 
@@ -9,25 +10,54 @@ class Bot:
     SOCKET_BUFFER_SIZE = 1024
     START_CMD_TOKEN = "<<<<"
     END_CMD_TOKEN = ">>>>"
-    TIMEOUT_LIMIT = 2
+    TIMEOUT_LIMIT = 10
 
     def __init__(self, bot_id, bot_name, ip_address, port=10000):
         self.port = port
         self.ip_address = ip_address
         # the basestation's endpoint socket with the 
         self.sock = socket.create_connection((ip_address, port))
+        # an arbitrarily small time
+        self.sock.settimeout(0.01)
         self._name = bot_name
         self._id = bot_id
         self.last_status_time = time.time()
+        self.is_socket_connected = True
+    
+    def try_receive_data(self, peek: bool=False) -> Optional[str]:
+        """ Tries to receive data from the Minibot. 
+
+        Arguments:
+            peek:  Whether to empty the socket buffer.  If False empty buffer,
+                if True, do not. 
+        Returns:  The data, or None if it cannot receive data 
+        """
+        line = None
+        try: 
+            if peek:
+                data = self.sock.recv(Bot.SOCKET_BUFFER_SIZE, socket.MSG_PEEK)
+            else:
+                data = self.sock.recv(Bot.SOCKET_BUFFER_SIZE)
+            line = data.decode("utf-8")
+            if len(line) == 0:
+                self.sock.close()
+                self.is_socket_connected = False
+        except socket.timeout:
+            pass
+        return line
+
 
     def sendKV(self, key, value):
         """
         send command with specified key and value
         """
+        if not self.is_socket_connected:
+            return
+        
         data = f"<<<<{key},{value}>>>>".encode()
-        line = self.sock.recv(Bot.SOCKET_BUFFER_SIZE, socket.MSG_PEEK).decode("utf-8")
+        line = self.try_receive_data(peek=True)
         print(f"Line {line}")
-        if len(line) > 0:
+        if line is None or len(line) > 0:
             self.sock.sendall(data)
     
     def readKV(self):
@@ -35,9 +65,12 @@ class Bot:
         Reads from the socket connection between the basesation and the Minibot
         <<<<BOTSTATUS,ACTIVE>>>>
         """
-        data_str = self.sock.recv(Bot.SOCKET_BUFFER_SIZE).decode("utf-8")
+        if not self.is_socket_connected:
+            return
+        data_str = self.try_receive_data()
         print(f"Data str {data_str}")
-        
+        if data_str is None:
+            return
         # parse the data by removing the angular brackets
         comma = data_str.find(",")
         start = data_str.find(Bot.START_CMD_TOKEN)
@@ -56,7 +89,8 @@ class Bot:
         """ Checks whether the Minibot has sent a heartbeat message recently 
         """
         time_diff = time.time() - self.last_status_time
-        return time_diff < Bot.TIMEOUT_LIMIT
+        print(f"Time diff {time_diff}")
+        return time_diff < Bot.TIMEOUT_LIMIT and self.is_socket_connected
    
     @property
     def name(self):
