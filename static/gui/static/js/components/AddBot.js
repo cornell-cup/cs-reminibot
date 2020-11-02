@@ -115,8 +115,9 @@ export default class AddBot extends React.Component {
     }
 
     componentDidMount() {
-        setInterval(this.getBotStatus.bind(this), 5000);
+        setInterval(this.getBotStatus.bind(this), 500);
         setInterval(this.refreshAvailableBots.bind(this), 2000);
+        setInterval(this.pulseHeartBeat.bind(this), 500);
     }
 
     /*
@@ -173,6 +174,24 @@ export default class AddBot extends React.Component {
     /*update power value when bot moves*/
     updatePowerValue(event) {
         this.state.power = event.target.value;
+    }
+
+    pulseHeartBeat() {
+        const _this = this;
+        axios.get('/heartbeat')
+            .then(function (response) {
+                if (response.data["is_heartbeat"]) {
+                    document.getElementById('led-red').style.animation = "blinkRed 4s 2";
+                    var delayInMilliseconds = 2000; //1 second
+
+                    setTimeout(function () {
+                        document.getElementById('led-red').style.animation = "none";
+                    }, delayInMilliseconds);
+                }
+            })
+            .catch(function (error) {
+                // console.log(error);
+            });
     }
 
     /*adds bot name to list*/
@@ -302,29 +321,6 @@ export default class AddBot extends React.Component {
                     // console.log(error);
                 })
         }
-    }
-    
-    checkBotStatus() {
-        const _this = this;
-        axios({
-            method: 'GET',
-            url: '/start',
-            data: JSON.stringify({
-                key: "BOTSTATUS",
-            })
-        })
-            .then(function (response) {
-                if (response.data = "ACTIVE") {
-                    console.log(response.data);
-                }
-                else{
-                    let bot_name = this.props.selected_bot;
-                    let li = this.props.bot_list;
-                }
-            })
-            .catch(function (error) {
-                // console.log(error);
-            })
     }
 
     getVisionData() {
