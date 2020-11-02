@@ -11,7 +11,7 @@ getSpeechRecognitionData() {
 }
 ```
 ## Naming conventions
-1. Use Camel casing for all names.  Classes should start with an uppercase letter, all other identifiers should use   
+1. Use Camel casing for all names.  Classes should start with an uppercase letter, all other identifiers should start with a lowercase letter.   
 ```javascript
 class CoolBot extends React.Component {
     updateCurrentBot(event) {
