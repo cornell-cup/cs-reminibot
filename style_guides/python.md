@@ -1,7 +1,7 @@
 # Python Style Guide
 ## Function Definitions
 1. Ensure that all function definitions have type hints.  Refer to the documentation for the typing module: https://docs.python.org/3/library/typing.html.  For easier guides, just Google "type hints typing module Python".
-```
+```python
 from typing import List, Optional
 
 def add_postive_nums(number_lst: List[int]) -> Optional[int]:
@@ -13,7 +13,7 @@ In the above example, type hints are used to specify the argument type and retur
     1. What the functions does.
     2. The arguments the function takes. 
     3. The return type of the function.
-```
+```python
 def add_positive_nums(number_lst: List[int]) -> Optional[int]:
   """ Finds the sum of a list of positive numbers.  
   
@@ -26,14 +26,14 @@ def add_positive_nums(number_lst: List[int]) -> Optional[int]:
 
 ## Naming conventions
 1. All classes should use Camel casing. 
-```
+```python
   class MinibotBaseStation:
     .......
     
   class SuperCoolClass:
 ```
 2. All other identifiers (variables, functions, etc.) should use Snake casing.  
-```
+```python
   def minibot_base_station_function():
     super_cool_variable = 1
 ```
@@ -41,7 +41,7 @@ def add_positive_nums(number_lst: List[int]) -> Optional[int]:
 1. Ensure that lines are within 80 characters.
 2. Functions within a class should be separated by a single empty line.
 3. Functions outside a class or two classes should be separed by two empty lines.
-```
+```python
 def func_1():
   pass
 
