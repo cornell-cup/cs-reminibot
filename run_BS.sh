@@ -11,7 +11,8 @@ cd ..
 cd ..
 cd basestation
 echo "================= STARTING BLOCKLY USER PROGRAM DATABASE ================="
-python3 flask_app.py &
+#python3 flask_app.py &
 echo "=========== STARTING BASESTATION ==============="
-python3 base_station_interface.py 
+#python3 base_station_interface.py 
+python3 base_station_interface_flask.py
 

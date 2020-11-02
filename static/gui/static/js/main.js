@@ -17,7 +17,7 @@ class Navbar extends React.Component {
   render() {
     return (
       <div className="jumbotron text-center">
-        <img className="logo" src="./static/gui/static/img/logo.png" />
+        <img className="logo" src="{{ url_for('static', filename = 'img/logo.png')}}" />
         <h1>MiniBot GUI</h1>
       </div>
     );

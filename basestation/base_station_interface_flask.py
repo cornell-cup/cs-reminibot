@@ -5,7 +5,7 @@ Main file from which BaseStation Websocket interface begins.
 # import tornado
 # import tornado.web
 # import tornado.websocket\
-from flask import Flask, request
+from flask import Flask, request, render_template
 import os.path
 import json
 import logging
@@ -16,7 +16,9 @@ import requests
 
 # Minibot imports.
 from base_station import BaseStation
-app = Flask(__name__)
+
+# set template folder
+app = Flask(__name__, template_folder = '../static/gui/', static_folder = '../static/gui/static')
 
 base_station = BaseStation()
 send_blockly_remote_server = True
@@ -36,114 +38,119 @@ to the front-end which maybe is not what we want'''
 # temporary session_id valud
 session_id = "temp"
       
-@app.route('/start',methods=['POST'])
+@app.route('/start', methods=['POST', 'GET'])
 def post():
-  data = json.loads(request.data)
-  key = data['key']
+    if request.method == 'POST':
+        print(request)
+        data = json.loads(request.data)
+        key = data['key']
+        # key = ""
 
-  # session_id = self.get_secure_cookie("user_id") #
-  # if session_id:
-  #     session_id = session_id.decode("utf-8")
+        # session_id = self.get_secure_cookie("user_id") #
+        # if session_id:
+        #     session_id = session_id.decode("utf-8")
 
-  if key == "CONNECTBOT":
-      bot_name = data['bot_name']
-      if bot_name != None and bot_name != "":
-          print("Connecting bot " + str(bot_name))
-          print("session " + str(session_id))
-          return json.dumps(base_station.add_bot_to_session(
-              session_id, bot_name)).encode()
-      else:
-          print("No bot received, or bot name empty.")
-  if key == "MODE":
-      print("Reached MODE")
-      bot_name = data['bot_name']
-      mode_type = data['value']
-      print("here!")
-      bot_id = base_station.bot_name_to_bot_id(bot_name)
-      bot = base_station.get_bot(bot_id)
-      bot.sendKV(key, str(mode_type))
-  elif key == "WHEELS":
-      bot_name = data['bot_name']
-      direction = data['direction']
-      power = str(data['power'])
-      bot_id = base_station.bot_name_to_bot_id(bot_name)
-      base_station.move_wheels_bot(
-          session_id, bot_id, direction, power)
-    #   print(f"direction: {direction}, power: {power}")
-  elif key == "PORTS":
-      # leftmotor = data['leftmotor']
-      bot_id = base_station.bot_name_to_bot_id(data['bot_name'])
-      
-      portarray = data['ports']
-      for x in portarray:
-          print(x)
-      base_station.set_ports(portarray, session_id, bot_id)
+        if key == "CONNECTBOT":
+            bot_name = data['bot_name']
+            if bot_name != None and bot_name != "":
+                print("Connecting bot " + str(bot_name))
+                print("session " + str(session_id))
+                return json.dumps(base_station.add_bot_to_session(
+                    session_id, bot_name)).encode()
+            else:
+                print("No bot received, or bot name empty.")
+        if key == "MODE":
+            print("Reached MODE")
+            bot_name = data['bot_name']
+            mode_type = data['value']
+            print("here!")
+            bot_id = base_station.bot_name_to_bot_id(bot_name)
+            bot = base_station.get_bot(bot_id)
+            bot.sendKV(key, str(mode_type))
+        elif key == "WHEELS":
+            bot_name = data['bot_name']
+            direction = data['direction']
+            power = str(data['power'])
+            bot_id = base_station.bot_name_to_bot_id(bot_name)
+            base_station.move_wheels_bot(
+                session_id, bot_id, direction, power)
+            #   print(f"direction: {direction}, power: {power}")
+        elif key == "PORTS":
+            # leftmotor = data['leftmotor']
+            bot_id = base_station.bot_name_to_bot_id(data['bot_name'])
+            
+            portarray = data['ports']
+            for x in portarray:
+                print(x)
+            base_station.set_ports(portarray, session_id, bot_id)
 
-  # Looks for bots on the local network to connect to.
-  elif key == "DISCOVERBOTS":
-      return (json.dumps(
-          base_station.get_active_bots_names()).encode())
+        # Looks for bots on the local network to connect to.
+        elif key == "DISCOVERBOTS":
+            return (json.dumps(
+                base_station.get_active_bots_names()).encode())
 
-  # Receives the Blockly Generated Python scripts sent from the GUI.
-  elif key == "SCRIPTS":
-      print('data is:')
-      print(data)
-      value = data['value']
-      bot_name = data['bot_name']
-      params = {'bot_name': bot_name, 'value': value}
+        # Receives the Blockly Generated Python scripts sent from the GUI.
+        elif key == "SCRIPTS":
+            print('data is:')
+            print(data)
+            value = data['value']
+            bot_name = data['bot_name']
+            params = {'bot_name': bot_name, 'value': value}
 
-      # TODO integrate this flask app
-      if send_blockly_remote_server:
-          url = 'http://127.0.0.1:5000/code/'
-          x = requests.post(url, json=params)
-          print("Post")
-          print(x.json)
+            # TODO integrate this flask app
+            if send_blockly_remote_server:
+                url = 'http://127.0.0.1:5000/code/'
+                x = requests.post(url, json=params)
+                print("Post")
+                print(x.json)
 
-          print('database test')
-          url2 = 'http://127.0.0.1:5000/program/'
-          x = requests.get(url2)
-          print("Get")
-          print(x.json)
+                print('database test')
+                url2 = 'http://127.0.0.1:5000/program/'
+                x = requests.get(url2)
+                print("Get")
+                print(x.json)
 
-      bot_id = base_station.bot_name_to_bot_id(bot_name)
-      bot = base_station.get_bot(bot_id)
-      # reset the previous script's error message, so we can get the new error message
-      # of the new script
-      bot.set_result(None)
-      if bot:
-          print("Code len = " + str(len(value)))
-          print(type(bot))
-          if len(value) == 0:
-              print("GETTING SCRIPTS")
-              bot.sendKV("SCRIPTS", '')
-          elif len(value) == 1:
-              print("SENDING SCRIPTS")
-              bot.sendKV("SCRIPTS", value[0])
-          elif len(value) == 2:
-              print("SAVING SCRIPTS")
-              bot.sendKV("SCRIPTS", ",".join(value))
-          else:
-              # TODO check if a "long enough" program
-              # is supposed to be sent over
-              print("RUNNING SCRIPT")
-              # self.send_program(bot, value)
-              send_program(bot, value)
-        
+            bot_id = base_station.bot_name_to_bot_id(bot_name)
+            bot = base_station.get_bot(bot_id)
+            # reset the previous script's error message, so we can get the new error message
+            # of the new script
+            bot.set_result(None)
+            if bot:
+                print("Code len = " + str(len(value)))
+                print(type(bot))
+                if len(value) == 0:
+                    print("GETTING SCRIPTS")
+                    bot.sendKV("SCRIPTS", '')
+                elif len(value) == 1:
+                    print("SENDING SCRIPTS")
+                    bot.sendKV("SCRIPTS", value[0])
+                elif len(value) == 2:
+                    print("SAVING SCRIPTS")
+                    bot.sendKV("SCRIPTS", ",".join(value))
+                else:
+                    # TODO check if a "long enough" program
+                    # is supposed to be sent over
+                    print("RUNNING SCRIPT")
+                    # self.send_program(bot, value)
+                    send_program(bot, value)
+                
 
-  elif key == "DISCONNECTBOT":
-      bot_name = data['bot']
-      bot_id = base_station.bot_name_to_bot_id(bot_name)
-      base_station.remove_bot_from_session(session_id, bot_id)
-  elif key == "BOTSTATUS":
-      bot_name = data['bot_name']
-      bot_id = base_station.bot_name_to_bot_id(bot_name)
-      bot = base_station.get_bot(bot_id)
-      if bot:
-          bot.sendKV("BOTSTATUS", '')
-          # self.write(json.dumps(bot.tcp_listener_thread.status).encode())
-          return json.dumps(bot.tcp_listener_thread.status).encode()
-  
-  return "" #catch-all return TODO: fix code structure so we don't have to do this
+        elif key == "DISCONNECTBOT":
+            bot_name = data['bot']
+            bot_id = base_station.bot_name_to_bot_id(bot_name)
+            base_station.remove_bot_from_session(session_id, bot_id)
+        elif key == "BOTSTATUS":
+            bot_name = data['bot_name']
+            bot_id = base_station.bot_name_to_bot_id(bot_name)
+            bot = base_station.get_bot(bot_id)
+            if bot:
+                bot.sendKV("BOTSTATUS", '')
+                # self.write(json.dumps(bot.tcp_listener_thread.status).encode())
+                return json.dumps(bot.tcp_listener_thread.status).encode()
+        return "" #catch-all return TODO: fix code structure so we don't have to do this
+    else:
+        return render_template('index.html')
+    
 
 def send_program(bot, program):
   """
@@ -261,5 +268,5 @@ if __name__ == "__main__":
     """
     # base_station_server = BaseInterface(8080, send_blockly_remote_server=True)
     # base_station_server.start()
-    app.run()
+    app.run(host='localhost', port='8080')
     
