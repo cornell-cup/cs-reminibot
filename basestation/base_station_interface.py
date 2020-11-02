@@ -51,6 +51,7 @@ class BaseInterface:
                 send_blockly_remote_server=send_blockly_remote_server,
             )),
             ("/vision", VisionHandler, dict(base_station=self.base_station)),
+            ("/heartbeat", HeartbeatHandler, dict(base_station=self.base_station)),
             ("/result", ErrorMessageHandler, dict(base_station=self.base_station))
         ]
 
@@ -66,7 +67,7 @@ class BaseInterface:
         """
         Creates the application object (via Tornado).
         """
-        return tornado.web.Application(self.handlers, **self.settings, debug=True)
+        return tornado.web.Application(self.handlers, **self.settings)
 
 
 class ClientHandler(tornado.web.RequestHandler):
@@ -188,10 +189,9 @@ class ClientHandler(tornado.web.RequestHandler):
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             bot = self.base_station.get_bot(bot_id)
             if bot:
-                status = self.base_station.get_bot_status(bot)
-                json_reply = {"BOTSTATUS": status}
-                self.write(json.dumps(json_reply).encode())
-    
+                bot.sendKV("BOTSTATUS", '')
+                self.write(json.dumps(bot.tcp_listener_thread.status).encode())
+
     def send_program(self, bot, program):
         """
         Sends the program received from Blockly to the bot, translated
@@ -276,6 +276,17 @@ class VisionHandler(tornado.websocket.WebSocketHandler):
     def post(self):
         info = json.loads(self.request.body.decode())
         self.base_station.update_vision_log(info)
+
+
+class HeartbeatHandler(tornado.websocket.WebSocketHandler):
+    def initialize(self, base_station):
+        self.base_station = base_station
+
+    def get(self):
+        time_interval = 1
+        is_heartbeat = self.base_station.is_heartbeat_recent(time_interval)
+        heartbeat_json = {"is_heartbeat": is_heartbeat}
+        self.write(json.dumps(heartbeat_json).encode())
 
 
 class ErrorMessageHandler(tornado.websocket.WebSocketHandler):
