@@ -190,15 +190,3 @@ Upgrade npm to the lastest version by running:
 sudo npm install npm@latest -g
 ```
 [Continue with the remaining installation steps](#Continue)
-
-
-# Common Problems & Fixes:
-#### ERROR: EACCES when trying to run npm commands
-Try running the following command to fix this:
-```
-sudo chown -R $(whoami) ~/.npm
-```
-And then run your npm command with sudo in front of it if it still doesn't work.  For example:
-```
-sudo npm install
-```

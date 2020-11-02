@@ -1,6 +1,6 @@
 import React from 'react';
 import axios from 'axios';
-import { Button } from './Util.js'
+import {Button} from './Util.js'
 
 /*
  *  A RefreshingList is a list designed to refresh when its update()
@@ -48,14 +48,14 @@ class RefreshingList extends React.Component {
 }
 
 function Ports(props) {
-    const ports = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"];
+    const ports = ["2","3","4","5","6","7","8","9","10","11","12","13"];
     let buttonList = [];
 
     for (let i = 0; i < ports.length; i++) {
         buttonList.push(<li><button className="btn_ports" onClick={() => props.motorPorts(props.portName, ports[i])}>{ports[i]}</button></li>);
     }
     return (<ul> {buttonList} </ul>);
-};
+  };
 
 function PortsList(props) {
     const portNames = [
@@ -63,7 +63,7 @@ function PortsList(props) {
     ]
 
     const portLabels = [
-        "Left Motor", "Right Motor", "Motor 3", "Line Follower",
+        "Left Motor", "Right Motor", "Motor 3", "Line Follower", 
         "Infrared", "RFID", "Ultrasonic"
     ]
 
@@ -72,161 +72,23 @@ function PortsList(props) {
 
     for (let i = 0; i < portNames.length; i++) {
         let link = <a href="">{portLabels[i]}</a>
-        let ports = <Ports portName={portNames[i]} motorPorts={props.motorPorts} />
+        let ports = <Ports portName={portNames[i]} motorPorts={props.motorPorts}/>
         let listElement = <li> {link} {ports} </li>
         allListElements.push(listElement);
     }
 
     return (
         <nav id="main_nav">
-            <ul>
-                <li>
-                    <a href="">Motor Ports</a>
-                    <ul> {allListElements} </ul>
-                </li>
-            </ul>
+        <ul>
+        <li>
+            <a href="">Motor Ports</a>
+            <ul> {allListElements} </ul>
+        </li>
+        </ul>
         </nav>
     );
 }
 
-class SpeechRecognition extends React.Component {
-    /** Implements the SpeechRecognition Toggle button */
-    constructor(props) {
-        super();
-        this.state = {
-            on: false // Indicates if button is on or off
-        }
-        this.getSpeechRecognitionData = this.getSpeechRecognitionData.bind(this);
-        this.toggle = this.toggle.bind(this);
-        // Number of messages to display in GUI
-        this.maxMessages = 4;
-        // Used to alternate the colors between odd and even messages.  This is 
-        // so that when the messages are scrolling, the messages retain the 
-        // same color.  For example, let's say we have the messages ["a", b", 
-        // "c", "d"] and "a" and "c" are blue and "b" and "d" are black.  Hence,
-        // the odd-index messages are blue and the even-index are black. When we
-        // add "e" to the queue and pop "a", the queue will look like ["b", "c",
-        // "d", "e"].  We still want "b" and "d" to be black and "c" to be blue.
-        // Hence now we must make the even-index messages blue and the odd-index
-        // messages black. 
-        this.queueColorIndex = 0;
-        this.queue = [""];
-        // Interval function to poll server backend
-        // TODO: Replace polling with WebSockets at some point
-        this.speechRecognitionInterval = null;
-
-        // colors for the messages in the feedback box
-        this.colors = ["#000080", "black"]
-    }
-
-    /** Turns the button on or off */
-    toggle() {
-        const _this = this;
-        // If button was previously off, turn_on should be True.
-        let turnOn = !this.state.on;
-
-        // If we are turning the speech recognition service on, 
-        // start polling the backend server for status messages to be 
-        // displayed on the GUI
-        if (turnOn) {
-            this.speechRecognitionInterval = setInterval(
-                this.getSpeechRecognitionData.bind(this), 500
-            );
-        }
-        // If we are turning the speech recognition service off, stop polling
-        // the backend
-        else {
-            clearInterval(this.speechRecognitionInterval);
-            let feedbackBox = document.getElementById(
-                'speech_recognition_feedback_box'
-            );
-            feedbackBox.innerHTML = "";
-            this.queue = [""];
-        }
-
-        // Tell the backend server to start / stop the speech recognition service 
-        axios({
-            method: 'POST',
-            url: '/speech_recognition',
-            data: JSON.stringify({
-                command: turnOn ? "START" : "STOP",
-                bot_name: _this.props.selected_bot
-            })
-        }).then(function (response) {
-            if (response.data) {
-                console.log("Speech Recognition", response.data);
-            }
-        }).catch(function (error) {
-            console.log("Speech Recognition", error);
-        })
-
-        this.setState({on: turnOn});
-    }
-
-    /** Get the messages from the speech recognition service from the
-     * backend server.
-     */
-    getSpeechRecognitionData() {
-        const _this = this;
-        axios.get('/speech_recognition')
-            .then(function (response) {
-                // only add to the message queue if the message is a new message
-                // and is not an empty string
-                if (_this.queue[_this.queue.length - 1] !== response.data &&
-                    response.data !== "") {
-                    // keep the message a fixed length
-                    if (_this.queue.length == _this.maxMessages) {
-                        _this.queue.shift();
-                    }
-                    _this.queue.push(response.data);
-                    // flips the value of the index from 0 to 1 and vice-versa
-                    // to alternate the colors (see constructor for more
-                    // detailed documentation)
-                    _this.queueColorIndex = 1 - _this.queueColorIndex;
-                }
-                let feedbackBox = document.getElementById(
-                    'speech_recognition_feedback_box'
-                );
-                feedbackBox.innerHTML = "";
-
-                // Iterate through the queue, adding each message to the 
-                // feedback box as a separate html paragraph (so that we can 
-                // style each message differently).  Iterate through the queue
-                // backwards so that the most recent messages show up first
-                for (let i = _this.queue.length - 1; i >= 0; i--) {
-                    // make the first message bold
-                    let bold = "font-weight: bold;";
-                    // make new messages alternate colors
-                    let color = (i % 2 == _this.queueColorIndex) ? 
-                        _this.colors[0] : _this.colors[1];
-
-                    // pargraph style
-                    let pFontWeight = (i == _this.queue.length - 1) ? bold : "";
-                    let pColor = "color: " + color + ";";
-                    let pMargin = "margin: 0;";
-                    let pStyle = pFontWeight + pMargin + pColor;
-                    let pStart = "<p style=\"" + pStyle + "\">";
-                    let pEnd = "</p>";
-                    let paragraph = pStart + _this.queue[i] + pEnd;
-                    feedbackBox.innerHTML += paragraph;
-                }
-            }).catch(function (error) {
-                console.log("Speech Recognition", error);
-            });
-    }
-
-    render() {
-        let x = (this.state.on) ? 
-            "Stop Speech Recognition" : "Start Speech Recognition";
-        return (
-            <div>
-                <button className="btn btn-primary element-wrapper" 
-                    onClick={this.toggle}>{x}</button>
-            </div>
-
-        );
-    }
-}
 
 export default class AddBot extends React.Component {
     constructor(props) {
@@ -391,25 +253,25 @@ export default class AddBot extends React.Component {
     }
 
     /*motor ports*/
-    motorPorts(name, port1) {
-        const _this = this;
-        console.log(name);
-        console.log(port1);
+    motorPorts(name, port1){
+      const _this = this;
+      console.log(name);
+      console.log(port1);
 
-        axios({
-            method: 'POST',
-            url: '/start',
-            data: JSON.stringify({
-                key: "PORTS",
-                ports: [name, String(port1)],
-                bot_name: _this.props.selected_bot,
-            })
-        })
-            .then(function (response) {
-            })
-            .catch(function (error) {
-                console.log(error);
-            })
+      axios({
+          method: 'POST',
+          url: '/start',
+          data: JSON.stringify({
+              key: "PORTS",
+              ports: [name, String(port1)],
+              bot_name: _this.props.selected_bot,
+          })
+      })
+          .then(function (response) {
+          })
+          .catch(function (error) {
+              console.log(error);
+          })
     }
 
     /* removes selected object from list*/
@@ -539,7 +401,7 @@ export default class AddBot extends React.Component {
                 </div>
                 <div className="row">
                     <div className="col horizontalDivCenter">
-                        <div className="element-wrapper">
+                        <div className="element-wrapper"> 
                             <label> Bot List: </label>
                             <select onChange={this.selectBotListener}>
                                 {this.props.bot_list.map(
@@ -551,7 +413,7 @@ export default class AddBot extends React.Component {
                                 )}
                             </select>
                         </div>
-                        <Button id="remove_bot" name="Remove" onClick={() => _this.deleteBotListener()} bot_list={this.props.bot_list} />
+                        <Button id="remove_bot" name="Remove" onClick={()=>_this.deleteBotListener()} bot_list={this.props.bot_list} />
                         <div className="led-box element-wrapper">
                             <div id="led-red"></div>
                         </div>
@@ -585,34 +447,21 @@ export default class AddBot extends React.Component {
                             <div>
                                 <label> Power: </label>
                             </div>
-                            <input id="custom-range-1" class="custom-range" name="wheel_power" type="range" min="0" max="100"
-                                step="5" onChange={evt => this.updatePowerValue(evt)} />
+                            <input id="custom-range-1" class="custom-range" name="wheel_power" type="range" min="0" max="100" 
+                                step="5" onChange={evt => this.updatePowerValue(evt)}/>
                         </form>
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col horizontalDivCenter">
-                        <p id="small_title"> Speech Recognition </p>
                     </div>
                 </div>
                 {/* button-wrapper is a custom class to add padding
                     the rest is bootstrap css */}
-                <div className="col horizontalDivCenter">
-                    <SpeechRecognition selected_bot={this.props.selected_bot} 
-                        float="right" />
-                </div>
-                <div className="col horizontalDivCenter">
-                    <label id="speech_recognition_feedback_box" />
-                </div>
-                <br />
-                <br />
-                <div className="row">
+                <div className="row button-wrapper">
                     <div className="col horizontalDivCenter">
-                        <button className="btn btn-success element-wrapper mr-1" onClick={() => this.objectDetectionOnClick()}>Object Detection</button>
-                        <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.lineFollowOnClick()}>Line Follow</button>
+                        <button type="button" className="btn btn-primary" onClick={() => this.lineFollowOnClick()}>Line Follow</button>
+                        <div className="divider" />
+                        <button type="button" className="btn btn-success" onClick={() => this.objectDetectionOnClick()}>Object Detection</button>
                     </div>
                 </div>
-            </div >
+            </div>
         );
     }
 }
