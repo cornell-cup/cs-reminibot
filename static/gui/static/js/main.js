@@ -32,9 +32,9 @@ class Platform extends React.Component {
     super(props);
     this.state = {
       customBlockList: [],
-      bot_name: '',
+      botName: '',
       blockly_xml: null,
-      bot_list: [],
+      botList: [],
       selected_bot: ''
     };
 
@@ -47,8 +47,8 @@ class Platform extends React.Component {
 
   updateBotName(value) {
     const _this = this;
-    _this.setState({ bot_name: value }, () => {
-      console.log('updated bot name to: ' + this.state.bot_name);
+    _this.setState({ botName: value }, () => {
+      console.log('updated bot name to: ' + this.state.botName);
     });
   }
 
@@ -58,7 +58,7 @@ class Platform extends React.Component {
   }
 
   setBotList(botList) {
-    this.setState({ bot_list: botList });
+    this.setState({ botList: botList });
   }
 
   setSelectedBot(bot) {
@@ -85,9 +85,9 @@ class Platform extends React.Component {
                 <AddBot
                   updateBotName={this.updateBotName}
                   setBotList={this.setBotList}
-                  bot_list={this.state.bot_list}
+                  botList={this.state.botList}
                   setSelectedBot={this.setSelectedBot}
-                  selected_bot={this.state.selected_bot}
+                  selectedBot={this.state.selected_bot}
                 />
               </div>
               <div className="col">
@@ -99,7 +99,7 @@ class Platform extends React.Component {
             <Blockly
               blockly_xml={this.state.blockly_xml}
               setBlockly={this.setBlockly}
-              bot_name={this.state.bot_name}
+              botName={this.state.botName}
               customBlockList={this.state.customBlockList}
               redefineCustomBlockList={this.redefineCustomBlockList}
             />

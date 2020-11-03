@@ -31,23 +31,24 @@ class Bot:
         Arguments:
             peek:  Whether to empty the socket buffer.  If False empty buffer,
                 if True, do not. 
-        Returns:  The data, or None if it cannot receive data 
+        Returns:  The data, or None if the socket is disconnected 
         """
-        line = None
+        line = ""
         try:
             if peek:
                 data = self.sock.recv(Bot.SOCKET_BUFFER_SIZE, socket.MSG_PEEK)
             else:
                 data = self.sock.recv(Bot.SOCKET_BUFFER_SIZE)
             line = data.decode("utf-8")
-            if len(line) == 0:
+            line = line if len(line) > 0 else None # if "" then line = None
+            if line is None:
                 self.sock.close()
                 self.is_socket_connected = False
         except socket.timeout:
             pass
         except ConnectionResetError:
             print("Connection Reset Error")
-            line = ""
+            line = None
             self.is_socket_connected = False
         return line
 
@@ -62,8 +63,7 @@ class Bot:
         line = self.try_receive_data(peek=True)
         print(f"Line {line}")
         print(f"Data {data}")
-        if line is None or len(line) > 0:
-
+        if line is not None:
             self.sock.sendall(data)
 
     def readKV(self):

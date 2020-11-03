@@ -544,7 +544,7 @@ export default class MinibotBlockly extends React.Component {
       data: JSON.stringify({
         key: 'SCRIPTS',
         value: blockly.value,
-        bot_name: this.props.bot_name
+        bot_name: this.props.botName
       }),
     })
       .then(function (response) {
@@ -561,7 +561,7 @@ export default class MinibotBlockly extends React.Component {
       url: '/start',
       data: JSON.stringify({
         key: "WHEELS",
-        bot_name: this.props.bot_name,
+        bot_name: this.props.botName,
         direction: "stop",
         power: 0,
       })
@@ -762,7 +762,7 @@ export default class MinibotBlockly extends React.Component {
           </form>
           <br />
           <PythonTextBox
-            botName={this.props.bot_name}
+            botName={this.props.botName}
             custom_block={this.custom_block}
             dblock={this.dblock}
             dblockAll={this.dblockAll}
