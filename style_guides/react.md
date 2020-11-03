@@ -22,6 +22,41 @@ class CoolBot extends React.Component {
 ```
 ## Line Length and Spacing
 1.  Ensure that all lines are less than 80 characters long.
+2.  Long lists of arguments or fields that exceed 80 characters such as:
+```javascript
+{ property1: value1, property2: value2, property3: value3 .... }
+
+// OR 
+
+<ReactObject props1=value1 props2=values2 props3=value3 ... \>
+```
+
+should be formatted vertically as follows:
+```javascript
+{
+  property1: value1,
+  property2: value2,
+  property2: value3,
+  ...
+}
+
+// OR
+
+<ReactObject
+  props1=value1
+  props2=value2
+  props2=value3
+  ...
+\>
+```
+3. Format promises and callbacks (such as axios requests) as follows:
+```javascript
+doSomethingAsynchronously()
+.then((arg1, arg2) => {
+  // do things here with arg1 and arg2
+})
+.catch( (err) => console.log("Oops"))
+```
 
 ## Variables
 1.  Use `const` to define a variable whose value will not change later on.
