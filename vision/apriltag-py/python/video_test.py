@@ -18,7 +18,7 @@ system may add.
 """
 
 DETECT_TAGS = True
-SHOW_IMAGE = False
+SHOW_IMAGE = True
 BLUE = (255, 0, 0)
 
 
