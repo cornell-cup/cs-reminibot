@@ -186,14 +186,14 @@ def back(power):
 def left(power):
     """ Move minibot left """
     acquire_lock()
-    transmit_continuously('L')
+    transmit_once('L')
     release_lock()
 
 
 def right(power):
     """ Move minibot right """
     acquire_lock()
-    transmit_continuously('R')
+    transmit_once('R')
     release_lock()
 
 
