@@ -15,14 +15,14 @@
 	<script src="{{ url_for('static',filename='js/vendor/blockly/blocks_compressed.js') }}"></script>
 	<script src="{{ url_for('static',filename='js/vendor/blockly/en.js') }}"></script>
 
-	<!--TODO: localize d3-->	
+	<!--TODO: localize d3-->
 	<script src="https://d3js.org/d3.v5.min.js"></script>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
 <body>
 	<!-- HTML HERE -->
-  <div id="root"></div>
+	<div id="root"></div>
 	<xml id="toolbox" style="display:none;">
 		<category name="Control" colour="220">
 			<block type="controls_repeat_ext"></block>
@@ -105,15 +105,14 @@
 			<block type="custom_block"></block>
 		</category>
 		<!-- ADDING CUSTOM BLOCKS -->
-	</xml> -->
+	</xml>
 	<!-- basic imports -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 	<!-- IMPORT CUSTOM BLOCKS -->
 	<script type="text/javascript" src="{{ url_for('static', filename='js/blocks/custom_blocks.js')}}"></script>
 	<script type="text/javascript" src="{{ url_for('static', filename='js/blocks/custom_json.js')}}"></script>
-	manual scripts
+
 	<script src="{{ url_for('static', filename='build/app.bundle.js')}}"></script>
 </body>
 
 </html>
-
