@@ -6,7 +6,7 @@ import sys
 import time
 import requests
 from util import get_image, get_matrices_from_file, undistort_image, get_offsets_from_file
-from util import compute_tag_undistorted_pose
+from util import compute_tag_undistorted_pose, get_numpy_matrix, read_calib_json
 
 # Constants
 DEVICE_ID = 0  # The device the camera is, usually 0. TODO make this adjustable
@@ -40,11 +40,20 @@ def main():
 
     # Get matrices from calibration file
     print("Parsing calibration file " + calib_file_name + "...")
-    calib_file, camera_matrix, dist_coeffs = get_matrices_from_file(
-        calib_file_name)
-    transform_matrix = get_transform_matrix(calib_file)
-    x_offset, y_offset = get_offsets_from_file(calib_file)
+    calib_file, calib_data = read_calib_json(calib_file_name)
+    transform_matrix = get_numpy_matrix(
+        calib_data, "transform_matrix")
+    camera_matrix = get_numpy_matrix(calib_data, "camera_matrix")
+    dist_coeffs = get_numpy_matrix(calib_data, "dist_coeffs")
+    x_offset = calib_data["offsets"]["x"]
+    y_offset = calib_data["offsets"]["y"]
     calib_file.close()
+
+    # calib_file, camera_matrix, dist_coeffs = get_matrices_from_file(
+    #     calib_file_name)
+    # transform_matrix = get_transform_matrix(calib_file)
+    # x_offset, y_offset = get_offsets_from_file(calib_file)
+    # calib_file.close()
 
     assert (camera_matrix.shape == (3, 3))
     assert (dist_coeffs.shape == (1, 5))
