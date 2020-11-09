@@ -24,7 +24,7 @@ def main():
 
     # Get checkerboard
     cols, rows = args["cols"], args["rows"]
-    camera = get_camera(0)
+    camera = util.get_camera(0)
     image, gray_image, corners = get_checkerboard_interactive(camera,cols, rows)
     cv2.waitKey(0)
     camera.release()
@@ -62,10 +62,12 @@ def main():
     calib_data["dist_coeffs"] = dist.tolist()
     calib_data["new_camera_matrix"] = new_mtx.tolist()
 
-    print("Writing calibration file")
-
-    with open("calib0.json", "w+") as calib_file:
-        json.dump(calib_data, calib_file)
+    if args["output"]:
+        print("Writing calibration file")
+        with open(args["output"] + ".json", "w+") as calib_file:
+            json.dump(calib_data, calib_file)
+    else:
+        print(json.dumps(calib_data))
 
     cv2.destroyAllWindows()
 
@@ -94,16 +96,6 @@ def get_image_on_keypress(camera):
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
     return image
-
-
-def get_camera(idx):
-    camera = cv2.VideoCapture(idx)
-    if not cv2.VideoCapture.isOpened(camera):
-        raise Exception("Unable to open camera: {}".format(idx))
-    camera.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-    camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
-    camera.set(cv2.CAP_PROP_FPS, 30)
-    return camera
 
 def get_args():
     """
@@ -156,6 +148,15 @@ def get_args():
         type=int,
         default=0,
         help="ID of the camera to calibrate",
+    )
+
+    parser.add_argument(
+        "-o",
+        "--output",
+        metavar="<output-file-name>.json",
+        type=str,
+        default=None,
+        help="Name of file to write",
     )
 
     # TODO add multiple camera support - currently assuming ONE camera only.
