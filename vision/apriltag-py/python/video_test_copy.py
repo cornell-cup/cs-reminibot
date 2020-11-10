@@ -6,6 +6,7 @@ import util
 import itertools
 import statistics
 
+
 """
 Shows a video to detect tags live.
 
@@ -22,7 +23,10 @@ system may add.
 
 DETECT_TAGS = True
 SHOW_IMAGE = True
+PRINT_FPS = False
 BLUE = (255, 0, 0)
+APPLY_CHECKERBOARD = False
+APPLY_TRANSFORM = False
 
 
 def main():
@@ -32,18 +36,21 @@ def main():
     start = time.time()
     frame_num = 0
     while True:
-        frame_num += 1
+        if PRINT_FPS:
+            frame_num += 1
         ret, frame = camera.read()
         if not DETECT_TAGS:
             if SHOW_IMAGE:
                 cv2.imshow("frame", frame)
-        fps = frame_num / (time.time() - start)
-        # print("Showing frame {}".format(frame_num))
-        # print("Current speed: {} fps".format(fps))
+        if PRINT_FPS:
+            fps = frame_num / (time.time() - start)
+            print("Showing frame {}".format(frame_num))
+            print("Current speed: {} fps".format(fps))
         if DETECT_TAGS:
-            horizontal_dist = []
-            vertical_dist = []
-            row = -1
+            if APPLY_CHECKERBOARD:
+                frame = undistort_image(frame, sys.argv[1])
+            elif APPLY_TRANSFORM:
+                frame = apply_transform(frame, sys.argv[1])
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             detections, det_image = detector.detect(gray, return_image=True)
             print(len(detections))
@@ -60,18 +67,20 @@ def main():
                 y_axis = (tr[0] + br[0]) // 2, (tr[1] + br[1]) // 2
                 # print("Tag {} found at ({},{})".format(d.tag_id, tag_x, tag_y))
                 # print("with angle {}".format(util.get_tag_angle(d.corners)))
-                
-            dx, dy = [], []
-            for col in range(8-1):
-                for row in range(3):
-                    dx.append(x_pts[8*row + col + 1] - x_pts[8*row + col])
-            
-            y_chunks = [y_pts[(8*c):(8*(c+1))] for c in range(3)]
-            for c in range(3-1):
-                dy.extend([p[1]-p[0] for p in zip(y_chunks[c],y_chunks[c+1])])
-            
-            print("dx: {}\ndy: {}\nx_m: {} y_m: {}".format(
-                dx,
+
+            if len(detections) == 24:
+                # Compute diffs in x and y for tag mat
+                dx, dy = [], []
+                for col in range(8-1):
+                    for row in range(3):
+                        dx.append(x_pts[8*row + col + 1] - x_pts[8*row + col])
+                y_chunks = [y_pts[(8*c):(8*(c+1))] for c in range(3)]
+                for c in range(3-1):
+                    dy.extend([p[1]-p[0]
+                               for p in zip(y_chunks[c], y_chunks[c+1])])
+                # print stats
+                print("dx: {}\ndy: {}\nx_m: {} y_m: {}".format(
+                    dx, dy, max(dx)-min(dx), max(dy)-min(dy)))
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
     camera.release()
@@ -82,6 +91,29 @@ def main():
 def get_point(corner):
     x, y = corner
     return int(x), int(y)
+
+
+def undistort_image(frame, filename):
+    calib_file, calib_data = util.read_calib_json(filename)
+    mat = util.get_numpy_matrix(calib_data, "camera_matrix")
+    dist = util.get_numpy_matrix(calib_data, "dist_coeffs")
+    new_mtx = util.get_numpy_matrix(calib_data, "new_camera_matrix")
+    x = calib_data["roi"]["x"]
+    y = calib_data["roi"]["y"]
+    calib_file.close()
+
+    # Undistort
+    dst = cv2.undistort(frame, mat, dist, None, new_mtx)
+
+    # Crop
+    height, width = frame.shape[:2]
+    dst = dst[y:y+height, x:x+width]
+    return dst
+
+
+def apply_transform(frame, filename):
+    # TODO apply the transform from calibration to the frame
+    return frame
 
 
 def setup_camera():
