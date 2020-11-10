@@ -136,7 +136,7 @@ export default class AddBot extends React.Component {
                 'Content-Type': 'application/json'
             },
             data: JSON.stringify({
-                key: "DISCOVERBOTS_TESTS"
+                key: "DISCOVERBOTS"
             })
         })
             .then(function (response) {

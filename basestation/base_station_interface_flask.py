@@ -5,7 +5,7 @@ Main file from which BaseStation Websocket interface begins.
 # import tornado
 # import tornado.web
 # import tornado.websocket\
-from flask import Flask, request, render_template, jsonify
+from flask import Flask, request, render_template, jsonify, session
 import os.path
 import json
 import logging
@@ -20,6 +20,7 @@ from base_station import BaseStation
 # set template folder
 app = Flask(__name__, template_folder='../static/gui/',
             static_folder='../static/gui/static')
+app.secret_key = 'test'
 
 base_station = BaseStation()
 send_blockly_remote_server = True
@@ -37,9 +38,9 @@ to the front-end which maybe is not what we want'''
 #   if request.method == 'POST':
 
 # temporary session_id valud
-session_id = "temp"
 
 
+'''
 @app.route('/test', methods=['POST'])
 def test():
     print(f"values:{request.values}")
@@ -54,18 +55,18 @@ def test():
 
     print(f"get_json:{type((request.get_json()))}")
     print(f"get_json:{json.loads(request.get_json())}")
+'''
 
 
 @app.route('/start', methods=['GET'])
 def get():
     return render_template('index.html')
-    # return ""
 
 
 @app.route('/start', methods=['POST'])
 def post():
     try:
-
+        '''
         print(f"values:{request.values}")
 
         print(f"form:{request.form}")
@@ -75,10 +76,9 @@ def post():
         print(f"data: {request.data}")
         print(f"args: {request.args}")
 
-        print(f"get_json:{type((request.get_json()))}")
-        # print(f"get_json:{json.loads(request.get_json())}")
+        print(f"get_json:{type((request.get_json()))}")'''
+        print(f"get_json:{request.get_json()}")
 
-        # data = json.loads(request.data)
         data = request.get_json()
     except:
         print("post error")
@@ -91,6 +91,10 @@ def post():
     # session_id = self.get_secure_cookie("user_id") #
     # if session_id:
     #     session_id = session_id.decode("utf-8")
+    if not "id" in session:
+        session["id"] = str(base_station.add_session())
+
+    session_id = session["id"]
 
     if key == "CONNECTBOT":
         bot_name = data['bot_name']
@@ -129,6 +133,8 @@ def post():
 
     # Looks for bots on the local network to connect to.
     elif key == "DISCOVERBOTS":
+        print("reached discoverbots", (json.dumps(
+            base_station.get_active_bots_names()).encode()))
         return (json.dumps(
             base_station.get_active_bots_names()).encode())
 
