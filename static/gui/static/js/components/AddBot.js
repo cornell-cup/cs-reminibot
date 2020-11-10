@@ -113,7 +113,6 @@ export default class AddBot extends React.Component {
     }
 
     componentDidMount() {
-        setInterval(this.getBotStatus.bind(this), 500);
         setInterval(this.refreshAvailableBots.bind(this), 200);
     }
 
@@ -133,10 +132,24 @@ export default class AddBot extends React.Component {
         })
             .then(function (response) {
                 // console.log(response.data);
+                
                 _this.state.available_bots = response.data
+                let chosenBotLabel = document.getElementById("chosen-bot")
+                let chosenBotLabelWords = chosenBotLabel.innerHTML.split(" ");
+                let chosenBotName = chosenBotLabelWords[chosenBotLabelWords.length - 1];
+                let removeButton = document.getElementById("remove-bot");
+
+                if (!_this.state.available_bots.includes(chosenBotName)) {
+                    chosenBotLabel.innerHTML = "";
+                    removeButton.style.visibility = "hidden";
+                }
+                else {
+                    removeButton.style.visibility = "visible";
+                }
+
                 let refreshingBotList = _this.refreshingBotListRef.current
                 if (refreshingBotList !== null) {
-                    _this.refreshingBotListRef.current.update(response.data)
+                    _this.refreshingBotListRef.current.update(response.data);
                 }
 
             })
@@ -178,6 +191,7 @@ export default class AddBot extends React.Component {
         let li = this.props.botList;
         let botName = (this.refreshingBotListRef.current == null) ?
             "" : this.refreshingBotListRef.current.state.current_bot;
+        
         const _this = this;
         axios({
             method: 'POST',
@@ -191,10 +205,9 @@ export default class AddBot extends React.Component {
                 console.log("Trying to add bot to list")
                 if (response.data && !li.includes(botName)) {
                     console.log("Bot" + botName + " added successfully")
-                    li.push(botName);
-                    _this.props.updateBotName(botName);
-                    _this.props.setBotList(li);
-                    _this.props.setSelectedBot(botName);
+                    let msg = "Currently connected to: ";
+                    document.getElementById("chosen-bot").innerHTML = msg + botName;
+
                 } else {
                     console.log("Failed to add " + botName)
                 }
@@ -256,8 +269,9 @@ export default class AddBot extends React.Component {
     /* removes selected object from list*/
     deleteBotListener(event) {
         let li = this.props.botList;
-        li.pop(this.props.selectedBot);
-        this.props.setBotList(li)
+        console.log("BotList" + this.props.botList);
+        li.pop();
+        this.props.setBotList(li)     
 
         axios({
             method: 'POST',
@@ -265,7 +279,7 @@ export default class AddBot extends React.Component {
             data: JSON.stringify(
                 {
                     key: "DISCONNECTBOT",
-                    bot: this.props.selectedBot
+                    bot_name: this.props.selectedBot,
                 }),
         })
             .then(function (response) {
@@ -273,42 +287,9 @@ export default class AddBot extends React.Component {
             })
             .catch(function (error) {
                 console.warn(error);
-            });
+            })
     }
 
-    getBotStatus() {
-        console.log("Getting bot status");
-        let botName = this.props.selectedBot;
-        console.log("Bot Name ", botName);
-        let li = this.props.botList;
-        console.log("Bot List ", li);
-        const _this = this;
-        if (li.includes(botName)) {
-            axios({
-                method: 'POST',
-                url: '/start',
-                data: JSON.stringify({
-                    key: "BOTSTATUS",
-                    bot_name: this.props.selectedBot
-                })
-            })
-                .then(function (response) {
-                    if (response.data = "ACTIVE") {
-                        console.log(response.data);
-                    }
-                    else{
-                        let index = li.indexOf(botName);
-                        if (index > -1){
-                            li.splice(index, 1);
-                        }
-                        this.props.setBotList(li)
-                    }
-                })
-                .catch(function (error) {
-                    // console.log(error);
-                })
-        }
-    }
 
     getVisionData() {
         const _this = this;
@@ -389,8 +370,8 @@ export default class AddBot extends React.Component {
                 <div className="row">
                     <div className="col horizontalDivCenter">
                         <div className="element-wrapper"> 
-                            <label> Bot List: </label>
-                            <select onChange={this.selectBotListener}>
+                            <label id="chosen-bot"> </label>
+                            {/* <select onChange={this.selectBotListener}>
                                 {this.props.botList.map(
                                     function (botName, idx) {
                                         return (
@@ -398,9 +379,9 @@ export default class AddBot extends React.Component {
                                         );
                                     }
                                 )}
-                            </select>
+                            </select> */}
                         </div>
-                        <Button id="remove_bot" name="Remove" onClick={()=>_this.deleteBotListener()} botList={this.props.botList} />
+                        <Button id="remove-bot" name="Remove" onClick={()=>_this.deleteBotListener()} botList={this.props.botList} style = {{visibility: "hidden"}} />
                         <div className="led-box element-wrapper">
                             <div id="led-red"></div>
                         </div>

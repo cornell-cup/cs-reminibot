@@ -134,6 +134,18 @@ class ClientHandler(tornado.web.RequestHandler):
 
         # Looks for bots on the local network to connect to.
         elif key == "DISCOVERBOTS":
+            # go through each bot and make sure its active
+            for bot_name in self.base_station.get_active_bots_names():
+                bot_id = self.base_station.bot_name_to_bot_id(bot_name)
+                bot = self.base_station.get_bot(bot_id)
+                if not bot:
+                    continue
+                status = self.base_station.get_bot_status(bot)
+                # if the bot is inactive, remove it from the active bots list
+                if status == "INACTIVE":
+                    self.base_station.remove_bot(bot_id)
+
+            # return all the bots that are active after removing the inactive ones
             self.write(json.dumps(
                 self.base_station.get_active_bots_names()).encode())
         # Receives the Blockly Generated Python scripts sent from the GUI.
@@ -180,17 +192,10 @@ class ClientHandler(tornado.web.RequestHandler):
                     self.send_program(bot, value)
 
         elif key == "DISCONNECTBOT":
-            bot_name = data['bot']
+            bot_name = data['bot_name']
+            print("removing bot name" + bot_name)
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             self.base_station.remove_bot_from_session(session_id, bot_id)
-        elif key == "BOTSTATUS":
-            bot_name = data['bot_name']
-            bot_id = self.base_station.bot_name_to_bot_id(bot_name)
-            bot = self.base_station.get_bot(bot_id)
-            if bot:
-                status = self.base_station.get_bot_status(bot)
-                json_reply = {"BOTSTATUS": status}
-                self.write(json.dumps(json_reply).encode())
     
     def send_program(self, bot, program):
         """

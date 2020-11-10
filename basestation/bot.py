@@ -61,8 +61,8 @@ class Bot:
 
         data = f"<<<<{key},{value}>>>>".encode()
         line = self.try_receive_data(peek=True)
-        print(f"Line {line}")
-        print(f"Data {data}")
+        # print(f"Line {line}")
+        # print(f"Data {data}")
         if line is not None:
             self.sock.sendall(data)
 
@@ -74,7 +74,7 @@ class Bot:
         if not self.is_socket_connected:
             return
         data_str = self.try_receive_data()
-        print(f"Data str {data_str}")
+        # print(f"Data str {data_str}")
         if data_str is None:
             return
         # parse the data by removing the angular brackets
@@ -95,7 +95,7 @@ class Bot:
         """ Checks whether the Minibot has sent a heartbeat message recently 
         """
         time_diff = time.time() - self.last_status_time
-        print(f"Time diff {time_diff}")
+        # print(f"Time diff {time_diff}")
         return time_diff < Bot.TIMEOUT_LIMIT and self.is_socket_connected
 
     @property

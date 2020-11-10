@@ -183,7 +183,12 @@ class Minibot:
             # If its a connection socket, receive the data and execute the
             # necessary command
             else:
-                data_str = sock.recv(Minibot.SOCKET_BUFFER_SIZE).decode("utf-8")
+                
+                try:
+                    data_str = sock.recv(Minibot.SOCKET_BUFFER_SIZE).decode("utf-8")
+                except ConnectionResetError:
+                    print(f"Connection closed by Basestation")
+                    data_str = None
                 # if the socket receives "", it means the socket was closed
                 # from the other end, so close this endpoint too
                 print(f"Data string from basestation {data_str}")
@@ -212,6 +217,7 @@ class Minibot:
         """ TODO
         """
         for sock in errored_out_socks:
+            print(f"Socket errored out!!!! {sock}")
             self.close_sock(sock) # TODO handle more conditions instead of just
             # closing the socket
 
