@@ -1,19 +1,15 @@
 """
 Script to take pictures of the object shown by the user. It currently
 requires the user to constantly press the space bar to take images once the script is
-running. After quiting the script, there will be a new folder (default name images).
-There will be the following file structure:
+running. When space is pressed while the webcam feed is shown, the captured image
+is augmented a certain amount of times, and the resulting images are saved in the
+appropriate folder. There will be the following file structure.
 
-object/images
-├── training
-    └── True
-    └── False
-├── validation
-    └── True
-    └── False
-
-This file structure is required to use tensorflow's flow_from_directory function
-in augmentation.
+object
+├── images
+    └── category1
+    └── category2
+    └── ...
 """
 
 #packages
@@ -21,7 +17,11 @@ import cv2
 import sys
 import os
 import argparse
+import numpy as np
+from keras_preprocessing.image import ImageDataGenerator
 from random import random
+#modules
+import augment
 
 def take_pictures(args):
     image_counter = 0
@@ -37,8 +37,19 @@ def take_pictures(args):
         print("Not opening")
         exit(0)
 
-    while cap.isOpened():
+    # Instantiates image augmenter according to parameters
+    datagen = ImageDataGenerator(
+        rescale = 1./255, fill_mode='nearest',
+        rotation_range=args.rotation_range,
+        width_shift_range = args.width_shift_range,
+        height_shift_range = args.height_shift_range,
+        shear_range = args.shear_range,
+        zoom_range = args.zoom_range,
+        horizontal_flip = args.horizontal_flip,
+        vertical_flip = args.vertical_flip
+        )
 
+    while cap.isOpened():
         # Gets webcam feed
         ret, frame = cap.read()
         key = cv2.waitKey(1)
@@ -50,32 +61,29 @@ def take_pictures(args):
         frame = cv2.flip(frame, 1)
         shown_frame = cv2.resize(frame, args.window_dim)
 
-        cv2.imshow('Capture', shown_frame)
-
-        #Takes a picture on space
-        if key & 0xFF == ord(' '):
-        # for image_counter in range(1000):
-            # Determines whether image is for training or validation
-            rand = random()
-            if rand < args.ratio:
-                type = "training"
-            else:
-                type = "validation"
-            if args.test:
-                path = os.getcwd() + '/test/'
-            else:
-                path = os.getcwd() + '/' + args.folder + '/' + type + '/' + args.category + '/'
-            # Makes directorties for given path
-            if not os.path.isdir(path):
-                os.makedirs(path)
-            # Writes the capture to file
-            cv2.imwrite(path + '/' + args.image_name + '_' + str(image_counter) + '.jpg', frame)
-            image_counter += 1
-
+        cv2.imshow('Capture', frame)
 
         # Quits on escape or 'q'
         if key & 0xFF in [27, 1048603, ord('q')]:
+            exit = True
             break
+
+        #Takes a picture on space
+        if key & 0xFF == ord(' '):
+
+            # Defins directory for resulting images, and creates it if nonexistent
+            path = os.getcwd() + "/images/" + args.category + "/"
+            if not os.path.isdir(path):
+                os.makedirs(path)
+
+            # Augments capture frame, and saves all resulting images to appropriate directory
+            frame = np.expand_dims(frame, 0)
+            datagen.fit(frame)
+            for x, val in zip(datagen.flow(frame,
+                save_to_dir=path,
+                 save_prefix='img',
+                save_format='png'),range(args.amount - 1)):
+                pass
 
     cap.release()
     cv2.destroyAllWindows()
@@ -92,13 +100,20 @@ if __name__=="__main__":
     parser.add_argument("-window", "-w", nargs='*', action="store", dest="window_dim", type=int, default=[300,300],
         help="Specifies the dimensions of the webcame feed window in px (accepts exactly two args)")
 
-    #may want to keep it as images
-    parser.add_argument("-folder", "-f", action="store", dest="folder", default="images",
-        help="Specifies the folder that the images should be stored in")
+    # Defines category of images for this current capture (either 'True' or 'False' for binary classification)
     parser.add_argument("-category", "-c", action="store", dest="category", default="True",
         help="Specifies the category of the images")
-    parser.add_argument("-ratio", "-r", action="store", dest="ratio", default=.2, type=float,
-        help="Specifies the ratio of images to be store as training images to all taken (0 < ratio < 1)")
+
+    #Image augmentation
+    parser.add_argument('-amount', action="store", type=int, dest="amount", default=10,
+        help="Amount of augmented images to create from single capture")
+    parser.add_argument('-rot', action="store", type=float, dest="rotation_range", default=40, help='Degree range for random rotations of the image')
+    parser.add_argument('-width', action="store", type=float, dest="width_shift_range", default=0.2, help='Width shift range')
+    parser.add_argument('-height', action="store", type=float, dest="height_shift_range", default=0.2, help='Height shift range')
+    parser.add_argument('-shear', action="store", type=float, dest="shear_range", default=0.2, help='Shear range')
+    parser.add_argument('-zoom', action="store", type=float, dest="zoom_range", default=0.2, help='Zoom range')
+    parser.add_argument('-hflip', action="store", type=bool, dest="horizontal_flip", default=True, help='Horizontal flip')
+    parser.add_argument('-vflip', action="store", type=bool, dest="vertical_flip", default=True, help='Vertical flip')
 
     #Puts images in 'test' if specified
     parser.add_argument("-test","-t",dest="test", action="store_true")
@@ -110,8 +125,8 @@ if __name__=="__main__":
         parser.error('-dim expected two values')
     if args.window_dim is not None and len(args.window_dim) != 2:
         parser.error('-window expected two values')
-    if args.ratio < 0 or args.ratio > 1:
-        parser.error('x must be in [0,1] in \'-ratio x\'')
+    # if args.ratio < 0 or args.ratio > 1:
+    #     parser.error('x must be in [0,1] in \'-ratio x\'')
 
     # Converts image_dim and window_dim from array to tuple
     args.image_dim = (args.image_dim[0],args.image_dim[1])
