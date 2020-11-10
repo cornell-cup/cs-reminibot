@@ -19,13 +19,14 @@ Instructions for use:
 
 def main():
 
-    # Get args 
+    # Get args
     args = get_args()
 
     # Get checkerboard
     cols, rows = args["cols"], args["rows"]
     camera = util.get_camera(0)
-    image, gray_image, corners = get_checkerboard_interactive(camera,cols, rows)
+    image, gray_image, corners = get_checkerboard_interactive(
+        camera, cols, rows)
     cv2.waitKey(0)
     camera.release()
 
@@ -33,9 +34,10 @@ def main():
     # From tutorial:
     # https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_calib3d/py_calibration/py_calibration.html#calibration
     criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
-    obj_points = np.zeros((rows*cols,3), np.float32)
-    obj_points[:,:2] = np.mgrid[0:cols,0:rows].T.reshape(-1,2)
-    img_points = cv2.cornerSubPix(gray_image, corners, (11,11), (-1,-1), criteria)
+    obj_points = np.zeros((rows*cols, 3), np.float32)
+    obj_points[:, :2] = np.mgrid[0:cols, 0:rows].T.reshape(-1, 2)
+    img_points = cv2.cornerSubPix(
+        gray_image, corners, (11, 11), (-1, -1), criteria)
     ret, mat, dist, rvecs, tvecs = cv2.calibrateCamera(
         [obj_points],
         [img_points],
@@ -44,13 +46,14 @@ def main():
         None
     )
     height, width = image.shape[:2]
-    new_mtx, roi = cv2.getOptimalNewCameraMatrix(mat, dist, (width,height), 1, (width,height))
+    new_mtx, roi = cv2.getOptimalNewCameraMatrix(
+        mat, dist, (width, height), 1, (width, height))
 
     # Undistort
     dst = cv2.undistort(image, mat, dist, None, new_mtx)
 
     # Crop
-    x,y,w,h = roi
+    x, y, w, h = roi
     dst = dst[y:y+height, x:x+width]
 
     # Show new image
@@ -61,6 +64,12 @@ def main():
     calib_data["camera_matrix"] = mat.tolist()
     calib_data["dist_coeffs"] = dist.tolist()
     calib_data["new_camera_matrix"] = new_mtx.tolist()
+    calib_data["roi"] = {
+        "x": x,
+        "y": y,
+        "w": w,
+        "h": h
+    }
 
     if args["output"]:
         print("Writing calibration file")
@@ -70,6 +79,7 @@ def main():
         print(json.dumps(calib_data))
 
     cv2.destroyAllWindows()
+
 
 def get_checkerboard_interactive(camera, cols, rows):
     corners = None
@@ -88,6 +98,7 @@ def get_checkerboard_interactive(camera, cols, rows):
             break
     return image, gray_image, corners
 
+
 def get_image_on_keypress(camera):
     image = None
     while True:
@@ -96,6 +107,7 @@ def get_image_on_keypress(camera):
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
     return image
+
 
 def get_args():
     """
@@ -164,6 +176,7 @@ def get_args():
     options = parser.parse_args()
     args = vars(options)  # get dict of args parsed
     return args
+
 
 if __name__ == "__main__":
     main()
