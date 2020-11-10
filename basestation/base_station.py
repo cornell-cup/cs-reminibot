@@ -322,7 +322,9 @@ class BaseStation:
         bot_id = self.bot_name_to_bot_id(bot_name)
         if bot_id in self.active_bots:
             bot = self.active_bots[bot_id]
-            return self.active_sessions[session_id].add_bot_id_to_session(bot.id)
+            temp = self.active_sessions[session_id].add_bot_id_to_session(bot.id)
+            print(f"Bots in session {self.active_sessions[session_id].bots}")
+            return temp
         else:
             return False
 
@@ -334,7 +336,9 @@ class BaseStation:
             session_id (str): a unique id
             bot_id (str): a unique id
         """
+        print(f"Session id when removing bot {session_id}")
         session = self.active_sessions[session_id]
+        print(f"List of session bots removing bot {session.bots}")
         session.remove_bot_id_from_session(bot_id)
 
     # ================== BASESTATION GUI ==================

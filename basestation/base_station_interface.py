@@ -119,14 +119,13 @@ class ClientHandler(tornado.web.RequestHandler):
             direction = data['direction']
             power = str(data['power'])
 
-
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             self.base_station.move_wheels_bot(
                 session_id, bot_id, direction, power)
         elif key == "PORTS":
             # leftmotor = data['leftmotor']
             bot_id = self.base_station.bot_name_to_bot_id(data['bot_name'])
-            
+
             portarray = data['ports']
             for x in portarray:
                 print(x)
@@ -191,12 +190,6 @@ class ClientHandler(tornado.web.RequestHandler):
                     print("RUNNING SCRIPT")
                     self.send_program(bot, value)
 
-        elif key == "DISCONNECTBOT":
-            bot_name = data['bot_name']
-            print("removing bot name" + bot_name)
-            bot_id = self.base_station.bot_name_to_bot_id(bot_name)
-            self.base_station.remove_bot_from_session(session_id, bot_id)
-    
     def send_program(self, bot, program):
         """
         Sends the program received from Blockly to the bot, translated
@@ -223,8 +216,8 @@ class ClientHandler(tornado.web.RequestHandler):
         }
 
         # functions that run continuously, and hence need to be started
-        # in a new thread on the Minibot otherwise the Minibot will get 
-        # stuck in an infinite loop and will be unable to receive 
+        # in a new thread on the Minibot otherwise the Minibot will get
+        # stuck in an infinite loop and will be unable to receive
         # other commands
         threaded_functions = [
             "fwd",
@@ -238,7 +231,7 @@ class ClientHandler(tornado.web.RequestHandler):
         # Regex is for bot-specific functions (move forward, stop, etc)
         # 1st group is the whitespace (useful for def, for, etc),
         # 2nd group is for func name, 3rd group is for args,
-        # 4th group is for anything else (additional whitespace, 
+        # 4th group is for anything else (additional whitespace,
         # ":" for end of if condition, etc)
         pattern = r"(.*)bot.(\w*)\((.*)\)(.*)"
         regex = re.compile(pattern)
@@ -259,7 +252,8 @@ class ClientHandler(tornado.web.RequestHandler):
                     parsed_line += "Thread(target={}, args=[{}]).start()\n".format(
                         func, args)
                 else:
-                    parsed_line += func + "(" + args + ")" + match.group(4) + "\n"
+                    parsed_line += func + \
+                        "(" + args + ")" + match.group(4) + "\n"
                 parsed_program.append(parsed_line)
 
         parsed_program_string = "".join(parsed_program)

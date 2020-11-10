@@ -34,8 +34,8 @@ class Platform extends React.Component {
       customBlockList: [],
       botName: '',
       blockly_xml: null,
-      botList: [],
-      selected_bot: ''
+      chosenBotText: '',
+      removeBotButtonStyle: {},
     };
 
     this.updateBotName = this.updateBotName.bind(this);
@@ -43,6 +43,8 @@ class Platform extends React.Component {
     this.setBotList = this.setBotList.bind(this);
     this.setSelectedBot = this.setSelectedBot.bind(this);
     this.redefineCustomBlockList = this.redefineCustomBlockList.bind(this);
+    this.setChosenBotText = this.setChosenBotText(this);
+    this.setRemoveButtonStyle = this.setRemoveButtonStyle(this);
   }
 
   updateBotName(value) {
@@ -57,16 +59,16 @@ class Platform extends React.Component {
     _this.setState({ blockly_xml: xmltext });
   }
 
-  setBotList(botList) {
-    this.setState({ botList: botList });
-  }
-
-  setSelectedBot(bot) {
-    this.setState({ selected_bot: bot });
-  }
-
   redefineCustomBlockList(newCustomBlockList) {
-    this.setState({customBlockList: newCustomBlockList});
+    this.setState({ customBlockList: newCustomBlockList });
+  }
+
+  setChosenBotText(text) {
+    this.setState({ chosenBotText: text });
+  }
+
+  setRemoveButtonStyle(style) {
+    this.setState({ removeBotButtonStyle: style });
   }
 
   render() {
@@ -84,10 +86,10 @@ class Platform extends React.Component {
               <div className="col">
                 <AddBot
                   updateBotName={this.updateBotName}
-                  setBotList={this.setBotList}
-                  botList={this.state.botList}
-                  setSelectedBot={this.setSelectedBot}
-                  selectedBot={this.state.selected_bot}
+                  chosenBotText={this.state.chosenBotText}
+                  setChosenBotText={this.setChosenBotText}
+                  removeButtonStyle={this.state.removeBotButtonStyle}
+                  setRemoveButtonStyle={this.setRemoveButtonStyle}
                 />
               </div>
               <div className="col">

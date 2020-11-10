@@ -1,6 +1,6 @@
 import React from 'react';
 import axios from 'axios';
-import {Button} from './Util.js'
+import { Button } from './Util.js'
 
 /*
  *  A RefreshingList is a list designed to refresh when its update()
@@ -48,14 +48,14 @@ class RefreshingList extends React.Component {
 }
 
 function Ports(props) {
-    const ports = ["2","3","4","5","6","7","8","9","10","11","12","13"];
+    const ports = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"];
     let buttonList = [];
 
     for (let i = 0; i < ports.length; i++) {
         buttonList.push(<li><button className="btn_ports" onClick={() => props.motorPorts(props.portName, ports[i])}>{ports[i]}</button></li>);
     }
     return (<ul> {buttonList} </ul>);
-  };
+};
 
 function PortsList(props) {
     const portNames = [
@@ -63,7 +63,7 @@ function PortsList(props) {
     ]
 
     const portLabels = [
-        "Left Motor", "Right Motor", "Motor 3", "Line Follower", 
+        "Left Motor", "Right Motor", "Motor 3", "Line Follower",
         "Infrared", "RFID", "Ultrasonic"
     ]
 
@@ -72,19 +72,19 @@ function PortsList(props) {
 
     for (let i = 0; i < portNames.length; i++) {
         let link = <a href="">{portLabels[i]}</a>
-        let ports = <Ports portName={portNames[i]} motorPorts={props.motorPorts}/>
+        let ports = <Ports portName={portNames[i]} motorPorts={props.motorPorts} />
         let listElement = <li> {link} {ports} </li>
         allListElements.push(listElement);
     }
 
     return (
         <nav id="main_nav">
-        <ul>
-        <li>
-            <a href="">Motor Ports</a>
-            <ul> {allListElements} </ul>
-        </li>
-        </ul>
+            <ul>
+                <li>
+                    <a href="">Motor Ports</a>
+                    <ul> {allListElements} </ul>
+                </li>
+            </ul>
         </nav>
     );
 }
@@ -105,9 +105,7 @@ export default class AddBot extends React.Component {
         // see https://reactjs.org/docs/refs-and-the-dom.html
         this.refreshingBotListRef = React.createRef();
 
-        this.updateInputValue = this.updateInputValue.bind(this);
         this.addBotListener = this.addBotListener.bind(this);
-        this.selectBotListener = this.selectBotListener.bind(this);
         this.buttonMapListener = this.buttonMapListener.bind(this);
         this.motorPorts = this.motorPorts.bind(this);
     }
@@ -132,7 +130,7 @@ export default class AddBot extends React.Component {
         })
             .then(function (response) {
                 // console.log(response.data);
-                
+
                 _this.state.available_bots = response.data
                 let chosenBotLabel = document.getElementById("chosen-bot")
                 let chosenBotLabelWords = chosenBotLabel.innerHTML.split(" ");
@@ -158,29 +156,6 @@ export default class AddBot extends React.Component {
             })
     }
 
-    /*print statement for when active bots are discovered*/
-    updateInputValue(event) {
-        this.props.setSelectedBot(event.target.value)
-        // this.state.selectedBot = event.target.value;
-        console.log("target")
-        console.log(event.target);
-        const _this = this;
-        axios({
-            method: 'POST',
-            url: '/start',
-            data: JSON.stringify({
-                key: "DISCOVERBOTS"
-            })
-        })
-            .then(function (response) {
-                console.log(response.data);
-            })
-            .catch(function (error) {
-                console.log(error);
-            })
-
-    }
-
     /*update power value when bot moves*/
     updatePowerValue(event) {
         this.state.power = event.target.value;
@@ -191,7 +166,7 @@ export default class AddBot extends React.Component {
         let li = this.props.botList;
         let botName = (this.refreshingBotListRef.current == null) ?
             "" : this.refreshingBotListRef.current.state.current_bot;
-        
+
         const _this = this;
         axios({
             method: 'POST',
@@ -207,6 +182,8 @@ export default class AddBot extends React.Component {
                     console.log("Bot" + botName + " added successfully")
                     let msg = "Currently connected to: ";
                     document.getElementById("chosen-bot").innerHTML = msg + botName;
+                    this.setChosenBotText(msg + botName);
+                    this.setRemoveButtonStyle({ visibility: "hidden" });
 
                 } else {
                     console.log("Failed to add " + botName)
@@ -215,13 +192,6 @@ export default class AddBot extends React.Component {
             .catch(function (error) {
                 console.log(error);
             })
-    }
-
-    /*listener for dropdown menu*/
-    selectBotListener(event) {
-        let botName = event.target.value;
-        this.props.setSelectedBot(botName)
-        // this.setState({ selectedBot: botName });
     }
 
     /*listener for direction buttons*/
@@ -245,49 +215,32 @@ export default class AddBot extends React.Component {
     }
 
     /*motor ports*/
-    motorPorts(name, port1){
-      const _this = this;
-      console.log(name);
-      console.log(port1);
-
-      axios({
-          method: 'POST',
-          url: '/start',
-          data: JSON.stringify({
-              key: "PORTS",
-              ports: [name, String(port1)],
-              bot_name: _this.props.selectedBot,
-          })
-      })
-          .then(function (response) {
-          })
-          .catch(function (error) {
-              console.log(error);
-          })
-    }
-
-    /* removes selected object from list*/
-    deleteBotListener(event) {
-        let li = this.props.botList;
-        console.log("BotList" + this.props.botList);
-        li.pop();
-        this.props.setBotList(li)     
+    motorPorts(name, port1) {
+        const _this = this;
+        console.log(name);
+        console.log(port1);
 
         axios({
             method: 'POST',
             url: '/start',
-            data: JSON.stringify(
-                {
-                    key: "DISCONNECTBOT",
-                    bot_name: this.props.selectedBot,
-                }),
+            data: JSON.stringify({
+                key: "PORTS",
+                ports: [name, String(port1)],
+                bot_name: _this.props.selectedBot,
+            })
         })
             .then(function (response) {
-                console.log('removed bot successfully');
             })
             .catch(function (error) {
-                console.warn(error);
+                console.log(error);
             })
+    }
+
+    /* removes chosen bot label and button */
+    deleteBotListener(event) {
+        document.getElementById("chosen-bot").innerHTML = "";
+        let removeButton = document.getElementById("remove-bot");
+        removeButton.style.visibility = "hidden";
     }
 
 
@@ -369,19 +322,10 @@ export default class AddBot extends React.Component {
                 </div>
                 <div className="row">
                     <div className="col horizontalDivCenter">
-                        <div className="element-wrapper"> 
-                            <label id="chosen-bot"> </label>
-                            {/* <select onChange={this.selectBotListener}>
-                                {this.props.botList.map(
-                                    function (botName, idx) {
-                                        return (
-                                            <option key={idx} value={botName}> {botName} </option>
-                                        );
-                                    }
-                                )}
-                            </select> */}
+                        <div className="element-wrapper">
+                            <label id="chosen-bot"> {this.props.chosenBotText} </label>
                         </div>
-                        <Button id="remove-bot" name="Remove" onClick={()=>_this.deleteBotListener()} botList={this.props.botList} style = {{visibility: "hidden"}} />
+                        <Button id="remove-bot" name="Remove" onClick={() => _this.deleteBotListener()} botList={this.props.botList} style={{ visibility: "hidden" }} />
                         <div className="led-box element-wrapper">
                             <div id="led-red"></div>
                         </div>
@@ -415,8 +359,8 @@ export default class AddBot extends React.Component {
                             <div>
                                 <label> Power: </label>
                             </div>
-                            <input id="custom-range-1" class="custom-range" name="wheel_power" type="range" min="0" max="100" 
-                                step="5" onChange={evt => this.updatePowerValue(evt)}/>
+                            <input id="custom-range-1" class="custom-range" name="wheel_power" type="range" min="0" max="100"
+                                step="5" onChange={evt => this.updatePowerValue(evt)} />
                         </form>
                     </div>
                 </div>
