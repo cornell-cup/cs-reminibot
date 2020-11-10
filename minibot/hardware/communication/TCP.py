@@ -46,8 +46,12 @@ class TCP(object):
 
     def send_to_basestation(self, key, value):
         """
-        Sends information back to the basestation. can only execute if the
-        connection is active
+        Sends information back to the basestation - can only execute if the
+        connection is active.
+
+        Args:
+            key (str): Identifier of the command
+            value (str): Value of the command
         """
         # print(self.active)
         if self.active:

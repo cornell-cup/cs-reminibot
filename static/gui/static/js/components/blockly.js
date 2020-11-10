@@ -124,6 +124,7 @@ class PythonTextBox extends React.Component {
   /* Target function for the button "Run Code". Send python code
      in the editing box to backend. */
   run_script(event) {
+    var _this = this;
     var start_time = this.state.coding_start;
     if (start_time != -1) {
       var time = (new Date().getTime() - start_time) / 1000
@@ -147,32 +148,40 @@ class PythonTextBox extends React.Component {
       .catch(function (error) {
         console.warn(error);
       });
-
-    axios({
-      method: 'POST',
-      url: '/result',
-      data: JSON.stringify({
-        bot_name: this.props.botName
-      }),
-    })
-      .then((response) => {
-        console.log("The error message is: !!!")
-        console.log(response);
-        document.getElementById("errormessage").value = response.data["error"];
-        console.log(document.get)
-        if (response.data["code"] === 1) {
-          // lime green 
-          document.getElementById("errormessage").style.color="#32CD32";
-        }
-        else {
-          // red
-          document.getElementById("errormessage").style.color="#FF0000";
-        }
+    /* 
+     * Repeatedly call the ErrorMessageHandler in base_station_interface.py
+     * until a non-empty execution result of the Python program is received. 
+     */
+    let interval = setInterval(function() {
+      axios({
+        method: 'POST',
+        url: '/result',
+        data: JSON.stringify({
+          bot_name: _this.props.botName
+        }),
       })
-      .catch((err) => {
-        console.log(err)
-      })
-
+        .then((response) => {
+          document.getElementById("errormessage").value = response.data["error"];
+          // if the code is -1 it means the result hasn't arrived yet, hence 
+          // we shouldn't clear the interval and should continue polling
+          if (response.data["code"] !== -1) {
+            if (response.data["code"] === 1) {
+              // lime green 
+              document.getElementById("errormessage").style.color="#32CD32";
+            }
+            else {
+              // red
+              document.getElementById("errormessage").style.color="#FF0000";
+            }
+            // result has arrived so go ahead and clear the interval (stop polling
+            // the server)
+            clearInterval(interval);
+          }
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+      }, 500);
   }
 
   render() {

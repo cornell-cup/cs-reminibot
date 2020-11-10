@@ -18,7 +18,7 @@ class PiBot(BaseStationBot, object):
         self.tcp_listener_thread.start()
 
         self.scripts = []
-        self.result = None
+        self.error_message = None
         return
 
     def get_ip(self):
@@ -33,13 +33,11 @@ class PiBot(BaseStationBot, object):
         """
         return self.port
 
-    def get_result(self):
-        # print("result is: ")
-        # print(self.result)
-        return self.result
+    def get_error_message(self):
+        return self.error_message
 
-    def set_result(self, result):
-        self.result = result
+    def set_error_message(self, error_message):
+        self.error_message = error_message
 
     def is_active(self):
         """
@@ -47,13 +45,22 @@ class PiBot(BaseStationBot, object):
         """
         return self.tcp_connection.is_connection_active()
 
+
     def sendKV(self, key, value):
         """
-        send command with specified key and value
+        Send command from a bot with specified key and value.
+
+        Args:
+            key (str): Identifier of the command
+            value (str): Value of the command
         """
         return self.tcp_connection.sendKV(key, value)
 
+
     class TCPListener(threading.Thread):
+        """
+        This class listens to data sent from TCP.py.
+        """
         def __init__(self, outerClass, t):
             super().__init__()
             self.outerClass = outerClass
@@ -62,7 +69,7 @@ class PiBot(BaseStationBot, object):
 
         def run(self):
             """
-            wait for incoming data as long as tcp connection is alive
+            Wait for incoming data as long as tcp connection is alive.
             """
             try:
                 while True:
@@ -76,7 +83,7 @@ class PiBot(BaseStationBot, object):
 
         def tcp_parse_incoming(self, data):
             """
-            parse incoming data
+            Parse incoming data.
             """
             start = data.find("<<<<")
             end = data.find(">>>>")
@@ -88,11 +95,17 @@ class PiBot(BaseStationBot, object):
             return True
 
         def tcp_act_on_incoming(self, key, value):
+            """
+            Set field values according to key.
+
+            Args:
+                key (str): Identifier of the command
+                value (str): Value of the command
+            """
             if key == "SCRIPTS":
                 values = value.split(",")
                 self.scripts = values
             elif key == "BOTSTATUS":
                 self.status = value
-            # print("key: " + key + ", value:" + value)
-            elif key == "RESULT":
-                self.outerClass.set_result(value)
+            elif key == "ERRORMESSAGE":
+                self.outerClass.set_error_message(value)
