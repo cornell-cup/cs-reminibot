@@ -108,6 +108,7 @@ export default class AddBot extends React.Component {
         this.addBotListener = this.addBotListener.bind(this);
         this.buttonMapListener = this.buttonMapListener.bind(this);
         this.motorPorts = this.motorPorts.bind(this);
+
     }
 
     componentDidMount() {
@@ -132,17 +133,18 @@ export default class AddBot extends React.Component {
                 // console.log(response.data);
 
                 _this.state.available_bots = response.data
-                let chosenBotLabel = document.getElementById("chosen-bot")
-                let chosenBotLabelWords = chosenBotLabel.innerHTML.split(" ");
+                let chosenBotLabel = _this.props.chosenBotText
+                let chosenBotLabelWords = chosenBotLabel.split(" ");
                 let chosenBotName = chosenBotLabelWords[chosenBotLabelWords.length - 1];
-                let removeButton = document.getElementById("remove-bot");
+                console.log("chosen bot name: " + chosenBotName)
 
                 if (!_this.state.available_bots.includes(chosenBotName)) {
-                    chosenBotLabel.innerHTML = "";
-                    removeButton.style.visibility = "hidden";
+                    _this.props.setChosenBotText("");
+                    _this.props.setRemoveButtonStyle("hidden");
                 }
                 else {
-                    removeButton.style.visibility = "visible";
+                    _this.props.setChosenBotText("Successfully added " + chosenBotName);
+                    _this.props.setRemoveButtonStyle("visible");
                 }
 
                 let refreshingBotList = _this.refreshingBotListRef.current
@@ -163,7 +165,7 @@ export default class AddBot extends React.Component {
 
     /*adds bot name to list*/
     addBotListener(event) {
-        let li = this.props.botList;
+        let li = this.state.available_bots;
         let botName = (this.refreshingBotListRef.current == null) ?
             "" : this.refreshingBotListRef.current.state.current_bot;
 
@@ -177,13 +179,12 @@ export default class AddBot extends React.Component {
             })
         })
             .then(function (response) {
-                console.log("Trying to add bot to list")
-                if (response.data && !li.includes(botName)) {
+                console.log("Trying to add bot to list " + botName)
+                if (response.data) {
                     console.log("Bot" + botName + " added successfully")
                     let msg = "Currently connected to: ";
-                    document.getElementById("chosen-bot").innerHTML = msg + botName;
-                    this.setChosenBotText(msg + botName);
-                    this.setRemoveButtonStyle({ visibility: "hidden" });
+                    _this.props.setChosenBotText(msg + botName);
+                    _this.props.setRemoveButtonStyle("visible");
 
                 } else {
                     console.log("Failed to add " + botName)
@@ -238,9 +239,8 @@ export default class AddBot extends React.Component {
 
     /* removes chosen bot label and button */
     deleteBotListener(event) {
-        document.getElementById("chosen-bot").innerHTML = "";
-        let removeButton = document.getElementById("remove-bot");
-        removeButton.style.visibility = "hidden";
+        this.props.setChosenBotText("");
+        this.props.setRemoveButtonStyle("hidden");
     }
 
 
@@ -325,7 +325,7 @@ export default class AddBot extends React.Component {
                         <div className="element-wrapper">
                             <label id="chosen-bot"> {this.props.chosenBotText} </label>
                         </div>
-                        <Button id="remove-bot" name="Remove" onClick={() => _this.deleteBotListener()} botList={this.props.botList} style={{ visibility: "hidden" }} />
+                        <Button id="remove-bot" name="Remove" onClick={() => _this.deleteBotListener()} style={this.props.removeBotButtonStyle} />
                         <div className="led-box element-wrapper">
                             <div id="led-red"></div>
                         </div>
