@@ -2,9 +2,6 @@ import React from 'react';
 
 /* Returns a button with padding around it */
 export function Button(props) {
-  if (props.name === "Remove") {
-    console.log("Remove button style ", props.style);
-  }
   return (
     <div className="element-wrapper">
       <button id={props.id} onClick={props.onClick} style={props.style}>

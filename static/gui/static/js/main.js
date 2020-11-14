@@ -42,13 +42,13 @@ class Platform extends React.Component {
       customBlockList: [],
       botName: '',
       blockly_xml: null,
-      chosenBotText: '',
+      selectedBotName: '',
       removeBotButtonStyle: this.hiddenStyle,
     };
 
     this.setBlockly = this.setBlockly.bind(this);
     this.redefineCustomBlockList = this.redefineCustomBlockList.bind(this);
-    this.setChosenBotText = this.setChosenBotText.bind(this);
+    this.setSelectedBotName= this.setSelectedBotName.bind(this);
     this.setRemoveButtonStyle = this.setRemoveButtonStyle.bind(this);
 
   }
@@ -69,9 +69,9 @@ class Platform extends React.Component {
     this.setState({ customBlockList: newCustomBlockList });
   }
 
-  setChosenBotText(text) {
+  setSelectedBotName(text) {
     const _this = this;
-    _this.setState({ chosenBotText: text });
+    _this.setState({ selectedBotName: text });
   }
 
   setRemoveButtonStyle(style) {
@@ -79,7 +79,6 @@ class Platform extends React.Component {
 
     if (style === "hidden") {
       _this.setState({ removeBotButtonStyle: this.hiddenStyle });
-      console.log(style);
     }
     else {
       _this.setState({ removeBotButtonStyle: this.visibleStyle });
@@ -102,8 +101,8 @@ class Platform extends React.Component {
             <div className="row">
               <div className="col">
                 <AddBot
-                  chosenBotText={this.state.chosenBotText}
-                  setChosenBotText={this.setChosenBotText}
+                  selectedBotName={this.state.selectedBotName}
+                  setSelectedBotName={this.setSelectedBotName}
                   removeBotButtonStyle={this.state.removeBotButtonStyle}
                   setRemoveButtonStyle={this.setRemoveButtonStyle}
                 />
