@@ -136,7 +136,7 @@ export default class AddBot extends React.Component {
             // currently connected bot label)
             if (!_this.state.availableBots.includes(_this.props.selectedBotName)) {
                 _this.props.setSelectedBotName("");
-                _this.props.setRemoveButtonStyle("hidden");
+                _this.props.setSelectedBotStyle("hidden");
             }
 
             let refreshingBotList = _this.refreshingBotListRef.current;
@@ -166,7 +166,13 @@ export default class AddBot extends React.Component {
         let botName = (this.refreshingBotListRef.current == null) ?
             "" : this.refreshingBotListRef.current.state.current_bot;
         this.props.setSelectedBotName(botName);
-        this.props.setRemoveButtonStyle("visible");
+  
+        if (li.length != 0){
+            this.props.setSelectedBotStyle("visible");
+        }
+        else {
+            this.props.setSelectedBotStyle("hidden");
+        }
         console.log("Bot" + botName + " added successfully")
     }
 
@@ -215,7 +221,7 @@ export default class AddBot extends React.Component {
     /* removes selected bot label and button */
     deleteBotListener(event) {
         this.props.setSelectedBotName("");
-        this.props.setRemoveButtonStyle("hidden");
+        this.props.setSelectedBotStyle("hidden");
     }
 
 
@@ -298,8 +304,8 @@ export default class AddBot extends React.Component {
                 <div className="row">
                     <div className="col horizontalDivCenter">
                         <div className="element-wrapper">
-                            <label id="selected-bot"> 
-                                {_this.getSelectedBotText()}
+                            <label id="selected-bot" style={this.props.selectedBotStyle} >
+                                {_this.getSelectedBotText()} 
                             </label>
                         </div>
                         <Button id="remove-bot" name="Remove" 

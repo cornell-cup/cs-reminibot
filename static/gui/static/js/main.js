@@ -31,6 +31,19 @@ class Platform extends React.Component {
   constructor(props) {
     super(props);
 
+    this.hiddenLabelStyle = {
+      borderStyle : 'solid', 
+      borderWidth : "1px", 
+      visibility: 'hidden',
+    };
+
+    this.visibleLabelStyle = {
+      borderStyle : 'solid', 
+      borderWidth : "1px", 
+      padding: '4px',
+      visibility: 'visible',
+    };
+
     this.hiddenStyle = {
       visibility: 'hidden',
     };
@@ -43,13 +56,14 @@ class Platform extends React.Component {
       botName: '',
       blockly_xml: null,
       selectedBotName: '',
+      selectedBotStyle: this.hiddenLabelStyle,
       removeBotButtonStyle: this.hiddenStyle,
     };
 
     this.setBlockly = this.setBlockly.bind(this);
     this.redefineCustomBlockList = this.redefineCustomBlockList.bind(this);
     this.setSelectedBotName= this.setSelectedBotName.bind(this);
-    this.setRemoveButtonStyle = this.setRemoveButtonStyle.bind(this);
+    this.setSelectedBotStyle= this.setSelectedBotStyle.bind(this);
 
   }
 
@@ -74,17 +88,16 @@ class Platform extends React.Component {
     _this.setState({ selectedBotName: text });
   }
 
-  setRemoveButtonStyle(style) {
+  setSelectedBotStyle(style) {
     const _this = this;
-
     if (style === "hidden") {
+      _this.setState({ selectedBotStyle: this.hiddenLabelStyle });
       _this.setState({ removeBotButtonStyle: this.hiddenStyle });
     }
     else {
+      _this.setState({ selectedBotStyle: this.visibleLabelStyle });
       _this.setState({ removeBotButtonStyle: this.visibleStyle });
     }
-
-
   }
 
   render() {
@@ -103,8 +116,9 @@ class Platform extends React.Component {
                 <AddBot
                   selectedBotName={this.state.selectedBotName}
                   setSelectedBotName={this.setSelectedBotName}
+                  selectedBotStyle={this.state.selectedBotStyle}
+                  setSelectedBotStyle={this.setSelectedBotStyle}
                   removeBotButtonStyle={this.state.removeBotButtonStyle}
-                  setRemoveButtonStyle={this.setRemoveButtonStyle}
                 />
               </div>
               <div className="col">

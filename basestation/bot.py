@@ -11,7 +11,7 @@ class Bot:
     SOCKET_BUFFER_SIZE = 1024
     START_CMD_TOKEN = "<<<<"
     END_CMD_TOKEN = ">>>>"
-    TIMEOUT_LIMIT = 10
+    TIMEOUT_LIMIT = 5
 
     def __init__(self, bot_name, ip_address, port=10000):
         self.port = port

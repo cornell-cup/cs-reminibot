@@ -1,27 +1,18 @@
+from bs_repr import BS_Repr
+from collections import deque
 from select import select
 from socket import socket, timeout, AF_INET, SOCK_STREAM, SOCK_DGRAM 
 from socket import SOL_SOCKET, SO_REUSEADDR, SO_BROADCAST
+from threading import Thread
 from typing import List, Tuple
+import ast
+import concurrent.futures
+import importlib
+import os
 import struct
 import sys
 import time
-import importlib
-import ast
-import os
-import concurrent.futures
-from threading import Thread
-from collections import deque
-
-# TODO: use argparser to handle the -t
-# Load the ECE Dummy ops if testing, real bot-level function library otherwise.
-# ECE dummy ops replace physical bot outputs with print statements.
-if len(sys.argv) == 2 and sys.argv[1] == "-t":
-    import scripts.ece_dummy_ops as ece
-    BOT_LIB_FUNCS = "ece_dummy_ops"
-else:
-    import scripts.pi_arduino as ece
-    BOT_LIB_FUNCS = "pi_arduino"
-
+import argparse
 
 class Minibot: 
     """ Represents a minibot.  Handles all communication with the basestation
@@ -65,6 +56,7 @@ class Minibot:
         # TODO: All message queues should have a max limit of messages that they
         # store, implement custom class at some point
         self.writable_sock_message_queue_map = {}
+        self.bs_repr = None
         self.sock_lists = [
             self.readable_socks, self.writable_socks, self.errorable_socks
         ]
@@ -94,7 +86,6 @@ class Minibot:
             # select returns as soon as it detects some activity on one or more
             # of the sockets in the lists passed to it, or if the timeout time 
             # has elapsed
-            time.sleep(1)
             read_ready_socks, write_ready_socks, errored_out_socks = select(
                 self.readable_socks, 
                 self.writable_socks, 
@@ -109,6 +100,14 @@ class Minibot:
             self.handle_errorable_socks(errored_out_socks)
             self.handle_writable_socks(write_ready_socks)
             self.handle_readable_socks(read_ready_socks)
+            # if basestation exists but is disconnected, stop minibot
+            if self.bs_repr and not self.bs_repr.is_connected():
+                print("Basestation Disconnected")
+                Thread(target=ece.stop).start()
+                self.close_sock(self.bs_repr.conn_sock)
+                self.bs_repr = None
+                
+                
 
     def create_listener_sock(self):
         """ Creates a socket that listens for TCP connections from the 
@@ -176,6 +175,8 @@ class Minibot:
                 # set to non-blocking reads (when we call connection.recv, 
                 # should read whatever is in its buffer and return immediately)
                 connection.setblocking(0)
+                # initialize basestation repr to the connection sock
+                self.bs_repr = BS_Repr(sock)
                 # we don't need to write anything right now, so don't add to 
                 # writable socks
                 self.readable_socks.add(connection)
@@ -188,22 +189,28 @@ class Minibot:
                     data_str = sock.recv(Minibot.SOCKET_BUFFER_SIZE).decode("utf-8")
                 except ConnectionResetError:
                     print(f"Connection closed by Basestation")
+                    self.bs_repr = None
                     data_str = None
                 # if the socket receives "", it means the socket was closed
                 # from the other end, so close this endpoint too
                 print(f"Data string from basestation {data_str}")
                 if data_str:
-                    self.parse_and_execute_commands(sock, data_str)
+                    feedback = self.parse_and_execute_commands(sock, data_str)
+                    # print(f"feedback from parsing {feedback}") 
                 else:
                     self.close_sock(sock)
-                # TODO need to write back saying that the command executed
+                # TODO need to write back saying that the command executed. 
                 # successfully
 
     def handle_writable_socks(self, write_ready_socks):
-        """ TODO 
+        """ 
+        iterate through all the sockets in the write_ready_socks and 
+        send over all messages in the socket's message_queue
+        Arguments:
+            write_ready_socks: 
+                All sockets that have had data written to them
         """
-        # iterate through all the sockets in the write_ready_socks and 
-        # send over all messages in the socket's message_queue
+        
         for sock in write_ready_socks:
             message_queue = self.writable_sock_message_queue_map[sock]
             all_messages = "".join(message_queue)
@@ -214,7 +221,12 @@ class Minibot:
 
 
     def handle_errorable_socks(self, errored_out_socks):
-        """ TODO
+        """ 
+        iterate through all the sockets in the errored_out_socks and 
+        close these socks
+        Arguments:
+            errored_out_socks: 
+                All sockets that have errored out
         """
         for sock in errored_out_socks:
             print(f"Socket errored out!!!! {sock}")
@@ -277,6 +289,8 @@ class Minibot:
             # it to the writable socks
             self.writable_socks.add(sock)
             message = "<<<<BOTSTATUS,ACTIVE>>>>"
+            #update status time of the basestation
+            self.bs_repr.update_status_time()
             if sock in self.writable_sock_message_queue_map:
                 self.writable_sock_message_queue_map[sock].append(message)
             else:
@@ -391,5 +405,17 @@ class Minibot:
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Take in arguments for minibot')
+    parser.add_argument('-t', action="store_true", dest = "isSimulation", default = False)
+    args = parser.parse_args()
+
+    if args.isSimulation:
+        import scripts.ece_dummy_ops as ece
+        BOT_LIB_FUNCS = "ece_dummy_ops"
+    else:
+        import scripts.pi_arduino as ece
+        BOT_LIB_FUNCS = "pi_arduino"
+   
+    print (BOT_LIB_FUNCS)
     minibot = Minibot()
     minibot.main()

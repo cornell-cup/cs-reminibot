@@ -300,3 +300,10 @@ h1 {
     background-color: white;
     position: absolute;
 }
+
+#selected-bot {
+    border-style: solid;
+    border-color: black;
+    border-width: 5px;
+    padding: 5px;
+}
