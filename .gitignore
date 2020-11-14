@@ -122,3 +122,5 @@ node_modules/
 
 gui/package-lock.json
 
+# User entered Python program
+minibot/scripts/bot_script.py
