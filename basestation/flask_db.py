@@ -3,6 +3,8 @@ import bcrypt
 import datetime
 import hashlib
 import os
+import json
+
 
 db = SQLAlchemy()
 
@@ -83,3 +85,72 @@ class User(db.Model):
             'email': self.email,
             'custom_function': self.custom_function
         }
+
+
+def get_user_by_email(email):
+    return User.query.filter(User.email == email).first()
+
+
+def get_user_by_session_token(session_token):
+    return User.query.filter(User.session_token == session_token).first()
+
+
+def get_user_by_update_token(update_token):
+    return User.query.filter(User.update_token == update_token).first()
+
+
+def update_custom_function_by_session_token(session_token, custom_function):
+    user = get_user_by_session_token(session_token)
+    if not user:
+        return False, "Invalid session token"
+    user.custom_function = custom_function
+    db.session.commit()
+    return True, user
+
+
+def verify_credentials(email, password):
+    optional_user = get_user_by_email(email)
+
+    if optional_user is None:
+        return False, None
+
+    return optional_user.verify_password(password), optional_user
+
+
+def create_user(email, password):
+    already_existing_user = get_user_by_email(email)
+
+    if already_existing_user:
+        return False, already_existing_user
+
+    user = User(
+        email=email,
+        password=password
+    )
+
+    db.session.add(user)
+    db.session.commit()
+    return True, user
+
+
+def renew_session(update_token):
+    user = get_user_by_update_token(update_token)
+    print(user)
+    if user is None:
+        raise Exception('Invalid update token')
+
+    user.renew_session()
+    db.session.commit()
+    return user
+
+
+def extract_token(request):
+    auth_header = request.headers.get('Authorization')
+    if auth_header is None:
+        return False, json.dumps({'error': 'Missing authorization header.'})
+
+    bearer_token = auth_header.replace('Bearer ', '').strip()
+    if not bearer_token:
+        return False, json.dumps({'error': 'Invalid authorization header.'})
+
+    return True, bearer_token

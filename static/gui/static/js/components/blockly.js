@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import {Button, LabeledTextBox} from './Util.js'
+import { Button, LabeledTextBox } from './Util.js'
 
 
 function UserAccountModal(props) {
@@ -75,10 +75,10 @@ class PythonTextBox extends React.Component {
 
   handleFunctionNameChange(event) {
     var _this = this;
-    var item = _this.props.customBlockList.find(element => element[0] === event.target.value); 
+    var item = _this.props.customBlockList.find(element => element[0] === event.target.value);
     if (item != undefined) {
       document.getElementById("textarea").value = item[1];
-      _this.setState({ pythonTextBoxCode: item[1]});
+      _this.setState({ pythonTextBoxCode: item[1] });
     }
     this.setState({ function_name: event.target.value });
   }
@@ -93,14 +93,14 @@ class PythonTextBox extends React.Component {
   handleScriptChange(event) {
     this.setState({ pythonTextBoxCode: event.target.value });
     if (this.state.coding_start == -1) {
-      this.setState({ coding_start: new Date().getTime()})
+      this.setState({ coding_start: new Date().getTime() })
     }
   }
 
   handleTab(event) {
-    if (event.keyCode==9){
+    if (event.keyCode == 9) {
       event.preventDefault();
-      document.getElementById("textarea").value = this.state.pythonTextBoxCode+'    ';
+      document.getElementById("textarea").value = this.state.pythonTextBoxCode + '    ';
       this.setState({ pythonTextBoxCode: event.target.value });
     }
   }
@@ -118,7 +118,7 @@ class PythonTextBox extends React.Component {
   }
 
   view_history(event) {
-    window.open("http://127.0.0.1:5000/program/")
+    window.open("/program/")
   }
 
   /* Target function for the button "Run Code". Send python code
@@ -128,12 +128,15 @@ class PythonTextBox extends React.Component {
     if (start_time != -1) {
       var time = (new Date().getTime() - start_time) / 1000
       document.getElementById("time").value = time.toString() + "s";
-      this.setState({coding_start : -1})
+      this.setState({ coding_start: -1 })
     }
 
     axios({
       method: 'POST',
       url: '/start',
+      headers: {
+        'Content-Type': 'application/json'
+      },
       data: JSON.stringify({
         key: 'SCRIPTS',
         value: this.state.pythonTextBoxCode,
@@ -151,6 +154,9 @@ class PythonTextBox extends React.Component {
     axios({
       method: 'POST',
       url: '/result',
+      headers: {
+        'Content-Type': 'application/json'
+      },
       data: JSON.stringify({
         bot_name: this.props.botName
       }),
@@ -162,11 +168,11 @@ class PythonTextBox extends React.Component {
         console.log(document.get)
         if (response.data["code"] === 1) {
           // lime green 
-          document.getElementById("errormessage").style.color="#32CD32";
+          document.getElementById("errormessage").style.color = "#32CD32";
         }
         else {
           // red
-          document.getElementById("errormessage").style.color="#FF0000";
+          document.getElementById("errormessage").style.color = "#FF0000";
         }
       })
       .catch((err) => {
@@ -181,12 +187,12 @@ class PythonTextBox extends React.Component {
         <p id="title"> <b>Python </b> </p>
         {/* Python  */}
         <div>
-        <textarea
-          id="textarea"
-          rows="10"
-          cols="98"
-          onChange={this.handleScriptChange}
-          onKeyDown={this.handleTab}
+          <textarea
+            id="textarea"
+            rows="10"
+            cols="98"
+            onChange={this.handleScriptChange}
+            onKeyDown={this.handleTab}
           />
         </div>
         {/* Custom blockly button and textbox */}
@@ -204,12 +210,12 @@ class PythonTextBox extends React.Component {
           />
           <Button
             id={"DBlock"}
-            onClick={() => { if (window.confirm('You Are Deleting Custom Block: '+this.state.function_name)) this.props.dblock(this.state.function_name) } }
+            onClick={() => { if (window.confirm('You Are Deleting Custom Block: ' + this.state.function_name)) this.props.dblock(this.state.function_name) }}
             name={"Delete Custom Block"}
           />
           <Button
             id={"DBlockAll"}
-            onClick={() => { if (window.confirm('You Are Deleting All Custom Blocks')) this.props.dblockAll() } }
+            onClick={() => { if (window.confirm('You Are Deleting All Custom Blocks')) this.props.dblockAll() }}
             name={"Delete All Custom Blocks"}
           />
         </div>
@@ -226,8 +232,8 @@ class PythonTextBox extends React.Component {
           <Button id={"run"} onClick={this.run_script} name={"Run"} />
           <Button id={"history"} onClick={this.view_history} name={"View History"} />
           <Button id={"copy"} onClick={this.copy} name={"Copy Code From Blockly"} />
-          <div> <textarea id = "errormessage" rows="1" cols="60" /></div>
-          <div> <textarea style={{ color: 'blue' }} id = "time" rows="1" cols="20" /></div>
+          <div> <textarea id="errormessage" rows="1" cols="60" /></div>
+          <div> <textarea style={{ color: 'blue' }} id="time" rows="1" cols="20" /></div>
         </div>
         <div id="PythonUpload" className="horizontalDiv">
           <form>
@@ -297,13 +303,13 @@ export default class MinibotBlockly extends React.Component {
   manageDefaultCustomBlocklyFunction() {
     const defaultFunction = [this.state.emptyFunctionName, " "];
     if (this.props.customBlockList.length == 0) {
-        this.props.customBlockList.push(defaultFunction);
+      this.props.customBlockList.push(defaultFunction);
     }
     // default function can only exist if only one element in array
-    else if (this.props.customBlockList[0][0]===this.state.emptyFunctionName && this.props.customBlockList.length>1) {
-        // delete first element
-        this.props.customBlockList.splice(0, 1);
-      }
+    else if (this.props.customBlockList[0][0] === this.state.emptyFunctionName && this.props.customBlockList.length > 1) {
+      // delete first element
+      this.props.customBlockList.splice(0, 1);
+    }
   }
 
   update_custom_blocks() {
@@ -313,7 +319,7 @@ export default class MinibotBlockly extends React.Component {
     formData.append("custom_function", JSON.stringify(this.props.customBlockList));
     axios({
       method: 'post',
-      url: 'http://127.0.0.1:5000/custom_function/',
+      url: '/custom_function/',
       data: formData,
       headers: { 'Content-Type': 'multipart/form-data' }
     })
@@ -370,7 +376,7 @@ export default class MinibotBlockly extends React.Component {
         var field = allBlocks[i].getField(fieldName);
         // get currently selected function in drop down menu
         var currentFunc = field.getText();
-        var item = _this.props.customBlockList.find(element => element[0] === currentFunc); 
+        var item = _this.props.customBlockList.find(element => element[0] === currentFunc);
         if (item === undefined) {
           field.setText(this.props.customBlockList[0][0]);
           field.setValue(_this.props.customBlockList[0][1]);
@@ -388,9 +394,9 @@ export default class MinibotBlockly extends React.Component {
     // toolbox.refreshSelection();
   }
 
- custom_block(function_name, pythonTextBoxCode) {
+  custom_block(function_name, pythonTextBoxCode) {
     var _this = this;
-    var item = _this.props.customBlockList.find(element => element[0] === function_name); 
+    var item = _this.props.customBlockList.find(element => element[0] === function_name);
     if (item == undefined) {
       _this.props.customBlockList.push([function_name, pythonTextBoxCode]);
     } else {
@@ -405,7 +411,7 @@ export default class MinibotBlockly extends React.Component {
     var item = _this.props.customBlockList.find(element => element[0] === function_name)
     const index = _this.props.customBlockList.indexOf(item);
     if (index === -1) {
-      window.alert('Custom Block - '+function_name+' - Does Not Exist');
+      window.alert('Custom Block - ' + function_name + ' - Does Not Exist');
       return;
     }
     _this.props.customBlockList.splice(index, 1);
@@ -416,7 +422,7 @@ export default class MinibotBlockly extends React.Component {
 
   dblockAll() {
     var _this = this;
-    if(_this.props.customBlockList[0][0]===_this.state.emptyFunctionName){
+    if (_this.props.customBlockList[0][0] === _this.state.emptyFunctionName) {
       window.alert('There Are No Custom Blocks');
       return;
     }
@@ -425,7 +431,7 @@ export default class MinibotBlockly extends React.Component {
     this.update_custom_blocks();
 
   }
-  
+
 
   /* handles input change for file name and coding textboxes */
   handleInputChange(event) {
@@ -541,6 +547,9 @@ export default class MinibotBlockly extends React.Component {
     axios({
       method: 'POST',
       url: '/start',
+      headers: {
+        'Content-Type': 'application/json'
+      },
       data: JSON.stringify({
         key: 'SCRIPTS',
         value: blockly.value,
@@ -559,6 +568,9 @@ export default class MinibotBlockly extends React.Component {
     axios({
       method: 'POST',
       url: '/start',
+      headers: {
+        'Content-Type': 'application/json'
+      },
       data: JSON.stringify({
         key: "WHEELS",
         bot_name: this.props.bot_name,
@@ -585,7 +597,7 @@ export default class MinibotBlockly extends React.Component {
   logout(event) {
     axios({
       method: 'POST',
-      url: 'http://127.0.0.1:5000/logout/',
+      url: '/logout/',
     })
       .then((response) => {
         this.setState({
@@ -630,7 +642,7 @@ export default class MinibotBlockly extends React.Component {
     var formData = new FormData(document.getElementById("registerForm"));
     axios({
       method: 'post',
-      url: 'http://127.0.0.1:5000/register/',
+      url: '/register/',
       data: formData,
       headers: { 'Content-Type': 'multipart/form-data' }
     })
@@ -659,13 +671,13 @@ export default class MinibotBlockly extends React.Component {
     console.log(_this.props.customBlockList);
     axios({
       method: 'post',
-      url: 'http://127.0.0.1:5000/login/',
+      url: '/login/',
       data: formData,
       headers: { 'Content-Type': 'multipart/form-data' }
     })
       .then((response) => {
         _this.props.redefineCustomBlockList(
-            JSON.parse(response.data.custom_function));
+          JSON.parse(response.data.custom_function));
         // invokes component did update
         this.setState({
           login_email: formData.get("email"),
@@ -675,10 +687,10 @@ export default class MinibotBlockly extends React.Component {
           isLoggedIn: true,
         });
         // _this.props.customBlockList.push(JSON.parse(response.data.custom_function))[0];
-        if(temp[0][0]!==_this.state.emptyFunctionName && _this.props.customBlockList[0][0]!==_this.state.emptyFunctionName){
+        if (temp[0][0] !== _this.state.emptyFunctionName && _this.props.customBlockList[0][0] !== _this.state.emptyFunctionName) {
           _this.props.customBlockList.push.apply(_this.props.customBlockList, temp);
         }
-        if(temp[0][0]!==_this.state.emptyFunctionName && _this.props.customBlockList[0][0]===_this.state.emptyFunctionName){
+        if (temp[0][0] !== _this.state.emptyFunctionName && _this.props.customBlockList[0][0] === _this.state.emptyFunctionName) {
           _this.props.customBlockList.splice(0, 1);
           _this.props.customBlockList.push.apply(_this.props.customBlockList[0], temp);
         }

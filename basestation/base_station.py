@@ -231,8 +231,6 @@ class BaseStation:
                 return bot_id
         return None
 
-    
-
     def move_wheels_bot(self, session_id, bot_id, direction, power):
         """
         Gives wheels power based on user input
@@ -267,7 +265,7 @@ class BaseStation:
         # else:
         #     value = "0,0,0,0"
         # TODO remove print
-        print("Active bot " + str(type(self.active_bots[bot_id])))
+        # print("Active bot " + str(type(self.active_bots[bot_id])))
         self.active_bots[bot_id].sendKV("WHEELS", direction)
         return True
 
@@ -349,7 +347,7 @@ class BaseStation:
     def set_position_of_bot(self, bot_id, pos):
         pass
 
-    def set_ports( self, ports, session_id, bot_id ):
+    def set_ports(self, ports, session_id, bot_id):
         if not session_id or not bot_id:
             return False
 
@@ -358,12 +356,12 @@ class BaseStation:
             return False
         for x in ports:
             print(x)
-        
+
         portsstr = " ".join([str(l) for l in ports])
 
         self.active_bots[bot_id].sendKV("PORTS", portsstr)
-        
-        #do something
+
+        # do something
 
         return True
 
@@ -417,12 +415,11 @@ class BaseStation:
             bot_id (str): a unique id
         """
 
-        print("session_id is:")
-        print(session_id)
-        print("bot_name is: ")
-        print(bot_name)
+        # print("session_id is: ", session_id)
+        # print("bot_name is: ", bot_name)
 
-        print(self.active_bots)
+        # print("active bots: ", self.active_bots)
+        # print("active sessions: ", self.active_sessions)
 
         bot_id = self.bot_name_to_bot_id(bot_name)
         if bot_id in self.active_bots:
@@ -505,8 +502,6 @@ class BaseStation:
                 + "Port:^ " + str(bot.get_port()) + "\n" \
                 + "Sessions:^ " + str(sessions) + "\n" + "\n"
         return bot_info
-
-    
 
     def get_error_message(self, bot_name):
         bot_id = self.bot_name_to_bot_id(bot_name)

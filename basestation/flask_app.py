@@ -1,99 +1,245 @@
-import time
-import json
-from flask import Flask, request, redirect
+"""
+Main file from which BaseStation Websocket interface begins.
+"""
+
+# import tornado
+# import tornado.web
+# import tornado.websocket\
+from flask import Flask, request, render_template, jsonify, session, redirect
 from flask_db import db, Program, User
 from flask_api import status
 from flask_cors import CORS
+import os.path
+import json
+import logging
+import sys
+import time
+import re  # regex import
+import requests
 
-app = Flask(__name__)
+# Minibot imports.
+from base_station import BaseStation
+import flask_db as blockly_app
+from base_station_interface import BaseStationInterface
+
+# set template folder
+app = Flask(__name__, template_folder='../static/gui/',
+            static_folder='../static/gui/static')
+
+app.secret_key = 'test'
+
+base_station_interface = BaseStationInterface()
+send_blockly_remote_server = True
+
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
+
+# blockly server
+
 db_filename = 'program.db'
-CORS(app)  # allows cross-origin-requests
-
+# CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///%s' % db_filename
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
-
 db.init_app(app)
 with app.app_context():
     db.create_all()
-
 login_email = ""
 
 
-def get_user_by_email(email):
-    return User.query.filter(User.email == email).first()
+# TODO: deal with secure cookies for get request
+'''attempt to send cookies through separate route, but would require adding this route
+to the front-end which maybe is not what we want'''
+# @app.route('/getcookie')
+# def get_cookie():
+#   name = request.cookies.get("user_id")
+#   return name
+
+# @app.route('/setcookie', methods = ['POST', 'GET'])
+# def set_cookie():
+#   if request.method == 'POST':
+
+# temporary session_id valud
+session = {}
 
 
-def get_user_by_session_token(session_token):
-    return User.query.filter(User.session_token == session_token).first()
+@app.route('/start', methods=['GET'])
+def get():
+    return render_template('index.html')
 
 
-def get_user_by_update_token(update_token):
-    return User.query.filter(User.update_token == update_token).first()
+@app.route('/start', methods=['POST'])
+def post():
+    try:
+        # print(f"get_json:{request.get_json()}")
+        data = request.get_json()
+    except:
+        print("post error")
+        return ""
 
-def update_custom_function_by_session_token(session_token, custom_function):
-    user = get_user_by_session_token(session_token)
-    if not user:
-        return False, "Invalid session token"
-    user.custom_function = custom_function
-    db.session.commit()
-    return True, user
+    key = data['key']
+    # print(f"loaded json, key = {key}")
+    # key = ""
+
+    # session_id = self.get_secure_cookie("user_id") #
+    # if session_id:
+    #     session_id = session_id.decode("utf-8")
+    # print("session: ", session)
+    if not "id" in session:
+        print("added session")
+        session["id"] = base_station_interface.add_session()
+
+    session_id = session["id"]
+
+    if key == "CONNECTBOT":
+        bot_name = data['bot_name']
+        return base_station_interface.connect_bot(bot_name, session_id)
+        # bot_name = request.form.get('bot_name')
+        # if bot_name != None and bot_name != "":
+        #     print("Connecting bot " + str(bot_name))
+        #     print("session " + str(session_id))
+        #     return json.dumps(base_station.add_bot_to_session(
+        #         session_id, bot_name)).encode()
+        # else:
+        #     print("No bot received, or bot name empty.")
+    if key == "MODE":
+        bot_name = data['bot_name']
+        mode_type = data['value']
+        base_station_interface.mode(bot_name, mode_type, session_id)
+        # print("here!")
+        # bot_id = base_station.bot_name_to_bot_id(bot_name)
+        # bot = base_station.get_bot(bot_id)
+        # bot.sendKV(key, str(mode_type))
+    elif key == "WHEELS":
+        bot_name = data['bot_name']
+        direction = data['direction']
+        power = str(data['power'])
+        base_station_interface.wheels(bot_name, direction, power, session_id)
+        # bot_id = base_station.bot_name_to_bot_id(bot_name)
+        # base_station.move_wheels_bot(
+        #     session_id, bot_id, direction, power)
+        #   print(f"direction: {direction}, power: {power}")
+    elif key == "PORTS":
+        # leftmotor = data['leftmotor']
+        bot_id = base_station.bot_name_to_bot_id(data['bot_name'])
+        portarray = data['ports']
+        base_station_interface.ports(session_id, bot_id, portarray)
+        # for x in portarray:
+        #     print(x)
+        # base_station.set_ports(portarray, session_id, bot_id)
+
+    # Looks for bots on the local network to connect to.
+    elif key == "DISCOVERBOTS":
+        # print("reached discoverbots")
+        return base_station_interface.discoverbots()
+        # return (json.dumps(
+        #     base_station.get_active_bots_names()).encode())
+
+    # Receives the Blockly Generated Python scripts sent from the GUI.
+    elif key == "SCRIPTS":
+        print('data is:')
+        print(data)
+        value = data['value']
+        bot_name = data['bot_name']
+        # params = {'bot_name': bot_name, 'value': value}
+
+        # TODO integrate this flask app
+        # if send_blockly_remote_server:
+        #     url = 'http://127.0.0.1:5000/code/'
+        #     x = requests.post(url, json=params)
+        #     print("Post")
+        #     print(x.json)
+
+        #     print('database test')
+        #     url2 = 'http://127.0.0.1:5000/program/'
+        #     x = requests.get(url2)
+        #     print("Get")
+        #     print(x.json)
+
+        # bot_id = base_station.bot_name_to_bot_id(bot_name)
+        # bot = base_station.get_bot(bot_id)
+        # # reset the previous script's error message, so we can get the new error message
+        # # of the new script
+        # bot.set_result(None)
+        # if bot:
+        #     print("Code len = " + str(len(value)))
+        #     print(type(bot))
+        #     if len(value) == 0:
+        #         print("GETTING SCRIPTS")
+        #         bot.sendKV("SCRIPTS", '')
+        #     elif len(value) == 1:
+        #         print("SENDING SCRIPTS")
+        #         bot.sendKV("SCRIPTS", value[0])
+        #     elif len(value) == 2:
+        #         print("SAVING SCRIPTS")
+        #         bot.sendKV("SCRIPTS", ",".join(value))
+        #     else:
+        #         # TODO check if a "long enough" program
+        #         # is supposed to be sent over
+        #         print("RUNNING SCRIPT")
+        #         # self.send_program(bot, value)
+        #         send_program(bot, value)
+
+    elif key == "DISCONNECTBOT":
+        bot_name = data['bot']
+        base_station_interface.disconnectbot(bot_name, session_id)
+        # base_station.remove_bot_from_session(session_id, bot_id)
+    elif key == "BOTSTATUS":
+        bot_name = data['bot_name']
+        return base_station_interface.botstatus(bot_name)
+        # bot = base_station.get_bot(bot_id)
+        # if bot:
+        #     bot.sendKV("BOTSTATUS", '')
+        #     # self.write(json.dumps(bot.tcp_listener_thread.status).encode())
+        #     return json.dumps(bot.tcp_listener_thread.status).encode()
+    return ""  # catch-all return TODO: fix code structure so we don't have to do this
 
 
-def verify_credentials(email, password):
-    optional_user = get_user_by_email(email)
-
-    if optional_user is None:
-        return False, None
-
-    return optional_user.verify_password(password), optional_user
+@app.route('/vision', methods=['GET'])
+def vision_get():
+    return json.dumps(base_station.get_vision_data()).encode()
 
 
-def create_user(email, password):
-    already_existing_user = get_user_by_email(email)
-
-    if already_existing_user:
-        return False, already_existing_user
-
-    user = User(
-        email=email,
-        password=password
-    )
-
-    db.session.add(user)
-    db.session.commit()
-    return True, user
+@app.route('/vision', methods=['POST'])
+def vision_post():
+    print(request.data)
+    info = json.loads(request.data)
+    base_station.update_vision_log(info)
+    print()
 
 
-def renew_session(update_token):
-    user = get_user_by_update_token(update_token)
-    print(user)
-    if user is None:
-        raise Exception('Invalid update token')
-
-    user.renew_session()
-    db.session.commit()
-    return user
+@app.route('/heartbeat', methods=['GET'])
+def heartbeat_update():
+    return base_station_interface.heartbeat()
+    # time_interval = 1
+    # is_heartbeat = base_station.is_heartbeat_recent(time_interval)
+    # heartbeat_json = {"is_heartbeat": is_heartbeat}
+    # return json.dumps(heartbeat_json).encode()
 
 
-def extract_token(request):
-    auth_header = request.headers.get('Authorization')
-    if auth_header is None:
-        return False, json.dumps({'error': 'Missing authorization header.'})
+@ app.route('/result', methods=['POST'])
+def error_message_update():
+    print("Request sent to result route")
+    data = json.loads(request.data)
+    bot_name = data['bot_name']
+    return base_station_interface.error_message_update(bot_name)
+    # while not error_message:
+    #     error_message = base_station.get_error_message(bot_name)
+    # if error_message == "Successful execution":
+    #     error_json = {"error": error_message, "code": 1}
+    # else:
+    #     error_json = {"error": error_message, "code": 0}
+    # print("error_json is: ")
+    # print(error_json)
+    # return json.dumps(error_json).encode()
 
-    bearer_token = auth_header.replace('Bearer ', '').strip()
-    if not bearer_token:
-        return False, json.dumps({'error': 'Invalid authorization header.'})
 
-    return True, bearer_token
-
-
-@app.route("/")
+@ app.route("/")
 def hello():
     return "Hello World!"
 
 
-@app.route("/program/")
+@ app.route("/program/")
 def get_program():
     programs = Program.query.all()
     for program in programs:
@@ -101,7 +247,7 @@ def get_program():
     return json.dumps({'data': [program.serialize() for program in programs]})
 
 
-@app.route("/code/", methods=['POST'])
+@ app.route("/code/", methods=['POST'])
 def post_code():
     print("can you see me")
     global login_email
@@ -133,7 +279,7 @@ def register_account():
     if not password:
         return json.dumps({'error': 'Invalid password'}), 404
 
-    created, user = create_user(email, password)
+    created, user = blockly_app.create_user(email, password)
 
     if not created:
         return json.dumps({'error': 'User already exists'}), 404
@@ -169,7 +315,7 @@ def login():
     if not password:
         return json.dumps({'error': 'Invalid password'}), 404
 
-    success, user = verify_credentials(email, password)
+    success, user = blockly_app.verify_credentials(email, password)
 
     if not success:
         return json.dumps({'error': 'Incorrect email or password'}), 404
@@ -201,13 +347,13 @@ def logout():
 
 @app.route('/session/', methods=['POST'])
 def update_session():
-    success, update_token = extract_token(request)
+    success, update_token = blockly_app.extract_token(request)
 
     if not success:
         return update_token
 
     try:
-        user = renew_session(update_token)
+        user = blockly_app.renew_session(update_token)
     except:
         return json.dumps({'error': 'Invalid update token'})
 
@@ -216,6 +362,7 @@ def update_session():
         'session_expiration': str(user.session_expiration),
         'update_token': user.update_token
     })
+
 
 @app.route('/custom_function/', methods=['POST'])
 def update_custom_function():
@@ -226,12 +373,19 @@ def update_custom_function():
         print("error: Missing session_token or custom_function")
         return json.dumps({'error': 'Missing session_token or custom_function'}), 404
 
-    success, res = update_custom_function_by_session_token(session_token, custom_function)
+    success, res = blockly_app.update_custom_function_by_session_token(
+        session_token, custom_function)
 
     if not success:
         print("error: invalid session_token")
         return json.dumps({'error': 'invalid session_token'}), 404
     return json.dumps({'custom_function': custom_function}), 201
 
+
 if __name__ == "__main__":
-    app.run()
+    """
+    Main method for running base station Server.
+    """
+    # base_station_server = BaseInterface(8080, send_blockly_remote_server=True)
+    # base_station_server.start()
+    app.run(host='localhost', port='8080')
