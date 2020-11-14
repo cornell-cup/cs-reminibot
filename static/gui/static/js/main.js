@@ -30,26 +30,27 @@ class Navbar extends React.Component {
 class Platform extends React.Component {
   constructor(props) {
     super(props);
+
+    this.hiddenStyle = {
+      visibility: 'hidden',
+    };
+    this.visibleStyle = {
+      visibility: 'visible',
+    };
+
     this.state = {
       customBlockList: [],
       botName: '',
       blockly_xml: null,
       chosenBotText: '',
-      removeBotButtonStyle: {},
+      removeBotButtonStyle: this.hiddenStyle,
     };
 
-    this.updateBotName = this.updateBotName.bind(this);
     this.setBlockly = this.setBlockly.bind(this);
     this.redefineCustomBlockList = this.redefineCustomBlockList.bind(this);
     this.setChosenBotText = this.setChosenBotText.bind(this);
     this.setRemoveButtonStyle = this.setRemoveButtonStyle.bind(this);
 
-    const hiddenStyle = {
-      visible: 'hidden',
-    };
-    const visibleStyle = {
-      visible: 'visible',
-    };
   }
 
   updateBotName(value) {
@@ -76,7 +77,7 @@ class Platform extends React.Component {
   setRemoveButtonStyle(style) {
     const _this = this;
 
-    if (style = "hidden") {
+    if (style === "hidden") {
       _this.setState({ removeBotButtonStyle: this.hiddenStyle });
       console.log(style);
     }
@@ -101,10 +102,9 @@ class Platform extends React.Component {
             <div className="row">
               <div className="col">
                 <AddBot
-                  updateBotName={this.updateBotName}
                   chosenBotText={this.state.chosenBotText}
                   setChosenBotText={this.setChosenBotText}
-                  removeButtonStyle={this.state.removeBotButtonStyle}
+                  removeBotButtonStyle={this.state.removeBotButtonStyle}
                   setRemoveButtonStyle={this.setRemoveButtonStyle}
                 />
               </div>

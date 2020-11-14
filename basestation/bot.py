@@ -13,7 +13,7 @@ class Bot:
     END_CMD_TOKEN = ">>>>"
     TIMEOUT_LIMIT = 10
 
-    def __init__(self, bot_id, bot_name, ip_address, port=10000):
+    def __init__(self, bot_name, ip_address, port=10000):
         self.port = port
         self.ip_address = ip_address
         # the basestation's endpoint socket with the
@@ -21,7 +21,6 @@ class Bot:
         # an arbitrarily small time
         self.sock.settimeout(0.01)
         self._name = bot_name
-        self._id = bot_id
         self.last_status_time = time.time()
         self.is_socket_connected = True
 
@@ -101,7 +100,3 @@ class Bot:
     @property
     def name(self):
         return self._name
-
-    @property
-    def id(self):
-        return self._id

@@ -31,13 +31,8 @@ class BaseInterface:
         self.base_station = BaseStation()
         self.port = port
 
-        self.base_station_key = self.base_station.get_base_station_key()
-        """prints key to console"""
-        print(self.base_station_key)
-
         self.settings = {
             "static_path": os.path.join(os.path.dirname(__file__), "../static"),
-            "cookie_secret": str(self.base_station.add_session())
         }
 
         # Setting up handlers.
@@ -80,69 +75,44 @@ class ClientHandler(tornado.web.RequestHandler):
         self.send_blockly_remote_server = send_blockly_remote_server
 
     def get(self):
-        if not self.get_secure_cookie("user_id"):
-            new_id = self.base_station.add_session()
-            self.set_secure_cookie("user_id", new_id)
-
-        session_id = self.get_secure_cookie("user_id")
-        if session_id:
-            session_id = session_id.decode("utf-8")
         self.render("../static/gui/index.html", title="Client")
 
     def post(self):
         data = json.loads(self.request.body.decode())
         key = data['key']
 
-        session_id = self.get_secure_cookie("user_id")
-        if session_id:
-            session_id = session_id.decode("utf-8")
-
-        if key == "CONNECTBOT":
-            bot_name = data['bot_name']
-            if bot_name != None and bot_name != "":
-                print("Connecting bot " + str(bot_name))
-                print("session " + str(session_id))
-                self.write(json.dumps(self.base_station.add_bot_to_session(
-                    session_id, bot_name)).encode())
-            else:
-                print("No bot received, or bot name empty.")
         if key == "MODE":
             print("Reached MODE")
             bot_name = data['bot_name']
             mode_type = data['value']
             print("here!")
-            bot_id = self.base_station.bot_name_to_bot_id(bot_name)
-            bot = self.base_station.get_bot(bot_id)
+            bot = self.base_station.get_bot(bot_name)
             bot.sendKV(key, str(mode_type))
         elif key == "WHEELS":
             bot_name = data['bot_name']
             direction = data['direction']
             power = str(data['power'])
 
-            bot_id = self.base_station.bot_name_to_bot_id(bot_name)
-            self.base_station.move_wheels_bot(
-                session_id, bot_id, direction, power)
+            self.base_station.move_wheels_bot(bot_name, direction, power)
         elif key == "PORTS":
             # leftmotor = data['leftmotor']
-            bot_id = self.base_station.bot_name_to_bot_id(data['bot_name'])
-
+            bot_name = data['bot_name']
             portarray = data['ports']
             for x in portarray:
                 print(x)
-            self.base_station.set_ports(portarray, session_id, bot_id)
+            self.base_station.set_ports(portarray, bot_name)
 
         # Looks for bots on the local network to connect to.
         elif key == "DISCOVERBOTS":
             # go through each bot and make sure its active
             for bot_name in self.base_station.get_active_bots_names():
-                bot_id = self.base_station.bot_name_to_bot_id(bot_name)
-                bot = self.base_station.get_bot(bot_id)
+                bot = self.base_station.get_bot(bot_name)
                 if not bot:
                     continue
                 status = self.base_station.get_bot_status(bot)
                 # if the bot is inactive, remove it from the active bots list
                 if status == "INACTIVE":
-                    self.base_station.remove_bot(bot_id)
+                    self.base_station.remove_bot(bot_name)
 
             # return all the bots that are active after removing the inactive ones
             self.write(json.dumps(
@@ -167,8 +137,7 @@ class ClientHandler(tornado.web.RequestHandler):
                 print("Get")
                 print(x.json)
 
-            bot_id = self.base_station.bot_name_to_bot_id(bot_name)
-            bot = self.base_station.get_bot(bot_id)
+            bot = self.base_station.get_bot(bot_name)
             # reset the previous script's error message, so we can get the new error message
             # of the new script
             bot.set_result(None)

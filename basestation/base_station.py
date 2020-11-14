@@ -13,7 +13,6 @@ import threading
 
 # internal
 # from connection.base_connection import BaseConnection
-from session.session import Session
 
 MAX_VISION_LOG_LENGTH = 1000
 
@@ -21,7 +20,6 @@ MAX_VISION_LOG_LENGTH = 1000
 class BaseStation:
     def __init__(self):
         self.active_bots = {}
-        self.active_sessions = {}
         self.active_playgrounds = {}
         self.vision_log = []
 
@@ -141,20 +139,18 @@ class BaseStation:
         is established successfully.
 
         Args:
-            bot_id (str):
             ip (str):
             port (int):
 
         Return:
             id of newly added bot
         """
-        bot_id = self.generate_id()
         if not bot_name:
             bot_name = "minibot" + \
                 ip_address[len(ip_address)-3:].replace('.', '')
 
-        new_bot = Bot(bot_id, bot_name, ip_address, port)
-        self.active_bots[bot_id] = new_bot
+        new_bot = Bot(bot_name, ip_address, port)
+        self.active_bots[bot_name] = new_bot
 
     def get_bot_status(self, bot):
         """ Gets whether the Minibot is currently connected or has been 
@@ -169,72 +165,42 @@ class BaseStation:
         if bot.is_connected():
             status = "ACTIVE"
         else:
-            # self.remove_bot_from_session(self.session, bot._id)
             status = "INACTIVE"
         return status
 
-    def remove_bot(self, bot_id):
+    def remove_bot(self, bot_name):
         """
         Removes minibot from list of active bots by name.
 
         Args:
-            bot_id (str): bot id of removed bot
+            bot_name (str): bot name of removed bot
 
         Return:
             True if bot was successfully removed
             False otherwise
         """
-        self.active_bots.pop(bot_id)
-        return bot_id not in self.active_bots
+        self.active_bots.pop(bot_name)
+        return bot_name not in self.active_bots
 
-    def bot_name_to_bot_id(self, bot_name):
-        """
-        Returns bot id corresponding to bot name
-
-        Args:
-            bot_name (str):
-
-        """
-        for bot_id, bot in self.active_bots.items():
-            if bot.name == bot_name:
-                return bot_id
-        return None
-
-    def move_wheels_bot(self, session_id, bot_id, direction, power):
+    def move_wheels_bot(self, bot_name, direction, power):
         """
         Gives wheels power based on user input
-
-        Args:
-            session_id:
-            bot_id:
-            direction:
-            power:
 
         Return:
             True if bot successfully received direction
             False otherwise
         """
-        if not session_id or not bot_id:
-            return False
-
-        session = self.active_sessions[session_id]
-        if not session or not session.has_bot(bot_id):
-            return False
-
         direction = direction.lower()
-        print("Active bot " + str(type(self.active_bots[bot_id])))
-        self.active_bots[bot_id].sendKV("WHEELS", direction)
+        print("Active bot " + str(type(self.active_bots[bot_name])))
+        self.active_bots[bot_name].sendKV("WHEELS", direction)
         return True
 
-    def get_bot(self, bot_id):
+    def get_bot(self, bot_name):
         """
         Returns bot object corresponding to bot id
-
-        Args:
-            bot_id:
         """
-        if bot_id in self.active_bots:
-            return self.active_bots[bot_id]
+        if bot_name in self.active_bots:
+            return self.active_bots[bot_name]
         else:
             return None
 
@@ -244,114 +210,19 @@ class BaseStation:
         """
         return {bot.get_ip(): bot.id for _, bot in self.active_bots.items()}
 
-    def get_bot_sessions(self, bot_id):
-        """
-        Returns a list of session_id connected to the bot associated with bot_id.
-        """
-        sessions = []
-        for session_id, session in self.active_sessions.items():
-            if session.has_bot(bot_id):
-                sessions.append(session_id)
-        return sessions
-
-    def set_ports(self, ports, session_id, bot_id):
-        if not session_id or not bot_id:
-            return False
-
-        session = self.active_sessions[session_id]
-        if not session or not session.has_bot(bot_id):
-            return False
+    def set_ports(self, ports, bot_name):
         for x in ports:
             print(x)
 
         portsstr = " ".join([str(l) for l in ports])
 
-        self.active_bots[bot_id].sendKV("PORTS", portsstr)
-
+        self.active_bots[bot_name].sendKV("PORTS", portsstr)
         # do something
-
         return True
-
-    # ================== SESSIONS ==================
-
-    def list_active_sessions(self):
-        """
-        Returns all of the session_id in active_sessions
-
-        Returns:
-            list : list of session_id
-        """
-        return self.active_sessions.keys()
-
-    def has_session(self, session_id):
-        """
-        Returns True if session_id exists in active_sessions
-
-        Returns:
-            boolean
-        """
-        return session_id in self.active_sessions
-
-    def add_session(self):
-        """
-        Adds a new session to active_sessions
-
-        Returns:
-            session_id (str): a unique id
-        """
-        session_id = self.generate_id()
-        self.active_sessions[session_id] = Session(session_id)
-        return session_id
-
-    def add_bot_to_session(self, session_id, bot_name):
-        """
-        Adds bot id to session given session id and bot name.
-
-        Args:
-            session_id (str): a unique id
-            bot_id (str): a unique id
-        """
-
-        print("session_id is:")
-        print(session_id)
-        print("bot_name is: ")
-        print(bot_name)
-
-        print(self.active_bots)
-
-        bot_id = self.bot_name_to_bot_id(bot_name)
-        if bot_id in self.active_bots:
-            bot = self.active_bots[bot_id]
-            temp = self.active_sessions[session_id].add_bot_id_to_session(bot.id)
-            print(f"Bots in session {self.active_sessions[session_id].bots}")
-            return temp
-        else:
-            return False
-
-    def remove_bot_from_session(self, session_id, bot_id):
-        """"
-        Removes bot from session
-
-        Args:
-            session_id (str): a unique id
-            bot_id (str): a unique id
-        """
-        print(f"Session id when removing bot {session_id}")
-        session = self.active_sessions[session_id]
-        print(f"List of session bots removing bot {session.bots}")
-        session.remove_bot_id_from_session(bot_id)
 
     # ================== BASESTATION GUI ==================
 
-    def get_base_station_key(self):
-        """
-        Returns basestation key to access basestation gui. If there is no key, a key is randomly generated
-        """
-        if self.basestation_key == "":
-            self.basestation_key = self.generate_id()
-        return self.basestation_key
 
     def get_error_message(self, bot_name):
-        bot_id = self.bot_name_to_bot_id(bot_name)
-        bot = self.active_bots[bot_id]
+        bot = self.active_bots[bot_name]
         return bot.get_result()

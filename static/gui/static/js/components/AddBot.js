@@ -112,7 +112,7 @@ export default class AddBot extends React.Component {
     }
 
     componentDidMount() {
-        setInterval(this.refreshAvailableBots.bind(this), 200);
+        setInterval(this.refreshAvailableBots.bind(this), 500);
     }
 
     /*
@@ -128,34 +128,29 @@ export default class AddBot extends React.Component {
             data: JSON.stringify({
                 key: "DISCOVERBOTS"
             })
+        }).then(function (response) {
+            _this.state.available_bots = response.data;
+            let chosenBotLabel = _this.props.chosenBotText;
+            let chosenBotLabelWords = chosenBotLabel.split(" ");
+            let chosenBotName = chosenBotLabelWords[
+                chosenBotLabelWords.length - 1];
+            console.log("chosen bot name: " + chosenBotName);
+
+            // If the Chosen Bot (the currently connected bot)
+            // is no longer active, remove it from the Chosen Bot label (the 
+            // currently connected bot label)
+            if (!_this.state.available_bots.includes(chosenBotName)) {
+                _this.props.setChosenBotText("");
+                _this.props.setRemoveButtonStyle("hidden");
+            }
+
+            let refreshingBotList = _this.refreshingBotListRef.current;
+            if (refreshingBotList !== null) {
+                _this.refreshingBotListRef.current.update(response.data);
+            }
+        }).catch(function (error) {
+            console.log(error);
         })
-            .then(function (response) {
-                // console.log(response.data);
-
-                _this.state.available_bots = response.data
-                let chosenBotLabel = _this.props.chosenBotText
-                let chosenBotLabelWords = chosenBotLabel.split(" ");
-                let chosenBotName = chosenBotLabelWords[chosenBotLabelWords.length - 1];
-                console.log("chosen bot name: " + chosenBotName)
-
-                if (!_this.state.available_bots.includes(chosenBotName)) {
-                    _this.props.setChosenBotText("");
-                    _this.props.setRemoveButtonStyle("hidden");
-                }
-                else {
-                    _this.props.setChosenBotText("Successfully added " + chosenBotName);
-                    _this.props.setRemoveButtonStyle("visible");
-                }
-
-                let refreshingBotList = _this.refreshingBotListRef.current
-                if (refreshingBotList !== null) {
-                    _this.refreshingBotListRef.current.update(response.data);
-                }
-
-            })
-            .catch(function (error) {
-                console.log(error);
-            })
     }
 
     /*update power value when bot moves*/
@@ -168,31 +163,10 @@ export default class AddBot extends React.Component {
         let li = this.state.available_bots;
         let botName = (this.refreshingBotListRef.current == null) ?
             "" : this.refreshingBotListRef.current.state.current_bot;
-
-        const _this = this;
-        axios({
-            method: 'POST',
-            url: '/start',
-            data: JSON.stringify({
-                key: "CONNECTBOT",
-                bot_name: botName,
-            })
-        })
-            .then(function (response) {
-                console.log("Trying to add bot to list " + botName)
-                if (response.data) {
-                    console.log("Bot" + botName + " added successfully")
-                    let msg = "Currently connected to: ";
-                    _this.props.setChosenBotText(msg + botName);
-                    _this.props.setRemoveButtonStyle("visible");
-
-                } else {
-                    console.log("Failed to add " + botName)
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
-            })
+        console.log("Bot" + botName + " added successfully")
+        let msg = "Currently connected to: ";
+        this.props.setChosenBotText(msg + botName);
+        this.props.setRemoveButtonStyle("visible");
     }
 
     /*listener for direction buttons*/
@@ -303,7 +277,7 @@ export default class AddBot extends React.Component {
 
 
     render() {
-        var _this = this;
+        const _this = this;
         return (
             <div className="container-fluid control">
                 <div className="row">
@@ -325,7 +299,9 @@ export default class AddBot extends React.Component {
                         <div className="element-wrapper">
                             <label id="chosen-bot"> {this.props.chosenBotText} </label>
                         </div>
-                        <Button id="remove-bot" name="Remove" onClick={() => _this.deleteBotListener()} style={this.props.removeBotButtonStyle} />
+                        <Button id="remove-bot" name="Remove" 
+                            onClick={() => _this.deleteBotListener()} 
+                            style={_this.props.removeBotButtonStyle} />
                         <div className="led-box element-wrapper">
                             <div id="led-red"></div>
                         </div>
