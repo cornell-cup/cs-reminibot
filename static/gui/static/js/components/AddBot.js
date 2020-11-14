@@ -40,10 +40,12 @@ class RefreshingList extends React.Component {
             _this.state.current_bot = _this.state.availableBots[0]
         }
 
-        return <select onChange={(e) => this.updateCurrentBot(e)}>
-            {_this.state.availableBots.map(
-                (name, idx) => <option key={idx}> {name} </option>)}
-        </select>
+        return (
+            <select onChange={(e) => this.updateCurrentBot(e)}>
+                {_this.state.availableBots.map(
+                    (name, idx) => <option key={idx}> {name} </option>)}
+            </select>
+        );
     }
 }
 
