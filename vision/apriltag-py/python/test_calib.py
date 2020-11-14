@@ -18,7 +18,7 @@ Instructions for use:
 def main():
     # Get checkerboard
     cols, rows = 9, 6
-    camera = get_camera()
+    camera = get_camera(0)
     image, gray_image, corners = get_checkerboard_interactive(camera,cols, rows)
     print(corners)
     cv2.waitKey(0)
@@ -28,8 +28,8 @@ def main():
     # From tutorial:
     # https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_calib3d/py_calibration/py_calibration.html#calibration
     criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
-    obj_points = np.zeros((6*9,3), np.float32)
-    obj_points[:,:2] = np.mgrid[0:9,0:6].T.reshape(-1,2)
+    obj_points = np.zeros((rows*cols,3), np.float32)
+    obj_points[:,:2] = np.mgrid[0:cols,0:rows].T.reshape(-1,2)
     img_points = cv2.cornerSubPix(gray_image, corners, (11,11), (-1,-1), criteria)
     ret, mat, dist, rvecs, tvecs = cv2.calibrateCamera(
         [obj_points],
@@ -80,8 +80,8 @@ def get_image_on_keypress(camera):
     return image
 
 
-def get_camera():
-    camera = cv2.VideoCapture(0)
+def get_camera(idx):
+    camera = cv2.VideoCapture(idx)
     if not cv2.VideoCapture.isOpened(camera):
         raise Exception("Unable to open camera")
     camera.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)

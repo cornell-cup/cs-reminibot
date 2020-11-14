@@ -26,7 +26,7 @@ BLUE = (255, 0, 0)
 
 
 def main():
-    camera = setup_camera()
+    camera = setup_camera(1)
 
     detector = apriltag.Detector(searchpath=apriltag._get_demo_searchpath())
     _, frame = camera.read()
@@ -44,26 +44,26 @@ def main():
 
     # Analyze points for error based on position
     print(compute_stats(points))
-    points = []
+    # points = []
 
-    # Do it all again, but undistort
-    calib_file, calib_data = util.read_calib_json("tester.json")
-    camera_matrix = util.get_numpy_matrix(calib_data, "camera_matrix")
-    dist_coeffs = util.get_numpy_matrix(calib_data, "dist_coeffs")
-    new_camera_matrix = util.get_numpy_matrix(calib_data, "new_camera_matrix")
-    calib_file.close()
+    # # Do it all again, but undistort
+    # calib_file, calib_data = util.read_calib_json("tester.json")
+    # camera_matrix = util.get_numpy_matrix(calib_data, "camera_matrix")
+    # dist_coeffs = util.get_numpy_matrix(calib_data, "dist_coeffs")
+    # new_camera_matrix = util.get_numpy_matrix(calib_data, "new_camera_matrix")
+    # calib_file.close()
     
-    new_image = cv2.undistort(frame, camera_matrix, dist_coeffs, None, new_camera_matrix)
-    gray = cv2.cvtColor(new_image, cv2.COLOR_BGR2GRAY)
-    detections, _ = detector.detect(gray, return_image=True)
-    print(len(detections))
-    points = []
-    for d in range(len(detections)):
-        tag_x, tag_y = detections[d].center
-        center_point = (int(tag_x), int(tag_y))
-        points.append(center_point)
+    # new_image = cv2.undistort(frame, camera_matrix, dist_coeffs, None, new_camera_matrix)
+    # gray = cv2.cvtColor(new_image, cv2.COLOR_BGR2GRAY)
+    # detections, _ = detector.detect(gray, return_image=True)
+    # print(len(detections))
+    # points = []
+    # for d in range(len(detections)):
+    #     tag_x, tag_y = detections[d].center
+    #     center_point = (int(tag_x), int(tag_y))
+    #     points.append(center_point)
     
-    print(compute_stats(points))
+    # print(compute_stats(points))
     camera.release()
     cv2.destroyAllWindows()
     pass
@@ -97,8 +97,8 @@ def get_point(corner):
     return int(x), int(y)
 
 
-def setup_camera():
-    camera = cv2.VideoCapture(0)
+def setup_camera(idx):
+    camera = cv2.VideoCapture(idx)
     camera.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
     camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
     camera.set(cv2.CAP_PROP_FPS, 60)
