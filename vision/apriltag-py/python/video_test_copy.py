@@ -55,6 +55,7 @@ def main():
             detections, det_image = detector.detect(gray, return_image=True)
             print(len(detections))
             points = []
+            dim_lst = []
             for d in range(len(detections)):
                 tag_x, tag_y = detections[d].center
                 center_point = (int(tag_x), int(tag_y))
@@ -68,6 +69,17 @@ def main():
                 # print("Tag {} found at ({},{})".format(d.tag_id, tag_x, tag_y))
                 # print("with angle {}".format(util.get_tag_angle(d.corners)))
 
+                # Compute size of each tag as they appear on camera
+
+                tl = get_point(detections[d].corners[0])
+                tr = get_point(detections[d].corners[1])
+                br = get_point(detections[d].corners[2])
+
+                width = tr - tl
+                height = tr - br
+                dim = np.array([width, height])
+                dim_lst.append(dim)
+
             if len(detections) == 24:
                 # Compute diffs in x and y for tag mat
                 dx, dy = [], []
@@ -78,9 +90,16 @@ def main():
                 for c in range(3-1):
                     dy.extend([p[1]-p[0]
                                for p in zip(y_chunks[c], y_chunks[c+1])])
+
+                dim_lst = np.array(dim_lst)
                 # print stats
                 print("dx: {}\ndy: {}\nx_m: {} y_m: {}".format(
                     dx, dy, max(dx)-min(dx), max(dy)-min(dy)))
+
+                # Compute stats for dim_lst
+                print("dimension (w x h): {}\nmax_diff_w: {} max_diff_h: {}".format(
+                    dim_lst, max(dim_lst[:, 0])-min(dim_lst[:0]), max(dim_lst[:, 1])-min(dim_lst[:, 1])))
+
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
     camera.release()
