@@ -9,6 +9,8 @@ import importlib
 import ast
 import os
 import concurrent.futures
+from multiprocessing import Process, Manager, Value
+from ctypes import c_char_p
 
 # Create a UDP socket
 sock = socket(AF_INET, SOCK_DGRAM)
@@ -34,6 +36,8 @@ else:
     import scripts.pi_arduino as ece
     BOT_LIB_FUNCS = "pi_arduino"
 
+current_process = None
+
 
 def parse_command(cmd, tcpInstance):
     """
@@ -43,6 +47,8 @@ def parse_command(cmd, tcpInstance):
          cmd (:obj:`str`): The command name.
          tcpInstance (:obj:`str`): Payload or contents of command.
     """
+    global current_process 
+
     comma = cmd.find(",")
     start = cmd.find("<<<<")
     end = cmd.find(">>>>")
@@ -63,6 +69,9 @@ def parse_command(cmd, tcpInstance):
             Thread(target=ece.right, args=[50]).start()
         else:
             Thread(target=ece.stop).start()
+            if current_process is not None:
+                current_process.terminate()
+
     elif key == "MODE":
         if value == "object_detection":
             print("Object Detection")
@@ -88,12 +97,14 @@ def parse_command(cmd, tcpInstance):
                     file_dir + "/scripts/" + script_name, 'w+')
                 file.write(program)
                 file.close()
-                return_value = spawn_script_process(script_name)
-                return return_value
-            except Exception as exception:
-                print("Exception occurred at compile time")
-                str_exception = str(type(exception)) + ": " + str(exception)
-                return str_exception
+                # Run the Python program in a different process so that we 
+                # don't need to wait for it to terminate and we can kill it
+                # whenever we want.
+                time.sleep(0.1)
+                current_process = Process(target=run_script, args=(script_name, tcpInstance))
+                current_process.start()
+            except Exception:
+                pass
 
 
 def process_string(value):
@@ -115,25 +126,12 @@ def process_string(value):
     return program
 
 
-def spawn_script_process(scriptname):
-    """
-    Creates a new thread to run the script process on.
-    Args:
-        scriptname (:obj:`str`): The name of the script to run.
-    """
-    time.sleep(0.1)
-
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        future = executor.submit(run_script, scriptname)
-        return_value = future.result()
-        return return_value
-
-
-def run_script(scriptname):
+def run_script(scriptname, tcp_instance):
     """
     Loads a script and runs it.
     Args:
-        scriptname (:obj:`str`): The name of the script to run.
+        scriptname (str): The name of the script to run.
+        tcp_instance (object): TCP object for communication.
     """
 
     # Cache invalidation and module refreshes are needed to ensure
@@ -145,13 +143,12 @@ def run_script(scriptname):
         script = importlib.import_module(script_name)
         importlib.reload(script)
         script.run()
-        return "Successful execution"
+        result = "Successful execution"
+        tcp_instance.send_to_basestation("ERRORMESSAGE", result)
     except Exception as exception:
-        print("Exception occurred at run time")
-        print(type(exception))
-        print(str(exception))
         str_exception = str(type(exception)) + ": " + str(exception)
-        return str_exception
+        result = str_exception
+        tcp_instance.send_to_basestation("ERRORMESSAGE", result)
 
 
 def start_base_station_heartbeat(ip_address):
@@ -217,11 +214,7 @@ def main():
         tcp_instance = TCP()
         while True:
             time.sleep(0.01)
-            return_value = parse_command(tcp_instance.get_command(), tcp_instance)
-            # print("return_value is:")
-            # print(return_value)
-            if return_value is not None:
-                tcp_instance.send_to_basestation("RESULT", return_value)
+            parse_command(tcp_instance.get_command(), tcp_instance)
 
     finally:
         sock.close()
