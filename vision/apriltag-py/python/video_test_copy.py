@@ -30,7 +30,7 @@ APPLY_TRANSFORM = False
 
 
 def main():
-    camera = setup_camera()
+    camera = setup_camera(0)
 
     detector = apriltag.Detector(searchpath=apriltag._get_demo_searchpath())
     start = time.time()
@@ -75,14 +75,16 @@ def main():
                 tr = get_point(detections[d].corners[1])
                 br = get_point(detections[d].corners[2])
 
-                width = tr - tl
-                height = tr - br
+                width = dist(tr, tl)
+                height = dist(tr, br)
                 dim = np.array([width, height])
                 dim_lst.append(dim)
 
             if len(detections) == 24:
                 # Compute diffs in x and y for tag mat
                 dx, dy = [], []
+                x_pts = [p[0] for p in points]
+                y_pts = [p[1] for p in points]
                 for col in range(8-1):
                     for row in range(3):
                         dx.append(x_pts[8*row + col + 1] - x_pts[8*row + col])
@@ -97,8 +99,8 @@ def main():
                     dx, dy, max(dx)-min(dx), max(dy)-min(dy)))
 
                 # Compute stats for dim_lst
-                print("dimension (w x h): {}\nmax_diff_w: {} max_diff_h: {}".format(
-                    dim_lst, max(dim_lst[:, 0])-min(dim_lst[:0]), max(dim_lst[:, 1])-min(dim_lst[:, 1])))
+                print("dimension (w x h): \nmax_diff_w: {} max_diff_h: {}".format(
+                    max(dim_lst[:, 0])-min(dim_lst[:, 0]), max(dim_lst[:, 1])-min(dim_lst[:, 1])))
 
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
@@ -135,12 +137,19 @@ def apply_transform(frame, filename):
     return frame
 
 
-def setup_camera():
-    camera = cv2.VideoCapture(0)
+def setup_camera(idx):
+    camera = cv2.VideoCapture(idx)
     camera.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
     camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
     camera.set(cv2.CAP_PROP_FPS, 60)
     return camera
+
+def dist(p1, p2):
+    X = 0
+    Y = 1
+    return np.sqrt(
+        (p2[X] - p1[X])**2 + (p2[Y]-p1[Y])**2
+    )
 
 
 if __name__ == "__main__":
