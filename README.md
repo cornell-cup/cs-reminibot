@@ -59,6 +59,7 @@ hardware to the software and GUI. BaseStation runs on `cs-reminibot/basestation/
 simple web application that runs on HTTP.
 
 To run the BaseStation, run the following command.  You should currently be in the cs-reminibot directory.
+**If you want the use the speech recognition feature of the Minibot platform, run this command in your regular terminal (not VSCode terminal).  This is because VSCode does not have permission to access your computer's microphone.**
  
 ```
 ./run_BS.sh
@@ -104,6 +105,13 @@ Upgrade npm to the lastest version by running:
 ```
 sudo npm install npm@latest -g
 ```
+
+#### Pyaudio installation:
+These dependencies must be installed if you want to use the speech recognition feature of our Minibot platform.  In a terminal run:
+```
+sudo apt-get install libasound-dev portaudio19-dev libportaudio2 libportaudiocpp0
+sudo apt-get install ffmpeg libav-tools
+```
 [Continue with the remaining installation steps](#Continue)
 
 <a name="MacOS"></a>
@@ -139,6 +147,11 @@ Upgrade npm to the lastest version by running:
 
 ```
 npm install npm@latest -g
+```
+#### Pyaudio installation:
+These dependencies must be installed if you want to use the speech recognition feature of our Minibot platform.  In a terminal run:
+```
+brew install portaudio
 ```
 [Continue with the remaining installation steps](#Continue)
 
@@ -188,6 +201,13 @@ Upgrade npm to the lastest version by running:
 
 ```
 sudo npm install npm@latest -g
+```
+
+#### Pyaudio installation:
+These dependencies must be installed if you want to use the speech recognition feature of our Minibot platform.  In a terminal run:
+```
+sudo apt-get install libasound-dev portaudio19-dev libportaudio2 libportaudiocpp0
+sudo apt-get install ffmpeg libav-tools
 ```
 [Continue with the remaining installation steps](#Continue)
 
