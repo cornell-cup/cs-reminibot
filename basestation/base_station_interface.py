@@ -12,15 +12,9 @@ import sys
 import time
 import re  # regex import
 import requests
-import threading
-import pyaudio
-import speech_recognition as sr
-from util.stoppable_thread import StoppableThread
 
 # Minibot imports.
 from base_station import BaseStation
-# from piVision import *
-# from piVision.server import startBotVisionServer
 
 
 class BaseInterface:
@@ -57,13 +51,8 @@ class BaseInterface:
                 send_blockly_remote_server=send_blockly_remote_server,
             )),
             ("/vision", VisionHandler, dict(base_station=self.base_station)),
-<<<<<<< HEAD
             ("/heartbeat", HeartbeatHandler, dict(base_station=self.base_station)),
             ("/result", ErrorMessageHandler, dict(base_station=self.base_station))
-=======
-            ("/voice", VoiceHandler, dict(base_station=self.base_station)),
-            ("/heartbeat", HeartbeatHandler, dict(base_station=self.base_station))
->>>>>>> eda82ced5361e3ea35f582ae5b65597b38983fe1
         ]
 
     def start(self):
@@ -119,10 +108,8 @@ class ClientHandler(tornado.web.RequestHandler):
             else:
                 print("No bot received, or bot name empty.")
         if key == "MODE":
-            print("Reached MODE")
             bot_name = data['bot_name']
             mode_type = data['value']
-            print("here!")
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             bot = self.base_station.get_bot(bot_id)
             bot.sendKV(key, str(mode_type))
@@ -131,14 +118,13 @@ class ClientHandler(tornado.web.RequestHandler):
             direction = data['direction']
             power = str(data['power'])
 
-
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             self.base_station.move_wheels_bot(
                 session_id, bot_id, direction, power)
         elif key == "PORTS":
             # leftmotor = data['leftmotor']
             bot_id = self.base_station.bot_name_to_bot_id(data['bot_name'])
-            
+
             portarray = data['ports']
             for x in portarray:
                 print(x)
@@ -159,26 +145,20 @@ class ClientHandler(tornado.web.RequestHandler):
             if self.send_blockly_remote_server:
                 url = 'http://127.0.0.1:5000/code/'
                 x = requests.post(url, json=params)
-                print("Post")
-                print(x.json)
-
-                print('database test')
                 url2 = 'http://127.0.0.1:5000/program/'
                 x = requests.get(url2)
-                print("Get")
-                print(x.json)
 
             bot_id = self.base_station.bot_name_to_bot_id(bot_name)
             bot = self.base_station.get_bot(bot_id)
             # reset the previous script's error message, so we can get the new error message
             # of the new script
-            bot.set_result(None)
+            bot.set_error_message(None)
             if bot:
                 print("Code len = " + str(len(value)))
                 print(type(bot))
                 if len(value) == 0:
                     print("GETTING SCRIPTS")
-                    bot.sendKV("SCRIPTS", '')
+                    bot.sendKV("SCRIPTS", "")
                 elif len(value) == 1:
                     print("SENDING SCRIPTS")
                     bot.sendKV("SCRIPTS", value[0])
@@ -209,12 +189,9 @@ class ClientHandler(tornado.web.RequestHandler):
         into ECE-supplied functions.
 
         Args:
-            bot: The pi_bot to send to
-            program: The string containing the python code generated
-            from blockly
-
+            bot: the pi_bot to send to
+            program: the string containing the python code generated
         """
-
         # function_map : Blockly functions -> ECE functions
         function_map = {
             "move_forward": "fwd",
@@ -229,8 +206,8 @@ class ClientHandler(tornado.web.RequestHandler):
         }
 
         # functions that run continuously, and hence need to be started
-        # in a new thread on the Minibot otherwise the Minibot will get 
-        # stuck in an infinite loop and will be unable to receive 
+        # in a new thread on the Minibot otherwise the Minibot will get
+        # stuck in an infinite loop and will be unable to receive
         # other commands
         threaded_functions = [
             "fwd",
@@ -244,7 +221,7 @@ class ClientHandler(tornado.web.RequestHandler):
         # Regex is for bot-specific functions (move forward, stop, etc)
         # 1st group is the whitespace (useful for def, for, etc),
         # 2nd group is for func name, 3rd group is for args,
-        # 4th group is for anything else (additional whitespace, 
+        # 4th group is for anything else (additional whitespace,
         # ":" for end of if condition, etc)
         pattern = r"(.*)bot.(\w*)\((.*)\)(.*)"
         regex = re.compile(pattern)
@@ -253,7 +230,7 @@ class ClientHandler(tornado.web.RequestHandler):
         for line in program_lines:
             match = regex.match(line)
             if not match:
-                parsed_program.append(line + '\n')  # "normal" python
+                parsed_program.append(line + '\n')  # "normal" Python
             else:
                 func = function_map[match.group(2)]
                 args = match.group(3)
@@ -265,11 +242,11 @@ class ClientHandler(tornado.web.RequestHandler):
                     parsed_line += "Thread(target={}, args=[{}]).start()\n".format(
                         func, args)
                 else:
-                    parsed_line += func + "(" + args + ")" + match.group(4) + "\n"
+                    parsed_line += func + \
+                        "(" + args + ")" + match.group(4) + "\n"
                 parsed_program.append(parsed_line)
 
         parsed_program_string = "".join(parsed_program)
-        print(parsed_program_string)
 
         # Now actually send to the bot
         bot.sendKV("SCRIPTS", parsed_program_string)
@@ -299,86 +276,31 @@ class HeartbeatHandler(tornado.websocket.WebSocketHandler):
         heartbeat_json = {"is_heartbeat": is_heartbeat}
         self.write(json.dumps(heartbeat_json).encode())
 
-class VoiceHandler(tornado.websocket.WebSocketHandler):
-    def initialize(self, base_station):
-        self.base_station = base_station
-
-    def get(self):
-        pass #not sure what's supposed to happen here
-
-    def post(self):
-        data = json.loads(self.request.body.decode())
-        key = data['key']
-        
-        bot_name = data['bot_name']
-        bot_id = self.base_station.bot_name_to_bot_id(bot_name)
-        bot = self.base_station.get_bot(bot_id)
-        if not bot:
-            return
-
-        if key == "START VOICE":  # start listening
-            print("starting voiceServer thread")
-            VoiceHandler.flag = True
-            self.base_station.voice_server = StoppableThread(self.voice_recognition)
-            self.base_station.voice_server.start()
-        elif key == "STOP VOICE":
-            print("ending onBotVisionServer thread")
-            if (VoiceHandler.flag):
-                print("About to call base_station.voice_server.stop()")
-                self.base_station.voice_server.stop()
-            else:
-                print("ERROR: No on bot vision server started")
-    
-    def voice_recognition(self, thread_safe_condition):
-        RECORDING_TIME_LIMIT = 5
-        commands = {
-            "forward" : "Minibot moves forward",
-            "backward" : "Minibot moves backwards",
-            "left" : "Minibot moves left",
-            "right" : "Minibot moves right",
-            "stop" : "Minibot stops",
-            "object detection" : "Minibot starts object detection mode",
-            "line follow" : "Minibot starts line follow mode"
-        }
-        print("entered base_station.py")
-        # open the Microphone as variable microphone
-        with sr.Microphone() as microphone:
-            print("mic works")
-            r = sr.Recognizer()
-            while thread_safe_condition.read():
-                print("Say something!")
-                try:
-                    # listen for 5 seconds
-                    audio = r.listen(microphone, RECORDING_TIME_LIMIT)
-                    print("Converting from speech to text ...")
-                    words = r.recognize_google(audio)
-                    print("You said: " + words)
-                    if words in commands:
-                        print(commands[words])
-                    else:
-                        print("Invalid command")
-                except sr.WaitTimeoutError:
-                    print("timed out")
-                except sr.UnknownValueError:
-                    print("words not recognized")
-    
 
 class ErrorMessageHandler(tornado.websocket.WebSocketHandler):
+    """
+    Class for handling Python error messages.
+    """
+
     def initialize(self, base_station):
         self.base_station = base_station
 
     def post(self):
+        """
+        Called by blockly.js to send Python error message back to the GUI.
+        For each Python program entered, blockly.js will repeatedly call
+        this function until error_json has code != -1.
+        """
         data = json.loads(self.request.body.decode())
         bot_name = data['bot_name']
         error_message = self.base_station.get_error_message(bot_name)
-        while not error_message:
-            error_message = self.base_station.get_error_message(bot_name)
-        if error_message == "Successful execution":
+        if not error_message:
+            error_json = {"error": "", "code": -1}
+        elif error_message == "Successful execution":
             error_json = {"error": error_message, "code": 1}
         else:
             error_json = {"error": error_message, "code": 0}
-        print("error_json is: ")
-        print(error_json)
+        # Send back to GUI
         self.write(json.dumps(error_json).encode())
 
 

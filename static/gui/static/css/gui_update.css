@@ -2,7 +2,6 @@
 
 .box {
     margin: 1vh;
-    background: lightgrey;
     padding: 1vh;
     width: 560px;
 }
@@ -243,11 +242,12 @@ table {
 }
 
 #main_nav ul {
-    background: white;
+    background: transparent;
     float: left;
     -webkit-transition: .5s;
     transition: .5s;
     text-align: center;
+    color: white;
 }
 
 #main_nav li {
@@ -258,32 +258,38 @@ table {
     -webkit-transition: .5s;
     transition: .5s;
     text-align: center;
+    background: transparent;
+    color: white;
+
 }
 
 #main_nav>ul>li>a,
 h1 {
-    text-transform: uppercase;
+    color: white;
 }
 
 #main_nav a {
     display: block;
     text-decoration: none;
     padding: 5px 15px;
-    color: #000;
+    color: white;
     text-align: center;
+    /* font-weight: bold; */
+    background-color:  #EA4C46;
 }
 
 #main_nav ul ul {
     position: absolute;
-    left: 0;
-    top: 100%;
+    left: 75%;
+    top: 40%;
     visibility: hidden;
     opacity: 0;
 }
 
 #main_nav ul ul ul {
-    left: 80%;
-    top: 0;
+    left: 75%;
+    top: 0%;
+    position: absolute;
 }
 
 #main_nav li:hover,
@@ -313,6 +319,9 @@ h1 {
 .btn_ports {
     background: #ddd;
     width: 150px;
+    border-radius: 0.5em;
+    color: white;
+    background-color: #F07470;
 }
 
 .modal {

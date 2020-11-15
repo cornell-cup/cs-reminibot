@@ -1,6 +1,6 @@
 import React from 'react';
 import axios from 'axios';
-import {Button} from './Util.js'
+import { Button } from './Util.js'
 
 /*
  *  A RefreshingList is a list designed to refresh when its update()
@@ -48,14 +48,14 @@ class RefreshingList extends React.Component {
 }
 
 function Ports(props) {
-    const ports = ["2","3","4","5","6","7","8","9","10","11","12","13"];
+    const ports = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"];
     let buttonList = [];
 
     for (let i = 0; i < ports.length; i++) {
         buttonList.push(<li><button className="btn_ports" onClick={() => props.motorPorts(props.portName, ports[i])}>{ports[i]}</button></li>);
     }
     return (<ul> {buttonList} </ul>);
-  };
+};
 
 function PortsList(props) {
     const portNames = [
@@ -63,142 +63,32 @@ function PortsList(props) {
     ]
 
     const portLabels = [
-        "Left Motor", "Right Motor", "Motor 3", "Line Follower", 
+        "Left Motor", "Right Motor", "Motor 3", "Line Follower",
         "Infrared", "RFID", "Ultrasonic"
     ]
 
-<<<<<<< HEAD
     console.assert(portNames.length == portLabels.length);
     let allListElements = [];
 
     for (let i = 0; i < portNames.length; i++) {
         let link = <a href="">{portLabels[i]}</a>
-        let ports = <Ports portName={portNames[i]} motorPorts={props.motorPorts}/>
+        let ports = <Ports portName={portNames[i]} motorPorts={props.motorPorts} />
         let listElement = <li> {link} {ports} </li>
         allListElements.push(listElement);
     }
 
     return (
         <nav id="main_nav">
-        <ul>
-        <li>
-            <a href="">Motor Ports</a>
-            <ul> {allListElements} </ul>
-        </li>
-        </ul>
+            <ul>
+                <li>
+                    <a href="">Motor Ports</a>
+                    <ul> {allListElements} </ul>
+                </li>
+            </ul>
         </nav>
     );
 }
-=======
-class Voice extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            on: false
-        }
-        this.toggle = this.toggle.bind(this);
-        this.getVoice = this.getVoice.bind(this);
-    }
 
-    toggle() {
-        this.getVoice(this.state.on);
-        this.setState({
-            on: !this.state.on
-        });
-    }
->>>>>>> eda82ced5361e3ea35f582ae5b65597b38983fe1
-
-    getVoice(isOn) {
-        const _this = this;
-        console.log(isOn ? "STOP VOICE" : "START VOICE")
-        axios({
-            method: 'POST',
-            url: '/voice',
-            data: JSON.stringify({
-                key: isOn ? "STOP VOICE" : "START VOICE",
-                bot_name: this.props.selected_bot
-            })
-        }).then(function (response) {
-            if (response.data) {
-                console.log(response.data);
-            }
-        }).catch(function (error) {
-            // console.log(error);
-        })
-      }
-
-      render() {
-          var x = "";
-          if (this.state.on) {
-              x = "Stop Voice";
-          }
-          else {
-              x = "Start Voice";
-          }
-          return (
-              <div>
-                  <button className="btn btn-primary element-wrapper" onClick={this.toggle}>{x}</button>
-              </div>
-          );
-      }
-  }
-
-/*
- *  A toggle button to turn on/off the on-bot vision system
- */
-class Toggle extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            on: false
-        }
-        this.toggle = this.toggle.bind(this);
-        this.getOnBotVision = this.getOnBotVision.bind(this);
-    }
-
-    toggle() {
-        this.getOnBotVision(this.state.on);
-        this.setState({
-            on: !this.state.on
-        });
-    }
-
-    getOnBotVision(isOn) {
-        const _this = this;
-        console.log(isOn ? "STOPBOTVISION" : "STARTBOTVISION")
-        axios({
-            method: 'POST',
-            url: '/onbotvision',
-            data: JSON.stringify({
-                key: isOn ? "STOPBOTVISION" : "STARTBOTVISION",
-                bot_name: this.props.selected_bot
-            })
-        })
-            .then(function (response) {
-                if (response.data) {
-                    console.log(response.data);
-                }
-            })
-            .catch(function (error) {
-                // console.log(error);
-            })
-    }
-
-    render() {
-        var x = "";
-        if (this.state.on) {
-            x = "Stop On-Bot Vision";
-        }
-        else {
-            x = "Start On-Bot Vision";
-        }
-        return (
-            <div>
-                <button className="btn btn-primary" onClick={this.toggle}>{x}</button>
-            </div>
-        )
-    }
-}
 
 export default class AddBot extends React.Component {
     constructor(props) {
@@ -363,25 +253,25 @@ export default class AddBot extends React.Component {
     }
 
     /*motor ports*/
-    motorPorts(name, port1){
-      const _this = this;
-      console.log(name);
-      console.log(port1);
+    motorPorts(name, port1) {
+        const _this = this;
+        console.log(name);
+        console.log(port1);
 
-      axios({
-          method: 'POST',
-          url: '/start',
-          data: JSON.stringify({
-              key: "PORTS",
-              ports: [name, String(port1)],
-              bot_name: _this.props.selected_bot,
-          })
-      })
-          .then(function (response) {
-          })
-          .catch(function (error) {
-              console.log(error);
-          })
+        axios({
+            method: 'POST',
+            url: '/start',
+            data: JSON.stringify({
+                key: "PORTS",
+                ports: [name, String(port1)],
+                bot_name: _this.props.selected_bot,
+            })
+        })
+            .then(function (response) {
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
     }
 
     /* removes selected object from list*/
@@ -511,7 +401,7 @@ export default class AddBot extends React.Component {
                 </div>
                 <div className="row">
                     <div className="col horizontalDivCenter">
-                        <div className="element-wrapper"> 
+                        <div className="element-wrapper">
                             <label> Bot List: </label>
                             <select onChange={this.selectBotListener}>
                                 {this.props.bot_list.map(
@@ -523,14 +413,16 @@ export default class AddBot extends React.Component {
                                 )}
                             </select>
                         </div>
-                        <Button id="remove_bot" name="Remove" onClick={()=>_this.deleteBotListener()} bot_list={this.props.bot_list} />
+                        <Button id="remove_bot" name="Remove" onClick={() => _this.deleteBotListener()} bot_list={this.props.bot_list} />
                         <div className="led-box element-wrapper">
                             <div id="led-red"></div>
                         </div>
                     </div>
                 </div>
+                <br />
                 <div className="row">
                     <div className="col horizontalDivCenter">
+                        <p id="small_title">Ports </p>
                         <div className="element-wrapper in-front-of-other-elems">
                             <PortsList motorPorts={this.motorPorts} />
                         </div>
@@ -557,37 +449,19 @@ export default class AddBot extends React.Component {
                             <div>
                                 <label> Power: </label>
                             </div>
-                            <input id="custom-range-1" class="custom-range" name="wheel_power" type="range" min="0" max="100" 
-                                step="5" onChange={evt => this.updatePowerValue(evt)}/>
+                            <input id="custom-range-1" class="custom-range" name="wheel_power" type="range" min="0" max="100"
+                                step="5" onChange={evt => this.updatePowerValue(evt)} />
                         </form>
                     </div>
                 </div>
                 {/* button-wrapper is a custom class to add padding
                     the rest is bootstrap css */}
                 <div className="row button-wrapper">
-<<<<<<< HEAD
                     <div className="col horizontalDivCenter">
                         <button type="button" className="btn btn-primary" onClick={() => this.lineFollowOnClick()}>Line Follow</button>
                         <div className="divider" />
                         <button type="button" className="btn btn-success" onClick={() => this.objectDetectionOnClick()}>Object Detection</button>
                     </div>
-=======
-                    <div className="col-md-3">
-                         <Voice selected_bot={this.props.selected_bot} float="right" />
-                    </div>
-                    <div className="col-md-3">
-                        <Toggle selected_bot={this.props.selected_bot} />
-                    </div>
-                    <div className="divider" />
-                </div>
-                <div className="row button-wrapper">
-                    <div className="col-md-3">
-                        <button type="button" className="btn btn-success element-wrapper" onClick={() => this.objectDetectionOnClick()}>Object Detection</button>
-                    </div>
-                    <div className="col-md-3">
-                        <button type="button" className="btn btn-primary" onClick={() => this.lineFollowOnClick()}>Line Follow</button>
-                    </div>
->>>>>>> eda82ced5361e3ea35f582ae5b65597b38983fe1
                 </div>
             </div>
         );
