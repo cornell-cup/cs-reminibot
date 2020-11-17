@@ -61,7 +61,7 @@ def take_pictures(args):
         frame = cv2.flip(frame, 1)
         shown_frame = cv2.resize(frame, args.window_dim)
 
-        cv2.imshow('Capture', frame)
+        cv2.imshow('Capture', shown_frame)
 
         # Quits on escape or 'q'
         if key & 0xFF in [27, 1048603, ord('q')]:
