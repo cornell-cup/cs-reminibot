@@ -1,7 +1,7 @@
 from bs_repr import BS_Repr
 from collections import deque
 from select import select
-from socket import socket, timeout, AF_INET, SOCK_STREAM, SOCK_DGRAM 
+from socket import socket, timeout, AF_INET, SOCK_STREAM, SOCK_DGRAM
 from socket import SOL_SOCKET, SO_REUSEADDR, SO_BROADCAST
 from threading import Thread
 from typing import List, Tuple
@@ -14,7 +14,8 @@ import sys
 import time
 import argparse
 
-class Minibot: 
+
+class Minibot:
     """ Represents a minibot.  Handles all communication with the basestation
     as well as executing commands sent by the basestation.
 
@@ -33,7 +34,7 @@ class Minibot:
 
     def __init__(self):
         # Create a UDP socket.  We want to establish a TCP (reliable) connection
-        # between the basestation and the  
+        # between the basestation and the
         self.broadcast_sock = socket(AF_INET, SOCK_DGRAM)
         # can bind to the same port using the same ip address
         self.broadcast_sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
@@ -50,7 +51,7 @@ class Minibot:
         self.readable_socks = set()
         # contains sockets which we want to send some data on
         self.writable_socks = set()
-        # contains sockets that throw errors that we care about and want to 
+        # contains sockets that throw errors that we care about and want to
         # react to
         self.errorable_socks = set()
         # TODO: All message queues should have a max limit of messages that they
@@ -68,34 +69,34 @@ class Minibot:
         """
         self.create_listener_sock()
         # Add listener sock to input_socks so that we are alerted if any connections
-        # are trying to be created and add listener sock to errorable_socks so that 
-        # we are alerted if an error gets thrown by this listener sock.  No need to 
-        # add the listener sock to writable socks because we won't be writing to 
+        # are trying to be created and add listener sock to errorable_socks so that
+        # we are alerted if an error gets thrown by this listener sock.  No need to
+        # add the listener sock to writable socks because we won't be writing to
         # this socket, only listening.
         self.readable_socks.add(self.listener_sock)
         self.errorable_socks.add(self.listener_sock)
         while True:
-            # if the listener socket is the only socket alive, we need to 
+            # if the listener socket is the only socket alive, we need to
             # broadcast a message to the basestation to set up a new connection
             # with us (the minibot)
             if len(self.readable_socks) == 1:
                 self.broadcast_to_base_station()
             # select returns new lists of sockets that are read ready (have
             # received data), write ready (have initialized their buffers, and
-            # are ready to be written to), or errored out (have thrown an error) 
+            # are ready to be written to), or errored out (have thrown an error)
             # select returns as soon as it detects some activity on one or more
-            # of the sockets in the lists passed to it, or if the timeout time 
+            # of the sockets in the lists passed to it, or if the timeout time
             # has elapsed
             read_ready_socks, write_ready_socks, errored_out_socks = select(
-                self.readable_socks, 
-                self.writable_socks, 
-                self.errorable_socks, 
-                1, # timeout time
+                self.readable_socks,
+                self.writable_socks,
+                self.errorable_socks,
+                1,  # timeout time
             )
             # WARNING!! Be careful about closing sockets in any of these functions
             # because the local lists read_ready_socks, write_ready_socks
             # and errored_out_socks will still contain the closed socket.
-            # Hence, if you do this removal, make sure the socket is removed 
+            # Hence, if you do this removal, make sure the socket is removed
             # from these local lists too!!!
             self.handle_errorable_socks(errored_out_socks)
             self.handle_writable_socks(write_ready_socks)
@@ -106,15 +107,13 @@ class Minibot:
                 Thread(target=ece.stop).start()
                 self.close_sock(self.bs_repr.conn_sock)
                 self.bs_repr = None
-                
-                
 
     def create_listener_sock(self):
         """ Creates a socket that listens for TCP connections from the 
         basestation.
         """
         self.listener_sock = socket(AF_INET, SOCK_STREAM)
-        # "" means bind to all addresses on this device.  Port 10000 was 
+        # "" means bind to all addresses on this device.  Port 10000 was
         # randomly chosen as the port to bind to
         self.listener_sock.bind(("", 10000))
         # Make socket start listening
@@ -139,8 +138,8 @@ class Minibot:
             data = self.broadcast_sock.recv(4096)
         except timeout:
             print("Timed out")
-            
-        # TODO this security policy is stupid.  We should be doing 
+
+        # TODO this security policy is stupid.  We should be doing
         # authentication after we create the TCP connection and also we should
         # be using some service like WebAuth to obtain a shared key to encrypt
         # messages.  Might be a fun project to work on at some point but not
@@ -172,21 +171,22 @@ class Minibot:
                 print(
                     f"Connected to base station with address {base_station_addr}"
                 )
-                # set to non-blocking reads (when we call connection.recv, 
+                # set to non-blocking reads (when we call connection.recv,
                 # should read whatever is in its buffer and return immediately)
                 connection.setblocking(0)
                 # initialize basestation repr to the connection sock
                 self.bs_repr = BS_Repr(sock)
-                # we don't need to write anything right now, so don't add to 
+                # we don't need to write anything right now, so don't add to
                 # writable socks
                 self.readable_socks.add(connection)
                 self.errorable_socks.add(connection)
             # If its a connection socket, receive the data and execute the
             # necessary command
             else:
-                
+
                 try:
-                    data_str = sock.recv(Minibot.SOCKET_BUFFER_SIZE).decode("utf-8")
+                    data_str = sock.recv(
+                        Minibot.SOCKET_BUFFER_SIZE).decode("utf-8")
                 except ConnectionResetError:
                     print(f"Connection closed by Basestation")
                     self.bs_repr = None
@@ -196,10 +196,10 @@ class Minibot:
                 print(f"Data string from basestation {data_str}")
                 if data_str:
                     feedback = self.parse_and_execute_commands(sock, data_str)
-                    # print(f"feedback from parsing {feedback}") 
+                    # print(f"feedback from parsing {feedback}")
                 else:
                     self.close_sock(sock)
-                # TODO need to write back saying that the command executed. 
+                # TODO need to write back saying that the command executed.
                 # successfully
 
     def handle_writable_socks(self, write_ready_socks):
@@ -210,7 +210,7 @@ class Minibot:
             write_ready_socks: 
                 All sockets that have had data written to them
         """
-        
+
         for sock in write_ready_socks:
             message_queue = self.writable_sock_message_queue_map[sock]
             all_messages = "".join(message_queue)
@@ -218,7 +218,6 @@ class Minibot:
             sock.sendall(all_messages.encode())
             self.writable_sock_message_queue_map[sock] = deque()
             self.writable_socks.remove(sock)
-
 
     def handle_errorable_socks(self, errored_out_socks):
         """ 
@@ -230,7 +229,8 @@ class Minibot:
         """
         for sock in errored_out_socks:
             print(f"Socket errored out!!!! {sock}")
-            self.close_sock(sock) # TODO handle more conditions instead of just
+            # TODO handle more conditions instead of just
+            self.close_sock(sock)
             # closing the socket
 
     def close_sock(self, sock):
@@ -238,7 +238,7 @@ class Minibot:
             if sock in sock_list:
                 sock_list.remove(sock)
         sock.close()
-    
+
     def parse_and_execute_commands(self, sock: socket, data_str: str):
         """ Parses the data string into individual commands.  
 
@@ -264,11 +264,11 @@ class Minibot:
             key = data_str[start + token_len:comma]
             value = data_str[comma + 1:end]
             # executes command with key,value
-            self.execute_command(sock, key, value) 
+            self.execute_command(sock, key, value)
             # shrink the data_str with the remaining portion of the commands
             data_str = data_str[end + token_len:]
 
-    def execute_command(self, sock: socket, key: str, value: str ):
+    def execute_command(self, sock: socket, key: str, value: str):
         """ Executes a command using the given key-value pair 
 
         Arguments:
@@ -276,11 +276,11 @@ class Minibot:
                 value: command to be executed
         """
         # All ECE commands need to be called under separate threads because each
-        # ECE function contains an infinite loop.  This is because there was 
-        # data loss between the Raspberry Pi and the Arduino which is why the 
-        # Raspberry Pi needs to continuously repeat the command to the Arduino  
+        # ECE function contains an infinite loop.  This is because there was
+        # data loss between the Raspberry Pi and the Arduino which is why the
+        # Raspberry Pi needs to continuously repeat the command to the Arduino
         # so that some of the commands get through.  Once the data loss issue
-        # is fixed, we can implement a regular solution. If we did not have the 
+        # is fixed, we can implement a regular solution. If we did not have the
         # threads, our code execution pointer would get stuck in the infinite loop.
         print(f"Key {key}")
         if key == "BOTSTATUS":
@@ -289,13 +289,13 @@ class Minibot:
             # it to the writable socks
             self.writable_socks.add(sock)
             message = "<<<<BOTSTATUS,ACTIVE>>>>"
-            #update status time of the basestation
+            # update status time of the basestation
             self.bs_repr.update_status_time()
             if sock in self.writable_sock_message_queue_map:
                 self.writable_sock_message_queue_map[sock].append(message)
             else:
                 self.writable_sock_message_queue_map[sock] = deque([message])
-            
+
         elif key == "MODE":
             if value == "object_detection":
                 print("Object Detection")
@@ -306,7 +306,7 @@ class Minibot:
 
         elif key == "PORTS":
             ece.set_ports(value)
-            print("Set Ports")    
+            print("Set Ports")
 
         elif key == "SCRIPTS":
             # The script is always named bot_script.py.
@@ -325,12 +325,13 @@ class Minibot:
                     return return_value
                 except Exception as exception:
                     print("Exception occurred at compile time")
-                    str_exception = str(type(exception)) + ": " + str(exception)
+                    str_exception = str(type(exception)) + \
+                        ": " + str(exception)
                     return str_exception
         elif key == "WHEELS":
             cmds_functions_map = {
-                "forward": ece.fwd, 
-                "backward": ece.back, 
+                "forward": ece.fwd,
+                "backward": ece.back,
                 "left": ece.left,
                 "right": ece.right,
             }
@@ -339,10 +340,6 @@ class Minibot:
                 Thread(target=cmds_functions_map[value], args=[50]).start()
             else:
                 Thread(target=ece.stop).start()
-
-        
-            
-
 
     @staticmethod
     def process_string(value):
@@ -371,7 +368,7 @@ class Minibot:
             scriptname (:obj:`str`): The name of the script to run.
         """
         time.sleep(0.1)
-        run_script = None # TODO merge with Ruiqi's branch for his fix
+        run_script = None  # TODO merge with Ruiqi's branch for his fix
 
         with concurrent.futures.ThreadPoolExecutor() as executor:
             future = executor.submit(run_script, scriptname)
@@ -405,8 +402,10 @@ class Minibot:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Take in arguments for minibot')
-    parser.add_argument('-t', action="store_true", dest = "isSimulation", default = False)
+    parser = argparse.ArgumentParser(
+        description='Take in arguments for minibot')
+    parser.add_argument('-t', action="store_true",
+                        dest="isSimulation", default=False)
     args = parser.parse_args()
 
     if args.isSimulation:
@@ -415,7 +414,7 @@ if __name__ == "__main__":
     else:
         import scripts.pi_arduino as ece
         BOT_LIB_FUNCS = "pi_arduino"
-   
-    print (BOT_LIB_FUNCS)
+
+    print(BOT_LIB_FUNCS)
     minibot = Minibot()
     minibot.main()

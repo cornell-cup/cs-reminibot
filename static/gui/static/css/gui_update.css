@@ -307,3 +307,7 @@ h1 {
     border-width: 5px;
     padding: 5px;
 }
+
+#botName {
+    color: red;
+}

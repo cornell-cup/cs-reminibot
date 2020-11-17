@@ -150,8 +150,8 @@ export default class AddBot extends React.Component {
 
     getSelectedBotText() {
         if (this.props.selectedBotName !== "") {
-            return "Connected to " + this.props.selectedBotName;
-        } 
+            return this.props.selectedBotName;
+        }
         return "";
     }
 
@@ -166,8 +166,8 @@ export default class AddBot extends React.Component {
         let botName = (this.refreshingBotListRef.current == null) ?
             "" : this.refreshingBotListRef.current.state.current_bot;
         this.props.setSelectedBotName(botName);
-  
-        if (li.length != 0){
+
+        if (li.length != 0) {
             this.props.setSelectedBotStyle("visible");
         }
         else {
@@ -304,12 +304,12 @@ export default class AddBot extends React.Component {
                 <div className="row">
                     <div className="col horizontalDivCenter">
                         <div className="element-wrapper">
-                            <label id="selected-bot" style={this.props.selectedBotStyle} >
-                                {_this.getSelectedBotText()} 
+                            <label id="selected-bot" style={this.props.selectedBotStyle} > Connected to: &nbsp;
+                            <span id="botName">{_this.getSelectedBotText()} </span>
                             </label>
                         </div>
-                        <Button id="remove-bot" name="Remove" 
-                            onClick={() => _this.deleteBotListener()} 
+                        <Button id="remove-bot" name="Remove"
+                            onClick={() => _this.deleteBotListener()}
                             style={_this.props.removeBotButtonStyle} />
                         <div className="led-box element-wrapper">
                             <div id="led-red"></div>
