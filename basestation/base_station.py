@@ -29,12 +29,7 @@ class BaseStation:
             target=self.listen_for_minibot_broadcast, daemon=True
         )
 
-        self.vision_monitior_thread = threading.Thread(
-            target=self.vision_monitior, daemon=True
-        )
-
         self.listen_for_minibot_broadcast_thread.start()
-        self.vision_monitior_thread.start()
         self.basestation_key = ""
     # ==================== ID GENERATOR ====================
 
@@ -71,19 +66,6 @@ class BaseStation:
             return self.vision_log[-1]
         else:
             return None
-
-    def vision_monitior(self):
-        """
-        Checks if the len of the vision log is growing.
-        """
-        locations = {'id': '', 'x': '',
-                     'y': '', 'orientation': ''}
-        while True:
-            if self.vision_log:
-                count = len(self.vision_log)
-                time.sleep(1)
-                if len(self.vision_log) == count and self.vision_log[-1]['x'] != '':
-                    self.vision_log.append(locations)
 
     def get_vision_log(self):
         """
@@ -126,10 +108,10 @@ class BaseStation:
 
     def get_active_bots_names(self):
         """
-        Returns a list of the Bot IDs.
+        Returns a list of the Bot Names.
 
         Returns:
-            (list<str>): List of IDs of all active bots.
+            (list<str>): List of Names of all active bots.
         """
         return list([bot.name for _, bot in self.active_bots.items()])
 

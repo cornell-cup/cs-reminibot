@@ -13,6 +13,8 @@ import struct
 import sys
 import time
 import argparse
+import signal
+
 
 
 class Minibot:
@@ -36,7 +38,7 @@ class Minibot:
         # Create a UDP socket.  We want to establish a TCP (reliable) connection
         # between the basestation and the
         self.broadcast_sock = socket(AF_INET, SOCK_DGRAM)
-        # can bind to the same port using the same ip address
+        # can immediately rebind if the program is killed and then restarted
         self.broadcast_sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
         # can broadcast messages to all
         self.broadcast_sock.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
@@ -61,6 +63,7 @@ class Minibot:
         self.sock_lists = [
             self.readable_socks, self.writable_socks, self.errorable_socks
         ]
+        signal.signal(signal.SIGINT, self.sigint_handler)
 
     def main(self):
         """ Implements the main activity loop for the Minibot.  This activity 
@@ -103,16 +106,15 @@ class Minibot:
             self.handle_readable_socks(read_ready_socks)
             # if basestation exists but is disconnected, stop minibot
             if self.bs_repr and not self.bs_repr.is_connected():
-                print("Basestation Disconnected")
-                Thread(target=ece.stop).start()
-                self.close_sock(self.bs_repr.conn_sock)
-                self.bs_repr = None
+                self.basestation_disconnected(self.bs_repr.conn_sock)
 
     def create_listener_sock(self):
         """ Creates a socket that listens for TCP connections from the 
         basestation.
         """
         self.listener_sock = socket(AF_INET, SOCK_STREAM)
+        # can immediately rebind if the program is killed and then restarted
+        self.listener_sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
         # "" means bind to all addresses on this device.  Port 10000 was
         # randomly chosen as the port to bind to
         self.listener_sock.bind(("", 10000))
@@ -175,7 +177,7 @@ class Minibot:
                 # should read whatever is in its buffer and return immediately)
                 connection.setblocking(0)
                 # initialize basestation repr to the connection sock
-                self.bs_repr = BS_Repr(sock)
+                self.bs_repr = BS_Repr(connection)
                 # we don't need to write anything right now, so don't add to
                 # writable socks
                 self.readable_socks.add(connection)
@@ -183,22 +185,18 @@ class Minibot:
             # If its a connection socket, receive the data and execute the
             # necessary command
             else:
-
                 try:
                     data_str = sock.recv(
                         Minibot.SOCKET_BUFFER_SIZE).decode("utf-8")
                 except ConnectionResetError:
-                    print(f"Connection closed by Basestation")
-                    self.bs_repr = None
-                    data_str = None
+                    self.basestation_disconnected(sock)
                 # if the socket receives "", it means the socket was closed
                 # from the other end, so close this endpoint too
                 print(f"Data string from basestation {data_str}")
                 if data_str:
-                    feedback = self.parse_and_execute_commands(sock, data_str)
-                    # print(f"feedback from parsing {feedback}")
+                    self.parse_and_execute_commands(sock, data_str)
                 else:
-                    self.close_sock(sock)
+                    self.basestation_disconnected(sock)
                 # TODO need to write back saying that the command executed.
                 # successfully
 
@@ -238,6 +236,12 @@ class Minibot:
             if sock in sock_list:
                 sock_list.remove(sock)
         sock.close()
+    
+    def basestation_disconnected(self, basestation_sock):
+        print("Basestation Disconnected")
+        Thread(target=ece.stop).start()
+        self.close_sock(basestation_sock)
+        self.bs_repr = None
 
     def parse_and_execute_commands(self, sock: socket, data_str: str):
         """ Parses the data string into individual commands.  
@@ -400,21 +404,26 @@ class Minibot:
             str_exception = str(type(exception)) + ": " + str(exception)
             return str_exception
 
+    def sigint_handler(self, sig, frame):
+        print("Minibot received CTRL + C")
+        self.listener_sock.close()
+        self.broadcast_sock.close()
+        sys.exit(0)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description='Take in arguments for minibot')
     parser.add_argument('-t', action="store_true",
-                        dest="isSimulation", default=False)
+                        dest="is_simulation", default=False)
     args = parser.parse_args()
 
-    if args.isSimulation:
+    if args.is_simulation:
         import scripts.ece_dummy_ops as ece
         BOT_LIB_FUNCS = "ece_dummy_ops"
     else:
         import scripts.pi_arduino as ece
         BOT_LIB_FUNCS = "pi_arduino"
 
-    print(BOT_LIB_FUNCS)
     minibot = Minibot()
     minibot.main()

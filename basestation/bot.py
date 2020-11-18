@@ -46,7 +46,7 @@ class Bot:
         except socket.timeout:
             pass
         except ConnectionResetError:
-            print("Connection Reset Error")
+            print("Minibot disconnected")
             line = None
             self.is_socket_connected = False
         return line
