@@ -5,11 +5,11 @@ Base Station for the MiniBot.
 # external
 from random import choice
 from string import digits, ascii_lowercase, ascii_uppercase
-from bot import Bot
 import socket
 import sys
 import time
 import threading
+from bot import Bot
 
 # internal
 # from connection.base_connection import BaseConnection
@@ -28,19 +28,7 @@ class BaseStation:
         self.listen_for_minibot_broadcast_thread = threading.Thread(
             target=self.listen_for_minibot_broadcast, daemon=True
         )
-
         self.listen_for_minibot_broadcast_thread.start()
-        self.basestation_key = ""
-    # ==================== ID GENERATOR ====================
-
-    def generate_id(self, length=7):
-        """
-        Generates a unique 7 character id composed of digits, lowercase, 
-        and uppercase letters
-        """
-        chars = digits + ascii_lowercase + ascii_uppercase
-        unique_id = "".join([choice(chars) for i in range(length)])
-        return unique_id
 
     # ==================== VISION ====================
 
@@ -78,7 +66,6 @@ class BaseStation:
     def listen_for_minibot_broadcast(self):
         """ Listens for the Minibot to broadcast a message to figure out the 
         Minibot's ip address.
-
         Author: virenvshah (code taken from link below)
             https://github.com/jholtmann/ip_discovery
         """
@@ -113,7 +100,8 @@ class BaseStation:
         Returns:
             (list<str>): List of Names of all active bots.
         """
-        return list([bot.name for _, bot in self.active_bots.items()])
+        return list([bot.get_name() for _, bot in self.active_bots.items()])
+
 
     def add_bot(self, port, ip_address, bot_name=None):
         """
@@ -133,7 +121,7 @@ class BaseStation:
 
         new_bot = Bot(bot_name, ip_address, port)
         self.active_bots[bot_name] = new_bot
-
+    
     def get_bot_status(self, bot):
         """ Gets whether the Minibot is currently connected or has been 
         disconnected.  This is done by di
@@ -156,10 +144,6 @@ class BaseStation:
 
         Args:
             bot_name (str): bot name of removed bot
-
-        Return:
-            True if bot was successfully removed
-            False otherwise
         """
         self.active_bots.pop(bot_name)
         return bot_name not in self.active_bots
@@ -167,15 +151,9 @@ class BaseStation:
     def move_wheels_bot(self, bot_name, direction, power):
         """
         Gives wheels power based on user input
-
-        Return:
-            True if bot successfully received direction
-            False otherwise
         """
         direction = direction.lower()
-        print("Active bot " + str(type(self.active_bots[bot_name])))
         self.active_bots[bot_name].sendKV("WHEELS", direction)
-        return True
 
     def get_bot(self, bot_name):
         """
@@ -190,7 +168,7 @@ class BaseStation:
         """
         Returns a list of the ip addresses of all active bots.
         """
-        return {bot.get_ip(): bot.id for _, bot in self.active_bots.items()}
+        return {bot.get_ip(): bot.get_id() for _, bot in self.active_bots.items()}
 
     def set_ports(self, ports, bot_name):
         for x in ports:
@@ -199,12 +177,15 @@ class BaseStation:
         portsstr = " ".join([str(l) for l in ports])
 
         self.active_bots[bot_name].sendKV("PORTS", portsstr)
-        # do something
-        return True
 
     # ================== BASESTATION GUI ==================
 
-
     def get_error_message(self, bot_name):
-        bot = self.active_bots[bot_name]
-        return bot.get_result()
+        """
+        Retrieve Python error message from pi_bot.py.
+
+        Args:
+            bot_name (str): Name of the bot that run the Python program
+        """
+        bot = self.get_bot(bot_name)
+        return bot.get_error_message()

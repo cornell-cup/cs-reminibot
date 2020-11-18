@@ -46,6 +46,7 @@ class BaseInterface:
                 send_blockly_remote_server=send_blockly_remote_server,
             )),
             ("/vision", VisionHandler, dict(base_station=self.base_station)),
+            ("/heartbeat", HeartbeatHandler, dict(base_station=self.base_station)),
             ("/result", ErrorMessageHandler, dict(base_station=self.base_station))
         ]
 
@@ -61,7 +62,7 @@ class BaseInterface:
         """
         Creates the application object (via Tornado).
         """
-        return tornado.web.Application(self.handlers, **self.settings, debug=True)
+        return tornado.web.Application(self.handlers, **self.settings)
 
 
 class ClientHandler(tornado.web.RequestHandler):
@@ -82,10 +83,8 @@ class ClientHandler(tornado.web.RequestHandler):
         key = data['key']
 
         if key == "MODE":
-            print("Reached MODE")
             bot_name = data['bot_name']
             mode_type = data['value']
-            print("here!")
             bot = self.base_station.get_bot(bot_name)
             bot.sendKV(key, str(mode_type))
         elif key == "WHEELS":
@@ -128,25 +127,19 @@ class ClientHandler(tornado.web.RequestHandler):
             if self.send_blockly_remote_server:
                 url = 'http://127.0.0.1:5000/code/'
                 x = requests.post(url, json=params)
-                print("Post")
-                print(x.json)
-
-                print('database test')
                 url2 = 'http://127.0.0.1:5000/program/'
                 x = requests.get(url2)
-                print("Get")
-                print(x.json)
 
             bot = self.base_station.get_bot(bot_name)
             # reset the previous script's error message, so we can get the new error message
             # of the new script
-            bot.set_result(None)
+            bot.set_error_message(None)
             if bot:
                 print("Code len = " + str(len(value)))
                 print(type(bot))
                 if len(value) == 0:
                     print("GETTING SCRIPTS")
-                    bot.sendKV("SCRIPTS", '')
+                    bot.sendKV("SCRIPTS", "")
                 elif len(value) == 1:
                     print("SENDING SCRIPTS")
                     bot.sendKV("SCRIPTS", value[0])
@@ -165,12 +158,9 @@ class ClientHandler(tornado.web.RequestHandler):
         into ECE-supplied functions.
 
         Args:
-            bot: The pi_bot to send to
-            program: The string containing the python code generated
-            from blockly
-
+            bot: the pi_bot to send to
+            program: the string containing the python code generated
         """
-
         # function_map : Blockly functions -> ECE functions
         function_map = {
             "move_forward": "fwd",
@@ -209,7 +199,7 @@ class ClientHandler(tornado.web.RequestHandler):
         for line in program_lines:
             match = regex.match(line)
             if not match:
-                parsed_program.append(line + '\n')  # "normal" python
+                parsed_program.append(line + '\n')  # "normal" Python
             else:
                 func = function_map[match.group(2)]
                 args = match.group(3)
@@ -226,7 +216,6 @@ class ClientHandler(tornado.web.RequestHandler):
                 parsed_program.append(parsed_line)
 
         parsed_program_string = "".join(parsed_program)
-        print(parsed_program_string)
 
         # Now actually send to the bot
         bot.sendKV("SCRIPTS", parsed_program_string)
@@ -246,22 +235,40 @@ class VisionHandler(tornado.websocket.WebSocketHandler):
         self.base_station.update_vision_log(info)
 
 
+class HeartbeatHandler(tornado.websocket.WebSocketHandler):
+    def initialize(self, base_station):
+        self.base_station = base_station
+
+    def get(self):
+        time_interval = 1
+        is_heartbeat = self.base_station.is_heartbeat_recent(time_interval)
+        heartbeat_json = {"is_heartbeat": is_heartbeat}
+        self.write(json.dumps(heartbeat_json).encode())
+
+
 class ErrorMessageHandler(tornado.websocket.WebSocketHandler):
+    """
+    Class for handling Python error messages.
+    """
     def initialize(self, base_station):
         self.base_station = base_station
 
     def post(self):
+        """
+        Called by blockly.js to send Python error message back to the GUI.
+        For each Python program entered, blockly.js will repeatedly call
+        this function until error_json has code != -1.
+        """
         data = json.loads(self.request.body.decode())
         bot_name = data['bot_name']
         error_message = self.base_station.get_error_message(bot_name)
-        while not error_message:
-            error_message = self.base_station.get_error_message(bot_name)
-        if error_message == "Successful execution":
+        if not error_message:
+            error_json = {"error": "", "code": -1}
+        elif error_message == "Successful execution":
             error_json = {"error": error_message, "code": 1}
         else:
             error_json = {"error": error_message, "code": 0}
-        print("error_json is: ")
-        print(error_json)
+        # Send back to GUI
         self.write(json.dumps(error_json).encode())
 
 
