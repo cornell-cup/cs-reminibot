@@ -311,9 +311,6 @@ export default class AddBot extends React.Component {
                         <Button id="remove-bot" name="Remove"
                             onClick={() => _this.deleteBotListener()}
                             style={_this.props.removeBotButtonStyle} />
-                        <div className="led-box element-wrapper">
-                            <div id="led-red"></div>
-                        </div>
                     </div>
                 </div>
                 <div className="row">

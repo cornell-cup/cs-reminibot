@@ -100,7 +100,7 @@ class BaseStation:
         Returns:
             (list<str>): List of Names of all active bots.
         """
-        return list([bot.get_name() for _, bot in self.active_bots.items()])
+        return list([bot.name for _, bot in self.active_bots.items()])
 
 
     def add_bot(self, port, ip_address, bot_name=None):
@@ -180,7 +180,7 @@ class BaseStation:
 
     # ================== BASESTATION GUI ==================
 
-    def get_error_message(self, bot_name):
+    def get_script_exec_result(self, bot_name):
         """
         Retrieve Python error message from pi_bot.py.
 
@@ -188,4 +188,6 @@ class BaseStation:
             bot_name (str): Name of the bot that run the Python program
         """
         bot = self.get_bot(bot_name)
-        return bot.get_error_message()
+        bot.sendKV("SCRIPT_EXEC_RESULT", "")
+        bot.readKV()
+        return bot.script_exec_result

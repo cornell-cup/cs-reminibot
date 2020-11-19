@@ -130,7 +130,7 @@ class Platform extends React.Component {
             <Blockly
               blockly_xml={this.state.blockly_xml}
               setBlockly={this.setBlockly}
-              botName={this.state.botName}
+              selectedBotName={this.state.selectedBotName}
               customBlockList={this.state.customBlockList}
               redefineCustomBlockList={this.redefineCustomBlockList}
             />

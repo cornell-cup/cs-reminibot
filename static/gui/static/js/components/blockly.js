@@ -138,7 +138,7 @@ class PythonTextBox extends React.Component {
       data: JSON.stringify({
         key: 'SCRIPTS',
         value: this.state.pythonTextBoxCode,
-        bot_name: this.props.botName
+        bot_name: this.props.selectedBotName
       }),
     })
       .then(function (response) {
@@ -153,11 +153,13 @@ class PythonTextBox extends React.Component {
      * until a non-empty execution result of the Python program is received. 
      */
     let interval = setInterval(function() {
+      console.log(_this.props);
+      console.log(_this.props.selectedBotName);
       axios({
         method: 'POST',
         url: '/result',
         data: JSON.stringify({
-          bot_name: _this.props.botName
+          bot_name: _this.props.selectedBotName
         }),
       })
         .then((response) => {
@@ -553,7 +555,7 @@ export default class MinibotBlockly extends React.Component {
       data: JSON.stringify({
         key: 'SCRIPTS',
         value: blockly.value,
-        bot_name: this.props.botName
+        bot_name: this.props.selectedBotName
       }),
     })
       .then(function (response) {
@@ -570,7 +572,7 @@ export default class MinibotBlockly extends React.Component {
       url: '/start',
       data: JSON.stringify({
         key: "WHEELS",
-        bot_name: this.props.botName,
+        bot_name: this.props.selectedBotName,
         direction: "stop",
         power: 0,
       })
@@ -771,7 +773,7 @@ export default class MinibotBlockly extends React.Component {
           </form>
           <br />
           <PythonTextBox
-            botName={this.props.botName}
+            selectedBotName={this.props.selectedBotName}
             custom_block={this.custom_block}
             dblock={this.dblock}
             dblockAll={this.dblockAll}

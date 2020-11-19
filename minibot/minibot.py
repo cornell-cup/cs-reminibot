@@ -1,12 +1,13 @@
 from bs_repr import BS_Repr
 from collections import deque
+from ctypes import c_char_p
+from multiprocessing import Process, Manager, Value
 from select import select
 from socket import socket, timeout, AF_INET, SOCK_STREAM, SOCK_DGRAM
 from socket import SOL_SOCKET, SO_REUSEADDR, SO_BROADCAST
 from threading import Thread
 from typing import List, Tuple
 import ast
-import concurrent.futures
 import importlib
 import os
 import struct
@@ -60,6 +61,7 @@ class Minibot:
         # store, implement custom class at some point
         self.writable_sock_message_queue_map = {}
         self.bs_repr = None
+        self.script_exec_result = None
         self.sock_lists = [
             self.readable_socks, self.writable_socks, self.errorable_socks
         ]
@@ -186,13 +188,13 @@ class Minibot:
             # necessary command
             else:
                 try:
+                    # if the socket receives "", it means the socket was closed
+                    # from the other end
                     data_str = sock.recv(
                         Minibot.SOCKET_BUFFER_SIZE).decode("utf-8")
                 except ConnectionResetError:
-                    self.basestation_disconnected(sock)
-                # if the socket receives "", it means the socket was closed
-                # from the other end, so close this endpoint too
-                print(f"Data string from basestation {data_str}")
+                    data_str = ""
+
                 if data_str:
                     self.parse_and_execute_commands(sock, data_str)
                 else:
@@ -212,7 +214,6 @@ class Minibot:
         for sock in write_ready_socks:
             message_queue = self.writable_sock_message_queue_map[sock]
             all_messages = "".join(message_queue)
-            print(f"Messages getting sent {all_messages}")
             sock.sendall(all_messages.encode())
             self.writable_sock_message_queue_map[sock] = deque()
             self.writable_socks.remove(sock)
@@ -286,52 +287,43 @@ class Minibot:
         # so that some of the commands get through.  Once the data loss issue
         # is fixed, we can implement a regular solution. If we did not have the
         # threads, our code execution pointer would get stuck in the infinite loop.
-        print(f"Key {key}")
         if key == "BOTSTATUS":
-            print("RECEIVED BOTSTATUS!!!!!")
-            # we want to write to the socket we received data on, so add
-            # it to the writable socks
-            self.writable_socks.add(sock)
-            message = "<<<<BOTSTATUS,ACTIVE>>>>"
             # update status time of the basestation
             self.bs_repr.update_status_time()
-            if sock in self.writable_sock_message_queue_map:
-                self.writable_sock_message_queue_map[sock].append(message)
-            else:
-                self.writable_sock_message_queue_map[sock] = deque([message])
-
+            self.sendKV(sock, key, "ACTIVE")
+        elif key == "SCRIPT_EXEC_RESULT":
+            self.sendKV(sock, key, self.script_exec_result.value) 
         elif key == "MODE":
             if value == "object_detection":
-                print("Object Detection")
                 Thread(target=ece.object_detection).start()
             elif value == "line_follow":
-                print("Line Follow")
                 Thread(target=ece.line_follow).start()
-
         elif key == "PORTS":
             ece.set_ports(value)
-            print("Set Ports")
-
         elif key == "SCRIPTS":
             # The script is always named bot_script.py.
             if len(value) > 0:
-                try:
-                    script_name = "bot_script.py"
-                    program = Minibot.process_string(value)
+                script_name = "bot_script.py"
+                program = self.process_string(value)
 
-                    # file_dir is the path to folder this file is in
-                    file_dir = os.path.dirname(os.path.realpath(__file__))
-                    file = open(
-                        file_dir + "/scripts/" + script_name, 'w+')
-                    file.write(program)
-                    file.close()
-                    return_value = Minibot.spawn_script_process(script_name)
-                    return return_value
-                except Exception as exception:
-                    print("Exception occurred at compile time")
-                    str_exception = str(type(exception)) + \
-                        ": " + str(exception)
-                    return str_exception
+                # file_dir is the path to folder this file is in
+                file_dir = os.path.dirname(os.path.realpath(__file__))
+                script_file = open(file_dir + "/scripts/" + script_name, 'w+')
+                script_file.write(program)
+                script_file.close()
+                # create a shared variable of type "string" between the child
+                # process and the current process
+                manager = Manager()
+                self.script_exec_result = manager.Value(c_char_p, "")
+
+                # Run the Python program in a different process so that we 
+                # don't need to wait for it to terminate and we can kill it
+                # whenever we want.
+                current_process = Process(
+                    target=self.run_script, 
+                    args=(script_name, self.script_exec_result)
+                )
+                current_process.start()
         elif key == "WHEELS":
             cmds_functions_map = {
                 "forward": ece.fwd,
@@ -344,6 +336,17 @@ class Minibot:
                 Thread(target=cmds_functions_map[value], args=[50]).start()
             else:
                 Thread(target=ece.stop).start()
+    
+    def sendKV(self, sock, key, value):
+        # we want to write to the socket we received data on, so add
+        # it to the writable socks
+        self.writable_socks.add(sock)
+        message = f"<<<<{key},{value}>>>>"
+        if sock in self.writable_sock_message_queue_map:
+            self.writable_sock_message_queue_map[sock].append(message)
+        else:
+            self.writable_sock_message_queue_map[sock] = deque([message])
+
 
     @staticmethod
     def process_string(value):
@@ -364,27 +367,12 @@ class Minibot:
             program += "    " + cmds[i] + "\n"
         return program
 
-    @staticmethod
-    def spawn_script_process(scriptname):
-        """
-        Creates a new thread to run the script process on.
-        Args:
-            scriptname (:obj:`str`): The name of the script to run.
-        """
-        time.sleep(0.1)
-        run_script = None  # TODO merge with Ruiqi's branch for his fix
-
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            future = executor.submit(run_script, scriptname)
-            return_value = future.result()
-            return return_value
-
-    @staticmethod
-    def run_script(scriptname):
+    def run_script(self, scriptname, result):
         """
         Loads a script and runs it.
         Args:
-            scriptname (:obj:`str`): The name of the script to run.
+            scriptname (str): The name of the script to run.
+            tcp_instance (object): TCP object for communication.
         """
 
         # Cache invalidation and module refreshes are needed to ensure
@@ -396,13 +384,10 @@ class Minibot:
             script = importlib.import_module(script_name)
             importlib.reload(script)
             script.run()
-            return "Successful execution"
+            result.value = "Successful execution"
         except Exception as exception:
-            print("Exception occurred at run time")
-            print(type(exception))
-            print(str(exception))
             str_exception = str(type(exception)) + ": " + str(exception)
-            return str_exception
+            result.value = str_exception
 
     def sigint_handler(self, sig, frame):
         print("Minibot received CTRL + C")

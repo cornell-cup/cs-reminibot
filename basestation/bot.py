@@ -23,6 +23,7 @@ class Bot:
         self._name = bot_name
         self.last_status_time = time.time()
         self.is_socket_connected = True
+        self._script_exec_result = None
 
     def try_receive_data(self, peek: bool = False) -> Optional[str]:
         """ Tries to receive data from the Minibot. 
@@ -74,19 +75,24 @@ class Bot:
         # print(f"Data str {data_str}")
         if data_str is None:
             return
-        # parse the data by removing the angular brackets
-        comma = data_str.find(",")
-        start = data_str.find(Bot.START_CMD_TOKEN)
-        end = data_str.find(Bot.END_CMD_TOKEN)
 
-        token_len = len(Bot.START_CMD_TOKEN)
-        key = data_str[start + token_len:comma]
-        value = data_str[comma + 1:end]
+        while len(data_str) > 0:
+            comma = data_str.find(",")
+            start = data_str.find(Bot.START_CMD_TOKEN)
+            end = data_str.find(Bot.END_CMD_TOKEN)
 
-        # checks if BOTSTATUS is ACTIVE and resets the last status time
-        if key == "BOTSTATUS" and value == "ACTIVE":
-            # set to current time in seconds
-            self.last_status_time = time.time()
+            token_len = len(Bot.START_CMD_TOKEN)
+            key = data_str[start + token_len:comma]
+            value = data_str[comma + 1:end]
+
+            # checks if BOTSTATUS is ACTIVE and resets the last status time
+            if key == "BOTSTATUS" and value == "ACTIVE":
+                # set to current time in seconds
+                self.last_status_time = time.time()
+            elif key == "SCRIPT_EXEC_RESULT":
+                self.script_exec_result = value
+
+            data_str = data_str[end + token_len:]
 
     def is_connected(self) -> bool:
         """ Checks whether the Minibot has sent a heartbeat message recently 
@@ -97,3 +103,11 @@ class Bot:
     @property
     def name(self):
         return self._name
+    
+    @property
+    def script_exec_result(self):
+        return self._script_exec_result
+    
+    @script_exec_result.setter
+    def script_exec_result(self, value):
+        self._script_exec_result = value
