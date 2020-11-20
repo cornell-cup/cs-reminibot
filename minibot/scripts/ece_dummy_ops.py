@@ -99,6 +99,7 @@ def transmit_once(cmd):
              the Minibot forward)
     """
     for char in cmd:
+        time.sleep(0.1)
         print(char)
         # spi.writebytes([ord(char)])
 

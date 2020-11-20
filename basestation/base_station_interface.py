@@ -103,12 +103,9 @@ class BaseStationInterface:
         into ECE-supplied functions.
 
         Args:
-            bot: The pi_bot to send to
-            program: The string containing the python code generated
-            from blockly
-
+            bot: the pi_bot to send to
+            program: the string containing the python code generated
         """
-
         # function_map : Blockly functions -> ECE functions
         function_map = {
             "move_forward": "fwd",
@@ -148,7 +145,7 @@ class BaseStationInterface:
         for line in program_lines:
             match = regex.match(line)
             if not match:
-                parsed_program.append(line + '\n')  # "normal" python
+                parsed_program.append(line + '\n')  # "normal" Python
             else:
                 func = function_map[match.group(2)]
                 args = match.group(3)
@@ -165,7 +162,6 @@ class BaseStationInterface:
                 parsed_program.append(parsed_line)
 
         parsed_program_string = "".join(parsed_program)
-        print(parsed_program_string)
 
         # Now actually send to the bot
         bot.sendKV("SCRIPTS", parsed_program_string)

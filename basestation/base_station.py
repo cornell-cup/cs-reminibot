@@ -9,13 +9,10 @@ import socket
 import sys
 import time
 import threading
+from bot import Bot
 
 # internal
 # from connection.base_connection import BaseConnection
-from bot.pi_bot import PiBot
-from bot.sim_bot import SimBot
-from session.session import Session
-from connection.udp_connection import UDPConnection
 
 MAX_VISION_LOG_LENGTH = 1000
 
@@ -23,43 +20,15 @@ MAX_VISION_LOG_LENGTH = 1000
 class BaseStation:
     def __init__(self):
         self.active_bots = {}
-        self.active_sessions = {}
         self.active_playgrounds = {}
         self.vision_log = []
 
-        self.__udp_connection = UDPConnection()
-        self.__udp_connection.start()
-
         # Send a message on a specific port so that the minibots can discover the ip address
         # of the computer that the BaseStation is running on.
-        self.broadcast_ip_thread = threading.Thread(
-            target=self.broadcast_ip, daemon=True
+        self.listen_for_minibot_broadcast_thread = threading.Thread(
+            target=self.listen_for_minibot_broadcast, daemon=True
         )
-
-        self.bot_discover_thread = threading.Thread(
-            target=self.discover_and_create_bots, daemon=True
-        )
-
-        self.vision_monitior_thread = threading.Thread(
-            target=self.vision_monitior, daemon=True
-        )
-
-        self.broadcast_ip_thread.start()
-        self.bot_discover_thread.start()
-        self.vision_monitior_thread.start()
-        # self.connections = BaseConnection()
-
-        self.basestation_key = ""
-    # ==================== ID GENERATOR ====================
-
-    def generate_id(self, length=7):
-        """
-        Generates a unique 7 character id composed of digits, lowercase, 
-        and uppercase letters
-        """
-        chars = digits + ascii_lowercase + ascii_uppercase
-        unique_id = "".join([choice(chars) for i in range(length)])
-        return unique_id
+        self.listen_for_minibot_broadcast_thread.start()
 
     # ==================== VISION ====================
 
@@ -86,19 +55,6 @@ class BaseStation:
         else:
             return None
 
-    def vision_monitior(self):
-        """
-        Checks if the len of the vision log is growing.
-        """
-        locations = {'id': '', 'x': '',
-                     'y': '', 'orientation': ''}
-        while True:
-            if self.vision_log:
-                count = len(self.vision_log)
-                time.sleep(1)
-                if len(self.vision_log) == count and self.vision_log[-1]['x'] != '':
-                    self.vision_log.append(locations)
-
     def get_vision_log(self):
         """
         Returns entire vision log.
@@ -107,17 +63,12 @@ class BaseStation:
 
     # ==================== BOTS ====================
 
-    def broadcast_ip(self):
-        """ Broadcasts ip address of the computer that the BaseStation is running on
-        so that other minibots can connect to the BaseStation.
-
-        Returns: None
-
+    def listen_for_minibot_broadcast(self):
+        """ Listens for the Minibot to broadcast a message to figure out the 
+        Minibot's ip address.
         Author: virenvshah (code taken from link below)
             https://github.com/jholtmann/ip_discovery
         """
-        print("IP broadcast starting")
-
         # initialize the socket, AF_INET for IPv4 addresses,
         # SOCK_DGRAM for UDP connections
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -133,200 +84,85 @@ class BaseStation:
         request_password = "i_am_a_minibot"
 
         while True:
-            data, address = sock.recvfrom(4096)
+            buffer_size = 4096
+            data, address = sock.recvfrom(buffer_size)
             data = str(data.decode('UTF-8'))
 
             if data == request_password:
                 # Tell the minibot that you are the base station
-                sent = sock.sendto(response.encode(), address)
+                sock.sendto(response.encode(), address)
+                self.add_bot(port=10000, ip_address=address[0])
 
     def get_active_bots_names(self):
         """
-        Returns a list of the Bot IDs.
+        Returns a list of the Bot Names.
 
         Returns:
-            (list<str>): List of IDs of all active bots.
+            (list<str>): List of Names of all active bots.
         """
-        return list([bot.get_name() for _, bot in self.active_bots.items()])
+        return list([bot.name for _, bot in self.active_bots.items()])
 
-    def discover_and_create_bots(self):
-        """
-        Discovers active bots, creates an Bot object for each one, and stores 
-        them in active bots. If existing bot is not active, remove it from active_bots.
-        """
-        while True:
-            avaliable_bots = self.discover_bots()
-            added_bots_ip_dict = self.get_bots_ip_address()
-            for ip in avaliable_bots:
-                if ip in added_bots_ip_dict:
-                    bot_id = added_bots_ip_dict[ip]
-                    if not self.get_bot(bot_id).is_active():
-                        self.__udp_connection.set_address_inactive(ip)
-                        self.remove_bot(bot_id)
-                else:
-                    if self.__udp_connection.is_address_active(ip):
-                        self.add_bot(port=10000, type="PIBOT", ip=ip)
-            time.sleep(1)
 
-    def is_heartbeat_recent(self, time_interval):
-        curr_time = time.time()
-        last_heartbeat_time = self.__udp_connection.get_last_heartbeat_time()
-        return curr_time - last_heartbeat_time <= time_interval
-
-    def add_bot(self, port, type, ip=None, bot_name=None):
+    def add_bot(self, port, ip_address, bot_name=None):
         """
         Adds a bot to the list of active bots, if the connection
         is established successfully.
 
         Args:
-            bot_id (str):
             ip (str):
             port (int):
 
         Return:
             id of newly added bot
         """
-        bot_id = self.generate_id()
         if not bot_name:
-            bot_name = "minibot" + ip[len(ip)-3:].replace('.', '')
+            bot_name = "minibot" + \
+                ip_address[len(ip_address)-3:].replace('.', '')
 
-        if type == "PIBOT":
-            new_bot = PiBot(bot_id, bot_name, True, ip, port)
-        elif type == "SIMBOT":
-            new_bot = SimBot()
-
-        self.active_bots[bot_id] = new_bot
-
-        if new_bot.is_active():
-            return new_bot.get_id()
+        new_bot = Bot(bot_name, ip_address, port)
+        self.active_bots[bot_name] = new_bot
+    
+    def get_bot_status(self, bot):
+        """ Gets whether the Minibot is currently connected or has been 
+        disconnected.  This is done by di
+        1. Send Minibot BOTSTATUS
+        2. read from Minibot whatever Minibot has sent us.
+        3. check when was the last time Minibot sent us "I'm alive"
+        4. Return if Minibot is connected or not
+        """
+        bot.sendKV("BOTSTATUS", "ACTIVE")
+        bot.readKV()
+        if bot.is_connected():
+            status = "ACTIVE"
         else:
-            del new_bot
-            raise Exception("The connection was not active. Not adding the "
-                            + "bot.")
+            status = "INACTIVE"
+        return status
 
-    def remove_bot(self, bot_id):
+    def remove_bot(self, bot_name):
         """
         Removes minibot from list of active bots by name.
 
         Args:
-            bot_id (str): bot id of removed bot
-
-        Return:
-            True if bot was successfully removed
-            False otherwise
+            bot_name (str): bot name of removed bot
         """
-        del self.active_bots[bot_id]
-        return bot_id not in self.active_bots
+        self.active_bots.pop(bot_name)
+        return bot_name not in self.active_bots
 
-    def bot_name_to_bot_id(self, bot_name):
-        """
-        Returns bot id corresponding to bot name
-
-        Args:
-            bot_name (str):
-
-        """
-        for bot_id, bot in self.active_bots.items():
-            if bot.get_name() == bot_name:
-                return bot_id
-        return None
-
-    def move_wheels_bot(self, session_id, bot_id, direction, power):
+    def move_wheels_bot(self, bot_name, direction, power):
         """
         Gives wheels power based on user input
-
-        Args:
-            session_id:
-            bot_id:
-            direction:
-            power:
-
-        Return:
-            True if bot successfully received direction
-            False otherwise
         """
-        if not session_id or not bot_id:
-            return False
-
-        session = self.active_sessions[session_id]
-        if not session or not session.has_bot(bot_id):
-            return False
-
         direction = direction.lower()
-        # neg_power = "-" + power
-        # if direction == "forward" or direction == "fw":
-        #     value = ",".join([power, power, power, power])
-        # elif direction == "backward" or direction == "bw":
-        #     value = ",".join([neg_power, neg_power, neg_power, neg_power])
-        # elif direction == "left" or direction == "lt":
-        #     value = ",".join([neg_power, power, neg_power, power])
-        # elif direction == "right" or direction == "rt":
-        #     value = ",".join([power, neg_power, power, neg_power])
-        # else:
-        #     value = "0,0,0,0"
-        # TODO remove print
-        # print("Active bot " + str(type(self.active_bots[bot_id])))
-        self.active_bots[bot_id].sendKV("WHEELS", direction)
-        return True
+        self.active_bots[bot_name].sendKV("WHEELS", direction)
 
-    # def move_wings_bot(self, session_id, bot_id, power):
-    #     if not session_id or not bot_id:
-    #         return False
-    #
-    #     session = self.active_sessions[session_id]
-    #     if not session or not session.has_bot(bot_id):
-    #         return False
-    #
-    # def move_tail_bot(self, session_id, bot_id, power):
-    #     if not session_id or not bot_id:
-    #         return False
-    #
-    #     session = self.active_sessions[session_id]
-    #     if not session or not session.has_bot(bot_id):
-    #         return False
-    #
-    # def move_tail_bot(self, session_id, bot_id, power):
-    #     if not session_id or not bot_id:
-    #         return False
-    #
-    #     session = self.active_sessions[session_id]
-    #     if not session or not session.has_bot(bot_id):
-    #         return False
-    #
-    # def move_jaw_bot(self, session_id, bot_id, direction, power):
-    #     if not session_id or not bot_id:
-    #         return False
-    #
-    #     session = self.active_sessions[session_id]
-    #     if not session or not session.has_bot(bot_id):
-    #         return False
-    #
-    # def move_body_bot(self, session_id, bot_id, direction, power):
-    #     if not session_id or not bot_id:
-    #         return False
-    #
-    #     session = self.active_sessions[session_id]
-    #     if not session or not session.has_bot(bot_id):
-    #         return False
-
-    def get_bot(self, bot_id):
+    def get_bot(self, bot_name):
         """
         Returns bot object corresponding to bot id
-
-        Args:
-            bot_id:
         """
-        if bot_id in self.active_bots:
-            return self.active_bots[bot_id]
+        if bot_name in self.active_bots:
+            return self.active_bots[bot_name]
         else:
             return None
-
-    def discover_bots(self):
-        """
-        Returns a list of the names of PiBots, which are detectable
-        through UDP broadcast.
-        """
-        return list(self.__udp_connection.get_addresses())
 
     def get_bots_ip_address(self):
         """
@@ -334,176 +170,24 @@ class BaseStation:
         """
         return {bot.get_ip(): bot.get_id() for _, bot in self.active_bots.items()}
 
-    def get_bot_sessions(self, bot_id):
-        """
-        Returns a list of session_id connected to the bot associated with bot_id.
-        """
-        sessions = []
-        for session_id, session in self.active_sessions.items():
-            if session.has_bot(bot_id):
-                sessions.append(session_id)
-        return sessions
-
-    def set_position_of_bot(self, bot_id, pos):
-        pass
-
-    def set_ports(self, ports, session_id, bot_id):
-        if not session_id or not bot_id:
-            return False
-
-        session = self.active_sessions[session_id]
-        if not session or not session.has_bot(bot_id):
-            return False
+    def set_ports(self, ports, bot_name):
         for x in ports:
             print(x)
 
         portsstr = " ".join([str(l) for l in ports])
 
-        self.active_bots[bot_id].sendKV("PORTS", portsstr)
-
-        # do something
-
-        return True
-
-    # ================== SESSIONS ==================
-
-    def list_active_sessions(self):
-        """
-        Returns all of the session_id in active_sessions
-
-        Returns:
-            list : list of session_id
-        """
-        return self.active_sessions.keys()
-
-    def has_session(self, session_id):
-        """
-        Returns True if session_id exists in active_sessions
-
-        Returns:
-            boolean
-        """
-        return session_id in self.active_sessions
-
-    def add_session(self):
-        """
-        Adds a new session to active_sessions
-
-        Returns:
-            session_id (str): a unique id
-        """
-        session_id = self.generate_id()
-        self.active_sessions[session_id] = Session(session_id)
-        return session_id
-
-    def remove_session(self, session_id):
-        """
-        Removes a session from active_sessions
-
-        Args:
-            session_id (str): a unique id
-        """
-        del self.active_sessions[session_id]
-        return session_id not in self.active_sessions
-
-    def add_bot_to_session(self, session_id, bot_name):
-        """
-        Adds bot id to session given session id and bot name.
-
-        Args:
-            session_id (str): a unique id
-            bot_id (str): a unique id
-        """
-
-        # print("session_id is: ", session_id)
-        # print("bot_name is: ", bot_name)
-
-        # print("active bots: ", self.active_bots)
-        # print("active sessions: ", self.active_sessions)
-
-        bot_id = self.bot_name_to_bot_id(bot_name)
-        if bot_id in self.active_bots:
-            bot = self.active_bots[bot_id]
-            return self.active_sessions[session_id].add_bot_id_to_session(bot.get_id())
-        else:
-            return False
-
-    def remove_bot_from_session(self, session_id, bot_id):
-        """"
-        Removes bot from session
-
-        Args:
-            session_id (str): a unique id
-            bot_id (str): a unique id
-        """
-        session = self.active_sessions[session_id]
-        session.remove_bot_id_from_session(bot_id)
-
-    def get_bot_privacy(self, bot_id):
-        """
-        Returns true if bot is private, false otherwise
-
-        Args:
-            bot_id (str): a unique id
-        """
-        if bot_id not in self.active_bots:
-            print(str(bot_id) + " is not active")
-            return True
-        bot = self.active_bots[bot_id]
-        return bot.get_is_private()
-
-    def set_bot_privacy(self, bot_id, session_id, is_private):
-        """
-        Sets privacy of bot. Returns false if bot id is not associated with
-        an active bot
-
-        Args:
-            bot_id (str): a unique id
-            is_private (bool): true if private, false otherwise
-        """
-        if bot_id not in self.active_bots:
-            print(str(bot_id) + " is not active")
-            return False
-
-        if not self.active_sessions[session_id].has_bot(bot_id):
-            print("session " + str(session_id) +
-                  " does not own " + str(bot_id))
-            return False
-
-        bot = self.active_bots[bot_id]
-        bot.set_is_private(is_private)
+        self.active_bots[bot_name].sendKV("PORTS", portsstr)
 
     # ================== BASESTATION GUI ==================
 
-    def get_base_station_key(self):
+    def get_script_exec_result(self, bot_name):
         """
-        Returns basestation key to access basestation gui. If there is no key, a key is randomly generated
-        """
-        if self.basestation_key == "":
-            self.basestation_key = self.generate_id()
-        return self.basestation_key
+        Retrieve Python error message from pi_bot.py.
 
-    def get_bots_info(self):
+        Args:
+            bot_name (str): Name of the bot that run the Python program
         """
-        Returns information on every active bot with newline
-        """
-        bot_info = ""
-        for bot_id, bot in self.active_bots.items():
-            # "^" used for split function on frontend
-            sessions = []
-            for session_id in self.get_bot_sessions(bot_id):
-                sessions.append((session_id, "Connected " +
-                                 self.active_sessions[session_id].get_time_connected_to_bot_id(bot_id)))
-
-            bot_info = bot_info + "Name:^ " + str(bot.get_name()) + "\n" \
-                + "Id:^ " + str(bot.get_id()) + "\n" \
-                + "Private?:^ " + str(bot.get_is_private()) + "\n" \
-                + "IP:^ " + str(bot.get_ip()) + "\n" \
-                + "Port:^ " + str(bot.get_port()) + "\n" \
-                + "Sessions:^ " + str(sessions) + "\n" + "\n"
-        return bot_info
-
-    def get_error_message(self, bot_name):
-        bot_id = self.bot_name_to_bot_id(bot_name)
-        bot = self.active_bots[bot_id]
-        return bot.get_result()
+        bot = self.get_bot(bot_name)
+        bot.sendKV("SCRIPT_EXEC_RESULT", "")
+        bot.readKV()
+        return bot.script_exec_result
