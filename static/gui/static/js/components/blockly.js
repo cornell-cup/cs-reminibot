@@ -134,12 +134,11 @@ class PythonTextBox extends React.Component {
 
         axios({
             method: 'POST',
-            url: '/start',
+            url: '/script',
             headers: {
                 'Content-Type': 'application/json'
             },
             data: JSON.stringify({
-                key: 'SCRIPTS',
                 value: this.state.pythonTextBoxCode,
                 bot_name: this.props.selectedBotName
             }),
@@ -557,12 +556,11 @@ export default class MinibotBlockly extends React.Component {
     run_blockly(event) {
         axios({
             method: 'POST',
-            url: '/start',
+            url: '/script',
             headers: {
                 'Content-Type': 'application/json'
             },
             data: JSON.stringify({
-                key: 'SCRIPTS',
                 value: blockly.value,
                 bot_name: this.props.selectedBotName
             }),
@@ -578,12 +576,11 @@ export default class MinibotBlockly extends React.Component {
     stop_blockly() {
         axios({
             method: 'POST',
-            url: '/start',
+            url: '/wheels',
             headers: {
                 'Content-Type': 'application/json'
             },
             data: JSON.stringify({
-                key: "WHEELS",
                 bot_name: this.props.selectedBotName,
                 direction: "stop",
                 power: 0,

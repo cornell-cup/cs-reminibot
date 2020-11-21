@@ -2,16 +2,11 @@
 Main file from which BaseStation Websocket interface begins.
 """
 
-# import tornado
-# import tornado.web
-# import tornado.websocket\
 from flask import Flask, request, render_template, jsonify, session, redirect
 from flask_db import db, Program, User
 from flask_api import status
-from flask_cors import CORS
 import os.path
 import json
-import logging
 import sys
 import time
 import re  # regex import
@@ -20,21 +15,10 @@ import requests
 # Minibot imports.
 from base_station import BaseStation
 import flask_db as blockly_app
-from base_station_interface import BaseStationInterface
 
 # set template folder
 app = Flask(__name__, template_folder='../static/gui/',
             static_folder='../static/gui/static')
-
-app.secret_key = 'test'
-
-base_station_interface = BaseStationInterface()
-send_blockly_remote_server = True
-
-log = logging.getLogger('werkzeug')
-log.setLevel(logging.ERROR)
-
-# blockly server
 
 db_filename = 'program.db'
 # CORS(app)
@@ -47,199 +31,75 @@ with app.app_context():
 login_email = ""
 
 
-# TODO: deal with secure cookies for get request
-'''attempt to send cookies through separate route, but would require adding this route
-to the front-end which maybe is not what we want'''
-# @app.route('/getcookie')
-# def get_cookie():
-#   name = request.cookies.get("user_id")
-#   return name
-
-# @app.route('/setcookie', methods = ['POST', 'GET'])
-# def set_cookie():
-#   if request.method == 'POST':
-
-# temporary session_id valud
-session = {}
-
-
 @app.route('/start', methods=['GET'])
-def get():
+def start():
+    """ Display the WebGUI """
     return render_template('index.html')
 
+@app.route('/active-bots', methods=['GET'])
+def discover_bots():
+    """ Get all Minibots connected to the Basestation """
+    return json.dumps(base_station.get_active_bots())
 
-@app.route('/start', methods=['POST'])
-def post():
-    try:
-        # print(f"get_json:{request.get_json()}")
-        data = request.get_json()
-    except:
-        print("post error")
-        return ""
+@app.route('/wheels', methods=['POST'])
+def wheels():
+    """ Makes the Minibot move. """
+    data = request.get_json()
+    bot_name = data['bot_name']
+    direction = data['direction']
+    power = data['power']
+    base_station.move_bot_wheels(bot_name, direction, power)
+    return json.dumps(True)
 
-    key = data['key']
-    # print(f"loaded json, key = {key}")
-    # key = ""
 
-    # session_id = self.get_secure_cookie("user_id") #
-    # if session_id:
-    #     session_id = session_id.decode("utf-8")
-    # print("session: ", session)
-    if not "id" in session:
-        print("added session")
-        session["id"] = base_station_interface.add_session()
+@app.route('/script', methods=['POST'])
+def script():
+    """ Make Minibot run a Python script """
+    data = request.get_json()
+    bot_name = data['bot_name']
+    script_code = data['script_code']
+    base_station.send_bot_script(bot_name, script_code)
+    return json.dumps(True)
 
-    session_id = session["id"]
 
-    if key == "CONNECTBOT":
-        bot_name = data['bot_name']
-        return base_station_interface.connect_bot(bot_name, session_id)
-        # bot_name = request.form.get('bot_name')
-        # if bot_name != None and bot_name != "":
-        #     print("Connecting bot " + str(bot_name))
-        #     print("session " + str(session_id))
-        #     return json.dumps(base_station.add_bot_to_session(
-        #         session_id, bot_name)).encode()
-        # else:
-        #     print("No bot received, or bot name empty.")
-    if key == "MODE":
-        bot_name = data['bot_name']
-        mode_type = data['value']
-        base_station_interface.mode(bot_name, mode_type, session_id)
-        # print("here!")
-        # bot_id = base_station.bot_name_to_bot_id(bot_name)
-        # bot = base_station.get_bot(bot_id)
-        # bot.sendKV(key, str(mode_type))
-    elif key == "WHEELS":
-        bot_name = data['bot_name']
-        direction = data['direction']
-        power = str(data['power'])
-        base_station_interface.wheels(bot_name, direction, power, session_id)
-        # bot_id = base_station.bot_name_to_bot_id(bot_name)
-        # base_station.move_wheels_bot(
-        #     session_id, bot_id, direction, power)
-        #   print(f"direction: {direction}, power: {power}")
-    elif key == "PORTS":
-        # leftmotor = data['leftmotor']
-        bot_id = base_station.bot_name_to_bot_id(data['bot_name'])
-        portarray = data['ports']
-        base_station_interface.ports(session_id, bot_id, portarray)
-        # for x in portarray:
-        #     print(x)
-        # base_station.set_ports(portarray, session_id, bot_id)
-
-    # Looks for bots on the local network to connect to.
-    elif key == "DISCOVERBOTS":
-        # print("reached discoverbots")
-        return base_station_interface.discoverbots()
-        # return (json.dumps(
-        #     base_station.get_active_bots_names()).encode())
-
-    # Receives the Blockly Generated Python scripts sent from the GUI.
-    elif key == "SCRIPTS":
-        print('data is:')
-        print(data)
-        value = data['value']
-        bot_name = data['bot_name']
-        # params = {'bot_name': bot_name, 'value': value}
-
-        # TODO integrate this flask app
-        # if send_blockly_remote_server:
-        #     url = 'http://127.0.0.1:5000/code/'
-        #     x = requests.post(url, json=params)
-        #     print("Post")
-        #     print(x.json)
-
-        #     print('database test')
-        #     url2 = 'http://127.0.0.1:5000/program/'
-        #     x = requests.get(url2)
-        #     print("Get")
-        #     print(x.json)
-
-        # bot_id = base_station.bot_name_to_bot_id(bot_name)
-        # bot = base_station.get_bot(bot_id)
-        # # reset the previous script's error message, so we can get the new error message
-        # # of the new script
-        # bot.set_result(None)
-        # if bot:
-        #     print("Code len = " + str(len(value)))
-        #     print(type(bot))
-        #     if len(value) == 0:
-        #         print("GETTING SCRIPTS")
-        #         bot.sendKV("SCRIPTS", '')
-        #     elif len(value) == 1:
-        #         print("SENDING SCRIPTS")
-        #         bot.sendKV("SCRIPTS", value[0])
-        #     elif len(value) == 2:
-        #         print("SAVING SCRIPTS")
-        #         bot.sendKV("SCRIPTS", ",".join(value))
-        #     else:
-        #         # TODO check if a "long enough" program
-        #         # is supposed to be sent over
-        #         print("RUNNING SCRIPT")
-        #         # self.send_program(bot, value)
-        #         send_program(bot, value)
-
-    elif key == "DISCONNECTBOT":
-        bot_name = data['bot']
-        base_station_interface.disconnectbot(bot_name, session_id)
-        # base_station.remove_bot_from_session(session_id, bot_id)
-    elif key == "BOTSTATUS":
-        bot_name = data['bot_name']
-        return base_station_interface.botstatus(bot_name)
-        # bot = base_station.get_bot(bot_id)
-        # if bot:
-        #     bot.sendKV("BOTSTATUS", '')
-        #     # self.write(json.dumps(bot.tcp_listener_thread.status).encode())
-        #     return json.dumps(bot.tcp_listener_thread.status).encode()
-    return ""  # catch-all return TODO: fix code structure so we don't have to do this
+@app.route('/ports', methods=['POST'])
+def ports():
+    """ Configures which sensors and motors are connected to which ports on the 
+    Minibot's PCB (Printed Circuit Board)
+    """
+    data = request.get_json()
+    bot_name = data['bot_name']
+    ports = data['ports']
+    base_station.set_bot_ports(bot_name, ports)
+    return json.dumps(True)
 
 
 @app.route('/vision', methods=['GET'])
 def vision_get():
-    return json.dumps(base_station.get_vision_data()).encode()
+    return json.dumps(base_station.get_vision_data())
 
 
 @app.route('/vision', methods=['POST'])
 def vision_post():
-    print(request.data)
-    info = json.loads(request.data)
+    info = request.get_json()
     base_station.update_vision_log(info)
-    print()
+    return json.dumps(True)
 
 
-@app.route('/heartbeat', methods=['GET'])
-def heartbeat_update():
-    return base_station_interface.heartbeat()
-    # time_interval = 1
-    # is_heartbeat = base_station.is_heartbeat_recent(time_interval)
-    # heartbeat_json = {"is_heartbeat": is_heartbeat}
-    # return json.dumps(heartbeat_json).encode()
-
-
-@ app.route('/result', methods=['POST'])
+@app.route('/result', methods=['POST'])
 def error_message_update():
-    print("Request sent to result route")
-    data = json.loads(request.data)
+    data = request.get_json()
     bot_name = data['bot_name']
-    return base_station_interface.error_message_update(bot_name)
-    # while not error_message:
-    #     error_message = base_station.get_error_message(bot_name)
-    # if error_message == "Successful execution":
-    #     error_json = {"error": error_message, "code": 1}
-    # else:
-    #     error_json = {"error": error_message, "code": 0}
-    # print("error_json is: ")
-    # print(error_json)
-    # return json.dumps(error_json).encode()
+    script_exec_result = base_station.get_script_exec_result(bot_name)
+    if not script_exec_result:                         
+        code = -1
+    elif script_exec_result == "Successful execution": 
+        code = 1
+    else:                                              
+        code = 0
+    return json.dumps({"result": script_exec_result, "code": code})
 
-
-@ app.route("/")
-def hello():
-    return "Hello World!"
-
-
-@ app.route("/program/")
+@ app.route("/program")
 def get_program():
     programs = Program.query.all()
     for program in programs:
@@ -247,7 +107,7 @@ def get_program():
     return json.dumps({'data': [program.serialize() for program in programs]})
 
 
-@ app.route("/code/", methods=['POST'])
+@ app.route("/code", methods=['POST'])
 def post_code():
     print("can you see me")
     global login_email
@@ -296,11 +156,6 @@ def register_account():
         'user_id': user.id,
         'email': email
     })
-
-
-@app.route('/test/', methods=['POST'])
-def test():
-    return "hi"
 
 
 @app.route('/login/', methods=['POST'])
@@ -377,7 +232,6 @@ def update_custom_function():
         session_token, custom_function)
 
     if not success:
-        print("error: invalid session_token")
         return json.dumps({'error': 'invalid session_token'}), 404
     return json.dumps({'custom_function': custom_function}), 201
 
@@ -386,6 +240,5 @@ if __name__ == "__main__":
     """
     Main method for running base station Server.
     """
-    # base_station_server = BaseInterface(8080, send_blockly_remote_server=True)
-    # base_station_server.start()
+    base_station = BaseStation()
     app.run(host='localhost', port='8080')

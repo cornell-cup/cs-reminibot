@@ -3,6 +3,7 @@ var webpack = require('webpack');
 
 module.exports = {
     entry: './static/js/main.js',
+    watch: true,
     output: {
         path: path.resolve(__dirname, './static/build'),
         filename: 'app.bundle.js'

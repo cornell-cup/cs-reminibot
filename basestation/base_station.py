@@ -2,7 +2,6 @@
 Base Station for the MiniBot.
 """
 
-# external
 from random import choice
 from string import digits, ascii_lowercase, ascii_uppercase
 import socket
@@ -11,16 +10,11 @@ import time
 import threading
 from bot import Bot
 
-# internal
-# from connection.base_connection import BaseConnection
-
 MAX_VISION_LOG_LENGTH = 1000
-
 
 class BaseStation:
     def __init__(self):
         self.active_bots = {}
-        self.active_playgrounds = {}
         self.vision_log = []
 
         # Send a message on a specific port so that the minibots can discover the ip address
@@ -29,44 +23,51 @@ class BaseStation:
             target=self.listen_for_minibot_broadcast, daemon=True
         )
         self.listen_for_minibot_broadcast_thread.start()
+        self.blockly_function_map = {
+            "move_forward": "fwd",         "move_backward": "back",
+            "wait": "time.sleep",          "stop": "stop",
+            "set_wheel_power":             "ECE_wheel_pwr",
+            "turn_clockwise": "right",     "turn_counter_clockwise": "left",
+            "move_servo": "move_servo",    "read_ultrasonic": "read_ultrasonic",
+        }
+        # functions that run continuously, and hence need to be started
+        # in a new thread on the Minibot otherwise the Minibot will get
+        # stuck in an infinite loop and will be unable to receive
+        # other commands
+        self.blockly_threaded_functions = [
+            "fwd", "back", "right", "left", "stop", "ECE_wheel_pwr"
+        ]
 
     # ==================== VISION ====================
 
     def update_vision_log(self, value):
-        """
-        Updates vision log. Size of log based on MAX_VISION_LOG_LENGTH
-        Args:
-            values (dict): dictionary containing positions 
-        """
+        """ Updates vision log. Size of log based on MAX_VISION_LOG_LENGTH """
         locations = {'id': value['id'], 'x': value['x'],
                      'y': value['y'], 'orientation': value['orientation']}
-        # print("Received1 vision info: ", locations)
         self.vision_log.append(locations)
         if len(self.vision_log) > MAX_VISION_LOG_LENGTH:
             self.vision_log.pop(0)
-            self.vision_log.pop(0)
 
     def get_vision_data(self):
-        """
-        Returns most recent vision data
-        """
-        if self.vision_log:
-            return self.vision_log[-1]
-        else:
-            return None
-
-    def get_vision_log(self):
-        """
-        Returns entire vision log.
-        """
-        return self.vision_log
+        """ Returns most recent vision data """
+        return self.vision_log[-1] if self.vision_log else None
 
     # ==================== BOTS ====================
 
+    def get_bot(self, bot_name: str) -> Bot:
+        """ Returns bot object corresponding to bot name """
+        if bot_name in self.active_bots:
+            return self.active_bots[bot_name]
+        return None
+
+    def get_bot_names(self):
+        """ Returns a list of the Bot Names. """
+        return list(self.active_bots.keys())
+
+
     def listen_for_minibot_broadcast(self):
         """ Listens for the Minibot to broadcast a message to figure out the 
-        Minibot's ip address.
-        Author: virenvshah (code taken from link below)
+        Minibot's ip address. Code taken from link below:
             https://github.com/jholtmann/ip_discovery
         """
         # initialize the socket, AF_INET for IPv4 addresses,
@@ -93,44 +94,35 @@ class BaseStation:
                 sock.sendto(response.encode(), address)
                 self.add_bot(port=10000, ip_address=address[0])
 
-    def get_active_bots_names(self):
-        """
-        Returns a list of the Bot Names.
-
-        Returns:
-            (list<str>): List of Names of all active bots.
-        """
-        return list([bot.name for _, bot in self.active_bots.items()])
-
-
-    def add_bot(self, port, ip_address, bot_name=None):
-        """
-        Adds a bot to the list of active bots, if the connection
-        is established successfully.
-
-        Args:
-            ip (str):
-            port (int):
-
-        Return:
-            id of newly added bot
-        """
+    def add_bot(self, port: int, ip_address: str, bot_name: str = None):
+        """ Adds a bot to the list of active bots """
         if not bot_name:
-            bot_name = "minibot" + \
-                ip_address[len(ip_address)-3:].replace('.', '')
-
-        new_bot = Bot(bot_name, ip_address, port)
-        self.active_bots[bot_name] = new_bot
+            bot_name = f"minibot{ip_address[-3:].replace('.', '')}"
+        self.active_bots[bot_name] = Bot(bot_name, ip_address, port)
     
-    def get_bot_status(self, bot):
+    def get_active_bots(self):
+        """ Get the names of all the Minibots that are currently connected to 
+        Basestation
+        """
+        for bot_name in self.get_bot_names():
+            status = self.get_bot_status(bot_name)
+            # if the bot is inactive, remove it from the active bots list
+            if status == "INACTIVE":
+                self.remove_bot(bot_name)
+        return self.get_bot_names()
+    
+    def get_bot_status(self, bot_name: str) -> str:
         """ Gets whether the Minibot is currently connected or has been 
-        disconnected.  This is done by di
+        disconnected.
         1. Send Minibot BOTSTATUS
         2. read from Minibot whatever Minibot has sent us.
         3. check when was the last time Minibot sent us "I'm alive"
         4. Return if Minibot is connected or not
         """
+        bot = self.get_bot(bot_name)
+        # ask the bot to reply whether its ACTIVE
         bot.sendKV("BOTSTATUS", "ACTIVE")
+        # read the newest message from the bot
         bot.readKV()
         if bot.is_connected():
             status = "ACTIVE"
@@ -139,55 +131,60 @@ class BaseStation:
         return status
 
     def remove_bot(self, bot_name):
-        """
-        Removes minibot from list of active bots by name.
-
-        Args:
-            bot_name (str): bot name of removed bot
-        """
+        """Removes the specified bot from list of active bots."""
         self.active_bots.pop(bot_name)
-        return bot_name not in self.active_bots
 
-    def move_wheels_bot(self, bot_name, direction, power):
-        """
-        Gives wheels power based on user input
-        """
+    def move_bot_wheels(self, bot_name, direction, power):
+        """ Gives wheels power based on user input """
+        bot = self.get_bot(bot_name)
         direction = direction.lower()
-        self.active_bots[bot_name].sendKV("WHEELS", direction)
+        bot.sendKV("WHEELS", direction)
+    
+    def send_bot_script(self, bot_name: str, script: str):
+        bot = self.get_bot(bot_name)
+        # Regex is for bot-specific functions (move forward, stop, etc)
+        # 1st group is the whitespace (useful for def, for, etc),
+        # 2nd group is for func name, 3rd group is for args,
+        # 4th group is for anything else (additional whitespace,
+        # ":" for end of if condition, etc)
+        pattern = r"(.*)bot.(\w*)\((.*)\)(.*)"
+        regex = re.compile(pattern)
+        program_lines = script.split('\n')
+        parsed_program = []
+        for line in program_lines:
+            match = regex.match(line)
+            if match:
+                func = self.blockly_function_map[match.group(2)]
+                args = match.group(3)
+                whitespace = match.group(1)
+                if not whitespace:
+                    whitespace = ""
+                parsed_line = whitespace
+                if func in self.blockly_threaded_functions:
+                    parsed_line += f"Thread(target={func}, args=[{args}]).start()\n"
+                else:
+                    parsed_line += f"{func}({args}){match.group(4)}\n"
+                parsed_program.append(parsed_line)
+            else:
+                parsed_program.append(line + '\n')  # "normal" Python
 
-    def get_bot(self, bot_name):
-        """
-        Returns bot object corresponding to bot id
-        """
-        if bot_name in self.active_bots:
-            return self.active_bots[bot_name]
-        else:
-            return None
+        parsed_program_string = "".join(parsed_program)
 
-    def get_bots_ip_address(self):
-        """
-        Returns a list of the ip addresses of all active bots.
-        """
-        return {bot.get_ip(): bot.get_id() for _, bot in self.active_bots.items()}
+        # Now actually send to the bot
+        bot.sendKV("SCRIPTS", parsed_program_string)
+        
+    def set_bot_ports(self, ports, bot_name):
+        bot = self.get_bot(bot_name)
+        ports_str = " ".join([str(l) for l in ports])
+        bot.sendKV("PORTS", ports_str)
 
-    def set_ports(self, ports, bot_name):
-        for x in ports:
-            print(x)
-
-        portsstr = " ".join([str(l) for l in ports])
-
-        self.active_bots[bot_name].sendKV("PORTS", portsstr)
-
-    # ================== BASESTATION GUI ==================
-
-    def get_script_exec_result(self, bot_name):
-        """
-        Retrieve Python error message from pi_bot.py.
-
-        Args:
-            bot_name (str): Name of the bot that run the Python program
+    def get_bot_script_exec_result(self, bot_name: str):
+        """ Retrieve the last script's execution result from the specified bot.
         """
         bot = self.get_bot(bot_name)
+        # request the bot to send the script execution result
         bot.sendKV("SCRIPT_EXEC_RESULT", "")
+        # try reading to see if the bot has replied
         bot.readKV()
+        # this value might be None if the bot hasn't replied yet
         return bot.script_exec_result

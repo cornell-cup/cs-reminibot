@@ -123,17 +123,9 @@ export default class AddBot extends React.Component {
      */
     refreshAvailableBots() {
         const _this = this;
-        console.log("refreshing available bots");
-
         axios({
-            method: 'POST',
-            url: '/start',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            data: JSON.stringify({
-                key: "DISCOVERBOTS"
-            })
+            method: 'GET',
+            url: '/active-bots',
         }).then(function (response) {
             _this.state.availableBots = response.data;
             // If the Selected Bot (the currently connected bot)
@@ -186,12 +178,11 @@ export default class AddBot extends React.Component {
         const _this = this;
         axios({
             method: 'POST',
-            url: '/start',
+            url: '/wheels',
             headers: {
                 'Content-Type': 'application/json'
             },
             data: JSON.stringify({
-                key: "WHEELS",
                 bot_name: _this.props.selectedBotName,
                 direction: value,
                 power: _this.state.power,
@@ -207,17 +198,14 @@ export default class AddBot extends React.Component {
     /*motor ports*/
     motorPorts(name, port1) {
         const _this = this;
-        console.log(name);
-        console.log(port1);
 
         axios({
             method: 'POST',
-            url: '/start',
+            url: '/ports',
             headers: {
                 'Content-Type': 'application/json'
             },
             data: JSON.stringify({
-                key: "PORTS",
                 ports: [name, String(port1)],
                 bot_name: _this.props.selectedBotName,
             })
@@ -257,12 +245,11 @@ export default class AddBot extends React.Component {
         const _this = this;
         axios({
             method: 'POST',
-            url: '/start', //url to backend endpoint
+            url: '/mode', //url to backend endpoint
             headers: {
                 'Content-Type': 'application/json'
             },
             data: JSON.stringify({
-                key: "MODE",
                 bot_name: _this.props.selectedBotName,
                 value: "line_follow",
             })
@@ -280,12 +267,11 @@ export default class AddBot extends React.Component {
         console.log("Object Detection")
         axios({
             method: 'POST',
-            url: '/start', //url to backend endpoint
+            url: '/mode', //url to backend endpoint
             headers: {
                 'Content-Type': 'application/json'
             },
             data: JSON.stringify({
-                key: "MODE",
                 bot_name: _this.props.selectedBotName,
                 value: "object_detection",
             })
