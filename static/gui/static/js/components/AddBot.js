@@ -18,6 +18,14 @@ class RefreshingList extends React.Component {
         this.updateCurrentBot = this.updateCurrentBot.bind(this);
     }
 
+    discoverBots(event) {
+        console.log("Discvering bot");
+        axios({
+            method: 'GET',
+            url: '/discover-bots',
+        });
+    }
+
     update(newbots) {
         this.state.availableBots = newbots;
         // console.log("Current bot: " + this.state.current_bot)
@@ -34,14 +42,19 @@ class RefreshingList extends React.Component {
         const _this = this;
         if (_this.state.availableBots.length === 0) {
             _this.state.current_bot = "";
-            return <select><option>No bots available</option></select>
+            return <select onClick={this.discoverBots}>
+                <option>Click to search for available bots</option>
+            </select>
         }
         if (_this.state.current_bot === "") {
             _this.state.current_bot = _this.state.availableBots[0]
         }
 
         return (
-            <select onChange={(e) => this.updateCurrentBot(e)}>
+            <select 
+                onChange={(e) => this.updateCurrentBot(e)} 
+                onClick={this.discoverBots}
+            >
                 {_this.state.availableBots.map(
                     (name, idx) => <option key={idx}> {name} </option>)}
             </select>

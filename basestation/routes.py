@@ -3,41 +3,35 @@ Main file from which BaseStation Websocket interface begins.
 """
 
 from flask import Flask, request, render_template, jsonify, session, redirect
-from flask_db import db, Program, User
 from flask_api import status
 import os.path
 import json
 import sys
 import time
-import re  # regex import
-import requests
 
 # Minibot imports.
-from base_station import BaseStation
-import flask_db as blockly_app
+from basestation.flask_db import db, Program, User
+from basestation.base_station import BaseStation
+from basestation import app
+import basestation.flask_db as blockly_app
 
-# set template folder
-app = Flask(__name__, template_folder='../static/gui/',
-            static_folder='../static/gui/static')
-
-db_filename = 'program.db'
-# CORS(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///%s' % db_filename
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_ECHO'] = True
-db.init_app(app)
-with app.app_context():
-    db.create_all()
-login_email = ""
-
+base_station = BaseStation(app.debug)
 
 @app.route('/start', methods=['GET'])
 def start():
     """ Display the WebGUI """
     return render_template('index.html')
 
-@app.route('/active-bots', methods=['GET'])
+
+@app.route('/discover-bots', methods=['GET'])
 def discover_bots():
+    """ Get all Minibots connected to the Basestation """
+    base_station.listen_for_minibot_broadcast()
+    return json.dumps(True)
+
+
+@app.route('/active-bots', methods=['GET'])
+def active_bots():
     """ Get all Minibots connected to the Basestation """
     return json.dumps(base_station.get_active_bots())
 
@@ -90,7 +84,7 @@ def vision_post():
 def error_message_update():
     data = request.get_json()
     bot_name = data['bot_name']
-    script_exec_result = base_station.get_script_exec_result(bot_name)
+    script_exec_result = base_station.get_bot_script_exec_result(bot_name)
     if not script_exec_result:                         
         code = -1
     elif script_exec_result == "Successful execution": 
@@ -234,11 +228,3 @@ def update_custom_function():
     if not success:
         return json.dumps({'error': 'invalid session_token'}), 404
     return json.dumps({'custom_function': custom_function}), 201
-
-
-if __name__ == "__main__":
-    """
-    Main method for running base station Server.
-    """
-    base_station = BaseStation()
-    app.run(host='localhost', port='8080')

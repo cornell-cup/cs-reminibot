@@ -139,8 +139,8 @@ class PythonTextBox extends React.Component {
                 'Content-Type': 'application/json'
             },
             data: JSON.stringify({
-                value: this.state.pythonTextBoxCode,
-                bot_name: this.props.selectedBotName
+                bot_name: this.props.selectedBotName,
+                script_code: this.state.pythonTextBoxCode
             }),
         })
             .then(function (response) {
@@ -168,7 +168,7 @@ class PythonTextBox extends React.Component {
                 }),
             })
                 .then((response) => {
-                    document.getElementById("errormessage").value = response.data["error"];
+                    document.getElementById("errormessage").value = response.data["result"];
                     // if the code is -1 it means the result hasn't arrived yet, hence 
                     // we shouldn't clear the interval and should continue polling
                     if (response.data["code"] !== -1) {

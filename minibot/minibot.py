@@ -292,7 +292,10 @@ class Minibot:
             self.bs_repr.update_status_time()
             self.sendKV(sock, key, "ACTIVE")
         elif key == "SCRIPT_EXEC_RESULT":
-            self.sendKV(sock, key, self.script_exec_result.value) 
+            script_exec_result = (
+                self.script_exec_result.value if self.script_exec_result else ""
+            )
+            self.sendKV(sock, key, script_exec_result) 
         elif key == "MODE":
             if value == "object_detection":
                 Thread(target=ece.object_detection).start()

@@ -4,25 +4,22 @@ Base Station for the MiniBot.
 
 from random import choice
 from string import digits, ascii_lowercase, ascii_uppercase
+import os
+import psutil
+import re
 import socket
 import sys
 import time
 import threading
-from bot import Bot
+from basestation.bot import Bot
 
 MAX_VISION_LOG_LENGTH = 1000
 
 class BaseStation:
-    def __init__(self):
+    def __init__(self, app_debug=False):
         self.active_bots = {}
         self.vision_log = []
 
-        # Send a message on a specific port so that the minibots can discover the ip address
-        # of the computer that the BaseStation is running on.
-        self.listen_for_minibot_broadcast_thread = threading.Thread(
-            target=self.listen_for_minibot_broadcast, daemon=True
-        )
-        self.listen_for_minibot_broadcast_thread.start()
         self.blockly_function_map = {
             "move_forward": "fwd",         "move_backward": "back",
             "wait": "time.sleep",          "stop": "stop",
@@ -37,6 +34,22 @@ class BaseStation:
         self.blockly_threaded_functions = [
             "fwd", "back", "right", "left", "stop", "ECE_wheel_pwr"
         ]
+
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        # an arbitrarily small time
+        self.sock.settimeout(0.01)
+
+        # empty string means 0.0.0.0, which is all IP addresses on the local
+        # machine, because some machines can have multiple Network Interface
+        # Cards, and therefore will have multiple ip_addresses
+        server_address = ("0.0.0.0", 9434)
+
+        if app_debug and os.environ["WERKZEUG_RUN_MAIN"] == "true":
+            self.sock.bind(server_address)
+        else:
+            self.sock.bind(server_address)
+
 
     # ==================== VISION ====================
 
@@ -70,29 +83,22 @@ class BaseStation:
         Minibot's ip address. Code taken from link below:
             https://github.com/jholtmann/ip_discovery
         """
-        # initialize the socket, AF_INET for IPv4 addresses,
-        # SOCK_DGRAM for UDP connections
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
-        # empty string means 0.0.0.0, which is all IP addresses on the local
-        # machine, because some machines can have multiple Network Interface
-        # Cards, and therefore will have multiple ip_addresses
-        server_address = ("", 9434)
-        sock.bind(server_address)
 
         response = "i_am_the_base_station"
         # a minibot should send this message in order to receive the ip_address
         request_password = "i_am_a_minibot"
 
-        while True:
-            buffer_size = 4096
-            data, address = sock.recvfrom(buffer_size)
-            data = str(data.decode('UTF-8'))
+        buffer_size = 4096
+        try:
+            data, address = self.sock.recvfrom(buffer_size)
+        except socket.timeout:
+            data, address = b"", None
+        data = str(data.decode('UTF-8'))
 
-            if data == request_password:
-                # Tell the minibot that you are the base station
-                sock.sendto(response.encode(), address)
-                self.add_bot(port=10000, ip_address=address[0])
+        if data == request_password:
+            # Tell the minibot that you are the base station
+            self.sock.sendto(response.encode(), address)
+            self.add_bot(port=10000, ip_address=address[0])
 
     def add_bot(self, port: int, ip_address: str, bot_name: str = None):
         """ Adds a bot to the list of active bots """
@@ -142,6 +148,8 @@ class BaseStation:
     
     def send_bot_script(self, bot_name: str, script: str):
         bot = self.get_bot(bot_name)
+        # reset the previous script_exec_result
+        bot.script_exec_result = None
         # Regex is for bot-specific functions (move forward, stop, etc)
         # 1st group is the whitespace (useful for def, for, etc),
         # 2nd group is for func name, 3rd group is for args,
