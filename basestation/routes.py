@@ -67,6 +67,16 @@ def ports():
     base_station.set_bot_ports(bot_name, ports)
     return json.dumps(True)
 
+@app.route('/mode', methods=['POST'])
+def mode():
+    """ Makes the minibot run in either line follow or object detection mode """
+    data = request.get_json()
+    bot_name = data['bot_name']
+    mode = data['mode']
+    base_station.set_bot_mode(bot_name, mode)
+    return json.dumps(True)
+    
+
 
 @app.route('/vision', methods=['GET'])
 def vision_get():

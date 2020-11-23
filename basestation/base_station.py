@@ -146,6 +146,11 @@ class BaseStation:
         direction = direction.lower()
         bot.sendKV("WHEELS", direction)
     
+    def set_bot_mode(self, bot_name: str, mode: str):
+        """ Set the bot to either line follow or object detection mode """
+        bot = self.get_bot(bot_name)
+        bot.sendKV("MODE", mode)
+        
     def send_bot_script(self, bot_name: str, script: str):
         bot = self.get_bot(bot_name)
         # reset the previous script_exec_result
@@ -181,7 +186,7 @@ class BaseStation:
         # Now actually send to the bot
         bot.sendKV("SCRIPTS", parsed_program_string)
         
-    def set_bot_ports(self, ports, bot_name):
+    def set_bot_ports(self, bot_name, ports):
         bot = self.get_bot(bot_name)
         ports_str = " ".join([str(l) for l in ports])
         bot.sendKV("PORTS", ports_str)

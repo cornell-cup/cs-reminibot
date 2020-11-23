@@ -264,7 +264,7 @@ export default class AddBot extends React.Component {
             },
             data: JSON.stringify({
                 bot_name: _this.props.selectedBotName,
-                value: "line_follow",
+                mode: "line_follow",
             })
         })
             .then(function (response) {
@@ -286,7 +286,7 @@ export default class AddBot extends React.Component {
             },
             data: JSON.stringify({
                 bot_name: _this.props.selectedBotName,
-                value: "object_detection",
+                mode: "object_detection",
             })
         })
             .then(function (response) {
