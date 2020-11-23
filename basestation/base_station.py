@@ -45,6 +45,9 @@ class BaseStation:
         # Cards, and therefore will have multiple ip_addresses
         server_address = ("0.0.0.0", 9434)
 
+        # only bind in debug mode if you are the debug server, if you are the 
+        # monitoring program which restarts the debug server, do not bind,
+        # otherwise the debug server won't be able to bind
         if app_debug and os.environ["WERKZEUG_RUN_MAIN"] == "true":
             self.sock.bind(server_address)
         else:
