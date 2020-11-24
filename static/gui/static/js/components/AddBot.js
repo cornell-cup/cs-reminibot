@@ -71,7 +71,7 @@ function PortsList(props) {
     let allListElements = [];
 
     for (let i = 0; i < portNames.length; i++) {
-        let link = <a href="">{portLabels[i]}</a>
+        let link = <a href="">{portLabels[i]} &#8250;</a>
         let ports = <Ports portName={portNames[i]} motorPorts={props.motorPorts} />
         let listElement = <li> {link} {ports} </li>
         allListElements.push(listElement);
@@ -81,7 +81,7 @@ function PortsList(props) {
         <nav id="main_nav">
             <ul>
                 <li>
-                    <a href="">Motor Ports</a>
+                    <a href="">Motor Ports &#187;</a>
                     <ul> {allListElements} </ul>
                 </li>
             </ul>
@@ -323,7 +323,7 @@ export default class AddBot extends React.Component {
         }
     }
 
-    getVisionData() {
+    getonData() {
         const _this = this;
         axios({
             method: 'GET',

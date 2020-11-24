@@ -263,18 +263,12 @@ table {
 
 }
 
-#main_nav>ul>li>a,
-h1 {
-    color: white;
-}
-
 #main_nav a {
     display: block;
     text-decoration: none;
     padding: 5px 15px;
     color: white;
     text-align: center;
-    /* font-weight: bold; */
     background-color:  #EA4C46;
 }
 
@@ -292,19 +286,6 @@ h1 {
     position: absolute;
 }
 
-#main_nav li:hover,
-#main_nav li:hover li {
-    background: #ddd;
-}
-
-#main_nav li li:hover,
-#main_nav li li:hover li {
-    background: #bbb;
-}
-
-#main_nav li li li:hover {
-    background: #999;
-}
 
 #main_nav li:hover>ul {
     visibility: visible;
