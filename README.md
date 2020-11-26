@@ -204,11 +204,7 @@ sudo npm install npm@latest -g
 ```
 
 #### Pyaudio installation:
-These dependencies must be installed if you want to use the speech recognition feature of our Minibot platform.  In a terminal run:
-```
-sudo apt-get install libasound-dev portaudio19-dev libportaudio2 libportaudiocpp0
-sudo apt-get install ffmpeg libav-tools
-```
+Not supported for WSL.  
 [Continue with the remaining installation steps](#Continue)
 
 
