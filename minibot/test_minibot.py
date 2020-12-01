@@ -26,18 +26,18 @@ class TestMinibot:
 
     def spawn_minibot(self):
         self.spawn = subprocess.Popen(
-            args=["python3 minibot.py -t"], shell=True, universal_newlines=True)
+            args=["python3", "minibot.py", "-t"], stdout=subprocess.PIPE, universal_newlines=True)
 
     def test_connectivity(self):
         # checking bot status
-        self.send_botstatus(5)
-        print("Finished sending botstatus!!!!")
-        time.sleep(5)
-        output = self.spawn.communicate(timeout=1)
-        print(output)
-
-        # time.sleep(10)
-        # print("spawn readline " + output)
+        # self.send_botstatus(5)
+        
+        while True:
+            print("Finished sending botstatus!!!!")
+            output = self.spawn.stdout.read(1)
+            self.spawn.stdout.flush()
+            time.sleep(1)
+            print(output)
 
     def connect_to_minibot(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -62,7 +62,7 @@ class TestMinibot:
     def send_botstatus(self, num_times):
         for _ in range(num_times):
             self.conn_sock.sendall("<<<<BOTSTATUS,>>>>".encode())
-            time.sleep(0.5)
+            # time.sleep(0.5)
             if self.check_botstatus():
                 print("botstatus is active")
             else:
