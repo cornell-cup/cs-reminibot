@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import RequestButton from './RequestButton.js';
 
 export default class ObjectClassification extends React.Component {
 
@@ -11,7 +12,15 @@ export default class ObjectClassification extends React.Component {
 
   render() {
     return (
-      <h1>HELLO</h1>
+      <RequestButton
+        name="Take Picture"
+        path="/object/"
+        script_name="take_picture.py"
+        args={{
+          required: {},
+          optional: {}
+        }}
+      />
     )
   }
 }
