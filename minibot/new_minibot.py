@@ -82,7 +82,7 @@ def parse_command(cmd, tcpInstance):
 
     elif key == "PORTS":
         ece.set_ports(value)
-        print("Set Ports")    
+        print("Set Ports")
 
     elif key == "SCRIPTS":
         # The script is always named bot_script.py.

@@ -9,6 +9,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# csreminibot
+package-lock.json
+uninstall-node.sh
+
 # C extensions
 *.so
 *.o

@@ -333,3 +333,12 @@ h1 {
     background-color: white;
     position: absolute;
 }
+
+#speech_recognition_feedback_box {
+    background-color : 	#d3ebf4;
+    border-style: solid;
+    border-width: 0.5px;
+    padding: 20px;
+    width: 320px;
+}
+

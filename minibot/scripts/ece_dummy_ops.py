@@ -109,6 +109,7 @@ def transmit_continuously(cmd):
         cmd: (str) The command to be sent to the Arduino
     """
     while tlock.can_continue_transmitting():
+        time.sleep(0.5)
         transmit_once(cmd)
     # spi.writebytes([ord(STOP_CMD)])
 
