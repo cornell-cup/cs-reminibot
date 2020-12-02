@@ -12,6 +12,7 @@ import sys
 import time
 import re  # regex import
 import requests
+import subprocess
 
 # Minibot imports.
 from base_station import BaseStation
@@ -307,6 +308,21 @@ class ErrorMessageHandler(tornado.websocket.WebSocketHandler):
         print("error_json is: ")
         print(error_json)
         self.write(json.dumps(error_json).encode())
+
+'''
+Static vars for the Built-In Script Handler. initialize() is called each time
+a request is made to the BuiltInScriptHandler, so I leave this out to be
+defined "statically".
+Elements:
+    :procs  The processes as a mapping from
+            (request_id : str) => (subprocess.Popen object)
+    :next_req_id The next request_id to add a new process to the procs list.
+'''
+script_handler_props = {
+    "procs": dict(),
+    "next_req_id": 0
+}
+
 
 class BuiltinScriptHandler(tornado.web.RequestHandler):
 

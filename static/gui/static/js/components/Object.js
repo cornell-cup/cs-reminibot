@@ -12,15 +12,26 @@ export default class ObjectClassification extends React.Component {
 
   render() {
     return (
-      <RequestButton
-        name="Take Picture"
-        path="/object/"
-        script_name="take_picture.py"
-        args={{
-          required: {},
-          optional: {}
-        }}
-      />
+      <div>
+        <RequestButton
+          name="Take Picture"
+          path="/object/"
+          script_name="take_picture.py"
+          args={{
+            required: {},
+            optional: {}
+          }}
+        />
+        <RequestButton
+          name="Test"
+          path="object"
+          script_name="test.py"
+          args={{
+            required: {},
+            optional: {}
+          }}
+        />
+      </div>
     )
   }
 }
