@@ -82,6 +82,14 @@ def main():
 
 
 def get_checkerboard_interactive(camera, cols, rows):
+    """
+    Draws chessboard corners live. Returns when "q" is pressed.
+
+    Returns:
+    image of the checkerboard,
+    gray_scale image of the checkerbaord,
+    list pf corners of the checkerboard in image.
+    """
     corners = None
     found_checkerboard = False
     # Get checkerboard interactively
