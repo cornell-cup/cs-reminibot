@@ -116,7 +116,7 @@ class SpeechRecognition extends React.Component {
         this.speechRecognitionInterval = null;
 
         // colors for the messages in the feedback box
-        this.colors = ["#000080", "black"]
+        this.colors = ["#660000", "black"]
     }
 
     /** Turns the button on or off */
@@ -220,7 +220,7 @@ class SpeechRecognition extends React.Component {
             "Stop Speech Recognition" : "Start Speech Recognition";
         return (
             <div>
-                <button className="btn btn-primary element-wrapper"
+                <button className="btn btn-danger element-wrapper"
                     onClick={this.toggle}>{x}</button>
             </div>
 
@@ -592,29 +592,32 @@ export default class AddBot extends React.Component {
                         </form>
                     </div>
                 </div>
+                <br />
                 <div className="row">
-                <div className="col horizontalDivCenter">
-                    <p id="small_title"> Speech Recognition </p>
+                    <div className="col horizontalDivCenter">
+                        <p id="small_title"> Speech Recognition </p>
+                    </div>
                 </div>
-            </div>
-            {/* button-wrapper is a custom class to add padding
+                {/* button-wrapper is a custom class to add padding
                     the rest is bootstrap css */}
-            <div className="col horizontalDivCenter">
-                <SpeechRecognition selected_bot={this.props.selected_bot}
-                    float="right" />
-            </div>
-            <div className="col horizontalDivCenter">
-                <label id="speech_recognition_feedback_box" />
-            </div>
-            <br />
-            <br />
-            <div className="row">
                 <div className="col horizontalDivCenter">
-                    <button className="btn btn-success element-wrapper mr-1" onClick={() => this.objectDetectionOnClick()}>Object Detection</button>
-                    <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.lineFollowOnClick()}>Line Follow</button>
+                    <SpeechRecognition selected_bot={this.props.selected_bot}
+                        float="right" />
                 </div>
-            </div>
-        </div >
+                <div className="col horizontalDivCenter">
+                    <label id="speech_recognition_feedback_box" />
+                </div>
+                <br />
+                <br />
+                <div className="row">
+                    <div className="col horizontalDivCenter">
+                        <button className="btn btn-success element-wrapper mr-1" onClick={() => this.objectDetectionOnClick()}>Object Detection</button>
+                        <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.lineFollowOnClick()}>Line Follow</button>
+                    </div>
+                </div>
+                <br />
+                <br />
+            </div >
         );
     }
 }
