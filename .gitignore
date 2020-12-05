@@ -9,6 +9,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# csreminibot
+package-lock.json
+uninstall-node.sh
+
 # C extensions
 *.so
 *.o
@@ -118,3 +122,5 @@ node_modules/
 
 gui/package-lock.json
 
+# User entered Python program
+minibot/scripts/bot_script.py

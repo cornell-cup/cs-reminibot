@@ -1,4 +1,5 @@
 from hardware.communication.TCP import TCP
+
 from socket import *
 from threading import Thread
 import struct
@@ -7,18 +8,9 @@ import time
 import importlib
 import ast
 import os
-<<<<<<< HEAD
 import concurrent.futures
-=======
-# mport scripts.PiArduino as ece
-# import scripts.ece_dummy_ops as ece
-
-# for on-bot vision
-# from imutils.video import VideoStream
-# from imagezmq import imagezmq
-# from scripts.stoppableThreads import StoppableThread
-# import picamera
->>>>>>> eda82ced5361e3ea35f582ae5b65597b38983fe1
+from multiprocessing import Process, Manager, Value
+from ctypes import c_char_p
 
 # Create a UDP socket
 sock = socket(AF_INET, SOCK_DGRAM)
@@ -44,9 +36,7 @@ else:
     import scripts.pi_arduino as ece
     BOT_LIB_FUNCS = "pi_arduino"
 
-
-# global variable for on bot vision
-botVisionClient = None
+current_process = None
 
 
 def parse_command(cmd, tcpInstance):
@@ -57,6 +47,8 @@ def parse_command(cmd, tcpInstance):
          cmd (:obj:`str`): The command name.
          tcpInstance (:obj:`str`): Payload or contents of command.
     """
+    global current_process 
+
     comma = cmd.find(",")
     start = cmd.find("<<<<")
     end = cmd.find(">>>>")
@@ -77,6 +69,9 @@ def parse_command(cmd, tcpInstance):
             Thread(target=ece.right, args=[50]).start()
         else:
             Thread(target=ece.stop).start()
+            if current_process is not None:
+                current_process.terminate()
+
     elif key == "MODE":
         if value == "object_detection":
             print("Object Detection")
@@ -87,7 +82,7 @@ def parse_command(cmd, tcpInstance):
 
     elif key == "PORTS":
         ece.set_ports(value)
-        print("Set Ports")    
+        print("Set Ports")
 
     elif key == "SCRIPTS":
         # The script is always named bot_script.py.
@@ -102,29 +97,14 @@ def parse_command(cmd, tcpInstance):
                     file_dir + "/scripts/" + script_name, 'w+')
                 file.write(program)
                 file.close()
-<<<<<<< HEAD
-                return_value = spawn_script_process(script_name)
-                return return_value
-            except Exception as exception:
-                print("Exception occurred at compile time")
-                str_exception = str(type(exception)) + ": " + str(exception)
-                return str_exception
-=======
-                spawn_script_process(script_name)
-            except Exception as e:
-                print("Exception occured")
-                print(e)
-    elif key == "STARTBOTVISION":
-        print("On bot vision w/ server ip: " + server_ip)
-        # TODO: Thread is not working / needs to be tested
-        botVisionClient = StoppableThread(
-            target=startBotVisionClient, kwargs={'server_ip': server_ip}, daemon=True)
-        botVisionClient.start()
-    elif key == "STOPBOTVISION":
-        if (botVisionClient):
-            botVisionClient.stop()
-            botVisionClient = None
->>>>>>> eda82ced5361e3ea35f582ae5b65597b38983fe1
+                # Run the Python program in a different process so that we 
+                # don't need to wait for it to terminate and we can kill it
+                # whenever we want.
+                time.sleep(0.1)
+                current_process = Process(target=run_script, args=(script_name, tcpInstance))
+                current_process.start()
+            except Exception:
+                pass
 
 
 def process_string(value):
@@ -146,25 +126,12 @@ def process_string(value):
     return program
 
 
-def spawn_script_process(scriptname):
-    """
-    Creates a new thread to run the script process on.
-    Args:
-        scriptname (:obj:`str`): The name of the script to run.
-    """
-    time.sleep(0.1)
-
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        future = executor.submit(run_script, scriptname)
-        return_value = future.result()
-        return return_value
-
-
-def run_script(scriptname):
+def run_script(scriptname, tcp_instance):
     """
     Loads a script and runs it.
     Args:
-        scriptname (:obj:`str`): The name of the script to run.
+        scriptname (str): The name of the script to run.
+        tcp_instance (object): TCP object for communication.
     """
 
     # Cache invalidation and module refreshes are needed to ensure
@@ -176,13 +143,12 @@ def run_script(scriptname):
         script = importlib.import_module(script_name)
         importlib.reload(script)
         script.run()
-        return "Successful execution"
+        result = "Successful execution"
+        tcp_instance.send_to_basestation("ERRORMESSAGE", result)
     except Exception as exception:
-        print("Exception occurred at run time")
-        print(type(exception))
-        print(str(exception))
         str_exception = str(type(exception)) + ": " + str(exception)
-        return str_exception
+        result = str_exception
+        tcp_instance.send_to_basestation("ERRORMESSAGE", result)
 
 
 def start_base_station_heartbeat(ip_address):
@@ -207,7 +173,6 @@ def start_base_station_heartbeat(ip_address):
         time.sleep(9)
 
 
-<<<<<<< HEAD
 def main():
     try:
         server_ip = None
@@ -249,11 +214,7 @@ def main():
         tcp_instance = TCP()
         while True:
             time.sleep(0.01)
-            return_value = parse_command(tcp_instance.get_command(), tcp_instance)
-            # print("return_value is:")
-            # print(return_value)
-            if return_value is not None:
-                tcp_instance.send_to_basestation("RESULT", return_value)
+            parse_command(tcp_instance.get_command(), tcp_instance)
 
     finally:
         sock.close()
@@ -261,65 +222,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-=======
-def startBotVisionClient(server_ip):
-    import socket  # import needs to be here b/c same name as "from socket ..." on line 0
-    print("Entered the startBotVisionClient thread")
-
-    # initialize the ImageSender object with the socket address of server
-    sender = imagezmq.ImageSender(connect_to="tcp://{}:5555".format(server_ip))
-
-    # get the host name, initialize the video stream, and allow the
-    # camera sensor to warmup
-    rpiName = socket.gethostname()
-    vs = VideoStream(usePiCamera=True, resolution=(
-        240, 135), framerate=25).start()
-    # vs = VideoStream(src=0).start()
-    time.sleep(2.0)
-
-    while True:
-        # read the frame from the camera and send it to the server
-        frame = vs.read()
-        sender.send_image(rpiName, frame)
-
-
-try:
-    server_ip = None
-
-    # continuously try to connect to the base station
-    isTimeOut = True
-    while True:
-        # try connecting to the basestation every sec until connection is made
-        sock.settimeout(1.0)
-        while (isTimeOut):
-            try:
-                # Send data
-                print('sending: ' + message)
-                sent = sock.sendto(message.encode(), server_address)
-                # Receive response
-                print('waiting to receive')
-                data, server = sock.recvfrom(4096)
-                isTimeOut = False
-            except Exception as err:
-                print(err)
-
-        if data.decode('UTF-8') == 'i_am_the_base_station':
-            print('Received confirmation')
-            server_ip = str(server[0])
-            print('Server ip: ' + server_ip)
-            break
-        else:
-            print('Verification failed')
-            print('Trying again...')
-
-    base_station_thread = Thread(
-        target=start_base_station_heartbeat, args=(server_ip,), daemon=True
-    )
-    base_station_thread.start()
-    tcp_instance = TCP()
-    while True:
-        time.sleep(0.01)
-        parse_command(tcp_instance.get_command(), tcp_instance)
-finally:
-    sock.close()
->>>>>>> eda82ced5361e3ea35f582ae5b65597b38983fe1
