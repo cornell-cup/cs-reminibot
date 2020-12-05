@@ -132,28 +132,49 @@ def compute_dx_dy_all(img, detections, points, dim_lst, rows, cols, CANONICAL_TA
             else compute_canonical_diffs(img, detections, points, rows, cols, CANONICAL_TAG)
         )
         dim_lst = np.array(dim_lst)
+        widths = [l[0] for l in dim_lst]
+        heights = [h[1] for h in dim_lst]
+        if CANONICAL_TAG is not None:
+            X, Y = 0, 1
+            tag = detections[CANONICAL_TAG]
+            w_c = abs(tag.corners[0][X] - tag.corners[1][X])
+            h_c = abs(tag.corners[1][Y] - tag.corners[2][Y])
+        else:
+            w_c = statistics.mean(widths)
+            h_c = statistics.mean(heights)
+        x_dist = w_c * TAG_WIDTH / TAG_SIZE
+        y_dist = h_c * TAG_HEIGHT / TAG_SIZE
+        
         # print stats
+        print("POSITIONS")
         print(
             "dx: {}\ndy: {}\nx_m: {} y_m: {}".format(
                 None, None, max(dx) - min(dx), max(dy) - min(dy)
             )
         )
+        print("Percent Error X: {}% | Percent Error Y: {}%".format(
+            100 * statistics.mean(dx) / x_dist, 100 * statistics.mean(dy) / y_dist
+        ))
 
         # Compute stats for dim_lst
+        print("TAG DIMENSIONS")
         print(
             "dimension (w x h): \nmax_diff_w: {} max_diff_h: {}".format(
                 max(dim_lst[:, 0]) - min(dim_lst[:, 0]),
                 max(dim_lst[:, 1]) - min(dim_lst[:, 1]),
             )
         )
-        lengths = [item for sublist in dim_lst for item in sublist]
-
-        widths = [l[0] for l in dim_lst]
-        heights = [h[1] for h in dim_lst]
-        print("Widths: {}".format(widths))
-        print("Heights: {}".format(heights))
+        # print("Widths: {}".format(widths))
+        # print("Heights: {}".format(heights))
         print("Median width: {}".format(statistics.median(widths)))
         print("Median height: {}".format(statistics.median(heights)))
+        print("Percent Errors | width {}% | height {}%".format(
+            100 * statistics.mean([(w - w_c) / w_c for w in widths]),
+            100 * statistics.mean([(h - h_c) / h_c for h in heights])
+        ))
+        print("Std. Deviations | width {} | height {}".format(
+            statistics.stdev(widths), statistics.stdev(heights)
+        ))
     else:
         print("Not enough tag in detections")
 
