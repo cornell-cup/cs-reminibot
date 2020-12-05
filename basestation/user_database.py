@@ -38,18 +38,18 @@ class User(db.Model):
     password_digest = db.Column(db.String, nullable=False)
 
     # Custom Functions
-    custom_functions = db.Column(db.String, nullable=False)
+    custom_function = db.Column(db.String, nullable=False)
 
     def __init__(self, email, password):
         self.email = email
         self.password_digest = (
             bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt(rounds=13))
         )
-        self.custom_functions = "[]"
+        self.custom_function = "[]"
 
     def verify_password(self, password):
         # check the password against its hash that is stored in the database
-        return bcrypt.checkpw(password, self.password_digest)
+        return bcrypt.checkpw(password.encode('utf8'), self.password_digest)
 
     def serialize(self):
         return{

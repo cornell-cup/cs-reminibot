@@ -3,7 +3,7 @@ Base Station for the MiniBot.
 """
 
 from basestation.bot import Bot
-from basestation.user_database import User
+from basestation.user_database import Program, User
 from basestation import db
 
 from random import choice
@@ -223,6 +223,8 @@ class BaseStation:
             return -1, None
         if not user.verify_password(password):
             return 0, None
+        self.login_email = email
+        print(user.custom_function)
         return 1, user.custom_function
     
     def register(self, email, password) -> int:
@@ -239,8 +241,15 @@ class BaseStation:
         db.session.add(user)
         db.session.commit()
         return 1
-        
+    
+    def update_custom_function(self, custom_function):
+        if not self.login_email:
+            return False
 
+        user = User.query.filter(User.email == self.login_email).first()
+        user.custom_function = custom_function
+        db.session.commit()
+        return True
     
     @property
     def login_email(self):

@@ -48,7 +48,6 @@ class PythonTextBox extends React.Component {
         this.handleTab = this.handleTab.bind(this);
         this.run_script = this.run_script.bind(this);
         this.upload = this.upload.bind(this);
-        this.view_history = this.view_history.bind(this);
     }
     /* Target function for the button "Cope Code". Set the text
          in the editing box according to blockly. */
@@ -117,10 +116,6 @@ class PythonTextBox extends React.Component {
         reader.readAsText(file);
     }
 
-    view_history(event) {
-        window.open("/program/")
-    }
-
     /* Target function for the button "Run Code". Send python code
          in the editing box to backend. */
     run_script(event) {
@@ -154,7 +149,7 @@ class PythonTextBox extends React.Component {
          * Repeatedly call the ErrorMessageHandler in base_station_interface.py
          * until a non-empty execution result of the Python program is received. 
          */
-        let interval = setInterval(function() {
+        let interval = setInterval(function () {
             console.log(_this.props);
             console.log(_this.props.selectedBotName);
             axios({
@@ -174,11 +169,11 @@ class PythonTextBox extends React.Component {
                     if (response.data["code"] !== -1) {
                         if (response.data["code"] === 1) {
                             // lime green 
-                            document.getElementById("errormessage").style.color="#32CD32";
+                            document.getElementById("errormessage").style.color = "#32CD32";
                         }
                         else {
                             // red
-                            document.getElementById("errormessage").style.color="#FF0000";
+                            document.getElementById("errormessage").style.color = "#FF0000";
                         }
                         // result has arrived so go ahead and clear the interval (stop polling
                         // the server)
@@ -188,7 +183,7 @@ class PythonTextBox extends React.Component {
                 .catch((err) => {
                     console.log(err)
                 })
-            }, 500);
+        }, 500);
     }
 
     render() {
@@ -240,7 +235,6 @@ class PythonTextBox extends React.Component {
                 </div>
                 <div id="AdditionalButtons" className="horizontalDiv">
                     <Button id={"run"} onClick={this.run_script} name={"Run"} />
-                    <Button id={"history"} onClick={this.view_history} name={"View History"} />
                     <Button id={"copy"} onClick={this.copy} name={"Copy Code From Blockly"} />
                     <div> <textarea id="errormessage" rows="1" cols="60" /></div>
                     <div> <textarea style={{ color: 'blue' }} id="time" rows="1" cols="20" /></div>
@@ -676,7 +670,7 @@ export default class MinibotBlockly extends React.Component {
             headers: { 'Content-Type': 'multipart/form-data' }
         }).then((response) => {
             _this.props.redefineCustomBlockList(
-            JSON.parse(response.data.custom_function));
+                JSON.parse(response.data.custom_function));
             // invokes component did update
             this.setState({
                 login_email: formData.get("email"),
@@ -686,8 +680,8 @@ export default class MinibotBlockly extends React.Component {
             });
 
             // Add the custom functions that 
-            user_custom_functions = JSON.parse(response.data.custom_function);
-            _this.props.customBlockList.push(user_custom_functions)
+            user_custom_function = JSON.parse(response.data.custom_function);
+            _this.props.customBlockList.push(user_custom_function)
 
             _this.redefine_custom_blocks();
             _this.update_custom_blocks();
