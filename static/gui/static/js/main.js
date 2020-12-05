@@ -6,7 +6,8 @@ import ReactDOM from 'react-dom';
 import GridView from './components/gridview.js';
 import Blockly from './components/blockly.js';
 import AddBot from './components/AddBot.js';
-import Dashboard from './components/dashboard.js'
+import Dashboard from './components/dashboard.js';
+import ObjectClassification from './components/Object.js';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 
 /**
@@ -77,6 +78,7 @@ class Platform extends React.Component {
             <Tab>Setup</Tab>
             <Tab>Coding/Control</Tab>
             <Tab>Analytics</Tab>
+            <Tab>Object Classification</Tab>
           </TabList>
 
           <TabPanel>
@@ -108,6 +110,9 @@ class Platform extends React.Component {
             <Dashboard>
 
             </Dashboard>
+          </TabPanel>
+          <TabPanel>
+            <ObjectClassification />
           </TabPanel>
         </Tabs>
       </div>

@@ -12,6 +12,7 @@ import sys
 import time
 import re  # regex import
 import requests
+import subprocess
 
 # Minibot imports.
 from base_station import BaseStation
@@ -52,7 +53,8 @@ class BaseInterface:
             )),
             ("/vision", VisionHandler, dict(base_station=self.base_station)),
             ("/heartbeat", HeartbeatHandler, dict(base_station=self.base_station)),
-            ("/result", ErrorMessageHandler, dict(base_station=self.base_station))
+            ("/result", ErrorMessageHandler, dict(base_station=self.base_station)),
+            ("/builtin-script", BuiltinScriptHandler, dict(base_station=self.base_station))
         ]
 
     def start(self):
@@ -127,7 +129,7 @@ class ClientHandler(tornado.web.RequestHandler):
         elif key == "PORTS":
             # leftmotor = data['leftmotor']
             bot_id = self.base_station.bot_name_to_bot_id(data['bot_name'])
-            
+
             portarray = data['ports']
             for x in portarray:
                 print(x)
@@ -218,8 +220,8 @@ class ClientHandler(tornado.web.RequestHandler):
         }
 
         # functions that run continuously, and hence need to be started
-        # in a new thread on the Minibot otherwise the Minibot will get 
-        # stuck in an infinite loop and will be unable to receive 
+        # in a new thread on the Minibot otherwise the Minibot will get
+        # stuck in an infinite loop and will be unable to receive
         # other commands
         threaded_functions = [
             "fwd",
@@ -233,7 +235,7 @@ class ClientHandler(tornado.web.RequestHandler):
         # Regex is for bot-specific functions (move forward, stop, etc)
         # 1st group is the whitespace (useful for def, for, etc),
         # 2nd group is for func name, 3rd group is for args,
-        # 4th group is for anything else (additional whitespace, 
+        # 4th group is for anything else (additional whitespace,
         # ":" for end of if condition, etc)
         pattern = r"(.*)bot.(\w*)\((.*)\)(.*)"
         regex = re.compile(pattern)
@@ -306,6 +308,105 @@ class ErrorMessageHandler(tornado.websocket.WebSocketHandler):
         print("error_json is: ")
         print(error_json)
         self.write(json.dumps(error_json).encode())
+
+'''
+Static vars for the Built-In Script Handler. initialize() is called each time
+a request is made to the BuiltInScriptHandler, so I leave this out to be
+defined "statically".
+Elements:
+    :procs  The processes as a mapping from
+            (request_id : str) => (subprocess.Popen object)
+    :next_req_id The next request_id to add a new process to the procs list.
+'''
+script_handler_props = {
+    "procs": dict(),
+    "next_req_id": 0
+}
+
+
+class BuiltinScriptHandler(tornado.web.RequestHandler):
+
+    def initialize(self, base_station):
+        self.base_station = base_station
+        self.props = script_handler_props
+
+    def set_default_headers(self):
+        return self.set_header("Content-Type", 'application/json')
+
+    """
+    Format for START requests:
+    {
+        op: 'START'
+        path: <path to script to run, relative to root directory>
+        script_name: <file to run>
+        args: {
+            <flag> : <value>
+            ...
+        }
+    }
+
+    """
+
+    def make_cmd_str(self, req):
+        # paths start from root directory
+        script_name = "../" + req['path'] + "/" + req['script_name'] + " "
+        args = ""
+        for k in req['args'].keys():
+            # add on any args
+            args += "-{} {} ".format(k, req['args'][k])
+        return script_name + args
+
+    def post(self):
+        req = json.loads(self.request.body.decode())
+        res = None  # send this back to client
+
+        # Check that our JSON is good
+        if req['op'] == None:
+            self.set_status(400, reason="missing op")
+        elif req['op'] != 'START' and req['op'] != "STOP":
+            self.set_status(400, reason="op must be START or STOP")
+        elif req['op'] == 'START':
+            # Start the requested script
+            # TODO test for speed
+
+            # Prep next id and command for new process to execute
+            n = self.props['next_req_id']
+            py_cmd_str = ("python3 " + self.make_cmd_str(req))
+            py_cmd = list(filter(lambda x: x != "", py_cmd_str.split(" ")))
+            print("ARGS: {}".format(py_cmd))
+            print("Starting process: " + py_cmd_str)
+
+            # Create the requested script's own process, and add it to the list
+            # of procs.
+            self.props['procs'][str(
+                n)] = subprocess.Popen(py_cmd)
+
+            # Respond to the client
+            res = {
+                "status": "OK",
+                "handle": self.props['next_req_id']
+            }
+            self.props['next_req_id'] += 1
+            self.write(json.dumps(res).encode())
+            self.set_status(200)
+
+        elif req['op'] == 'STOP':
+            # Stop a script
+            script_name = "../" + req['path'] + "/" + req['script_name']
+
+            if req['handle'] == None:
+                self.set_status(400, reason="missing handle")
+            elif str(req['handle']) not in self.props['procs'].keys():
+                print(
+                    "Cannot stop non-existent process at handle {}".format(req['handle']))
+                self.set_status(404, reason="Handle does not exist")
+            else:
+                self.props['procs'][str(req['handle'])].kill()
+                print("Stopped process with handle {} running {}".format(
+                    req['handle'], script_name))
+                self.set_status(200)
+        else:
+            self.set_status(400)
 
 
 if __name__ == "__main__":
