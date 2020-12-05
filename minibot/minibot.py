@@ -119,14 +119,14 @@ class Minibot:
         # randomly chosen as the port to bind to
         self.listener_sock.bind(("", 10000))
         # Make socket start listening
-        print("Waiting for TCP connection from basestation")
+        print("Waiting for TCP connection from basestation", flush=True)
         self.listener_sock.listen()
 
     def broadcast_to_base_station(self):
         """ Establishes a TCP connection to the basestation.  This connection is 
         used to receive commands from the basestation, and send replies if necessary
         """
-        print("Broadcasting message to basestation.")
+        print("Broadcasting message to basestation.", flush=True)
         # try connecting to the basestation every 2 sec until connection is made
         self.broadcast_sock.settimeout(2.0)
         data = ""
@@ -139,7 +139,7 @@ class Minibot:
             )
             data = self.broadcast_sock.recv(4096)
         except timeout:
-            print("Timed out")
+            print("Timed out", flush=True)
 
         # TODO this security policy is stupid.  We should be doing
         # authentication after we create the TCP connection and also we should
@@ -149,12 +149,12 @@ class Minibot:
         # Minibot system.
         if data:
             if data.decode('UTF-8') == 'i_am_the_base_station':
-                print("Basestation replied!")
+                print("Basestation replied!", flush=True)
             else:
                 # if verification fails we just print but don't do anything
                 # about the fact that verification failed.  Please fix when
                 # rewriting the security policy
-                print('Verification failed.')
+                print('Verification failed.', flush=True)
 
     def handle_readable_socks(self, read_ready_socks: List[socket]):
         """ Reads from each of the sockets that have received some data.  
@@ -171,7 +171,7 @@ class Minibot:
             if sock is self.listener_sock:
                 connection, base_station_addr = sock.accept()
                 print(
-                    f"Connected to base station with address {base_station_addr}"
+                    f"Connected to base station with address {base_station_addr}", flush=True
                 )
                 # set to non-blocking reads (when we call connection.recv,
                 # should read whatever is in its buffer and return immediately)
@@ -192,7 +192,6 @@ class Minibot:
                         Minibot.SOCKET_BUFFER_SIZE).decode("utf-8")
                 except ConnectionResetError:
                     data_str = ""
-
                 if data_str:
                     self.parse_and_execute_commands(sock, data_str)
                 else:
@@ -225,7 +224,7 @@ class Minibot:
                 All sockets that have errored out
         """
         for sock in errored_out_socks:
-            print(f"Socket errored out!!!! {sock}")
+            print(f"Socket errored out!!!! {sock}", flush=True)
             # TODO handle more conditions instead of just
             self.close_sock(sock)
             # closing the socket
@@ -237,7 +236,7 @@ class Minibot:
         sock.close()
     
     def basestation_disconnected(self, basestation_sock):
-        print("Basestation Disconnected")
+        print("Basestation Disconnected", flush=True)
         Thread(target=ece.stop).start()
         self.close_sock(basestation_sock)
         self.bs_repr = None
@@ -326,6 +325,7 @@ class Minibot:
                 )
                 current_process.start()
         elif key == "WHEELS":
+            # print("key WHEELS", flush=True)
             cmds_functions_map = {
                 "forward": ece.fwd,
                 "backward": ece.back,
@@ -391,7 +391,7 @@ class Minibot:
             result.value = str_exception
 
     def sigint_handler(self, sig, frame):
-        print("Minibot received CTRL + C")
+        print("Minibot received CTRL + C", flush=True)
         self.listener_sock.close()
         self.broadcast_sock.close()
         sys.exit(0)
