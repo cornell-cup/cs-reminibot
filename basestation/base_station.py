@@ -2,6 +2,10 @@
 Base Station for the MiniBot.
 """
 
+from basestation.bot import Bot
+from basestation.user_database import User
+from basestation import db
+
 from random import choice
 from string import digits, ascii_lowercase, ascii_uppercase
 import os
@@ -11,7 +15,6 @@ import socket
 import sys
 import time
 import threading
-from basestation.bot import Bot
 
 MAX_VISION_LOG_LENGTH = 1000
 
@@ -52,6 +55,8 @@ class BaseStation:
             self.sock.bind(server_address)
         else:
             self.sock.bind(server_address)
+        
+        self._login_email = None
 
 
     # ==================== VISION ====================
@@ -204,3 +209,43 @@ class BaseStation:
         bot.readKV()
         # this value might be None if the bot hasn't replied yet
         return bot.script_exec_result
+
+    # ==================== DATABASE ====================
+    def login(self, email, password):
+        if not email:
+            return -1, None
+        if not password:
+            return 0, None
+
+        user = User.query.filter(User.email == email).first()
+        # email does not exist
+        if not user:
+            return -1, None
+        if not user.verify_password(password):
+            return 0, None
+        return 1, user.custom_function
+    
+    def register(self, email, password) -> int:
+        if not email:
+            return -1
+        if not password:
+            return 0
+
+        user = User.query.filter(User.email == email).first()
+        # user should not exist if we want to register a new account
+        if user:
+            return -2
+        user = User(email=email, password=password)
+        db.session.add(user)
+        db.session.commit()
+        return 1
+        
+
+    
+    @property
+    def login_email(self):
+        return self._login_email
+    
+    @login_email.setter
+    def login_email(self, email: str):
+        self._login_email = email

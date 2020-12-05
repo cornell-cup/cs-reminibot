@@ -2,7 +2,8 @@
 Main file from which BaseStation Websocket interface begins.
 """
 
-from flask import Flask, request, render_template, jsonify, session, redirect
+from flask import Flask
+from flask import request, render_template, jsonify, session, redirect
 from flask_api import status
 import os.path
 import json
@@ -10,10 +11,8 @@ import sys
 import time
 
 # Minibot imports.
-from basestation.flask_db import db, Program, User
 from basestation.base_station import BaseStation
 from basestation import app
-import basestation.flask_db as blockly_app
 
 base_station = BaseStation(app.debug)
 
@@ -22,18 +21,16 @@ def start():
     """ Display the WebGUI """
     return render_template('index.html')
 
-
 @app.route('/discover-bots', methods=['GET'])
 def discover_bots():
     """ Get all Minibots connected to the Basestation """
     base_station.listen_for_minibot_broadcast()
-    return json.dumps(True)
-
+    return json.dumps(True), status.HTTP_200_OK
 
 @app.route('/active-bots', methods=['GET'])
 def active_bots():
     """ Get all Minibots connected to the Basestation """
-    return json.dumps(base_station.get_active_bots())
+    return json.dumps(base_station.get_active_bots()), status.HTTP_200_OK
 
 @app.route('/wheels', methods=['POST'])
 def wheels():
@@ -43,7 +40,7 @@ def wheels():
     direction = data['direction']
     power = data['power']
     base_station.move_bot_wheels(bot_name, direction, power)
-    return json.dumps(True)
+    return json.dumps(True), status.HTTP_200_OK
 
 
 @app.route('/script', methods=['POST'])
@@ -53,8 +50,7 @@ def script():
     bot_name = data['bot_name']
     script_code = data['script_code']
     base_station.send_bot_script(bot_name, script_code)
-    return json.dumps(True)
-
+    return json.dumps(True), status.HTTP_200_OK
 
 @app.route('/ports', methods=['POST'])
 def ports():
@@ -65,7 +61,7 @@ def ports():
     bot_name = data['bot_name']
     ports = data['ports']
     base_station.set_bot_ports(bot_name, ports)
-    return json.dumps(True)
+    return json.dumps(True), status.HTTP_200_OK
 
 @app.route('/mode', methods=['POST'])
 def mode():
@@ -74,21 +70,17 @@ def mode():
     bot_name = data['bot_name']
     mode = data['mode']
     base_station.set_bot_mode(bot_name, mode)
-    return json.dumps(True)
-    
+    return json.dumps(True), status.HTTP_200_OK
 
-
-@app.route('/vision', methods=['GET'])
-def vision_get():
-    return json.dumps(base_station.get_vision_data())
-
-
-@app.route('/vision', methods=['POST'])
-def vision_post():
-    info = request.get_json()
-    base_station.update_vision_log(info)
-    return json.dumps(True)
-
+@app.route('/vision', methods=['POST', 'GET'])
+def vision():
+    if request.method == 'POST':
+        info = request.get_json()
+        print(info)
+        base_station.update_vision_log(info)
+        return json.dumps(True), status.HTTP_200_OK
+    else:
+        return json.dumps(base_station.get_vision_data()), status.HTTP_200_OK
 
 @app.route('/result', methods=['POST'])
 def error_message_update():
@@ -101,27 +93,59 @@ def error_message_update():
         code = 1
     else:                                              
         code = 0
-    return json.dumps({"result": script_exec_result, "code": code})
+    response_dict = {"result": script_exec_result, "code": code}
+    return json.dumps(response_dict), status.HTTP_200_OK
 
-@ app.route("/program")
+@app.route('/login/', methods=['POST'])
+def login():
+    email = request.form['email']
+    password = request.form['password']
+    response_dict = {"error_msg": "", "custom_functions": None}
+    login_status, user_custom_functions = base_station.login(email, password)
+    if login_status == -1:
+        response_dict["error_msg"] = "Invalid email"
+        response_status = status.HTTP_401_UNAUTHORIZED
+    elif login_status == 0:
+        response_dict["error_msg"] = "Invalid password"
+        response_status = status.HTTP_401_UNAUTHORIZED
+    else:
+        response_dict["custom_functions"] = user_custom_functions
+        response_status = status.HTTP_200_OK
+    return json.dumps(response_dict), response_status
+
+@app.route('/register/', methods=['POST'])
+def register_account():
+    email = request.form['email']
+    password = request.form['password']
+    print(type(password))
+    print(password)
+    response_dict = {"error_msg": ""}
+    login_status = base_station.register(email, password)
+    if login_status == -2:
+        response_dict["error_msg"] = "Email already exists"
+        response_status = status.HTTP_409_CONFLICT
+    if login_status == -1:
+        response_dict["error_msg"] = "Invalid email"
+        response_status = status.HTTP_401_UNAUTHORIZED
+    elif login_status == 0:
+        response_dict["error_msg"] = "Invalid password"
+        response_status = status.HTTP_401_UNAUTHORIZED
+    else:
+        response_status = status.HTTP_200_OK
+    return json.dumps(response_dict), response_status
+
+@app.route("/program")
 def get_program():
     programs = Program.query.all()
-    for program in programs:
-        print(program.serialize())
     return json.dumps({'data': [program.serialize() for program in programs]})
 
 
-@ app.route("/code", methods=['POST'])
+@app.route("/code", methods=['POST'])
 def post_code():
-    print("can you see me")
     global login_email
-    print("login_in email: " + login_email)
     data = request.get_json()
     t = time.localtime()
     current_time = time.strftime("%H:%M:%S", t)
-    print(data)
-    print(current_time)
-    print(login_email)
     program = Program(
         code=data.get('value'),
         time=current_time,
@@ -133,62 +157,6 @@ def post_code():
     return json.dumps(data)
 
 
-@app.route('/register/', methods=['POST'])
-def register_account():
-    email = request.form['email']
-    password = request.form['password']
-
-    if not email:
-        return json.dumps({'error': 'Invalid email'}), 404
-    if not password:
-        return json.dumps({'error': 'Invalid password'}), 404
-
-    created, user = blockly_app.create_user(email, password)
-
-    if not created:
-        return json.dumps({'error': 'User already exists'}), 404
-
-    print("session_token: " + user.session_token)
-    print("session_expiration" + str(user.session_expiration))
-    print("update_token" + user.update_token)
-    print("user_id" + str(user.id))
-
-    return json.dumps({
-        'session_token': user.session_token,
-        'session_expiration': str(user.session_expiration),
-        'update_token': user.update_token,
-        'user_id': user.id,
-        'email': email
-    })
-
-
-@app.route('/login/', methods=['POST'])
-def login():
-    global login_email
-    email = request.form['email']
-    password = request.form['password']
-
-    if not email:
-        return json.dumps({'error': 'Invalid email'}), 404
-
-    if not password:
-        return json.dumps({'error': 'Invalid password'}), 404
-
-    success, user = blockly_app.verify_credentials(email, password)
-
-    if not success:
-        return json.dumps({'error': 'Incorrect email or password'}), 404
-
-    print("success" + email)
-    login_email = email
-    return json.dumps({
-        'session_token': user.session_token,
-        'session_expiration': str(user.session_expiration),
-        'update_token': user.update_token,
-        'user_id': user.id,
-        'email': email,
-        'custom_function': user.custom_function
-    })
 
 
 @app.route('/logout/', methods=['POST'])
@@ -204,33 +172,9 @@ def logout():
     return content, status.HTTP_200_OK
 
 
-@app.route('/session/', methods=['POST'])
-def update_session():
-    success, update_token = blockly_app.extract_token(request)
-
-    if not success:
-        return update_token
-
-    try:
-        user = blockly_app.renew_session(update_token)
-    except:
-        return json.dumps({'error': 'Invalid update token'})
-
-    return json.dumps({
-        'session_token': user.session_token,
-        'session_expiration': str(user.session_expiration),
-        'update_token': user.update_token
-    })
-
-
 @app.route('/custom_function/', methods=['POST'])
 def update_custom_function():
-    session_token = request.form['session_token']
     custom_function = request.form['custom_function']
-
-    if not session_token or not custom_function:
-        print("error: Missing session_token or custom_function")
-        return json.dumps({'error': 'Missing session_token or custom_function'}), 404
 
     success, res = blockly_app.update_custom_function_by_session_token(
         session_token, custom_function)

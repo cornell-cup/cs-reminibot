@@ -7,10 +7,8 @@ from socket import socket, timeout, AF_INET, SOCK_STREAM, SOCK_DGRAM
 from socket import SOL_SOCKET, SO_REUSEADDR, SO_BROADCAST
 from threading import Thread
 from typing import List, Tuple
-import ast
 import importlib
 import os
-import struct
 import sys
 import time
 import argparse

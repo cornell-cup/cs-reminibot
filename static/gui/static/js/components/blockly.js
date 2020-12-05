@@ -279,7 +279,6 @@ export default class MinibotBlockly extends React.Component {
             function_name: "default_function",
             coding_start: -1,
             isLoggedIn: false,
-            sessionToken: "",
             loginErrorLabel: "",
             loginSuccessLabel: "",
             registerErrorLabel: "",
@@ -325,7 +324,6 @@ export default class MinibotBlockly extends React.Component {
     update_custom_blocks() {
         if (!this.state.isLoggedIn) return;
         var formData = new FormData();
-        formData.append("session_token", this.state.sessionToken);
         formData.append("custom_function", JSON.stringify(this.props.customBlockList));
         axios({
             method: 'post',
@@ -610,7 +608,6 @@ export default class MinibotBlockly extends React.Component {
             .then((response) => {
                 this.setState({
                     login_email: "",
-                    sessionToken: "",
                     loginSuccessLabel: "",
                     loginErrorLabel: "",
                     registerSuccessLabel: "",
@@ -653,69 +650,56 @@ export default class MinibotBlockly extends React.Component {
             url: '/register/',
             data: formData,
             headers: { 'Content-Type': 'multipart/form-data' }
-        })
-            .then((response) => {
-                this.setState({
-                    registerSuccessLabel: "Registered successfully!",
-                    registerErrorLabel: ""
-                });
-            })
-            .catch((error) => {
-                console.log("fail");
-                this.setState({
-                    login_email: "",
-                    registerSuccessLabel: "",
-                    registerErrorLabel: error.response.data['error']
-                });
-                console.log(error);
+        }).then((response) => {
+            this.setState({
+                registerSuccessLabel: "Registered successfully!",
+                registerErrorLabel: ""
             });
+        }).catch((error) => {
+            this.setState({
+                login_email: "",
+                registerSuccessLabel: "",
+                registerErrorLabel: error.response.data.error_msg
+            });
+            console.log(error);
+        });
     }
 
     handleLogin(event) {
         const _this = this;
-        var formData = new FormData(document.getElementById("loginForm"));
-        var temp = _this.props.customBlockList;
-        console.log("before login");
-        console.log(_this.props.customBlockList);
+        let formData = new FormData(document.getElementById("loginForm"));
+        let blockList = _this.props.customBlockList;
         axios({
             method: 'post',
             url: '/login/',
             data: formData,
             headers: { 'Content-Type': 'multipart/form-data' }
-        })
-            .then((response) => {
-                _this.props.redefineCustomBlockList(
-                    JSON.parse(response.data.custom_function));
-                // invokes component did update
-                this.setState({
-                    login_email: formData.get("email"),
-                    sessionToken: response.data.session_token,
-                    loginSuccessLabel: "Login Success",
-                    loginErrorLabel: "",
-                    isLoggedIn: true,
-                });
-                // _this.props.customBlockList.push(JSON.parse(response.data.custom_function))[0];
-                if (temp[0][0] !== _this.state.emptyFunctionName && _this.props.customBlockList[0][0] !== _this.state.emptyFunctionName) {
-                    _this.props.customBlockList.push.apply(_this.props.customBlockList, temp);
-                }
-                if (temp[0][0] !== _this.state.emptyFunctionName && _this.props.customBlockList[0][0] === _this.state.emptyFunctionName) {
-                    _this.props.customBlockList.splice(0, 1);
-                    _this.props.customBlockList.push.apply(_this.props.customBlockList[0], temp);
-                }
-                console.log("login");
-                console.log(_this.props.customBlockList);
-                _this.redefine_custom_blocks();
-                _this.update_custom_blocks();
-            })
-            .catch((error) => {
-                console.log("fail");
-                this.setState({
-                    login_email: "",
-                    loginSuccessLabel: "",
-                    loginErrorLabel: error.response.data['error']
-                });
-                console.log(error);
+        }).then((response) => {
+            _this.props.redefineCustomBlockList(
+            JSON.parse(response.data.custom_function));
+            // invokes component did update
+            this.setState({
+                login_email: formData.get("email"),
+                loginSuccessLabel: "Login Success",
+                loginErrorLabel: "",
+                isLoggedIn: true,
             });
+
+            // Add the custom functions that 
+            user_custom_functions = JSON.parse(response.data.custom_function);
+            _this.props.customBlockList.push(user_custom_functions)
+
+            _this.redefine_custom_blocks();
+            _this.update_custom_blocks();
+        }).catch((error) => {
+            // Typically due to invalid username / password 
+            this.setState({
+                login_email: "",
+                loginSuccessLabel: "",
+                loginErrorLabel: error.response.data.error_msg
+            });
+            console.log(error);
+        });
     }
 
 
