@@ -5,7 +5,6 @@ from subprocess import Popen
 
 
 class TestMinibot:
-
     SOCKET_BUFFER_SIZE = 1024
     START_CMD_TOKEN = "<<<<"
     END_CMD_TOKEN = ">>>>"
@@ -85,7 +84,7 @@ class TestMinibot:
         self.send_ports("LMOTOR 2")
         assert self.check_for_minibot_output("2\n")
         print("Ports test passed!\n")
-    
+
     def test_connectivity(self):
         """ Tests whatever 
         """
