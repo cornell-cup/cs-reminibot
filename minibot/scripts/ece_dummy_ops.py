@@ -100,7 +100,7 @@ def transmit_once(cmd):
     """
     for char in cmd:
         time.sleep(0.1)
-        print(char)
+        print(char, flush=True)
         # spi.writebytes([ord(char)])
 
 def transmit_continuously(cmd):

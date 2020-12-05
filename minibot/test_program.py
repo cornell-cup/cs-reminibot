@@ -1,4 +1,5 @@
 import time
 
 while True:
-    print("output")
+    print("output", flush=True)
+    time.sleep(1)
