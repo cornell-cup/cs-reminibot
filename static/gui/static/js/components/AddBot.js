@@ -51,8 +51,8 @@ class RefreshingList extends React.Component {
         }
 
         return (
-            <select 
-                onChange={(e) => this.updateCurrentBot(e)} 
+            <select
+                onChange={(e) => this.updateCurrentBot(e)}
                 onClick={this.discoverBots}
             >
                 {_this.state.availableBots.map(

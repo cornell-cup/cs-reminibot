@@ -9,7 +9,6 @@ from basestation import db
 from random import choice
 from string import digits, ascii_lowercase, ascii_uppercase
 import os
-import psutil
 import re
 import socket
 import sys
