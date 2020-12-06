@@ -461,7 +461,7 @@ export default class AddBot extends React.Component {
         }
     }
 
-    getonData() {
+    getVisionData() {
         const _this = this;
         axios({
             method: 'GET',
