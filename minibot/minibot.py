@@ -25,6 +25,9 @@ class Minibot:
     """
 
     # address refers to ip_address and port
+    # 255.255.255.255 to indicate that we are broadcasting to all addresses
+    # on port 9434.  The Basestation has been hard-coded to listen on port 9434
+    # for incoming Minibot broadcasts
     BROADCAST_ADDRESS = ('255.255.255.255', 9434)
     MINIBOT_MESSAGE = "i_am_a_minibot"
     BASESTATION_MESSAGE = "i_am_the_basestation"
@@ -33,7 +36,7 @@ class Minibot:
     START_CMD_TOKEN = "<<<<"
     END_CMD_TOKEN = ">>>>"
 
-    def __init__(self):
+    def __init__(self, port_number: int):
         # Create a UDP socket.  We want to establish a TCP (reliable) connection
         # between the basestation and the
         self.broadcast_sock = socket(AF_INET, SOCK_DGRAM)
@@ -43,6 +46,7 @@ class Minibot:
         self.broadcast_sock.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
         # listens for a TCP connection from the basestation
         self.listener_sock = None
+        self.port_number = port_number
 
         # Note:  The same socket can be in the readable_socks, writeable_socks
         # and errorable_socks i.e. the intersection of these lists does not need
@@ -117,7 +121,7 @@ class Minibot:
         self.listener_sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
         # "" means bind to all addresses on this device.  Port 10000 was
         # randomly chosen as the port to bind to
-        self.listener_sock.bind(("", 10000))
+        self.listener_sock.bind(("", self.port_number))
         # Make socket start listening
         print("Waiting for TCP connection from basestation", flush=True)
         self.listener_sock.listen()
@@ -131,12 +135,10 @@ class Minibot:
         self.broadcast_sock.settimeout(2.0)
         data = ""
         # broadcast message to basestation
+        msg_byte_str = f"{Minibot.MINIBOT_MESSAGE} {self.port_number}".encode()
         try:
-            message_byte_str = Minibot.MINIBOT_MESSAGE.encode()
             # use sendto() instead of send() for UDP
-            self.broadcast_sock.sendto(
-                message_byte_str, Minibot.BROADCAST_ADDRESS
-            )
+            self.broadcast_sock.sendto(msg_byte_str, Minibot.BROADCAST_ADDRESS)
             data = self.broadcast_sock.recv(4096)
         except timeout:
             print("Timed out", flush=True)
@@ -238,7 +240,9 @@ class Minibot:
     def basestation_disconnected(self, basestation_sock):
         print("Basestation Disconnected", flush=True)
         Thread(target=ece.stop).start()
+        print(basestation_sock)
         self.close_sock(basestation_sock)
+        print(self.readable_socks)
         self.bs_repr = None
 
     def parse_and_execute_commands(self, sock: socket, data_str: str):
@@ -398,10 +402,13 @@ class Minibot:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description='Take in arguments for minibot')
-    parser.add_argument('-t', action="store_true",
-                        dest="is_simulation", default=False)
+    parser = argparse.ArgumentParser(description='Arguments for Minibot')
+    parser.add_argument(
+        '-t', action="store_true", dest="is_simulation", default=False
+    )
+    parser.add_argument(
+        '-p', type=int, dest="port_number", default=10000
+    )
     args = parser.parse_args()
 
     if args.is_simulation:
@@ -411,5 +418,5 @@ if __name__ == "__main__":
         import scripts.pi_arduino as ece
         BOT_LIB_FUNCS = "pi_arduino"
 
-    minibot = Minibot()
+    minibot = Minibot(args.port_number)
     minibot.main()

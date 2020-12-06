@@ -37,6 +37,9 @@ class BaseStation:
             "fwd", "back", "right", "left", "stop", "ECE_wheel_pwr"
         ]
 
+        # This socket is used to listen for new incoming Minibot broadcasts
+        # The Minibot broadcast will allow us to learn the Minibot's ipaddress
+        # so that we can connect to the Minibot
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         # an arbitrarily small time
@@ -96,21 +99,35 @@ class BaseStation:
         request_password = "i_am_a_minibot"
 
         buffer_size = 4096
+
+        # Continuously read from the socket, collecting every single broadcast
+        # message sent by every Minibot
+        address_data_map = {}
         try:
             data, address = self.sock.recvfrom(buffer_size)
+            while data:
+                data = str(data.decode('UTF-8'))
+                address_data_map[address] = data
+                data, address = self.sock.recvfrom(buffer_size)
+        # nothing to read
         except socket.timeout:
-            data, address = b"", None
-        data = str(data.decode('UTF-8'))
+            pass
 
-        if data == request_password:
-            # Tell the minibot that you are the base station
-            self.sock.sendto(response.encode(), address)
-            self.add_bot(port=10000, ip_address=address[0])
+        for address in address_data_map:
+            # data should consist of "password port_number" 
+            data_lst = address_data_map[address].split(" ")
+
+            if data_lst[0] == request_password:
+                # Tell the minibot that you are the base station
+                self.sock.sendto(response.encode(), address)
+                self.add_bot(ip_address=address[0], port=data_lst[1])
 
     def add_bot(self, port: int, ip_address: str, bot_name: str = None):
         """ Adds a bot to the list of active bots """
         if not bot_name:
-            bot_name = f"minibot{ip_address[-3:].replace('.', '')}"
+            # bot name is "minibot" + <last three digits of ip_address> + "_" +
+            # <port number>
+            bot_name = f"minibot{ip_address[-3:].replace('.', '')}_{port}"
         self.active_bots[bot_name] = Bot(bot_name, ip_address, port)
     
     def get_active_bots(self):
