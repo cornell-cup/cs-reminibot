@@ -112,7 +112,9 @@ class BaseStation:
         # nothing to read
         except socket.timeout:
             pass
-
+        
+        # create a new Minibot object to represent each Minibot that sent a
+        # broadcast to the basestation
         for address in address_data_map:
             # data should consist of "password port_number" 
             data_lst = address_data_map[address].split(" ")
