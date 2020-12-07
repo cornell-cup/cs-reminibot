@@ -83,7 +83,6 @@ def mode():
 def vision():
     if request.method == 'POST':
         info = request.get_json()
-        print(info)
         base_station.update_vision_log(info)
         return json.dumps(True), status.HTTP_200_OK
     else:
@@ -120,6 +119,8 @@ def login():
     else:
         response_dict["custom_function"] = user_custom_function
         response_status = status.HTTP_200_OK
+    print(response_status)
+    print(response_dict)
     return json.dumps(response_dict), response_status
 
 
@@ -127,8 +128,6 @@ def login():
 def register_account():
     email = request.form['email']
     password = request.form['password']
-    print(type(password))
-    print(password)
     response_dict = {"error_msg": ""}
     login_status = base_station.register(email, password)
     if login_status == -2:
@@ -149,11 +148,10 @@ def register_account():
 def logout():
     login_email = base_station.login_email
     if login_email == "":
-        print("login email empty")
         content = {'error': 'no user to logout'}
         return content, status.HTTP_400_BAD_REQUEST
 
-    content = {'success': 'user '+login_email+' was logged out.'}
+    content = {'success': 'user '+ login_email +' was logged out.'}
     login_email = ""
     return content, status.HTTP_200_OK
 
@@ -167,3 +165,16 @@ def update_custom_function():
         return json.dumps({'error': 'Not logged in'}), status.HTTP_401_UNAUTHORIZED
     else:
         return json.dumps({'error': ''}), status.HTTP_200_OK
+
+
+@app.route('/speech_recognition', methods=['POST', 'GET'])
+def speech_recognition():
+    if request.method == 'POST':
+        data = request.get_json()
+        bot_name = data['bot_name']
+        command = data["command"]
+        base_station.toggle_speech_recognition(bot_name, command)
+        return json.dumps(True), status.HTTP_200_OK
+    else:
+        message = base_station.get_speech_recognition_status()
+        return json.dumps(message), status.HTTP_200_OK

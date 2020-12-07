@@ -5,6 +5,7 @@ Base Station for the MiniBot.
 from basestation.bot import Bot
 from basestation.user_database import Program, User
 from basestation import db
+from basestation.util.stoppable_thread import StoppableThread, ThreadSafeVariable
 
 from random import choice
 from string import digits, ascii_lowercase, ascii_uppercase
@@ -14,8 +15,32 @@ import socket
 import sys
 import time
 import threading
+import pyaudio
+import speech_recognition as sr
 
 MAX_VISION_LOG_LENGTH = 1000
+
+def make_thread_safe(func):
+    """ Decorator which wraps the specified function with a lock.  This makes
+    sure that there aren't concurrent calls to the basestation functions.  The
+    reason we need this is because both SpeechRecognition and the regular 
+    movement buttons call basestation functions to make the Minibot move.  The
+    SpeechRecognition function runs in its own background thread.  We 
+    do not want the SpeechRecognition function calling the basestation functions
+    while the movement button requests are calling them.  Hence we protect 
+    the necessary basestation functions with a lock that is owned by the basestation
+    Arguments:
+         func: The function that will become thread safe
+    """
+    def decorated_func(*args, **kwargs):
+        # args[0] is self for any basestation member function
+        assert isinstance(args[0], BaseStation)
+        lock = args[0].lock
+        lock.acquire()
+        val = func(*args, **kwargs)
+        lock.release()
+        return val
+    return decorated_func
 
 class BaseStation:
     def __init__(self, app_debug=False):
@@ -59,6 +84,8 @@ class BaseStation:
             self.sock.bind(server_address)
         
         self._login_email = None
+        self.speech_recog_thread = None
+        self.lock = threading.Lock()
 
 
     # ==================== VISION ====================
@@ -166,6 +193,7 @@ class BaseStation:
         """Removes the specified bot from list of active bots."""
         self.active_bots.pop(bot_name)
 
+    @make_thread_safe
     def move_bot_wheels(self, bot_name, direction, power):
         """ Gives wheels power based on user input """
         bot = self.get_bot(bot_name)
@@ -236,13 +264,13 @@ class BaseStation:
             return 0, None
 
         user = User.query.filter(User.email == email).first()
+        print(f"User {user}")
         # email does not exist
         if not user:
             return -1, None
         if not user.verify_password(password):
             return 0, None
         self.login_email = email
-        print(user.custom_function)
         return 1, user.custom_function
     
     def register(self, email, password) -> int:
@@ -268,7 +296,93 @@ class BaseStation:
         user.custom_function = custom_function
         db.session.commit()
         return True
+
+    # ==================== SPEECH RECOGNITION ====================
+    def get_speech_recognition_status(self) -> str:
+        message = (
+            self.speech_recog_thread.message_queue.pop() 
+            if self.speech_recog_thread else ""
+        )
+        # could be None because message_queue.pop() can return None
+        message = "" if message is None else message
+        return message
     
+    def toggle_speech_recognition(self, bot_name, command):
+        if command == "START":
+            # create a new thread that listens and converts speech
+            # to text in the background.  Cannot run this non-terminating 
+            # function  in the current thread because the current post request 
+            # will not terminate and our server will not handle any more 
+            # requests.
+            self.speech_recog_thread = StoppableThread(
+                self.speech_recognition, bot_name 
+            )
+            self.speech_recog_thread.start()
+        # stop listening
+        elif command == "STOP":
+            if self.speech_recog_thread:
+                self.speech_recog_thread.stop()
+
+    def speech_recognition(
+        self, 
+        thread_safe_condition: ThreadSafeVariable, 
+        thread_safe_message_queue: ThreadSafeVariable, 
+        bot_name: str 
+    ) -> None:
+        """ Listens to the user and converts the user's speech to text. 
+        Arguments:
+            thread_safe_condition: This variable is used by the parent function 
+                to stop this speech recognition thread.  As long as this variable
+                is True, the speech recognition service runs.  When it becomes 
+                False, the service exits its loop.
+            thread_safe_message_queue:  The queue of messages to be displayed 
+                on the GUI. Needs to be thread safe because messages are pushed 
+                on to the queue by this thread, and the parent function / thread
+                pops messages from this queue. The parent function relays these 
+                messages to the front-end as the response of a post request.
+            session_id:  Unique identifier for the user's current session.
+            bot_id:  Unique identifier for the Minibot we are connected to 
+                currently.
+        """
+        RECORDING_TIME_LIMIT = 5
+        # dictionary of commmands
+        commands = {
+            "forward": "Minibot moves forward",
+            "backward": "Minibot moves backwards",
+            "left": "Minibot moves left",
+            "right": "Minibot moves right",
+            "stop": "Minibot stops",
+        }
+        # open the Microphone as variable microphone
+        with sr.Microphone() as microphone:
+            recognizer = sr.Recognizer()
+            while thread_safe_condition.get_val():
+                thread_safe_message_queue.push("Say something!")
+                try:
+                    # listen for 5 seconds
+                    audio = recognizer.listen(microphone, RECORDING_TIME_LIMIT)
+                    thread_safe_message_queue.push("Converting from speech to text")
+
+                    # convert speech to text
+                    words = recognizer.recognize_google(audio)
+
+                    # remove non-alphanumeric characters
+                    regex = re.compile('[^a-zA-Z]')  # removing punctuation
+                    regex.sub('', words)
+                    thread_safe_message_queue.push(f"You said: {words}")
+
+                    # check if the command is valid
+                    if words in commands:
+                        thread_safe_message_queue.push(commands[words])
+                        self.move_bot_wheels(bot_name, words, 100)
+                    else:
+                        thread_safe_message_queue.push("Invalid command!")
+                except sr.WaitTimeoutError:
+                    thread_safe_message_queue.push("Timed out!")
+                except sr.UnknownValueError:
+                    thread_safe_message_queue.push("Words not recognized!")    
+    
+    # ==================== GETTERS and SETTERS ====================
     @property
     def login_email(self):
         return self._login_email
