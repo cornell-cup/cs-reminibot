@@ -688,6 +688,7 @@ export default class MinibotBlockly extends React.Component {
                         <div id="login and register">
                             {!this.state.isLoggedIn ? <button id="register" onClick={this.register}>Register</button> : null}
                             {!this.state.isLoggedIn ? <button id="login" onClick={this.login}>Login</button> : null}
+                            {this.state.isLoggedIn ? <label> Logged in as: {this.state.loginEmail} &nbsp; </label> : null}
                             {this.state.isLoggedIn ? <button id="logout" onClick={this.logout}>Logout</button> : null}
                             <UserAccountModal
                                 modalType="register"
@@ -703,12 +704,6 @@ export default class MinibotBlockly extends React.Component {
                                 errorLabel={this.state.loginErrorLabel}
                             />
                         </div>
-
-                        <div>
-                            {this.state.isLoggedIn ? <label> Login as: {this.state.loginEmail} </label> : null}
-
-                        </div>
-
                         <p id="title"><b>Blockly </b> </p>
                     </div>
                     <br />
