@@ -91,6 +91,7 @@ def vision():
 
 @app.route('/result', methods=['POST'])
 def error_message_update():
+    """Returns the result (either a successful execution or an error message) of running the user's code"""
     data = request.get_json()
     bot_name = data['bot_name']
     script_exec_result = base_station.get_bot_script_exec_result(bot_name)
@@ -106,6 +107,7 @@ def error_message_update():
 
 @app.route('/login/', methods=['POST'])
 def login():
+    """Logs the user in"""
     email = request.form['email']
     password = request.form['password']
     response_dict = {"error_msg": "", "custom_function": None}
@@ -126,6 +128,7 @@ def login():
 
 @app.route('/register/', methods=['POST'])
 def register_account():
+    """Registers the user"""
     email = request.form['email']
     password = request.form['password']
     response_dict = {"error_msg": ""}
@@ -146,6 +149,7 @@ def register_account():
 
 @app.route('/logout/', methods=['POST'])
 def logout():
+    """Logs the user out"""
     login_email = base_station.login_email
     if login_email == "":
         content = {'error': 'no user to logout'}
