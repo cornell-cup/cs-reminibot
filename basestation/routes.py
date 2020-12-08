@@ -121,8 +121,6 @@ def login():
     else:
         response_dict["custom_function"] = user_custom_function
         response_status = status.HTTP_200_OK
-    print(response_status)
-    print(response_dict)
     return json.dumps(response_dict), response_status
 
 
@@ -136,7 +134,7 @@ def register_account():
     if login_status == -2:
         response_dict["error_msg"] = "Email already exists"
         response_status = status.HTTP_409_CONFLICT
-    if login_status == -1:
+    elif login_status == -1:
         response_dict["error_msg"] = "Invalid email"
         response_status = status.HTTP_401_UNAUTHORIZED
     elif login_status == 0:

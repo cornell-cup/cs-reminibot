@@ -264,7 +264,6 @@ class BaseStation:
             return 0, None
 
         user = User.query.filter(User.email == email).first()
-        print(f"User {user}")
         # email does not exist
         if not user:
             return -1, None
