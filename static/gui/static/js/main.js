@@ -66,7 +66,7 @@ class Platform extends React.Component {
   }
 
   redefineCustomBlockList(newCustomBlockList) {
-    this.setState({customBlockList: newCustomBlockList});
+    this.setState({ customBlockList: newCustomBlockList });
   }
 
   render() {

@@ -71,7 +71,7 @@ function PortsList(props) {
     let allListElements = [];
 
     for (let i = 0; i < portNames.length; i++) {
-        let link = <a href="">{portLabels[i]}</a>
+        let link = <a>{portLabels[i]} &#8250;</a>
         let ports = <Ports portName={portNames[i]} motorPorts={props.motorPorts} />
         let listElement = <li> {link} {ports} </li>
         allListElements.push(listElement);
@@ -81,7 +81,7 @@ function PortsList(props) {
         <nav id="main_nav">
             <ul>
                 <li>
-                    <a href="">Motor Ports</a>
+                    <a>Motor Ports &#187;</a>
                     <ul> {allListElements} </ul>
                 </li>
             </ul>
@@ -116,7 +116,7 @@ class SpeechRecognition extends React.Component {
         this.speechRecognitionInterval = null;
 
         // colors for the messages in the feedback box
-        this.colors = ["#000080", "black"]
+        this.colors = ["#660000", "black"]
     }
 
     /** Turns the button on or off */
@@ -160,7 +160,7 @@ class SpeechRecognition extends React.Component {
             console.log("Speech Recognition", error);
         })
 
-        this.setState({on: turnOn});
+        this.setState({ on: turnOn });
     }
 
     /** Get the messages from the speech recognition service from the
@@ -197,7 +197,7 @@ class SpeechRecognition extends React.Component {
                     // make the first message bold
                     let bold = "font-weight: bold;";
                     // make new messages alternate colors
-                    let color = (i % 2 == _this.queueColorIndex) ? 
+                    let color = (i % 2 == _this.queueColorIndex) ?
                         _this.colors[0] : _this.colors[1];
 
                     // pargraph style
@@ -216,11 +216,11 @@ class SpeechRecognition extends React.Component {
     }
 
     render() {
-        let x = (this.state.on) ? 
+        let x = (this.state.on) ?
             "Stop Speech Recognition" : "Start Speech Recognition";
         return (
             <div>
-                <button className="btn btn-primary element-wrapper" 
+                <button className="btn btn-danger element-wrapper"
                     onClick={this.toggle}>{x}</button>
             </div>
 
@@ -557,8 +557,10 @@ export default class AddBot extends React.Component {
                         </div>
                     </div>
                 </div>
+                <br />
                 <div className="row">
                     <div className="col horizontalDivCenter">
+                        <p id="small_title">Ports </p>
                         <div className="element-wrapper in-front-of-other-elems">
                             <PortsList motorPorts={this.motorPorts} />
                         </div>
@@ -590,6 +592,7 @@ export default class AddBot extends React.Component {
                         </form>
                     </div>
                 </div>
+                <br />
                 <div className="row">
                     <div className="col horizontalDivCenter">
                         <p id="small_title"> Speech Recognition </p>
@@ -598,7 +601,7 @@ export default class AddBot extends React.Component {
                 {/* button-wrapper is a custom class to add padding
                     the rest is bootstrap css */}
                 <div className="col horizontalDivCenter">
-                    <SpeechRecognition selected_bot={this.props.selected_bot} 
+                    <SpeechRecognition selected_bot={this.props.selected_bot}
                         float="right" />
                 </div>
                 <div className="col horizontalDivCenter">
@@ -612,6 +615,8 @@ export default class AddBot extends React.Component {
                         <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.lineFollowOnClick()}>Line Follow</button>
                     </div>
                 </div>
+                <br />
+                <br />
             </div >
         );
     }

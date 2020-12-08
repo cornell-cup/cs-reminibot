@@ -114,7 +114,7 @@ export default class GridView extends React.Component {
             .attr('transform', `rotate(${o}, ${this.state.width / 2 + x}, ${this.state.height / 2 - y})`)
     }
 
-    deleteBot(){
+    deleteBot() {
         this.svg.selectAll("circle").remove();
         this.svg.selectAll("image").remove();
     }
@@ -152,21 +152,21 @@ export default class GridView extends React.Component {
         const _this = this;
         var pos = [];
         axios.get('/vision')
-        .then(function(response) {
-            console.log(response.data);
-            pos.push(response.data);
-            if(pos[0]['x']===''){
-                _this.deleteBot();
-            }
-            else{
-                _this.state.xcor=parseInt(pos[0]['x']);
-                _this.state.ycor=parseInt(pos[0]['y']);
-                _this.drawBot(_this.state.xcor,_this.state.ycor,'red',parseInt(pos[0]['orientation']));
-            }
-        })
-        .catch(function (error) {
-        // console.log(error);
-        })
+            .then(function (response) {
+                console.log(response.data);
+                pos.push(response.data);
+                if (pos[0]['x'] === '') {
+                    _this.deleteBot();
+                }
+                else {
+                    _this.state.xcor = parseInt(pos[0]['x']);
+                    _this.state.ycor = parseInt(pos[0]['y']);
+                    _this.drawBot(_this.state.xcor, _this.state.ycor, 'red', parseInt(pos[0]['orientation']));
+                }
+            })
+            .catch(function (error) {
+                // console.log(error);
+            })
 
     }
 
@@ -177,9 +177,9 @@ export default class GridView extends React.Component {
         //     this.getVisionData();
         //     this.drawBot(this.state.xcor,this.state.ycor,'transparent');
         // }
-        this.state.count=this.state.count+1
-        if(this.state.count%2==0){
-            clearInterval(this.find); 
+        this.state.count = this.state.count + 1
+        if (this.state.count % 2 == 0) {
+            clearInterval(this.find);
         }
         else {
             this.find = setInterval(this.getVisionData.bind(this), 10);
@@ -192,8 +192,10 @@ export default class GridView extends React.Component {
             <div id="component_view" className="box">
                 <p id="small_title">Vision </p>
                 <button id="grid_recenter" onClick={this.displayRobot}>Display Bot</button>
+                <br />
+                <br />
                 <div id="view"></div>
-            </div>
+            </div >
         );
     }
 }

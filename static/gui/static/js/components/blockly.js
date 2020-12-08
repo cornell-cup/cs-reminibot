@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import {Button, LabeledTextBox} from './Util.js';
+import { Button, LabeledTextBox } from './Util.js';
 import CodeMirror from 'react-codemirror';
 require('codemirror/mode/python/python');
 
@@ -50,8 +50,8 @@ class PythonEditor extends React.Component {
   }
 
   /* Updates this class's state to contain the code specified in the parameter*/
-  updateCode(code)  {
-    this.setState({code});
+  updateCode(code) {
+    this.setState({ code });
   }
 
   /* Returns the CodeMirror editor object */
@@ -122,7 +122,7 @@ class PythonEditor extends React.Component {
     if (start_time != -1) {
       var time = (new Date().getTime() - start_time) / 1000
       document.getElementById("time").value = time.toString() + "s";
-      this.setState({coding_start : -1})
+      this.setState({ coding_start: -1 })
     }
 
     axios({
@@ -144,7 +144,7 @@ class PythonEditor extends React.Component {
      * Repeatedly call the ErrorMessageHandler in base_station_interface.py
      * until a non-empty execution result of the Python program is received.
      */
-    let interval = setInterval(function() {
+    let interval = setInterval(function () {
       axios({
         method: 'POST',
         url: '/result',
@@ -159,11 +159,11 @@ class PythonEditor extends React.Component {
           if (response.data["code"] !== -1) {
             if (response.data["code"] === 1) {
               // lime green
-              document.getElementById("errormessage").style.color="#32CD32";
+              document.getElementById("errormessage").style.color = "#32CD32";
             }
             else {
               // red
-              document.getElementById("errormessage").style.color="#FF0000";
+              document.getElementById("errormessage").style.color = "#FF0000";
             }
             // result has arrived so go ahead and clear the interval (stop polling
             // the server)
@@ -173,7 +173,7 @@ class PythonEditor extends React.Component {
         .catch((err) => {
           console.log(err)
         })
-      }, 500);
+    }, 500);
   }
 
   render() {
@@ -182,8 +182,8 @@ class PythonEditor extends React.Component {
       mode: 'python'
     };
     return (
-      <div id="Python" style={{display: "flex", flexDirection: "row"}}>
-        <div style={{"min-width": '600px', "border": "2px solid grey", "margin-right": "10px"}}>
+      <div id="Python" style={{ display: "flex", flexDirection: "row" }}>
+        <div style={{ "min-width": '600px', "border": "2px solid grey", "margin-right": "10px" }}>
           <CodeMirror
             ref="editor"
             value={this.state.code}
@@ -191,7 +191,7 @@ class PythonEditor extends React.Component {
             options={options}
           />
         </div>
-        <div style={{"min-width": '600px'}}>
+        <div style={{ "min-width": '600px' }}>
           <div id="UpdateCustomFunction" className="horizontalDiv">
             <LabeledTextBox
               type={"text"}
@@ -206,12 +206,12 @@ class PythonEditor extends React.Component {
             />
             <Button
               id={"DBlock"}
-              onClick={() => { if (window.confirm('You Are Deleting Custom Block: '+this.state.function_name)) this.props.dblock(this.state.function_name) } }
+              onClick={() => { if (window.confirm('You Are Deleting Custom Block: ' + this.state.function_name)) this.props.dblock(this.state.function_name) }}
               name={"Delete Custom Block"}
             />
             <Button
               id={"DBlockAll"}
-              onClick={() => { if (window.confirm('You Are Deleting All Custom Blocks')) this.props.dblockAll() } }
+              onClick={() => { if (window.confirm('You Are Deleting All Custom Blocks')) this.props.dblockAll() }}
               name={"Delete All Custom Blocks"}
             />
           </div>
@@ -228,8 +228,8 @@ class PythonEditor extends React.Component {
             <Button id={"run"} onClick={this.run_script} name={"Run"} />
             <Button id={"history"} onClick={this.view_history} name={"View History"} />
             <Button id={"copy"} onClick={this.copy} name={"Copy Code From Blockly"} />
-            <div> <textarea id = "errormessage" rows="1" cols="60" /></div>
-            <div> <textarea style={{ color: 'blue' }} id = "time" rows="1" cols="20" /></div>
+            <div> <textarea id="errormessage" rows="1" cols="60" /></div>
+            <div> <textarea style={{ color: 'blue' }} id="time" rows="1" cols="20" /></div>
           </div>
           <div id="PythonUpload" className="horizontalDiv">
             <form>
@@ -300,13 +300,13 @@ export default class MinibotBlockly extends React.Component {
   manageDefaultCustomBlocklyFunction() {
     const defaultFunction = [this.state.emptyFunctionName, " "];
     if (this.props.customBlockList.length == 0) {
-        this.props.customBlockList.push(defaultFunction);
+      this.props.customBlockList.push(defaultFunction);
     }
     // default function can only exist if only one element in array
-    else if (this.props.customBlockList[0][0]===this.state.emptyFunctionName && this.props.customBlockList.length>1) {
-        // delete first element
-        this.props.customBlockList.splice(0, 1);
-      }
+    else if (this.props.customBlockList[0][0] === this.state.emptyFunctionName && this.props.customBlockList.length > 1) {
+      // delete first element
+      this.props.customBlockList.splice(0, 1);
+    }
   }
 
   update_custom_blocks() {
@@ -391,7 +391,7 @@ export default class MinibotBlockly extends React.Component {
     // toolbox.refreshSelection();
   }
 
- custom_block(function_name, pythonTextBoxCode) {
+  custom_block(function_name, pythonTextBoxCode) {
     var _this = this;
     var item = _this.props.customBlockList.find(element => element[0] === function_name);
     if (item == undefined) {
@@ -408,7 +408,7 @@ export default class MinibotBlockly extends React.Component {
     var item = _this.props.customBlockList.find(element => element[0] === function_name)
     const index = _this.props.customBlockList.indexOf(item);
     if (index === -1) {
-      window.alert('Custom Block - '+function_name+' - Does Not Exist');
+      window.alert('Custom Block - ' + function_name + ' - Does Not Exist');
       return;
     }
     _this.props.customBlockList.splice(index, 1);
@@ -419,7 +419,7 @@ export default class MinibotBlockly extends React.Component {
 
   dblockAll() {
     var _this = this;
-    if(_this.props.customBlockList[0][0]===_this.state.emptyFunctionName){
+    if (_this.props.customBlockList[0][0] === _this.state.emptyFunctionName) {
       window.alert('There Are No Custom Blocks');
       return;
     }
@@ -668,7 +668,7 @@ export default class MinibotBlockly extends React.Component {
     })
       .then((response) => {
         _this.props.redefineCustomBlockList(
-            JSON.parse(response.data.custom_function));
+          JSON.parse(response.data.custom_function));
         // invokes component did update
         this.setState({
           login_email: formData.get("email"),
@@ -678,10 +678,10 @@ export default class MinibotBlockly extends React.Component {
           isLoggedIn: true,
         });
         // _this.props.customBlockList.push(JSON.parse(response.data.custom_function))[0];
-        if(temp[0][0]!==_this.state.emptyFunctionName && _this.props.customBlockList[0][0]!==_this.state.emptyFunctionName){
+        if (temp[0][0] !== _this.state.emptyFunctionName && _this.props.customBlockList[0][0] !== _this.state.emptyFunctionName) {
           _this.props.customBlockList.push.apply(_this.props.customBlockList, temp);
         }
-        if(temp[0][0]!==_this.state.emptyFunctionName && _this.props.customBlockList[0][0]===_this.state.emptyFunctionName){
+        if (temp[0][0] !== _this.state.emptyFunctionName && _this.props.customBlockList[0][0] === _this.state.emptyFunctionName) {
           _this.props.customBlockList.splice(0, 1);
           _this.props.customBlockList.push.apply(_this.props.customBlockList[0], temp);
         }

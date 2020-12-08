@@ -2,7 +2,6 @@
 
 .box {
     margin: 1vh;
-    background: lightgrey;
     padding: 1vh;
     width: 560px;
 }
@@ -243,11 +242,12 @@ table {
 }
 
 #main_nav ul {
-    background: white;
+    background: transparent;
     float: left;
     -webkit-transition: .5s;
     transition: .5s;
     text-align: center;
+    color: white;
 }
 
 #main_nav li {
@@ -258,47 +258,34 @@ table {
     -webkit-transition: .5s;
     transition: .5s;
     text-align: center;
-}
+    background: transparent;
+    color: white;
 
-#main_nav>ul>li>a,
-h1 {
-    text-transform: uppercase;
 }
 
 #main_nav a {
     display: block;
     text-decoration: none;
     padding: 5px 15px;
-    color: #000;
+    color: white;
     text-align: center;
+    background-color:  #EA4C46;
 }
 
 #main_nav ul ul {
     position: absolute;
-    left: 0;
-    top: 100%;
+    left: 75%;
+    top: 40%;
     visibility: hidden;
     opacity: 0;
 }
 
 #main_nav ul ul ul {
-    left: 80%;
-    top: 0;
+    left: 75%;
+    top: 0%;
+    position: absolute;
 }
 
-#main_nav li:hover,
-#main_nav li:hover li {
-    background: #ddd;
-}
-
-#main_nav li li:hover,
-#main_nav li li:hover li {
-    background: #bbb;
-}
-
-#main_nav li li li:hover {
-    background: #999;
-}
 
 #main_nav li:hover>ul {
     visibility: visible;
@@ -313,6 +300,9 @@ h1 {
 .btn_ports {
     background: #ddd;
     width: 150px;
+    border-radius: 0.5em;
+    color: white;
+    background-color: #F07470;
 }
 
 .modal {
@@ -335,7 +325,7 @@ h1 {
 }
 
 #speech_recognition_feedback_box {
-    background-color : 	#d3ebf4;
+    background-color : 	#ffb2b2;
     border-style: solid;
     border-width: 0.5px;
     padding: 20px;

@@ -2,6 +2,11 @@
 Main file from which BaseStation Websocket interface begins.
 """
 
+from base_station import BaseStation
+from util.stoppable_thread import StoppableThread, ThreadSafeVariable
+import speech_recognition as sr
+import pyaudio
+import threading
 import tornado
 import tornado.web
 import tornado.websocket
@@ -12,15 +17,8 @@ import sys
 import time
 import re  # regex import
 import requests
-import threading
-import pyaudio
-import speech_recognition as sr
-from util.stoppable_thread import StoppableThread, ThreadSafeVariable
 
 # Minibot imports.
-from base_station import BaseStation
-# from piVision import *
-# from piVision.server import startBotVisionServer
 
 
 class BaseInterface:
@@ -286,7 +284,7 @@ class HeartbeatHandler(tornado.websocket.WebSocketHandler):
 
 
 class SpeechRecognitionHandler(tornado.websocket.WebSocketHandler):
-    """ Handles start speech recognition and stop speech recognition 
+    """ Handles start speech recognition and stop speech recognition
     requests from the WebGUI. """
 
     def initialize(self, base_station):
@@ -294,11 +292,11 @@ class SpeechRecognitionHandler(tornado.websocket.WebSocketHandler):
 
     def get(self):
         """ Gets the current status from the Speech Recognition system,
-        to be displayed on the WebGUI.  
+        to be displayed on the WebGUI.
         """
         speech_recog_thread = self.base_station.speech_recog_thread
         message = (
-            speech_recog_thread.message_queue.pop() 
+            speech_recog_thread.message_queue.pop()
             if speech_recog_thread else None
         )
         # could be None because get_val can return None too
@@ -307,8 +305,8 @@ class SpeechRecognitionHandler(tornado.websocket.WebSocketHandler):
         self.write(message)
 
     def post(self):
-        """ Starts and stops the speech recognition thread depending on the 
-        command sent in the request  
+        """ Starts and stops the speech recognition thread depending on the
+        command sent in the request
         """
         data = json.loads(self.request.body.decode())
         # The command is either START or STOP
@@ -322,9 +320,9 @@ class SpeechRecognitionHandler(tornado.websocket.WebSocketHandler):
         # start listening and converting speech to text
         if command == "START":
             # create a new thread that listens and converts speech
-            # to text in the background.  Cannot run this non-terminating 
-            # function  in the current thread because the current post request 
-            # will not terminate and our server will not handle any more 
+            # to text in the background.  Cannot run this non-terminating
+            # function  in the current thread because the current post request
+            # will not terminate and our server will not handle any more
             # requests.
             if not self.base_station.speech_recog_thread:
                 self.base_station.speech_recog_thread = StoppableThread(
@@ -336,28 +334,27 @@ class SpeechRecognitionHandler(tornado.websocket.WebSocketHandler):
             if self.base_station.speech_recog_thread:
                 self.base_station.speech_recog_thread.stop()
 
-
     def speech_recognition(
-        self, 
-        thread_safe_condition: ThreadSafeVariable, 
-        thread_safe_message_queue: ThreadSafeVariable, 
-        session_id: int, 
+        self,
+        thread_safe_condition: ThreadSafeVariable,
+        thread_safe_message_queue: ThreadSafeVariable,
+        session_id: int,
         bot_id: int
     ) -> None:
-        """ Listens to the user and converts the user's speech to text. 
+        """ Listens to the user and converts the user's speech to text.
 
         Arguments:
-            thread_safe_condition: This variable is used by the parent function 
+            thread_safe_condition: This variable is used by the parent function
                 to stop this speech recognition thread.  As long as this variable
-                is True, the speech recognition service runs.  When it becomes 
+                is True, the speech recognition service runs.  When it becomes
                 False, the service exits its loop.
-            thread_safe_message_queue:  The queue of messages to be displayed 
-                on the GUI. Needs to be thread safe because messages are pushed 
+            thread_safe_message_queue:  The queue of messages to be displayed
+                on the GUI. Needs to be thread safe because messages are pushed
                 on to the queue by this thread, and the parent function / thread
-                pops messages from this queue. The parent function relays these 
+                pops messages from this queue. The parent function relays these
                 messages to the front-end as the response of a post request.
             session_id:  Unique identifier for the user's current session.
-            bot_id:  Unique identifier for the Minibot we are connected to 
+            bot_id:  Unique identifier for the Minibot we are connected to
                 currently.
         """
         RECORDING_TIME_LIMIT = 5
@@ -377,7 +374,8 @@ class SpeechRecognitionHandler(tornado.websocket.WebSocketHandler):
                 try:
                     # listen for 5 seconds
                     audio = recognizer.listen(microphone, RECORDING_TIME_LIMIT)
-                    thread_safe_message_queue.push("Converting from speech to text")
+                    thread_safe_message_queue.push(
+                        "Converting from speech to text")
 
                     # convert speech to text
                     words = recognizer.recognize_google(audio)
@@ -399,12 +397,13 @@ class SpeechRecognitionHandler(tornado.websocket.WebSocketHandler):
                     thread_safe_message_queue.push("Timed out!")
                 except sr.UnknownValueError:
                     thread_safe_message_queue.push("Words not recognized!")
-                    
+
 
 class ErrorMessageHandler(tornado.websocket.WebSocketHandler):
     """
     Class for handling Python error messages.
     """
+
     def initialize(self, base_station):
         self.base_station = base_station
 
