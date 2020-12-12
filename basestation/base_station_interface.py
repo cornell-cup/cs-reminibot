@@ -309,6 +309,8 @@ class ErrorMessageHandler(tornado.websocket.WebSocketHandler):
         print(error_json)
         self.write(json.dumps(error_json).encode())
 
+
+
 '''
 Static vars for the Built-In Script Handler. initialize() is called each time
 a request is made to the BuiltInScriptHandler, so I leave this out to be

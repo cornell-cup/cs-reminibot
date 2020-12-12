@@ -2,6 +2,9 @@ from os import write
 from PIL import Image
 import numpy as np
 
+# import sys
+# np.set_printoptions(threshold=sys.maxsize)
+
 IMAGE_WIDTH = 300
 IMAGE_HEIGHT = 300
 TRUE_IMAGE = 100
@@ -55,12 +58,23 @@ def write_sprite():
 
 
 def write_labels():
-    label_array = np.zeros(TRUE_IMAGE + FALSE_IMAGE)
+    label_array = np.zeros((TRUE_IMAGE + FALSE_IMAGE) * 2)
     for i in range(TRUE_IMAGE):
-        label_array[i] = 1
+        label_array[2 * i + 1] = 1
+    for i in range(TRUE_IMAGE, TRUE_IMAGE + FALSE_IMAGE):
+        label_array[2 * i] = 1
     print(label_array)
     label_array.tofile('labels')
 
-write_labels()
-label_array = np.fromfile('labels')
-print(label_array[:150])
+# write_labels()
+# label_array = np.fromfile('labels', dtype=np.uint8)
+# print(label_array.shape)
+# print(label_array.sum())
+
+
+def read_sprite():
+    image = Image.open('data/sprite.png')
+    image_array = np.array(image)
+    print(image_array[len(image_array) // 2 :])
+
+read_sprite()
