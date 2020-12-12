@@ -25,8 +25,31 @@ export default class ObjectClassification extends React.Component {
           script_name="test.py"
           args={{}}
         />
+        <TrainButton />
       </div>
     )
+  }
+}
+
+class TrainButton extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+    };
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  handleClick() {
+    console.log("TRAIN");
+  }
+
+  render() {
+    return (
+      <div>
+        <button onClick={this.handleClick}>Train</button>
+      </div>
+    );
   }
 }
 
