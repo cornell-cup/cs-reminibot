@@ -73,7 +73,7 @@ def write_labels():
 
 
 def read_sprite():
-    image = Image.open('data/sprite.png')
+    image = Image.open('sprite.png')
     image_array = np.array(image)
     print(image_array[len(image_array) // 2 :])
 
