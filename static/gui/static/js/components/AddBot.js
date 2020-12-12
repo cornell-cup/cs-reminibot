@@ -28,6 +28,11 @@ class RefreshingList extends React.Component {
 
     update(newbots) {
         this.state.availableBots = newbots;
+        // current bot will automatically be updated when the component
+        // renders (see render function)
+        if (!newbots.includes(this.state.currentBot)) {
+            this.state.currentBot = "";
+        }
         this.setState({ state: this.state }) // forces re-render
     }
 
@@ -35,9 +40,13 @@ class RefreshingList extends React.Component {
         const _this = this;
         let newBotName = event.target.value;
         this.state.currentBot = newBotName;
+
+        console.log("Refreshing list updated current bot ", newBotName);
+        this.setState({ state: this.state })
     }
 
     render() {
+        console.log("Current bot ", this.state.currentBot)
         const _this = this;
         if (_this.state.availableBots.length === 0) {
             _this.state.currentBot = "";
@@ -158,7 +167,6 @@ class SpeechRecognition extends React.Component {
             this.queue = [""];
         }
 
-        console.log("yo yo yo " + _this.props.selectedBotName);
         // Tell the backend server to start / stop the speech recognition service 
         axios({
             method: 'POST',
@@ -283,7 +291,9 @@ export default class AddBot extends React.Component {
             // If the Selected Bot (the currently connected bot)
             // is no longer active, remove it from the Selected Bot label (the 
             // currently connected bot label)
-            if (!_this.state.availableBots.includes(_this.props.selectedBotName)) {
+            if (!(_this.props.selectedBotName === "") &&
+                !_this.state.availableBots.includes(_this.props.selectedBotName)
+            ) {
                 _this.props.setSelectedBotName("");
                 _this.props.setSelectedBotStyle("hidden");
             }
@@ -314,6 +324,8 @@ export default class AddBot extends React.Component {
         let li = this.state.availableBots;
         let botName = (this.refreshingBotListRef.current == null) ?
             "" : this.refreshingBotListRef.current.state.currentBot;
+        console.log("Add bot Ref currentBot ", this.refreshingBotListRef.current.state);
+        console.log("Updating setSelectedBotName to ", botName);
         this.props.setSelectedBotName(botName);
 
         if (li.length != 0) {
@@ -512,7 +524,7 @@ export default class AddBot extends React.Component {
                 {/* button-wrapper is a custom class to add padding
                     the rest is bootstrap css */}
                 <div className="col horizontalDivCenter">
-                    <SpeechRecognition selectedBotName={this.props.selectedBotName} 
+                    <SpeechRecognition selectedBotName={this.props.selectedBotName}
                         float="right" />
                 </div>
                 <div className="col horizontalDivCenter">

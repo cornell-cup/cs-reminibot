@@ -73,7 +73,7 @@ class Bot:
             self.sock.sendall(data)
 
     def readKV(self):
-        """ Reads from the socket connection between the basesation and the Minibot
+        """ Reads from the socket connection between the basestation and the Minibot
         <<<<BOTSTATUS,ACTIVE>>>>
         """
         if not self.is_socket_connected:
@@ -116,5 +116,5 @@ class Bot:
         return self._script_exec_result
 
     @script_exec_result.setter
-    def script_exec_result(self, value):
+    def script_exec_result(self, value: str):
         self._script_exec_result = value

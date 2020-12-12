@@ -6,7 +6,7 @@ import ReactDOM from 'react-dom';
 import GridView from './components/gridview.js';
 import Blockly from './components/blockly.js';
 import AddBot from './components/AddBot.js';
-import Dashboard from './components/dashboard.js'
+import Dashboard from './components/dashboard.js';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 
 /**
@@ -53,7 +53,6 @@ class Platform extends React.Component {
 
     this.state = {
       customBlockList: [],
-      botName: '',
       blockly_xml: null,
       selectedBotName: '',
       selectedBotStyle: this.hiddenLabelStyle,
@@ -65,13 +64,6 @@ class Platform extends React.Component {
     this.setSelectedBotName= this.setSelectedBotName.bind(this);
     this.setSelectedBotStyle= this.setSelectedBotStyle.bind(this);
 
-  }
-
-  updateBotName(value) {
-    const _this = this;
-    _this.setState({ botName: value }, () => {
-      console.log('updated bot name to: ' + this.state.botName);
-    });
   }
 
   setBlockly(xmltext) {

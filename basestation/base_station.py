@@ -296,7 +296,9 @@ class BaseStation:
         return 1
 
     def update_custom_function(self, custom_function: str) -> bool:
-        """Adds custom function(s) for the logged in user if there is a user logged in"""
+        """Adds custom function(s) for the logged in user if there is a user 
+        logged in
+        """
         if not self.login_email:
             return False
 
