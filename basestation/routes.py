@@ -81,6 +81,7 @@ def mode():
 
 @app.route('/vision', methods=['POST', 'GET'])
 def vision():
+    """Updates vision status"""
     if request.method == 'POST':
         info = request.get_json()
         base_station.update_vision_log(info)
@@ -153,13 +154,14 @@ def logout():
         content = {'error': 'no user to logout'}
         return content, status.HTTP_400_BAD_REQUEST
 
-    content = {'success': 'user '+ login_email +' was logged out.'}
+    content = {'success': 'user ' + login_email + ' was logged out.'}
     login_email = ""
     return content, status.HTTP_200_OK
 
 
 @app.route('/custom_function/', methods=['POST'])
 def update_custom_function():
+    """Updates the logged in user's custom functions"""
     custom_function = request.form['custom_function']
     is_logged_in = base_station.update_custom_function(custom_function)
 
@@ -171,6 +173,8 @@ def update_custom_function():
 
 @app.route('/speech_recognition', methods=['POST', 'GET'])
 def speech_recognition():
+    """Toggles speech recognition on/off for a POST request; returns the first message 
+    in the BaseStation speech recognition queue for a GET request"""
     if request.method == 'POST':
         data = request.get_json()
         bot_name = data['bot_name']

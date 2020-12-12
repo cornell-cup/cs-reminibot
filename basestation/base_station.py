@@ -9,6 +9,7 @@ from basestation.util.stoppable_thread import StoppableThread, ThreadSafeVariabl
 
 from random import choice
 from string import digits, ascii_lowercase, ascii_uppercase
+from typing import Tuple, Optional
 import os
 import re
 import socket
@@ -19,6 +20,7 @@ import pyaudio
 import speech_recognition as sr
 
 MAX_VISION_LOG_LENGTH = 1000
+
 
 def make_thread_safe(func):
     """ Decorator which wraps the specified function with a lock.  This makes
@@ -41,6 +43,7 @@ def make_thread_safe(func):
         lock.release()
         return val
     return decorated_func
+
 
 class BaseStation:
     def __init__(self, app_debug=False):
@@ -75,18 +78,17 @@ class BaseStation:
         # Cards, and therefore will have multiple ip_addresses
         server_address = ("0.0.0.0", 9434)
 
-        # only bind in debug mode if you are the debug server, if you are the 
+        # only bind in debug mode if you are the debug server, if you are the
         # monitoring program which restarts the debug server, do not bind,
         # otherwise the debug server won't be able to bind
         if app_debug and os.environ["WERKZEUG_RUN_MAIN"] == "true":
             self.sock.bind(server_address)
         else:
             self.sock.bind(server_address)
-        
+
         self._login_email = None
         self.speech_recog_thread = None
         self.lock = threading.Lock()
-
 
     # ==================== VISION ====================
 
@@ -114,7 +116,6 @@ class BaseStation:
         """ Returns a list of the Bot Names. """
         return list(self.active_bots.keys())
 
-
     def listen_for_minibot_broadcast(self):
         """ Listens for the Minibot to broadcast a message to figure out the 
         Minibot's ip address. Code taken from link below:
@@ -139,11 +140,11 @@ class BaseStation:
         # nothing to read
         except socket.timeout:
             pass
-        
+
         # create a new Minibot object to represent each Minibot that sent a
         # broadcast to the basestation
         for address in address_data_map:
-            # data should consist of "password port_number" 
+            # data should consist of "password port_number"
             data_lst = address_data_map[address].split(" ")
 
             if data_lst[0] == request_password:
@@ -158,7 +159,7 @@ class BaseStation:
             # <port number>
             bot_name = f"minibot{ip_address[-3:].replace('.', '')}_{port}"
         self.active_bots[bot_name] = Bot(bot_name, ip_address, port)
-    
+
     def get_active_bots(self):
         """ Get the names of all the Minibots that are currently connected to 
         Basestation
@@ -169,7 +170,7 @@ class BaseStation:
             if status == "INACTIVE":
                 self.remove_bot(bot_name)
         return self.get_bot_names()
-    
+
     def get_bot_status(self, bot_name: str) -> str:
         """ Gets whether the Minibot is currently connected or has been 
         disconnected.
@@ -177,6 +178,8 @@ class BaseStation:
         2. read from Minibot whatever Minibot has sent us.
         3. check when was the last time Minibot sent us "I'm alive"
         4. Return if Minibot is connected or not
+        Arguments:
+            bot_name: The name of the minibot
         """
         bot = self.get_bot(bot_name)
         # ask the bot to reply whether its ACTIVE
@@ -189,23 +192,24 @@ class BaseStation:
             status = "INACTIVE"
         return status
 
-    def remove_bot(self, bot_name):
+    def remove_bot(self, bot_name: str):
         """Removes the specified bot from list of active bots."""
         self.active_bots.pop(bot_name)
 
     @make_thread_safe
-    def move_bot_wheels(self, bot_name, direction, power):
+    def move_bot_wheels(self, bot_name: str, direction: str, power: str):
         """ Gives wheels power based on user input """
         bot = self.get_bot(bot_name)
         direction = direction.lower()
         bot.sendKV("WHEELS", direction)
-    
+
     def set_bot_mode(self, bot_name: str, mode: str):
         """ Set the bot to either line follow or object detection mode """
         bot = self.get_bot(bot_name)
         bot.sendKV("MODE", mode)
-        
+
     def send_bot_script(self, bot_name: str, script: str):
+        """Sends a python program to the specific bot"""
         bot = self.get_bot(bot_name)
         # reset the previous script_exec_result
         bot.script_exec_result = None
@@ -239,13 +243,14 @@ class BaseStation:
 
         # Now actually send to the bot
         bot.sendKV("SCRIPTS", parsed_program_string)
-        
-    def set_bot_ports(self, bot_name, ports):
+
+    def set_bot_ports(self, bot_name: str, ports: str):
+        """Sets motor port(s) of the specific bot"""
         bot = self.get_bot(bot_name)
         ports_str = " ".join([str(l) for l in ports])
         bot.sendKV("PORTS", ports_str)
 
-    def get_bot_script_exec_result(self, bot_name: str):
+    def get_bot_script_exec_result(self, bot_name: str) -> str:
         """ Retrieve the last script's execution result from the specified bot.
         """
         bot = self.get_bot(bot_name)
@@ -257,7 +262,8 @@ class BaseStation:
         return bot.script_exec_result
 
     # ==================== DATABASE ====================
-    def login(self, email, password):
+    def login(self, email: str, password: str) -> Tuple[int, Optional[str]]:
+        """Logs in the user if the email and password are valid"""
         if not email:
             return -1, None
         if not password:
@@ -271,8 +277,10 @@ class BaseStation:
             return 0, None
         self.login_email = email
         return 1, user.custom_function
-    
-    def register(self, email, password) -> int:
+
+    def register(self, email: str, password: str) -> int:
+        """Registers a new user if the email and password are not null and 
+        there is no account associated wth the email yet"""
         if not email:
             return -1
         if not password:
@@ -286,8 +294,9 @@ class BaseStation:
         db.session.add(user)
         db.session.commit()
         return 1
-    
-    def update_custom_function(self, custom_function):
+
+    def update_custom_function(self, custom_function: str) -> bool:
+        """Adds custom function(s) for the logged in user if there is a user logged in"""
         if not self.login_email:
             return False
 
@@ -298,23 +307,25 @@ class BaseStation:
 
     # ==================== SPEECH RECOGNITION ====================
     def get_speech_recognition_status(self) -> str:
+        """Retrieves the speech recognition status string"""
         message = (
-            self.speech_recog_thread.message_queue.pop() 
+            self.speech_recog_thread.message_queue.pop()
             if self.speech_recog_thread else ""
         )
         # could be None because message_queue.pop() can return None
         message = "" if message is None else message
         return message
-    
-    def toggle_speech_recognition(self, bot_name, command):
+
+    def toggle_speech_recognition(self, bot_name: str, command: str) -> None:
+        """Toggles the speech recognition between states of running and stopped"""
         if command == "START":
             # create a new thread that listens and converts speech
-            # to text in the background.  Cannot run this non-terminating 
-            # function  in the current thread because the current post request 
-            # will not terminate and our server will not handle any more 
+            # to text in the background.  Cannot run this non-terminating
+            # function  in the current thread because the current post request
+            # will not terminate and our server will not handle any more
             # requests.
             self.speech_recog_thread = StoppableThread(
-                self.speech_recognition, bot_name 
+                self.speech_recognition, bot_name
             )
             self.speech_recog_thread.start()
         # stop listening
@@ -323,10 +334,10 @@ class BaseStation:
                 self.speech_recog_thread.stop()
 
     def speech_recognition(
-        self, 
-        thread_safe_condition: ThreadSafeVariable, 
-        thread_safe_message_queue: ThreadSafeVariable, 
-        bot_name: str 
+        self,
+        thread_safe_condition: ThreadSafeVariable,
+        thread_safe_message_queue: ThreadSafeVariable,
+        bot_name: str
     ) -> None:
         """ Listens to the user and converts the user's speech to text. 
         Arguments:
@@ -360,7 +371,8 @@ class BaseStation:
                 try:
                     # listen for 5 seconds
                     audio = recognizer.listen(microphone, RECORDING_TIME_LIMIT)
-                    thread_safe_message_queue.push("Converting from speech to text")
+                    thread_safe_message_queue.push(
+                        "Converting from speech to text")
 
                     # convert speech to text
                     words = recognizer.recognize_google(audio)
@@ -379,13 +391,15 @@ class BaseStation:
                 except sr.WaitTimeoutError:
                     thread_safe_message_queue.push("Timed out!")
                 except sr.UnknownValueError:
-                    thread_safe_message_queue.push("Words not recognized!")    
-    
+                    thread_safe_message_queue.push("Words not recognized!")
+
     # ==================== GETTERS and SETTERS ====================
     @property
-    def login_email(self):
+    def login_email(self) -> str:
+        """Retrieves the login email property"""
         return self._login_email
-    
+
     @login_email.setter
     def login_email(self, email: str):
+        """Sets the login email property"""
         self._login_email = email

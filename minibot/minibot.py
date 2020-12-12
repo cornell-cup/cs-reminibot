@@ -15,7 +15,6 @@ import argparse
 import signal
 
 
-
 class Minibot:
     """ Represents a minibot.  Handles all communication with the basestation
     as well as executing commands sent by the basestation.
@@ -23,7 +22,6 @@ class Minibot:
     Note: sock stands for socket throughout this file.  A socket is one endpoint
         of a communication channel. 
     """
-
     # address refers to ip_address and port
     # 255.255.255.255 to indicate that we are broadcasting to all addresses
     # on port 9434.  The Basestation has been hard-coded to listen on port 9434
@@ -201,7 +199,7 @@ class Minibot:
                 # TODO need to write back saying that the command executed.
                 # successfully
 
-    def handle_writable_socks(self, write_ready_socks):
+    def handle_writable_socks(self, write_ready_socks: List[socket]):
         """ 
         iterate through all the sockets in the write_ready_socks and 
         send over all messages in the socket's message_queue
@@ -217,27 +215,29 @@ class Minibot:
             self.writable_sock_message_queue_map[sock] = deque()
             self.writable_socks.remove(sock)
 
-    def handle_errorable_socks(self, errored_out_socks):
-        """ 
-        iterate through all the sockets in the errored_out_socks and 
-        close these socks
+    def handle_errorable_socks(self, errored_out_socks: List[socket]):
+        """ Iterate through all the sockets in the errored_out_socks and 
+        close these socks.  All these sockets have received some error code
+        due to some failure.
+
         Arguments:
-            errored_out_socks: 
-                All sockets that have errored out
+            errored_out_socks: All sockets that have errored out
         """
         for sock in errored_out_socks:
             print(f"Socket errored out!!!! {sock}", flush=True)
             # TODO handle more conditions instead of just
-            self.close_sock(sock)
             # closing the socket
+            self.close_sock(sock)
 
-    def close_sock(self, sock):
+    def close_sock(self, sock: socket):
+        """ 
+        """
         for sock_list in self.sock_lists:
             if sock in sock_list:
                 sock_list.remove(sock)
         sock.close()
-    
-    def basestation_disconnected(self, basestation_sock):
+
+    def basestation_disconnected(self, basestation_sock: socket):
         print("Basestation Disconnected", flush=True)
         Thread(target=ece.stop).start()
         print(basestation_sock)
@@ -278,8 +278,8 @@ class Minibot:
         """ Executes a command using the given key-value pair 
 
         Arguments:
-                key: type of the command
-                value: command to be executed
+            key: type of the command
+            value: command to be executed
         """
         # All ECE commands need to be called under separate threads because each
         # ECE function contains an infinite loop.  This is because there was
@@ -296,7 +296,7 @@ class Minibot:
             script_exec_result = (
                 self.script_exec_result.value if self.script_exec_result else ""
             )
-            self.sendKV(sock, key, script_exec_result) 
+            self.sendKV(sock, key, script_exec_result)
         elif key == "MODE":
             if value == "object_detection":
                 Thread(target=ece.object_detection).start()
@@ -320,11 +320,11 @@ class Minibot:
                 manager = Manager()
                 self.script_exec_result = manager.Value(c_char_p, "")
 
-                # Run the Python program in a different process so that we 
+                # Run the Python program in a different process so that we
                 # don't need to wait for it to terminate and we can kill it
                 # whenever we want.
                 current_process = Process(
-                    target=self.run_script, 
+                    target=self.run_script,
                     args=(script_name, self.script_exec_result)
                 )
                 current_process.start()
@@ -341,8 +341,10 @@ class Minibot:
                 Thread(target=cmds_functions_map[value], args=[50]).start()
             else:
                 Thread(target=ece.stop).start()
-    
-    def sendKV(self, sock, key, value):
+
+    def sendKV(self, sock: socket, key: str, value: str):
+        """ Sends a key-value pair to the specified socket. The key value
+        pair is encoded as <<<<key, value>>>> when sent to the basestation """
         # we want to write to the socket we received data on, so add
         # it to the writable socks
         self.writable_socks.add(sock)
@@ -351,7 +353,6 @@ class Minibot:
             self.writable_sock_message_queue_map[sock].append(message)
         else:
             self.writable_sock_message_queue_map[sock] = deque([message])
-
 
     @staticmethod
     def process_string(value):
@@ -372,12 +373,12 @@ class Minibot:
             program += "    " + cmds[i] + "\n"
         return program
 
-    def run_script(self, scriptname, result):
+    def run_script(self, scriptname: str, result: manager.Value):
         """
         Loads a script and runs it.
         Args:
-            scriptname (str): The name of the script to run.
-            tcp_instance (object): TCP object for communication.
+            scriptname: The name of the script to run.
+            result: 
         """
 
         # Cache invalidation and module refreshes are needed to ensure
@@ -395,6 +396,11 @@ class Minibot:
             result.value = str_exception
 
     def sigint_handler(self, sig, frame):
+        """ Closes open resources before terminating the program, when 
+        receives a CTRL + C
+        """
+        print(type(sig))
+        print(type(frame))
         print("Minibot received CTRL + C", flush=True)
         self.listener_sock.close()
         self.broadcast_sock.close()

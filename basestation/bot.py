@@ -13,10 +13,20 @@ class Bot:
     END_CMD_TOKEN = ">>>>"
     TIMEOUT_LIMIT = 5
 
-    def __init__(self, bot_name, ip_address, port=10000):
+    def __init__(self, bot_name: str, ip_address: str, port: int = 10000):
+        """ Creates the Minibot representation.
+        Arguments:
+            bot_name:   The name of the Minibot
+            ip_address: The ip address of the Minibot
+            port:       The port on which the Minibot's listening/server socket 
+                        is running on.  This information is needed when trying 
+                        to initiate a connection with the Minibot.
+        """
         self.port = port
         self.ip_address = ip_address
-        # the basestation's endpoint socket with the
+        # Initiate connection with the Minibot.  If the initiation is successful,
+        # self.sock will contain the endpoint on which we can communication with
+        # the Minibot
         self.sock = socket.create_connection((ip_address, port))
         # an arbitrarily small time
         self.sock.settimeout(0.01)
@@ -40,7 +50,7 @@ class Bot:
             else:
                 data = self.sock.recv(Bot.SOCKET_BUFFER_SIZE)
             line = data.decode("utf-8")
-            line = line if len(line) > 0 else None # if "" then line = None
+            line = line if len(line) > 0 else None  # if "" then line = None
             if line is None:
                 self.sock.close()
                 self.is_socket_connected = False
@@ -52,10 +62,8 @@ class Bot:
             self.is_socket_connected = False
         return line
 
-    def sendKV(self, key, value):
-        """
-        send command with specified key and value
-        """
+    def sendKV(self, key: str, value: str):
+        """ Send message with specified key and value. """
         if not self.is_socket_connected:
             return
 
@@ -65,8 +73,7 @@ class Bot:
             self.sock.sendall(data)
 
     def readKV(self):
-        """
-        Reads from the socket connection between the basesation and the Minibot
+        """ Reads from the socket connection between the basesation and the Minibot
         <<<<BOTSTATUS,ACTIVE>>>>
         """
         if not self.is_socket_connected:
@@ -103,11 +110,11 @@ class Bot:
     @property
     def name(self):
         return self._name
-    
+
     @property
     def script_exec_result(self):
         return self._script_exec_result
-    
+
     @script_exec_result.setter
     def script_exec_result(self, value):
         self._script_exec_result = value

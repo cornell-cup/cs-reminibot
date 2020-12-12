@@ -28,7 +28,7 @@ class User(db.Model):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
 
-    # User information
+    """User information"""
     email = db.Column(db.String, nullable=False, unique=True)
     # Never store a password directly in a database, store a weird hash
     # of the password so that a hacker cannot directly see the user passwords
@@ -40,18 +40,18 @@ class User(db.Model):
     # Custom Functions
     custom_function = db.Column(db.String, nullable=False)
 
-    def __init__(self, email, password):
+    def __init__(self, email: str, password: str):
         self.email = email
         self.password_digest = (
             bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt(rounds=13))
         )
         self.custom_function = "[]"
 
-    def verify_password(self, password):
-        # check the password against its hash that is stored in the database
+    def verify_password(self, password: str) -> bool:
+        """Checks the password against its hash that is stored in the database"""
         return bcrypt.checkpw(password.encode('utf8'), self.password_digest)
 
-    def serialize(self):
+    def serialize(self) -> dict:
         return{
             'id': self.id,
             'email': self.email,
