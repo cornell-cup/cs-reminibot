@@ -72,7 +72,7 @@ def take_pictures(args):
         if key & 0xFF == ord(' '):
 
             # Defins directory for resulting images, and creates it if nonexistent
-            path = os.getcwd() + "/images/" + args.category + "/"
+            path = os.getcwd() + "/../object/images/" + args.category + "/"
             if not os.path.isdir(path):
                 os.makedirs(path)
 
