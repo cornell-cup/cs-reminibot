@@ -26,10 +26,10 @@ system may add.
 # Configuration Options
 SHOW_IMAGE = True
 PRINT_FPS = False
-APPLY_CHECKERBOARD = False
+APPLY_CHECKERBOARD = True
 APPLY_TRANSFORM = False
 # This tag is used as a canonical distance conversion
-CANONICAL_TAG = 1  
+CANONICAL_TAG = 11
 # Tag size is 6.25" with 8.5" expected width spacing and 11" expected height spacing
 TAG_SIZE = 6.25
 # Scale factor of output coordinates
@@ -63,12 +63,12 @@ def main():
             print("Showing frame {}".format(frame_num))
             print("Current speed: {} fps".format(fps))
         if APPLY_CHECKERBOARD:
-            frame = undistort_image(frame, sys.argv[1])
+            frame = undistort_image(frame, args["file"])
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         detections, det_image = detector.detect(gray, return_image=True)
         print(len(detections))
         if detections and APPLY_TRANSFORM:
-            detections = apply_transform(detections, sys.argv[1])
+            detections = apply_transform(detections, args["file"])
         points = []
         dim_lst = []
         for d in range(len(detections)):
@@ -315,8 +315,8 @@ def undistort_image(frame, filename):
     mat = util.get_numpy_matrix(calib_data, "camera_matrix")
     dist = util.get_numpy_matrix(calib_data, "dist_coeffs")
     new_mtx = util.get_numpy_matrix(calib_data, "new_camera_matrix")
-    x = calib_data["offsets"]["x"]
-    y = calib_data["offsets"]["y"]
+    x = calib_data["roi"]["x"]
+    y = calib_data["roi"]["y"]
 
     calib_file.close()
 
@@ -413,6 +413,15 @@ def get_args():
         type=int,
         default=0,
         help="ID of the camera to use"
+    )
+
+    parser.add_argument(
+        "-f",
+        "--file",
+        metavar="<calib file name>",
+        type=str,
+        required=False,
+        help="calibration file name"
     )
     
     options = parser.parse_args()
