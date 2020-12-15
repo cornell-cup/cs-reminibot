@@ -77,10 +77,10 @@ function Ports(props) {
     for (let i = 0; i < ports.length; i++) {
         buttonList.push(
             <li key={i}>
-                <button 
-                    className="btn_ports" 
+                <button
+                    className="btn_ports"
                     onClick={() => props.motorPorts(props.portName, ports[i])}>
-                        {ports[i]}   
+                    {ports[i]}
                 </button>
             </li>
         );
@@ -462,94 +462,104 @@ export default class AddBot extends React.Component {
         const _this = this;
         return (
             <div className="container-fluid control">
-                <div className="row">
-                    <div className="col text-center">
-                        <p className="small-title">Minibot Setup </p>
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col horizontalDivCenter">
-                        <div className="element-wrapper">
-                            <label className="white-label"> Available Bots: &nbsp; </label>
-                            <RefreshingList ref={this.refreshingBotListRef} />
-                        </div>
-                        <Button id="add-bot" name="Add Bot" onClick={this.addBotListener} />
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col horizontalDivCenter">
-                        <div className="element-wrapper">
-                            <label id="selected-bot" style={this.props.selectedBotStyle}> 
-                                Connected to: &nbsp; &nbsp;
-                                <span id="botName">
-                                    {_this.getSelectedBotText()} 
-                                </span>
-                            </label>
-                        </div>
-                        <Button id="remove-bot" name="Remove"
-                            onClick={() => _this.deleteBotListener()}
-                            style={_this.props.selectedBotStyle} 
-                        />
-                    </div>
-                </div>
-                <br />
-                <div className="row">
-                    <div className="col horizontalDivCenter">
-                        <p className="small-title">Ports </p>
-                        <div className="element-wrapper in-front-of-other-elems">
-                            <PortsList motorPorts={this.motorPorts} />
+                <div className="container">
+                    <div className="row">
+                        <div className="col text-center">
+                            <br />
+                            <p className="small-title">Minibot Setup </p>
                         </div>
                     </div>
-                </div>
-                <br />
-                <div className="row">
-                    <div className="col horizontalDivCenter">
-                        <p className="small-title">Movement </p>
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col text-center">
-                        <button className="button-movement" onClick={() => this.buttonMapListener("forward")}>forward</button>
-                        <br />
-                        <button className="button-movement" onClick={() => this.buttonMapListener("left")}>left</button>
-                        <button className="button-stop" onClick={() => this.buttonMapListener("stop")}>stop</button>
-                        <button className="button-movement" onClick={() => this.buttonMapListener("right")}>right</button>
-                        <br />
-                        <button className="button-movement" onClick={() => this.buttonMapListener("backward")}>backward</button>
-                        <br />
-                        <br />
-                        <form className="horizontalDivCenter">
-                            <div>
-                                <label className="white-label"> Power: &nbsp; </label>
+                    <div className="row">
+                        <div className="col horizontalDivCenter">
+                            <div className="element-wrapper">
+                                <label className="white-label"> Available Bots: &nbsp; </label>
+                                <RefreshingList ref={this.refreshingBotListRef} />
                             </div>
-                            <input id="custom-range-1" className="custom-range" name="wheel_power" type="range" min="0" max="100"
-                                step="5" onChange={evt => this.updatePowerValue(evt)} />
-                        </form>
+                            <Button id="add-bot" name="Add Bot" onClick={this.addBotListener} />
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col horizontalDivCenter">
+                            <div className="element-wrapper">
+                                <label id="selected-bot" style={this.props.selectedBotStyle}>
+                                    Connected to: &nbsp; &nbsp;
+                                <span id="botName">
+                                        {_this.getSelectedBotText()}
+                                    </span>
+                                </label>
+                            </div>
+                            <Button id="remove-bot" name="Remove"
+                                onClick={() => _this.deleteBotListener()}
+                                style={_this.props.selectedBotStyle} />
+                        </div>
                     </div>
                 </div>
                 <br />
-                <div className="row">
-                    <div className="col horizontalDivCenter">
-                        <p className="small-title"> Speech Recognition </p>
-                    </div>
-                </div>
-                {/* button-wrapper is a custom class to add padding
-                    the rest is bootstrap css */}
-                <div className="col horizontalDivCenter">
-                    <SpeechRecognition selectedBotName={this.props.selectedBotName}
-                        float="right" />
-                </div>
-                <div className="col horizontalDivCenter">
-                    <label id="speech_recognition_feedback_box" />
-                </div>
-                <div className="row">
-                    <div className="col horizontalDivCenter">
-                        <p className="small-title"> Custom Modes </p>
-                        <button className="btn btn-success element-wrapper mr-1" onClick={() => this.objectDetectionOnClick()}>Object Detection</button>
-                        <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.lineFollowOnClick()}>Line Follow</button>
+                <div className="container">
+                    <div className="row">
+                        <div className="col horizontalDivCenter">
+                            <p className="small-title">Ports </p>
+                            <div className="element-wrapper in-front-of-other-elems">
+                                <PortsList motorPorts={this.motorPorts} />
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <br />
+                <div className="container">
+                    <div className="row">
+                        <div className="col horizontalDivCenter">
+                            <p className="small-title">Movement </p>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col text-center">
+                            <button className="button-movement" onClick={() => this.buttonMapListener("forward")}>forward</button>
+                            <br />
+                            <button className="button-movement" onClick={() => this.buttonMapListener("left")}>left</button>
+                            <button className="button-stop" onClick={() => this.buttonMapListener("stop")}>stop</button>
+                            <button className="button-movement" onClick={() => this.buttonMapListener("right")}>right</button>
+                            <br />
+                            <button className="button-movement" onClick={() => this.buttonMapListener("backward")}>backward</button>
+                            <br />
+                            <br />
+                            <form className="horizontalDivCenter">
+                                <div>
+                                    <label className="white-label"> Power: &nbsp; </label>
+                                </div>
+                                <input id="custom-range-1" className="custom-range" name="wheel_power" type="range" min="0" max="100"
+                                    step="5" onChange={evt => this.updatePowerValue(evt)} />
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <div className="container">
+                    <div className="row">
+                        <div className="col horizontalDivCenter">
+                            <p className="small-title"> Speech Recognition </p>
+                        </div>
+                    </div>
+                    <div className="col horizontalDivCenter">
+                        <SpeechRecognition selectedBotName={this.props.selectedBotName}
+                            float="right" />
+                    </div>
+                    <div className="col horizontalDivCenter">
+                        <label id="speech_recognition_feedback_box" />
+                    </div>
+                </div>
+                <br />
+                <div className="container">
+                    <div className="row">
+                        <div className="col horizontalDivCenter">
+                            <p className="small-title"> Custom Modes </p>
+                            <button className="btn btn-success element-wrapper mr-1" onClick={() => this.objectDetectionOnClick()}>Object Detection</button>
+                            <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.lineFollowOnClick()}>Line Follow</button>
+                        </div>
+                    </div>
+                    <br />
+                </div>
+
                 <br />
             </div >
         );

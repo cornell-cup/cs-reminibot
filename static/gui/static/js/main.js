@@ -16,7 +16,7 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 class Navbar extends React.Component {
   render() {
     return (
-      <div style={{backgroundColor:"black"}} className="jumbotron text-center">
+      <div style={{backgroundColor:"#212529"}} className="jumbotron text-center">
         <img className="logo" src="./static/img/logo.png" />
         <h1 id="title"> MiniBot WebGUI </h1>
       </div>
