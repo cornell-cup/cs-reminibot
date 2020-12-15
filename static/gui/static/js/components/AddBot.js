@@ -493,6 +493,7 @@ export default class AddBot extends React.Component {
                                 style={_this.props.selectedBotStyle} />
                         </div>
                     </div>
+                    <br />
                 </div>
                 <br />
                 <div className="container">

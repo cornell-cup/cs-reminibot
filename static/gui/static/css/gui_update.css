@@ -14,21 +14,21 @@
 .button-login {
     background: #d1150c;
     color: white;
-    border-radius: 15px;
     height: 40px;
     font-weight: 650;
     letter-spacing: 0.11em;
 }
 
 .button-gradient {
-    background-image: linear-gradient(to right, red, rgb(255, 155, 0));
+    background-image: linear-gradient(to right, #e34850, rgb(255, 155, 0));
     color: white;
-    border: 2px solid grey;
+    border-radius: 5px;
+    padding: 5px;   
+    border: 0px;
 }
 
 .button-gradient:hover {
     background-image: linear-gradient(to right, rgb(235, 0, 0), rgb(245, 145, 0));
-    border: 2px solid white;
 }
 
 
@@ -45,12 +45,6 @@
 
 .white-label {
     color:white;
-}
-
-.container{
-    background-color: #2c3137;
-    border-radius: 25px;
-    padding: 5px 1px 5px 1px; 
 }
 
 .element-wrapper {
@@ -119,8 +113,10 @@ table {
 }
 
 .available-bots {
-    background-color: red;
+    background-color:#e34850;
     color: white;
+    padding: 2px;
+    border-radius: 5px;
 }
 
 .gridControlTable {
@@ -172,7 +168,9 @@ table {
     list-style: none;
     padding: 6px 12px;
     cursor: pointer;
-    color: white
+    color: white;
+    background-color:#3c434b ;
+    border-radius: 5px 5px 0 0;
 }
 
 .react-tabs__tab--selected {
@@ -331,6 +329,7 @@ table {
     border-width: 1px;
     color: white;
     padding: 5px;
+    background-color:#3c434b ;
 }
 
 #speech_recognition_feedback_box {
@@ -343,4 +342,18 @@ table {
 
 #botName {
     color: orange;
+    font-weight: bold;
+}
+
+
+.container{
+    background-color: #2c3137;
+    border-radius: 25px;
+    padding: 5px 1px 5px 1px; 
+}
+
+.container-coding{
+    background-color: #2c3137;
+    border-radius: 25px;
+    padding: 5px 5px 5px 5px; 
 }

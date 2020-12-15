@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import {Button, LabeledTextBox} from './Util.js';
+import { Button, LabeledTextBox } from './Util.js';
 import CodeMirror from 'react-codemirror';
 require('codemirror/mode/python/python');
 
@@ -55,8 +55,8 @@ class PythonEditor extends React.Component {
     }
 
     /* Updates this class's state to contain the code specified in the parameter*/
-    updateCode(code)    {
-        this.setState({code});
+    updateCode(code) {
+        this.setState({ code });
         if (this.state.codingStart == -1) {
             this.setState({ codingStart: new Date().getTime() })
         }
@@ -120,7 +120,7 @@ class PythonEditor extends React.Component {
         if (startTime != -1) {
             let time = (new Date().getTime() - startTime) / 1000
             document.getElementById("time").value = time.toString() + "s";
-            this.setState({codingStart : -1})
+            this.setState({ codingStart: -1 })
         }
 
         axios({
@@ -144,7 +144,7 @@ class PythonEditor extends React.Component {
          * Repeatedly call the ErrorMessageHandler in base_station_interface.py
          * until a non-empty execution result of the Python program is received.
          */
-        let interval = setInterval(function() {
+        let interval = setInterval(function () {
             axios({
                 method: 'POST',
                 url: '/result',
@@ -162,11 +162,11 @@ class PythonEditor extends React.Component {
                     if (response.data["code"] !== -1) {
                         if (response.data["code"] === 1) {
                             // lime green
-                            document.getElementById("error-message").style.color="#32CD32";
+                            document.getElementById("error-message").style.color = "#32CD32";
                         }
                         else {
                             // red
-                            document.getElementById("error-message").style.color="#FF0000";
+                            document.getElementById("error-message").style.color = "#FF0000";
                         }
                         // result has arrived so go ahead and clear the interval (stop polling
                         // the server)
@@ -176,7 +176,7 @@ class PythonEditor extends React.Component {
                 .catch((err) => {
                     console.log(err)
                 })
-            }, 500);
+        }, 500);
     }
 
     render() {
@@ -192,13 +192,13 @@ class PythonEditor extends React.Component {
                     </div>
                 </div>
                 <div className="row">
-                    <div 
+                    <div
                         className="col"
                         style={{
-                            "width": '600px', 
-                            "width": '480px', 
-                            "border": "2px solid grey", 
+                            "width": '500px',
+                            "width": '480px',
                             "marginRight": "5px",
+                            "padding": "20px",
                         }}
                     >
                         <CodeMirror
@@ -211,7 +211,7 @@ class PythonEditor extends React.Component {
                 </div>
                 <div className="row">
                     <div className="col">
-                        <form style={{color:"white"}}>
+                        <form style={{ color: "white" }}>
                             <input
                                 type="file"
                                 id="upload"
@@ -230,7 +230,7 @@ class PythonEditor extends React.Component {
                             placeholder={"FileName.py"}
                             onChange={(event) => this.handleFileNameChange(event)}
                         />
-                        <Button id={"download_python"} onClick={this.downloadPython} name={"Download"} />
+                        <Button id="download_python" onClick={this.downloadPython} name="Download" />
                     </div>
                 </div>
                 <div className="row">
@@ -248,32 +248,32 @@ class PythonEditor extends React.Component {
                         />
                         <Button
                             id={"DBlock"}
-                            onClick={() => { if (window.confirm('You Are Deleting Custom Block: '+this.state.functionName)) this.props.dblock(this.state.functionName) } }
+                            onClick={() => { if (window.confirm('You Are Deleting Custom Block: ' + this.state.functionName)) this.props.dblock(this.state.functionName) }}
                             name={"Delete"}
                         />
                         <Button
                             id={"DBlockAll"}
-                            onClick={() => { if (window.confirm('You Are Deleting All Custom Blocks')) this.props.dblockAll() } }
+                            onClick={() => { if (window.confirm('You Are Deleting All Custom Blocks')) this.props.dblockAll() }}
                             name={"Delete All"}
                         />
                     </div>
                 </div>
                 <div className="row">
                     <div className="col horizontalDiv">
-                        <div> 
-                            <textarea 
-                                id="error-message" 
+                        <div>
+                            <textarea
+                                id="error-message"
                                 placeholder="Script Execution Result"
-                                rows="1" 
-                                cols="60" 
+                                rows="1"
+                                cols="60"
                             />
                         </div>
-                        <div className="element-wrapper"> 
-                            <textarea 
-                                style={{ color: 'blue' }} 
+                        <div className="element-wrapper">
+                            <textarea
+                                style={{ color: 'blue' }}
                                 placeholder="Time Elapsed Coding"
-                                id = "time" 
-                                rows="1" 
+                                id="time"
+                                rows="1"
                                 cols="20"
                             />
                         </div>
@@ -335,13 +335,13 @@ export default class MinibotBlockly extends React.Component {
     manageDefaultCustomBlocklyFunction() {
         const defaultFunction = [this.state.emptyFunctionName, " "];
         if (this.props.customBlockList.length == 0) {
-                this.props.customBlockList.push(defaultFunction);
+            this.props.customBlockList.push(defaultFunction);
         }
         // default function can only exist if only one element in array
-        else if (this.props.customBlockList[0][0]===this.state.emptyFunctionName && this.props.customBlockList.length>1) {
-                // delete first element
-                this.props.customBlockList.splice(0, 1);
-            }
+        else if (this.props.customBlockList[0][0] === this.state.emptyFunctionName && this.props.customBlockList.length > 1) {
+            // delete first element
+            this.props.customBlockList.splice(0, 1);
+        }
     }
 
     updateCustomBlocks() {
@@ -436,7 +436,7 @@ export default class MinibotBlockly extends React.Component {
         let item = _this.props.customBlockList.find(element => element[0] === functionName)
         const index = _this.props.customBlockList.indexOf(item);
         if (index === -1) {
-            window.alert('Custom Block - '+functionName+' - Does Not Exist');
+            window.alert('Custom Block - ' + functionName + ' - Does Not Exist');
             return;
         }
         _this.props.customBlockList.splice(index, 1);
@@ -447,7 +447,7 @@ export default class MinibotBlockly extends React.Component {
 
     dblockAll() {
         const _this = this;
-        if(_this.props.customBlockList[0][0]===_this.state.emptyFunctionName){
+        if (_this.props.customBlockList[0][0] === _this.state.emptyFunctionName) {
             window.alert('There Are No Custom Blocks');
             return;
         }
@@ -463,7 +463,7 @@ export default class MinibotBlockly extends React.Component {
         const value = event.target.value;
         const name = event.target.name;
 
-        this.setState({blocklyFilename: value});
+        this.setState({ blocklyFilename: value });
     }
 
     handleFileNameChange(event) {
@@ -533,7 +533,7 @@ export default class MinibotBlockly extends React.Component {
         // code = code.replace(/\n/g, '<br>');
         // code = code.replace(/ /g, '&nbsp;');
         // document.getElementById('generatedPythonFromBlocklyBox').innerHTML = code;
-        this.setState({blocklyGeneratedPythonCode: code});
+        this.setState({ blocklyGeneratedPythonCode: code });
         // document.getElementById('blockly').value = window.Blockly.Python.workspaceToCode(this.workspace);
     }
 
@@ -565,7 +565,7 @@ export default class MinibotBlockly extends React.Component {
             method: 'POST',
             url: '/script',
             headers: {
-              'Content-Type': 'application/json'
+                'Content-Type': 'application/json'
             },
             data: JSON.stringify({
                 bot_name: _this.props.selectedBotName,
@@ -585,7 +585,7 @@ export default class MinibotBlockly extends React.Component {
             method: 'POST',
             url: '/wheels',
             headers: {
-              'Content-Type': 'application/json'
+                'Content-Type': 'application/json'
             },
             data: JSON.stringify({
                 bot_name: this.props.selectedBotName,
@@ -692,10 +692,10 @@ export default class MinibotBlockly extends React.Component {
                 loginErrorLabel: "",
                 isLoggedIn: true,
             });
-            if(temp[0][0]!==_this.state.emptyFunctionName && _this.props.customBlockList[0][0]!==_this.state.emptyFunctionName){
+            if (temp[0][0] !== _this.state.emptyFunctionName && _this.props.customBlockList[0][0] !== _this.state.emptyFunctionName) {
                 _this.props.customBlockList.push.apply(_this.props.customBlockList, temp);
             }
-            if(temp[0][0]!==_this.state.emptyFunctionName && _this.props.customBlockList[0][0]===_this.state.emptyFunctionName){
+            if (temp[0][0] !== _this.state.emptyFunctionName && _this.props.customBlockList[0][0] === _this.state.emptyFunctionName) {
                 _this.props.customBlockList.splice(0, 1);
                 _this.props.customBlockList.push.apply(_this.props.customBlockList[0], temp);
             }
@@ -718,11 +718,11 @@ export default class MinibotBlockly extends React.Component {
         return (
             <div className="container-fluid">
                 <div className="row">
-                    <div id="login and register" className="horizontalDiv">
-                        {!this.state.isLoggedIn ? <Button id="register" name="Register" onClick={this.register}/> : null}
+                    <div id="login and register" className="horizontalDiv" style={{ marginLeft: "40px" }}>
+                        {!this.state.isLoggedIn ? <Button id="register" name="Register" onClick={this.register} /> : null}
                         {!this.state.isLoggedIn ? <Button id="login" name="Login" onClick={this.login} /> : null}
                         {this.state.isLoggedIn ? <label className="white-label"> Logged in as: {this.state.loginEmail} &nbsp; </label> : null}
-                        {this.state.isLoggedIn ? <Button id="logout" name="Logout" onClick={this.logout} /> : null}
+                        {this.state.isLoggedIn ? <Button id="logout" name="Logout" onClick={this.logout}/> : null}
                         <UserAccountModal
                             modalType="register"
                             handleEvent={this.handleRegister}
@@ -738,57 +738,69 @@ export default class MinibotBlockly extends React.Component {
                         />
                     </div>
                 </div>
-                <div className="row">
-                    <div className="col">
-                        <div className="row">
-                            <div className="col text-center">
-                                <p className="small-title"> Blockly </p>
+                <br />
+                <div className="container-coding">
+                    <br />
+                    <div className="row">
+                        <div className="col">
+                            <div className="row">
+                                <div className="col text-center">
+                                    <p className="small-title"> Blockly </p>
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="col">
+                                    <div id="blocklyDiv" style={{ height: "500px", width: "575px", padding: "20px" }}></div>
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="col horizontalDiv">
+                                    <form style={{ color: "white", padding: "20px" }}>
+                                        <input
+                                            type="file"
+                                            id="blockUpload"
+                                            multiplesize="1"
+                                            accept=".xml"
+                                            onChange={this.loadFileAsBlocks}
+                                        />
+                                    </form>
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="col horizontalDiv">
+                                    <div className="element-wrapper" style={{ paddingLeft: "20px" }}><input
+                                        type="text"
+                                        name="blockly_filename"
+                                        placeholder="FileName.xml"
+                                        onChange={this.handleInputChange}
+                                    /></div>
+                                    <Button id="blocklySubmit" name="Download" onClick={this.download} />
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="col horizontalDiv">
+                                    <div className="element-wrapper" style={{ paddingLeft: "20px" }}>
+                                        <Button id="blocklyRun" name="Run" onClick={this.runBlockly} />
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div className="row">
-                            <div className="col">
-                                <div id="blocklyDiv" style={{height:"400px", width:"600px"}}></div>
-                            </div>
-                        </div>
-                        <div className="row">
-                            <div className="col horizontalDiv">
-                                <form style={{color:"white"}}>
-                                    <input
-                                        type="file"
-                                        id="blockUpload"
-                                        multiplesize="1"
-                                        accept=".xml"
-                                        onChange={this.loadFileAsBlocks}
-                                    />
-                                </form>
-                            </div>
-                        </div>
-                        <div className="row">
-                            <div className="col horizontalDiv">
-                                <div className="element-wrapper"><input
-                                    type="text"
-                                    name="blockly_filename"
-                                    placeholder="FileName.xml"
-                                    onChange={this.handleInputChange}
-                                /></div>
-                                <Button id="blocklySubmit" name="Download" onClick={this.download} />
-                            </div>
-                        </div>
-                        <div className="row">
-                            <div className="col horizontalDiv">
-                                <Button id="blocklyRun" name="Run" onClick={this.runBlockly} />
-                            </div>
-                        </div>
+                        <PythonEditor
+                            selectedBotName={this.props.selectedBotName}
+                            customBlock={this.customBlock}
+                            dblock={this.dblock}
+                            dblockAll={this.dblockAll}
+                            customBlockList={this.props.customBlockList}
+                            blocklyGeneratedPythonCode={this.state.blocklyGeneratedPythonCode}
+                        />
+                        <br />
+                        <br />
                     </div>
-                    <PythonEditor
-                        selectedBotName={this.props.selectedBotName}
-                        customBlock={this.customBlock}
-                        dblock={this.dblock}
-                        dblockAll={this.dblockAll}
-                        customBlockList={this.props.customBlockList}
-                        blocklyGeneratedPythonCode={this.state.blocklyGeneratedPythonCode}
-                    />
+                    <br />
+                    <br />
                 </div>
+                <br />
+                <br />
             </div>
         );
     }
