@@ -4,17 +4,18 @@
 <head>
 	<title>MiniBot Client GUI</title>
 	<!-- IMPORTS -->
-	<link rel="stylesheet" href="./static/gui/static/css/gui_update.css" />
-	<link rel="stylesheet" href="./static/gui/static/css/codemirror.css" />
+	<link rel="stylesheet" href="{{ url_for('static', filename = 'css/gui_update.css') }}" />
+	<link rel="stylesheet" href="{{ url_for('static', filename = 'css/codemirror.css') }}" />
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css"
 		integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+	<link rel="icon" href="{{ url_for('static', filename = 'img/logo.png' )}}" />
 
 	<!-- blockly imports -->
-	<script src="./static/gui/static/js/vendor/blockly/blockly_compressed.js"></script>
-	<script src="./static/gui/static/js/vendor/blockly/javascript_compressed.js"></script>
-	<script src="./static/gui/static/js/vendor/blockly/python_compressed.js"></script>
-	<script src="./static/gui/static/js/vendor/blockly/blocks_compressed.js"></script>
-	<script src="./static/gui/static/js/vendor/blockly/en.js"></script>
+	<script src="{{ url_for('static', filename='js/vendor/blockly/blockly_compressed.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/vendor/blockly/javascript_compressed.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/vendor/blockly/python_compressed.js') }}"></script>
+	<script src="{{ url_for('static',filename='js/vendor/blockly/blocks_compressed.js') }}"></script>
+	<script src="{{ url_for('static',filename='js/vendor/blockly/en.js') }}"></script>
 
 	<!--TODO: localize d3-->
 	<script src="https://d3js.org/d3.v5.min.js"></script>
@@ -110,10 +111,10 @@
 	<!-- basic imports -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 	<!-- IMPORT CUSTOM BLOCKS -->
-	<script type="text/javascript" src="./static/gui/static/js/blocks/custom_blocks.js"></script>
-	<script type="text/javascript" src="./static/gui/static/js/blocks/custom_json.js"></script>
-	<!-- manual scripts -->
-	<script src="/static/gui/static/build/app.bundle.js"></script>
+	<script type="text/javascript" src="{{ url_for('static', filename='js/blocks/custom_blocks.js')}}"></script>
+	<script type="text/javascript" src="{{ url_for('static', filename='js/blocks/custom_json.js')}}"></script>
+
+	<script src="{{ url_for('static', filename='build/app.bundle.js')}}"></script>
 </body>
 
 </html>

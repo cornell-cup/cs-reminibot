@@ -4,7 +4,7 @@ import React from 'react';
 export function Button(props) {
   return (
     <div className="element-wrapper">
-      <button id={props.id} onClick={props.onClick}>
+      <button id={props.id} onClick={props.onClick} style={props.style}>
         {props.name}
       </button>
     </div>
@@ -21,7 +21,7 @@ export function LabeledTextBox(props) {
         value={props.value}
         placeholder={props.placeholder}
         onChange={props.onChange}
-        // options={props.options}
+      // options={props.options}
       />
     </div>
   );

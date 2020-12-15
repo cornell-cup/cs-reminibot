@@ -6,7 +6,7 @@ import ReactDOM from 'react-dom';
 import GridView from './components/gridview.js';
 import Blockly from './components/blockly.js';
 import AddBot from './components/AddBot.js';
-import Dashboard from './components/dashboard.js'
+import Dashboard from './components/dashboard.js';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 
 /**
@@ -17,7 +17,7 @@ class Navbar extends React.Component {
   render() {
     return (
       <div className="jumbotron text-center">
-        <img className="logo" src="./static/gui/static/img/logo.png" />
+        <img className="logo" src="./static/img/logo.png" />
         <h1>MiniBot GUI</h1>
       </div>
     );
@@ -30,26 +30,40 @@ class Navbar extends React.Component {
 class Platform extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      customBlockList: [],
-      bot_name: '',
-      blockly_xml: null,
-      bot_list: [],
-      selected_bot: ''
+
+    this.hiddenLabelStyle = {
+      borderStyle : 'solid', 
+      borderWidth : "1px", 
+      visibility: 'hidden',
     };
 
-    this.updateBotName = this.updateBotName.bind(this);
-    this.setBlockly = this.setBlockly.bind(this);
-    this.setBotList = this.setBotList.bind(this);
-    this.setSelectedBot = this.setSelectedBot.bind(this);
-    this.redefineCustomBlockList = this.redefineCustomBlockList.bind(this);
-  }
+    this.visibleLabelStyle = {
+      borderStyle : 'solid', 
+      borderWidth : "1px", 
+      padding: '4px',
+      visibility: 'visible',
+    };
 
-  updateBotName(value) {
-    const _this = this;
-    _this.setState({ bot_name: value }, () => {
-      console.log('updated bot name to: ' + this.state.bot_name);
-    });
+    this.hiddenStyle = {
+      visibility: 'hidden',
+    };
+    this.visibleStyle = {
+      visibility: 'visible',
+    };
+
+    this.state = {
+      customBlockList: [],
+      blockly_xml: null,
+      selectedBotName: '',
+      selectedBotStyle: this.hiddenLabelStyle,
+      removeBotButtonStyle: this.hiddenStyle,
+    };
+
+    this.setBlockly = this.setBlockly.bind(this);
+    this.redefineCustomBlockList = this.redefineCustomBlockList.bind(this);
+    this.setSelectedBotName= this.setSelectedBotName.bind(this);
+    this.setSelectedBotStyle= this.setSelectedBotStyle.bind(this);
+
   }
 
   setBlockly(xmltext) {
@@ -57,16 +71,25 @@ class Platform extends React.Component {
     _this.setState({ blockly_xml: xmltext });
   }
 
-  setBotList(botList) {
-    this.setState({ bot_list: botList });
-  }
-
-  setSelectedBot(bot) {
-    this.setState({ selected_bot: bot });
-  }
-
   redefineCustomBlockList(newCustomBlockList) {
     this.setState({ customBlockList: newCustomBlockList });
+  }
+
+  setSelectedBotName(text) {
+    const _this = this;
+    _this.setState({ selectedBotName: text });
+  }
+
+  setSelectedBotStyle(style) {
+    const _this = this;
+    if (style === "hidden") {
+      _this.setState({ selectedBotStyle: this.hiddenLabelStyle });
+      _this.setState({ removeBotButtonStyle: this.hiddenStyle });
+    }
+    else {
+      _this.setState({ selectedBotStyle: this.visibleLabelStyle });
+      _this.setState({ removeBotButtonStyle: this.visibleStyle });
+    }
   }
 
   render() {
@@ -83,11 +106,11 @@ class Platform extends React.Component {
             <div className="row">
               <div className="col">
                 <AddBot
-                  updateBotName={this.updateBotName}
-                  setBotList={this.setBotList}
-                  bot_list={this.state.bot_list}
-                  setSelectedBot={this.setSelectedBot}
-                  selected_bot={this.state.selected_bot}
+                  selectedBotName={this.state.selectedBotName}
+                  setSelectedBotName={this.setSelectedBotName}
+                  selectedBotStyle={this.state.selectedBotStyle}
+                  setSelectedBotStyle={this.setSelectedBotStyle}
+                  removeBotButtonStyle={this.state.removeBotButtonStyle}
                 />
               </div>
               <div className="col">
@@ -99,7 +122,7 @@ class Platform extends React.Component {
             <Blockly
               blockly_xml={this.state.blockly_xml}
               setBlockly={this.setBlockly}
-              bot_name={this.state.bot_name}
+              selectedBotName={this.state.selectedBotName}
               customBlockList={this.state.customBlockList}
               redefineCustomBlockList={this.redefineCustomBlockList}
             />

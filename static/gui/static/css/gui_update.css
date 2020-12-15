@@ -208,39 +208,6 @@ table {
     font-weight: bold;
 }
 
-.led-box {
-    height: 30px;
-    width: 25%;
-}
-
-.led-box p {
-    font-size: 12px;
-    text-align: center;
-    margin: 1em;
-}
-
-#led-red {
-    margin: 0 auto;
-    width: 24px;
-    height: 24px;
-    background-color: #A00;
-    border-radius: 50%;
-    box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px, rgba(255, 0, 0, 0.5) 0 2px 12px;
-}
-
-@keyframes blinkRed {
-    from {
-        background-color: #A00;
-    }
-    50% {
-        background-color: rgb(81, 255, 0);
-        box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 7px 1px, inset #441313 0 -1px 9px, rgba(60, 255, 0, 0.5) 0 2px 0;
-    }
-    to {
-        background-color: #A00;
-    }
-}
-
 #main_nav ul {
     background: transparent;
     float: left;
@@ -324,6 +291,13 @@ table {
     position: absolute;
 }
 
+#selected-bot {
+    border-style: solid;
+    border-color: black;
+    border-width: 5px;
+    padding: 5px;
+}
+
 #speech_recognition_feedback_box {
     background-color : 	#ffb2b2;
     border-style: solid;
@@ -332,3 +306,6 @@ table {
     width: 320px;
 }
 
+#botName {
+    color: red;
+}
