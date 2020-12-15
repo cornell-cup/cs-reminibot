@@ -38,6 +38,12 @@
     color:white;
 }
 
+.container{
+    background-color: #2c3137;
+    border-radius: 25px;
+    padding: 5px 1px 5px 1px; 
+}
+
 .element-wrapper {
     padding-right: 15px;
 }
@@ -62,18 +68,18 @@
 }
 
 .main-body {
-    background: black;
+    background: #212529;
 }
 
 .jumbotron {
-    background-color: black;
+    background-color:#212529;
 }
 
 .navbar {
     width: 100vw;
     height: 8vh;
     size: 5em;
-    background: #323232;
+    background: #212529;
     color: white;
 }
 
@@ -167,7 +173,7 @@ table {
 .react-tabs__tab--selected {
     background: #fff;
     border-color: #aaa;
-    color: black;
+    color: #121212;
     border-radius: 5px 5px 0 0;
 }
 
@@ -201,7 +207,7 @@ table {
 }
 
 .button-movement {
-    background: rgb(255, 115, 0);
+    background: #e34850;
     color: white;
     border-radius: 30px;
     height: 40px;
@@ -227,7 +233,7 @@ table {
 
 .small_title {
     font-size: 30px; 
-    /* font-weight: bold; */
+    font-weight: bold;
     color: white
 }
 
