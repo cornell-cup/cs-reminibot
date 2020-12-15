@@ -464,7 +464,7 @@ export default class AddBot extends React.Component {
             <div className="container-fluid control">
                 <div className="row">
                     <div className="col text-center">
-                        <p className="small_title">Minibot Setup </p>
+                        <p className="small-title">Minibot Setup </p>
                     </div>
                 </div>
                 <div className="row">
@@ -488,13 +488,14 @@ export default class AddBot extends React.Component {
                         </div>
                         <Button id="remove-bot" name="Remove"
                             onClick={() => _this.deleteBotListener()}
-                            style={_this.props.selectedBotStyle} />
+                            style={_this.props.selectedBotStyle} 
+                        />
                     </div>
                 </div>
                 <br />
                 <div className="row">
                     <div className="col horizontalDivCenter">
-                        <p className="small_title">Ports </p>
+                        <p className="small-title">Ports </p>
                         <div className="element-wrapper in-front-of-other-elems">
                             <PortsList motorPorts={this.motorPorts} />
                         </div>
@@ -503,7 +504,7 @@ export default class AddBot extends React.Component {
                 <br />
                 <div className="row">
                     <div className="col horizontalDivCenter">
-                        <p className="small_title">Movement </p>
+                        <p className="small-title">Movement </p>
                     </div>
                 </div>
                 <div className="row">
@@ -529,7 +530,7 @@ export default class AddBot extends React.Component {
                 <br />
                 <div className="row">
                     <div className="col horizontalDivCenter">
-                        <p className="small_title"> Speech Recognition </p>
+                        <p className="small-title"> Speech Recognition </p>
                     </div>
                 </div>
                 {/* button-wrapper is a custom class to add padding
@@ -543,7 +544,7 @@ export default class AddBot extends React.Component {
                 </div>
                 <div className="row">
                     <div className="col horizontalDivCenter">
-                        <p className="small_title"> Custom Modes </p>
+                        <p className="small-title"> Custom Modes </p>
                         <button className="btn btn-success element-wrapper mr-1" onClick={() => this.objectDetectionOnClick()}>Object Detection</button>
                         <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.lineFollowOnClick()}>Line Follow</button>
                     </div>
