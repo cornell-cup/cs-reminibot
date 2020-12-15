@@ -5,7 +5,7 @@ Flask==1.1.1
 Flask-API==2.0
 Flask-SQLAlchemy==2.4.1    
 itsdangerous==0.24
-Jinja2==2.10
+Jinja2==2.10.1
 pycparser==2.19
 python-dotenv==0.15.0
 six==1.11.0            
