@@ -34,7 +34,7 @@ class PythonEditor extends React.Component {
         super(props);
         this.state = {
             code: "",
-            filename: "myPythonCode.py",
+            filename: "FileName.py",
             functionName: "default_function",
             codingStart: -1
         }
@@ -156,17 +156,17 @@ class PythonEditor extends React.Component {
                 }),
             })
                 .then((response) => {
-                    document.getElementById("errormessage").value = response.data["result"];
+                    document.getElementById("error-message").value = response.data["result"];
                     // if the code is -1 it means the result hasn't arrived yet, hence
                     // we shouldn't clear the interval and should continue polling
                     if (response.data["code"] !== -1) {
                         if (response.data["code"] === 1) {
                             // lime green
-                            document.getElementById("errormessage").style.color="#32CD32";
+                            document.getElementById("error-message").style.color="#32CD32";
                         }
                         else {
                             // red
-                            document.getElementById("errormessage").style.color="#FF0000";
+                            document.getElementById("error-message").style.color="#FF0000";
                         }
                         // result has arrived so go ahead and clear the interval (stop polling
                         // the server)
@@ -292,7 +292,7 @@ export default class MinibotBlockly extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            blocklyFilename: '',
+            blocklyFilename: 'FileName.xml',
             blocklyGeneratedPythonCode: "",
             pyblock: "",
             showPopup: false,
@@ -463,14 +463,13 @@ export default class MinibotBlockly extends React.Component {
         const value = event.target.value;
         const name = event.target.name;
 
-        this.setState({
-            [name]: value
-        });
+        this.setState({blocklyFilename: value});
     }
 
     handleFileNameChange(event) {
         this.setState({ filename: event.target.value });
     }
+
     handleFunctionNameChange(event) {
         this.setState({ functionName: event.target.value });
     }
@@ -561,6 +560,7 @@ export default class MinibotBlockly extends React.Component {
     /* Target function for the button "Run". Send python code
          corresponding to blockly to backend. */
     runBlockly(event) {
+        const _this = this;
         axios({
             method: 'POST',
             url: '/script',
@@ -568,8 +568,8 @@ export default class MinibotBlockly extends React.Component {
               'Content-Type': 'application/json'
             },
             data: JSON.stringify({
-                bot_name: this.props.selectedBotName,
-                script_code: blockly.value
+                bot_name: _this.props.selectedBotName,
+                script_code: _this.state.blocklyGeneratedPythonCode
             }),
         })
             .then(function (response) {
@@ -769,7 +769,6 @@ export default class MinibotBlockly extends React.Component {
                                     type="text"
                                     name="blockly_filename"
                                     placeholder="FileName.xml"
-                                    value={this.state.blocklyFilename}
                                     onChange={this.handleInputChange}
                                 /></div>
                                 <Button id="blocklySubmit" name="Download" onClick={this.download} />
