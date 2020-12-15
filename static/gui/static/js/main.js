@@ -16,9 +16,9 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 class Navbar extends React.Component {
   render() {
     return (
-      <div className="jumbotron text-center">
+      <div style={{backgroundColor:"black"}} className="jumbotron text-center">
         <img className="logo" src="./static/img/logo.png" />
-        <h1>MiniBot GUI</h1>
+        <h1 id="title"> MiniBot WebGUI </h1>
       </div>
     );
   }
@@ -31,19 +31,6 @@ class Platform extends React.Component {
   constructor(props) {
     super(props);
 
-    this.hiddenLabelStyle = {
-      borderStyle : 'solid', 
-      borderWidth : "1px", 
-      visibility: 'hidden',
-    };
-
-    this.visibleLabelStyle = {
-      borderStyle : 'solid', 
-      borderWidth : "1px", 
-      padding: '4px',
-      visibility: 'visible',
-    };
-
     this.hiddenStyle = {
       visibility: 'hidden',
     };
@@ -55,8 +42,7 @@ class Platform extends React.Component {
       customBlockList: [],
       blockly_xml: null,
       selectedBotName: '',
-      selectedBotStyle: this.hiddenLabelStyle,
-      removeBotButtonStyle: this.hiddenStyle,
+      selectedBotStyle: this.hiddenStyle,
     };
 
     this.setBlockly = this.setBlockly.bind(this);
@@ -83,12 +69,10 @@ class Platform extends React.Component {
   setSelectedBotStyle(style) {
     const _this = this;
     if (style === "hidden") {
-      _this.setState({ selectedBotStyle: this.hiddenLabelStyle });
-      _this.setState({ removeBotButtonStyle: this.hiddenStyle });
+      _this.setState({ selectedBotStyle: this.hiddenStyle });
     }
     else {
-      _this.setState({ selectedBotStyle: this.visibleLabelStyle });
-      _this.setState({ removeBotButtonStyle: this.visibleStyle });
+      _this.setState({ selectedBotStyle: this.visibleStyle });
     }
   }
 
@@ -110,10 +94,9 @@ class Platform extends React.Component {
                   setSelectedBotName={this.setSelectedBotName}
                   selectedBotStyle={this.state.selectedBotStyle}
                   setSelectedBotStyle={this.setSelectedBotStyle}
-                  removeBotButtonStyle={this.state.removeBotButtonStyle}
                 />
               </div>
-              <div className="col">
+              <div className="col horizontalDivCenter">
                 <GridView />
               </div>
             </div>

@@ -46,11 +46,10 @@ class RefreshingList extends React.Component {
     }
 
     render() {
-        console.log("Current bot ", this.state.currentBot)
         const _this = this;
         if (_this.state.availableBots.length === 0) {
             _this.state.currentBot = "";
-            return <select onClick={this.discoverBots}>
+            return <select className="available-bots" onClick={this.discoverBots}>
                 <option>Click to search for available bots</option>
             </select>
         }
@@ -60,6 +59,7 @@ class RefreshingList extends React.Component {
 
         return (
             <select
+                className="available-bots"
                 onChange={(e) => this.updateCurrentBot(e)}
                 onClick={this.discoverBots}
             >
@@ -75,7 +75,15 @@ function Ports(props) {
     let buttonList = [];
 
     for (let i = 0; i < ports.length; i++) {
-        buttonList.push(<li><button className="btn_ports" onClick={() => props.motorPorts(props.portName, ports[i])}>{ports[i]}</button></li>);
+        buttonList.push(
+            <li key={i}>
+                <button 
+                    className="btn_ports" 
+                    onClick={() => props.motorPorts(props.portName, ports[i])}>
+                        {ports[i]}   
+                </button>
+            </li>
+        );
     }
     return (<ul> {buttonList} </ul>);
 };
@@ -96,7 +104,7 @@ function PortsList(props) {
     for (let i = 0; i < portNames.length; i++) {
         let link = <a>{portLabels[i]} &#8250;</a>
         let ports = <Ports portName={portNames[i]} motorPorts={props.motorPorts} />
-        let listElement = <li> {link} {ports} </li>
+        let listElement = <li key={i}> {link} {ports} </li>
         allListElements.push(listElement);
     }
 
@@ -456,13 +464,13 @@ export default class AddBot extends React.Component {
             <div className="container-fluid control">
                 <div className="row">
                     <div className="col text-center">
-                        <p id="small_title">Minibot Setup </p>
+                        <p className="small_title">Minibot Setup </p>
                     </div>
                 </div>
                 <div className="row">
                     <div className="col horizontalDivCenter">
                         <div className="element-wrapper">
-                            <label> Available Bots: </label>
+                            <label className="white-label"> Available Bots: &nbsp; </label>
                             <RefreshingList ref={this.refreshingBotListRef} />
                         </div>
                         <Button id="add-bot" name="Add Bot" onClick={this.addBotListener} />
@@ -471,19 +479,22 @@ export default class AddBot extends React.Component {
                 <div className="row">
                     <div className="col horizontalDivCenter">
                         <div className="element-wrapper">
-                            <label id="selected-bot" style={this.props.selectedBotStyle} > Connected to: &nbsp;
-                            <span id="botName">{_this.getSelectedBotText()} </span>
+                            <label id="selected-bot" style={this.props.selectedBotStyle}> 
+                                Connected to: &nbsp; &nbsp;
+                                <span id="botName">
+                                    {_this.getSelectedBotText()} 
+                                </span>
                             </label>
                         </div>
                         <Button id="remove-bot" name="Remove"
                             onClick={() => _this.deleteBotListener()}
-                            style={_this.props.removeBotButtonStyle} />
+                            style={_this.props.selectedBotStyle} />
                     </div>
                 </div>
                 <br />
                 <div className="row">
                     <div className="col horizontalDivCenter">
-                        <p id="small_title">Ports </p>
+                        <p className="small_title">Ports </p>
                         <div className="element-wrapper in-front-of-other-elems">
                             <PortsList motorPorts={this.motorPorts} />
                         </div>
@@ -492,23 +503,23 @@ export default class AddBot extends React.Component {
                 <br />
                 <div className="row">
                     <div className="col horizontalDivCenter">
-                        <p id="small_title">Movement </p>
+                        <p className="small_title">Movement </p>
                     </div>
                 </div>
                 <div className="row">
                     <div className="col text-center">
-                        <button className="btn_btn-dir_movement" onClick={() => this.buttonMapListener("forward")}>forward</button>
+                        <button className="button-movement" onClick={() => this.buttonMapListener("forward")}>forward</button>
                         <br />
-                        <button className="btn_btn-dir_movement" onClick={() => this.buttonMapListener("left")}>left</button>
-                        <button className="btn_btn-dir_movement" onClick={() => this.buttonMapListener("stop")}>stop</button>
-                        <button className="btn_btn-dir_movement" onClick={() => this.buttonMapListener("right")}>right</button>
+                        <button className="button-movement" onClick={() => this.buttonMapListener("left")}>left</button>
+                        <button className="button-stop" onClick={() => this.buttonMapListener("stop")}>stop</button>
+                        <button className="button-movement" onClick={() => this.buttonMapListener("right")}>right</button>
                         <br />
-                        <button className="btn_btn-dir_movement" onClick={() => this.buttonMapListener("backward")}>backward</button>
+                        <button className="button-movement" onClick={() => this.buttonMapListener("backward")}>backward</button>
                         <br />
                         <br />
                         <form className="horizontalDivCenter">
                             <div>
-                                <label> Power: </label>
+                                <label className="white-label"> Power: &nbsp; </label>
                             </div>
                             <input id="custom-range-1" className="custom-range" name="wheel_power" type="range" min="0" max="100"
                                 step="5" onChange={evt => this.updatePowerValue(evt)} />
@@ -518,7 +529,7 @@ export default class AddBot extends React.Component {
                 <br />
                 <div className="row">
                     <div className="col horizontalDivCenter">
-                        <p id="small_title"> Speech Recognition </p>
+                        <p className="small_title"> Speech Recognition </p>
                     </div>
                 </div>
                 {/* button-wrapper is a custom class to add padding
@@ -530,10 +541,9 @@ export default class AddBot extends React.Component {
                 <div className="col horizontalDivCenter">
                     <label id="speech_recognition_feedback_box" />
                 </div>
-                <br />
-                <br />
                 <div className="row">
                     <div className="col horizontalDivCenter">
+                        <p className="small_title"> Custom Modes </p>
                         <button className="btn btn-success element-wrapper mr-1" onClick={() => this.objectDetectionOnClick()}>Object Detection</button>
                         <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.lineFollowOnClick()}>Line Follow</button>
                     </div>

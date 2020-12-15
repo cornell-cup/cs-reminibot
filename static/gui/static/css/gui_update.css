@@ -11,6 +11,18 @@
     padding-bottom: 10px;
 }
 
+.button-gradient {
+    background-image: linear-gradient(to right, red, rgb(255, 155, 0));
+    color: white;
+    border: 2px solid grey;
+}
+
+.button-gradient:hover {
+    background-image: linear-gradient(to right, rgb(235, 0, 0), rgb(245, 145, 0));
+    border: 2px solid white;
+}
+
+
 .control {
     padding-left: 15px;
     padding-top: 15px;
@@ -20,6 +32,10 @@
     width: 100px;
     height: auto;
     display: inline-block;
+}
+
+.white-label {
+    color:white;
 }
 
 .element-wrapper {
@@ -46,7 +62,11 @@
 }
 
 .main-body {
-    background: white;
+    background: black;
+}
+
+.jumbotron {
+    background-color: black;
 }
 
 .navbar {
@@ -77,11 +97,15 @@ table {
     text-align: center;
 }
 
-
 /*SETUP TAB*/
 
 #view {
     min-height: 0;
+}
+
+.available-bots {
+    background-color: red;
+    color: white;
 }
 
 .gridControlTable {
@@ -98,10 +122,6 @@ table {
 
 
 /*CONTROL TAB*/
-
-#controltab {}
-
-#controlpanel {}
 
 #blockly {
     height: 80vh;
@@ -141,6 +161,7 @@ table {
     list-style: none;
     padding: 6px 12px;
     cursor: pointer;
+    color: white
 }
 
 .react-tabs__tab--selected {
@@ -179,17 +200,17 @@ table {
     background: #fff;
 }
 
-.btn_btn-dir {
-    background: #d1150c;
+.button-movement {
+    background: rgb(255, 115, 0);
     color: white;
-    border-radius: 15px;
+    border-radius: 30px;
     height: 40px;
-    /* width: 120px; */
-    font-weight: 650;
+    width: 120px;
+    font-weight: 500;
     letter-spacing: 0.11em;
 }
 
-.btn_btn-dir_movement {
+.button-stop {
     background: #d1150c;
     color: white;
     border-radius: 30px;
@@ -200,12 +221,14 @@ table {
 }
 
 #title {
-    font-size: 40px;
+    font-size: 50px;
+    color: white
 }
 
-#small_title {
-    font-size: 30px;
-    font-weight: bold;
+.small_title {
+    font-size: 30px; 
+    /* font-weight: bold; */
+    color: white
 }
 
 #main_nav ul {
@@ -293,8 +316,9 @@ table {
 
 #selected-bot {
     border-style: solid;
-    border-color: black;
-    border-width: 5px;
+    border-color: white;
+    border-width: 1px;
+    color: white;
     padding: 5px;
 }
 
@@ -307,5 +331,5 @@ table {
 }
 
 #botName {
-    color: red;
+    color: orange;
 }

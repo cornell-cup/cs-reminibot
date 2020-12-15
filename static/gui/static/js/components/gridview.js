@@ -1,5 +1,7 @@
 import React from 'react';
 import axios from 'axios';
+import { Button } from './Util.js'
+
 /**
  * Component for the grid view of the simulated bots.
  */
@@ -188,10 +190,13 @@ export default class GridView extends React.Component {
 
     render() {
         return (
-
             <div id="component_view" className="box">
-                <p id="small_title">Vision </p>
-                <button id="grid_recenter" onClick={this.displayRobot}>Display Bot</button>
+                <p className="small_title">Vision &nbsp; &nbsp; </p>
+                <Button 
+                    id="grid_recenter" 
+                    onClick={this.displayRobot} 
+                    name={"Display Bot"}
+                />
                 <br />
                 <br />
                 <div id="view"></div>

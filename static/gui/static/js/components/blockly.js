@@ -185,7 +185,7 @@ class PythonEditor extends React.Component {
         };
         return (
             <div id="Python" style={{display: "flex", flexDirection: "row"}}>
-                <div style={{"min-width": '600px', "border": "2px solid grey", "margin-right": "10px"}}>
+                <div style={{"minWidth": '600px', "border": "2px solid grey", "marginRight": "10px"}}>
                     <CodeMirror
                         ref="editor"
                         value={this.state.code}
@@ -193,7 +193,7 @@ class PythonEditor extends React.Component {
                         options={options}
                     />
                 </div>
-                <div style={{"min-width": '600px'}}>
+                <div style={{"minWidth": '600px'}}>
                     <div id="UpdateCustomFunction" className="horizontalDiv">
                         <LabeledTextBox
                             type={"text"}
@@ -704,7 +704,7 @@ export default class MinibotBlockly extends React.Component {
                                 errorLabel={this.state.loginErrorLabel}
                             />
                         </div>
-                        <p id="title"><b>Blockly </b> </p>
+                        <p className="small-title"><b>Blockly </b> </p>
                     </div>
                     <br />
                     <br />
