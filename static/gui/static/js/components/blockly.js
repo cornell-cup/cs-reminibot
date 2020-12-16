@@ -195,6 +195,7 @@ class PythonEditor extends React.Component {
                     <div className="col"
                         style={{
                             "minWidth": '480px',
+                            "minHeight": '400px',
                             "marginRight": "5px",
                             "padding": "20px",
                         }}
@@ -748,12 +749,12 @@ export default class MinibotBlockly extends React.Component {
                             </div>
                             <div className="row">
                                 <div className="col">
-                                    <div id="blocklyDiv" style={{ height: "500px", width: "575px", padding: "20px" }}></div>
+                                    <div id="blocklyDiv" style={{ height: "520px", width: "575px", padding: "10px" }}></div>
                                 </div>
                             </div>
                             <div className="row">
                                 <div className="col horizontalDiv">
-                                    <form style={{ color: "white", padding: "20px" }}>
+                                    <form style={{ color: "white", paddingLeft: "20px"}}>
                                         <input
                                             type="file"
                                             id="blockUpload"
