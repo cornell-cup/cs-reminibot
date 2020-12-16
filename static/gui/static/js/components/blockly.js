@@ -175,6 +175,7 @@ class PythonEditor extends React.Component {
                 })
                 .catch((err) => {
                     console.log(err)
+                    clearInterval(interval);
                 })
         }, 500);
     }
@@ -277,6 +278,7 @@ class PythonEditor extends React.Component {
                             />
                         </div>
                         <Button id={"run"} onClick={this.runScript} name={"Run"} />
+                        <Button id="pythonStop" name="Stop" onClick={this.props.stopBlockly} />
                     </div>
                 </div>
             </div>
@@ -314,6 +316,7 @@ export default class MinibotBlockly extends React.Component {
         this.handleInputChange = this.handleInputChange.bind(this);
         this.download = this.download.bind(this);
         this.runBlockly = this.runBlockly.bind(this);
+        this.stopBlockly = this.stopBlockly.bind(this);
         this.dblock = this.dblock.bind(this);
         this.dblockAll = this.dblockAll.bind(this);
         this.login = this.login.bind(this);
@@ -780,6 +783,7 @@ export default class MinibotBlockly extends React.Component {
                                 <div className="col horizontalDiv">
                                     <div className="element-wrapper" style={{ paddingLeft: "20px" }}>
                                         <Button id="blocklyRun" name="Run" onClick={this.runBlockly} />
+                                        <Button id="blocklyStop" name="Stop" onClick={this.stopBlockly} />
                                     </div>
                                 </div>
                             </div>
@@ -791,6 +795,7 @@ export default class MinibotBlockly extends React.Component {
                             dblockAll={this.dblockAll}
                             customBlockList={this.props.customBlockList}
                             blocklyGeneratedPythonCode={this.state.blocklyGeneratedPythonCode}
+                            stopBlockly={this.stopBlockly}
                         />
                         <br />
                         <br />
