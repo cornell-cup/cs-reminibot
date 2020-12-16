@@ -72,6 +72,7 @@ class BlocklyPythonProcess:
             target=self.run_script,
             args=[script_name]
         )
+        self.proc.daemon = True
         self.proc.start()
 
     def process_string(self, value: str) -> str:

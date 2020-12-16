@@ -18,12 +18,18 @@ class TestMinibot:
         self.connect_to_minibot()
         # sending commands over TCP
 
-        self.test_movement()
-        self.test_error_messages()
-        self.test_mode()
-        self.test_ports()
-        self.test_connectivity()
+        try:
+            # Remember to send_botstatus at the start of every test otherwise
+            # the minibot will disconnect
+            self.test_movement()
+            self.test_error_messages()
+            self.test_mode()
+            self.test_ports()
+            self.test_connectivity()
+        except AssertionError as e:
+            print("TEST FAILED!!!!!")
 
+        print("ALL TEST CASES PASSED!!!")
         self.spawn.terminate()
 
     def spawn_minibot(self):
@@ -31,9 +37,8 @@ class TestMinibot:
             args=["python3", "minibot.py", "-t"], stdout=subprocess.PIPE, universal_newlines=True)
 
     def test_movement(self):
-        """ Tests minibot movement
-        """
-
+        self.send_botstatus()
+        assert self.check_botstatus()
         print("Testing forward movement")
         self.send_movement("forward")
         assert self.check_for_minibot_output("F\n")
@@ -60,6 +65,8 @@ class TestMinibot:
         print("Stop test passed!\n")
 
     def test_error_messages(self):
+        self.send_botstatus()
+        assert self.check_botstatus()
         print("Testing error message when pr('test') is run")
         self.send_program('pr("test")\n')
         error_msg = "<class 'NameError'>: name 'pr' is not defined"
@@ -69,6 +76,8 @@ class TestMinibot:
         print("Error message test passed!\n")
 
     def test_mode(self):
+        self.send_botstatus()
+        assert self.check_botstatus()
         print("Testing object detection mode")
         self.send_mode("object_detection")
         assert self.check_for_minibot_output("O\n")
@@ -80,14 +89,14 @@ class TestMinibot:
         print("Line follow test passed!\n")
 
     def test_ports(self):
+        self.send_botstatus()
+        assert self.check_botstatus()
         print("Testing setting a Left Motor to Port 2")
         self.send_ports("LMOTOR 2")
         assert self.check_for_minibot_output("2\n")
         print("Ports test passed!\n")
 
     def test_connectivity(self):
-        """ Tests whatever 
-        """
         for _ in range(5):
             self.send_botstatus()
             assert self.check_botstatus()
@@ -111,7 +120,6 @@ class TestMinibot:
         while (output := self.spawn.stdout.readline()) != string:
             if time.time() - start_time > 5:
                 return False
-            # print(output)
         return True
 
     def connect_to_minibot(self):
@@ -127,8 +135,9 @@ class TestMinibot:
             buffer_size = 4096
             data, minibot_address = sock.recvfrom(buffer_size)
             data = str(data.decode('UTF-8'))
+            data_lst = data.split(" ")
 
-            if data == request_password:
+            if data_lst[0] == request_password:
                 # Tell the minibot that you are the base station
                 sock.sendto(response.encode(), minibot_address)
                 break
