@@ -192,11 +192,9 @@ class PythonEditor extends React.Component {
                     </div>
                 </div>
                 <div className="row">
-                    <div
-                        className="col"
+                    <div className="col"
                         style={{
-                            "width": '500px',
-                            "width": '480px',
+                            "minWidth": '480px',
                             "marginRight": "5px",
                             "padding": "20px",
                         }}
