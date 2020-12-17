@@ -93,8 +93,6 @@ if __name__=="__main__":
     parser = argparse.ArgumentParser(description='Take in arguments for taking pictures')
     parser.add_argument("-color", "-col", action="store",type=bool,dest="color", default="True",
         help="Specifies whether the pictures taken should be in color")
-    parser.add_argument("-name", "-n", action="store", dest="image_name", default="img",
-        help="Specifies the names of the images to generate")
     parser.add_argument("-dim", "-d", nargs='*', action="store", dest="image_dim", type=int, default=[300,300],
         help="Specifies the dimensions of the output images in px (accepts exactly two args)")
     parser.add_argument("-window", "-w", nargs='*', action="store", dest="window_dim", type=int, default=[300,300],
@@ -114,9 +112,6 @@ if __name__=="__main__":
     parser.add_argument('-zoom', action="store", type=float, dest="zoom_range", default=0.2, help='Zoom range')
     parser.add_argument('-hflip', action="store", type=bool, dest="horizontal_flip", default=True, help='Horizontal flip')
     parser.add_argument('-vflip', action="store", type=bool, dest="vertical_flip", default=True, help='Vertical flip')
-
-    #Puts images in 'test' if specified
-    parser.add_argument("-test","-t",dest="test", action="store_true")
 
     args = parser.parse_args()
 
