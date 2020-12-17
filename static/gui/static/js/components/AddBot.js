@@ -18,8 +18,24 @@ class RefreshingList extends React.Component {
         this.updateCurrentBot = this.updateCurrentBot.bind(this);
     }
 
+    /**
+     * This function is called when the user presses on the Available Bots List
+     * This function simply tells the backend to listen for incoming Minibot
+     * broadcasts and update its internal list of active Minibots.  This 
+     * function doesn't update the WebGUI at all.  Instead, the refreshAvailableBots
+     * function, which runs continuously, fetches the updated active Minibots list
+     * from the backend.  refreshAvailableBots must run continuously to update the 
+     * Available Bots List in case a previously active Minibot disconnects.
+     * The reason we have a separate discoverBots function and a separate
+     * refreshAvailableBots function is because fetching the active Minibots 
+     * is inexpensive, so its okay if refreshAvailableBots runs continuously.
+     * However, making the Basestation listen for all active Minibots can be 
+     * relatively expensive, so we want to make the Basestation perform this
+     * not too frequently.  Hence, with this implementation, the Basestation will
+     * only need to perform this operation when the Available Bots List is clicked.
+     */
     discoverBots(event) {
-        console.log("Discvering bot");
+        console.log("Discovering new Minibot");
         axios({
             method: 'GET',
             url: '/discover-bots',
