@@ -191,7 +191,10 @@ class SpeechRecognition extends React.Component {
                 console.log("Speech Recognition", response.data);
             }
         }).catch(function (error) {
-            console.log("Speech Recognition", error);
+            if (error.response.data.error_msg.length > 0)
+                window.alert(error.response.data.error_msg);
+            else
+                console.log("Speech Recognition", error);
         })
 
         this.setState({ on: turnOn });
@@ -359,12 +362,12 @@ export default class AddBot extends React.Component {
                 direction: value,
                 power: _this.state.power,
             })
-        })
-            .then(function (response) {
-            })
-            .catch(function (error) {
+        }).catch(function (error) {
+            if (error.response.data.error_msg.length > 0)
+                window.alert(error.response.data.error_msg);
+            else
                 console.log(error);
-            })
+        })
     }
 
     /*motor ports*/
@@ -381,12 +384,12 @@ export default class AddBot extends React.Component {
                 ports: [name, String(port1)],
                 bot_name: _this.props.selectedBotName,
             })
-        })
-            .then(function (response) {
-            })
-            .catch(function (error) {
+        }).catch(function (error) {
+            if (error.response.data.error_msg.length > 0)
+                window.alert(error.response.data.error_msg);
+            else
                 console.log(error);
-            })
+        })
     }
 
     /* removes selected bot label and button */
@@ -425,13 +428,12 @@ export default class AddBot extends React.Component {
                 bot_name: _this.props.selectedBotName,
                 mode: "line_follow",
             })
-        })
-            .then(function (response) {
-                //do stuff after success
-            })
-            .catch(function (error) {
-                //handle errors
-            });
+        }).catch(function (error) {
+            if (error.response.data.error_msg.length > 0)
+                window.alert(error.response.data.error_msg);
+            else
+                console.log(error);
+        });
     }
 
     objectDetectionOnClick() {
@@ -447,13 +449,13 @@ export default class AddBot extends React.Component {
                 bot_name: _this.props.selectedBotName,
                 mode: "object_detection",
             })
-        })
-            .then(function (response) {
-                //do stuff after success
-            })
-            .catch(function (error) {
+        }).catch(function (error) {
+            if (error.response.data.error_msg.length > 0)
+                window.alert(error.response.data.error_msg);
+            else
+                console.log(error);
                 //handle errors
-            });
+        });
     }
 
 

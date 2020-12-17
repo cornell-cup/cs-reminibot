@@ -133,13 +133,15 @@ class PythonEditor extends React.Component {
                 bot_name: this.props.selectedBotName,
                 script_code: this.state.code
             }),
-        })
-            .then(function (response) {
-                console.log('sent script');
-            })
-            .catch(function (error) {
+        }).then(function (response) {
+            console.log('sent script');
+        }).catch(function (error) {
+            if (error.response.data.error_msg.length > 0)
+                window.alert(error.response.data.error_msg);
+            else
                 console.warn(error);
-            });
+        });
+
         /*
          * Repeatedly call the ErrorMessageHandler in base_station_interface.py
          * until a non-empty execution result of the Python program is received.
@@ -154,29 +156,30 @@ class PythonEditor extends React.Component {
                 data: JSON.stringify({
                     bot_name: _this.props.selectedBotName
                 }),
-            })
-                .then((response) => {
-                    document.getElementById("error-message").value = response.data["result"];
-                    // if the code is -1 it means the result hasn't arrived yet, hence
-                    // we shouldn't clear the interval and should continue polling
-                    if (response.data["code"] !== -1) {
-                        if (response.data["code"] === 1) {
-                            // lime green
-                            document.getElementById("error-message").style.color = "#32CD32";
-                        }
-                        else {
-                            // red
-                            document.getElementById("error-message").style.color = "#FF0000";
-                        }
-                        // result has arrived so go ahead and clear the interval (stop polling
-                        // the server)
-                        clearInterval(interval);
+            }).then((response) => {
+                document.getElementById("error-message").value = response.data["result"];
+                // if the code is -1 it means the result hasn't arrived yet, hence
+                // we shouldn't clear the interval and should continue polling
+                if (response.data["code"] !== -1) {
+                    if (response.data["code"] === 1) {
+                        // lime green
+                        document.getElementById("error-message").style.color = "#32CD32";
                     }
-                })
-                .catch((err) => {
-                    console.log(err)
+                    else {
+                        // red
+                        document.getElementById("error-message").style.color = "#FF0000";
+                    }
+                    // result has arrived so go ahead and clear the interval (stop polling
+                    // the server)
                     clearInterval(interval);
-                })
+                }
+            }).catch((err) => {
+                clearInterval(interval);
+                if (error.response.data.error_msg.length > 0)
+                    window.alert(error.response.data.error_msg);
+                else
+                    console.log(error);
+            })
         }, 500);
     }
 
@@ -573,14 +576,13 @@ export default class MinibotBlockly extends React.Component {
                 bot_name: _this.props.selectedBotName,
                 script_code: _this.state.blocklyGeneratedPythonCode
             }),
-        })
-            .then(function (response) {
-            })
-            .catch(function (error) {
-                console.warn(error);
-            });
+        }).catch(function (error) {
+            if (error.response.data.error_msg.length > 0)
+                window.alert(error.response.data.error_msg);
+            else
+                console.log(error);
+        });
     }
-
 
     stopBlockly() {
         axios({
@@ -594,8 +596,11 @@ export default class MinibotBlockly extends React.Component {
                 direction: "stop",
                 power: 0,
             })
-        }).then(function (response) {
         }).catch(function (error) {
+            if (error.response.data.error_msg.length > 0)
+                window.alert(error.response.data.error_msg);
+            else
+                console.log(error);
             console.log(error);
         })
     }
@@ -705,7 +710,6 @@ export default class MinibotBlockly extends React.Component {
             _this.redefineCustomBlocks();
             _this.updateCustomBlocks();
         }).catch((error) => {
-            console.log("fail");
             this.setState({
                 loginEmail: "",
                 loginSuccessLabel: "",
