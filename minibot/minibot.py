@@ -93,6 +93,7 @@ class Minibot:
             # select returns as soon as it detects some activity on one or more
             # of the sockets in the lists passed to it, or if the timeout time
             # has elapsed
+            # Example of using select in Python: https://pymotw.com/2/select/
             read_ready_socks, write_ready_socks, errored_out_socks = select(
                 self.readable_socks,
                 self.writable_socks,
