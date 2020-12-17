@@ -187,7 +187,7 @@ export default class GridView extends React.Component {
         // process the requests fast enough and the server gets overloaded 
         // and cannot handle any more requests.  If you want to poll faster,
         // then we need to make the backend be able to handle requests 
-        // asynchronously, or we need to use WebSockets which will hopefully
+        // concurrently, or we need to use WebSockets which will hopefully
         // allow for faster communication
         else {
             this.find = setInterval(this.getVisionData.bind(this), 100);
