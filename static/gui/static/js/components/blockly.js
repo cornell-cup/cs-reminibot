@@ -534,12 +534,7 @@ export default class MinibotBlockly extends React.Component {
         this.props.setBlockly(xmlText);
 
         let code = window.Blockly.Python.workspaceToCode(this.workspace);
-        /* Fix spacing in the Python Code box */
-        // code = code.replace(/\n/g, '<br>');
-        // code = code.replace(/ /g, '&nbsp;');
-        // document.getElementById('generatedPythonFromBlocklyBox').innerHTML = code;
         this.setState({ blocklyGeneratedPythonCode: code });
-        // document.getElementById('blockly').value = window.Blockly.Python.workspaceToCode(this.workspace);
     }
 
     download(event) {

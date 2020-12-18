@@ -40,7 +40,7 @@ class Platform extends React.Component {
 
     this.state = {
       customBlockList: [],
-      blockly_xml: null,
+      blocklyXml: null,
       selectedBotName: '',
       selectedBotStyle: this.hiddenStyle,
     };
@@ -54,7 +54,7 @@ class Platform extends React.Component {
 
   setBlockly(xmltext) {
     const _this = this;
-    _this.setState({ blockly_xml: xmltext });
+    _this.setState({ blocklyXml: xmltext });
   }
 
   redefineCustomBlockList(newCustomBlockList) {
@@ -103,7 +103,7 @@ class Platform extends React.Component {
           </TabPanel>
           <TabPanel>
             <Blockly
-              blockly_xml={this.state.blockly_xml}
+              blocklyXml={this.state.blocklyXml}
               setBlockly={this.setBlockly}
               selectedBotName={this.state.selectedBotName}
               customBlockList={this.state.customBlockList}
