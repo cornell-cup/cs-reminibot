@@ -296,11 +296,13 @@ export default class AddBot extends React.Component {
         this.refreshingBotListRef = React.createRef();
         this.addBotListener = this.addBotListener.bind(this);
         this.buttonMapListener = this.buttonMapListener.bind(this);
+        this.handleArrowKeyDown = this.handleArrowKeyDown.bind(this);
         this.motorPorts = this.motorPorts.bind(this);
     }
 
     componentDidMount() {
         setInterval(this.refreshAvailableBots.bind(this), 500);
+        document.addEventListener("keydown", this.handleArrowKeyDown);
     }
 
     /*
@@ -384,6 +386,26 @@ export default class AddBot extends React.Component {
             else
                 console.log(error);
         })
+    }
+
+    /** Handles keyboard input to control the movement buttons */
+    handleArrowKeyDown(event) {
+        const directionArray = ["left", "forward", "right", "backward"]
+        const spaceBar = 32;
+        const leftArrow = 37;
+        const downArrow = 40;
+
+        // If user presses spacebar, make the Minibot stop
+        if (event.keyCode === spaceBar) {
+            // prevent spacebar from jumping to the end of the page
+            event.preventDefault()
+            this.buttonMapListener("stop");
+        // If user presses an arrow key, make the Minibot move in that direction
+        } else if (event.keyCode >= leftArrow && event.keyCode <= downArrow) {
+            // prevent arrow key from causing the page to scroll
+            event.preventDefault()
+            this.buttonMapListener(directionArray[event.keyCode - leftArrow])
+        }
     }
 
     /*motor ports*/
