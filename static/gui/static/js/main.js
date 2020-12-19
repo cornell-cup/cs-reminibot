@@ -41,11 +41,13 @@ class Platform extends React.Component {
     this.state = {
       customBlockList: [],
       blocklyXml: null,
+      blocklyPythonCode: "",
       selectedBotName: '',
       selectedBotStyle: this.hiddenStyle,
     };
 
     this.setBlockly = this.setBlockly.bind(this);
+    this.setBlocklyPythonCode = this.setBlocklyPythonCode.bind(this)
     this.redefineCustomBlockList = this.redefineCustomBlockList.bind(this);
     this.setSelectedBotName = this.setSelectedBotName.bind(this);
     this.setSelectedBotStyle = this.setSelectedBotStyle.bind(this);
@@ -53,8 +55,11 @@ class Platform extends React.Component {
   }
 
   setBlockly(xmltext) {
-    const _this = this;
-    _this.setState({ blocklyXml: xmltext });
+    this.setState({ blocklyXml: xmltext });
+  }
+
+  setBlocklyPythonCode(code) {
+    this.setState({ blocklyPythonCode: code });
   }
 
   redefineCustomBlockList(newCustomBlockList) {
@@ -62,8 +67,7 @@ class Platform extends React.Component {
   }
 
   setSelectedBotName(text) {
-    const _this = this;
-    _this.setState({ selectedBotName: text });
+    this.setState({ selectedBotName: text });
   }
 
   setSelectedBotStyle(style) {
@@ -105,6 +109,8 @@ class Platform extends React.Component {
             <Blockly
               blocklyXml={this.state.blocklyXml}
               setBlockly={this.setBlockly}
+              blocklyPythonCode={this.state.blocklyPythonCode}
+              setBlocklyPythonCode={this.setBlocklyPythonCode}
               selectedBotName={this.state.selectedBotName}
               customBlockList={this.state.customBlockList}
               redefineCustomBlockList={this.redefineCustomBlockList}

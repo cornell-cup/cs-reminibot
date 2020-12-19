@@ -2,6 +2,7 @@ from ctypes import c_char_p
 from multiprocessing import Process, Manager, Value
 import os
 import importlib
+import sys
 
 
 class BlocklyPythonProcess:
