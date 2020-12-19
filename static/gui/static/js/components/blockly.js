@@ -493,6 +493,12 @@ export default class MinibotBlockly extends React.Component {
             scroll: true
         });
 
+        /* Loads blockly state from parent component */
+        if (this.props.blocklyXml) {
+            let xml = Blockly.Xml.textToDom(this.props.blocklyXml);
+            Blockly.Xml.domToWorkspace(xml, _this.workspace);
+        }
+
         /* Realtime code generation
                     (Every drag/drop or change in visual code will be
                     reflected in actual code view) */
@@ -500,13 +506,6 @@ export default class MinibotBlockly extends React.Component {
             _this.scriptToCode();
             _this.redefineCustomBlocks();
         });
-
-        /* Loads blockly state from parent component */
-        if (this.props.blocklyXml) {
-            let xml = Blockly.Xml.textToDom(this.props.blocklyXml);
-            Blockly.Xml.domToWorkspace(xml, _this.workspace);
-        }
-        this.redefineCustomBlocks();
     }
 
     compareCustomBlockLists(list1, list2) {
@@ -528,6 +527,7 @@ export default class MinibotBlockly extends React.Component {
     https://developers.google.com/blockly/guides/get-started/web
     */
     scriptToCode() {
+        console.log("Script to Coding")
         let xml = Blockly.Xml.workspaceToDom(this.workspace);
         let xmlText = Blockly.Xml.domToText(xml);
         this.props.setBlockly(xmlText);
