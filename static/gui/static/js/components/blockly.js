@@ -527,7 +527,6 @@ export default class MinibotBlockly extends React.Component {
     https://developers.google.com/blockly/guides/get-started/web
     */
     scriptToCode() {
-        console.log("Script to Coding")
         let xml = Blockly.Xml.workspaceToDom(this.workspace);
         let xmlText = Blockly.Xml.domToText(xml);
         this.props.setBlockly(xmlText);
