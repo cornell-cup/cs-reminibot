@@ -56,10 +56,19 @@ class PythonEditor extends React.Component {
     /* Updates the main.js state to contain the code specified in the parameter
       Also updates the coding time */
     updateCode(code) {
-        // update the code state to indicate user updates have been made 
-        // to the python code
-        codeState = (this.props.codeState === -1) ? 0 : this.props.codeState
-        this.props.setBlocklyPythonCode(code, codeState);
+        let codeState;
+        console.log("Code", code);
+        // Reset the codeState to -1 if the code is empty because empty code
+        // means that there are no useful user code updates that should be saved
+        // in the Python Coding Box
+        if (code.trim() === "")
+            codeState = -1;
+        else
+            // update the code state to indicate user updates have been made 
+            // to the Python code, 
+            codeState = (this.props.pythonCodeState === -1) ? 
+                0 : this.props.pythonCodeState;
+        this.props.setPythonCode(code, codeState);
         if (this.state.codingStart == -1) {
             this.setState({ codingStart: new Date().getTime() })
         }
@@ -530,14 +539,30 @@ export default class MinibotBlockly extends React.Component {
     https://developers.google.com/blockly/guides/get-started/web
     */
     scriptToCode() {
+        // update Blockly
         let xml = Blockly.Xml.workspaceToDom(this.workspace);
         let xmlText = Blockly.Xml.domToText(xml);
         this.props.setBlockly(xmlText);
 
-        let code = window.Blockly.Python.workspaceToCode(this.workspace);
-        // update code, and update code state to indicate current code is 
-        // entirely Blockly generated
-        this.props.setBlocklyPythonCode(code, -1);
+        let pythonCodeState = this.props.pythonCodeState;
+        // Python Box has user changes, and user has not been prompted with
+        // the Blockly overwriting code changes message
+        if (pythonCodeState === 0) {
+            let msg = "The Python Coding Box has user changes.  Can Blockly " +
+                "overwrite these changes?\n\n(If you press 'Cancel', Blockly " +
+                "won't overwrite the Python Coding Box, until it's empty again)";
+            // If the user wants to overwrite the changes, the Python
+            // code state will be updated to -1
+            pythonCodeState = window.confirm(msg) ? -1 : 1;
+        }
+
+        // Only update the pythonCodeState if there are no user changes, or
+        // if the user has said Blockly can overwrite the user changes
+        let code = (pythonCodeState < 0) ? 
+            window.Blockly.Python.workspaceToCode(this.workspace) : 
+            this.props.pythonCode;
+
+        this.props.setPythonCode(code, pythonCodeState);
     }
 
     download(event) {
@@ -797,7 +822,8 @@ export default class MinibotBlockly extends React.Component {
                             dblockAll={this.dblockAll}
                             customBlockList={this.props.customBlockList}
                             pythonCode={this.props.pythonCode}
-                            setBlocklyPythonCode={this.props.setBlocklyPythonCode}
+                            pythonCodeState={this.props.pythonCodeState}
+                            setPythonCode={this.props.setPythonCode}
                             stopBlockly={this.stopBlockly}
                         />
                         <br />

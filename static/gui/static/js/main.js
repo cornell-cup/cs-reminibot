@@ -41,13 +41,20 @@ class Platform extends React.Component {
     this.state = {
       customBlockList: [],
       blocklyXml: null,
-      blocklyPythonCode: "",
+      pythonCode: "",
+      // pythonCodeState == -1:  Code is completely blockly generated, no user
+      //    changes have been made
+      // pythonCodeState == 0:  User has made changes to the Python code, but 
+      //    the user has not yet disallowed Blockly from overwiting these changes
+      // pythonCodeState == 1:  User has made changes to the Python code
+      //    and has disallowed Blockly from overwriting these changes.
+      pythonCodeState: -1,
       selectedBotName: '',
       selectedBotStyle: this.hiddenStyle,
     };
 
     this.setBlockly = this.setBlockly.bind(this);
-    this.setBlocklyPythonCode = this.setBlocklyPythonCode.bind(this)
+    this.setPythonCode = this.setPythonCode.bind(this)
     this.redefineCustomBlockList = this.redefineCustomBlockList.bind(this);
     this.setSelectedBotName = this.setSelectedBotName.bind(this);
     this.setSelectedBotStyle = this.setSelectedBotStyle.bind(this);
@@ -58,8 +65,15 @@ class Platform extends React.Component {
     this.setState({ blocklyXml: xmltext });
   }
 
-  setBlocklyPythonCode(code) {
-    this.setState({ blocklyPythonCode: code });
+  /**
+   * Sets the Python code and code state.  See the comment in the constructor
+   * to understand the different values the code state can take.  
+   */
+  setPythonCode(code, state) {
+    this.setState({ 
+      pythonCode: code,
+      pythonCodeState: state,
+    });
   }
 
   redefineCustomBlockList(newCustomBlockList) {
@@ -85,8 +99,8 @@ class Platform extends React.Component {
       <div id="platform">
         <Tabs>
           <TabList>
-            <Tab>Setup</Tab>
-            <Tab>Coding/Control</Tab>
+            <Tab>Setup/Control</Tab>
+            <Tab>Coding</Tab>
             <Tab>Analytics</Tab>
           </TabList>
 
@@ -109,8 +123,9 @@ class Platform extends React.Component {
             <Blockly
               blocklyXml={this.state.blocklyXml}
               setBlockly={this.setBlockly}
-              blocklyPythonCode={this.state.blocklyPythonCode}
-              setBlocklyPythonCode={this.setBlocklyPythonCode}
+              pythonCode={this.state.pythonCode}
+              pythonCodeState={this.state.pythonCodeState}
+              setPythonCode={this.setPythonCode}
               selectedBotName={this.state.selectedBotName}
               customBlockList={this.state.customBlockList}
               redefineCustomBlockList={this.redefineCustomBlockList}
