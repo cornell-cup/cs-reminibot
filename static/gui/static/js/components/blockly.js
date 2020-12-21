@@ -57,7 +57,6 @@ class PythonEditor extends React.Component {
       Also updates the coding time */
     updateCode(code) {
         let codeState;
-        console.log("Code", code);
         // Reset the codeState to -1 if the code is empty because empty code
         // means that there are no useful user code updates that should be saved
         // in the Python Coding Box
