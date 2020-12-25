@@ -16,17 +16,17 @@ Please manually execute these tests before merging any PR.
 7. Kill the *minibot.py* program and verify that you no longer see that you're connected to a minibot in the WebGUI.
 8. Restart the *minibot.py* program and verify that you are able to connect to the minibot again.
 
-### Multiple Minibot Test (Setup/Control)
+### Multiple Minibot Test
 1. Run `python3 minibot.py -t` to start a virtual minibot.
 2. Run `python3 minibot.py -t -p 9000` to start another virtual minibot on port 9000 (you can choose any random port).
 3. Click on the *Available Bots* dropdown menu and verify that both minibot names are listed.
 4. Verify that you can connect to either minibot.
 5. Kill one of the minibots and verify that the *Available Bots* dropdown menu now only has one minibot name.
 
-## Basic Commands
+## Basic Commands (Setup/Control)
 ### Movement Test
 1. Start a virtual Minibot and connect to it. 
-2. Press the *forward*, *backward*, *left*, *right*, and *stop* movement buttons and verify that the characters "F", "B", "L", "R", and "S" are printed on the virtual Minibot's terminal.
+2. Click on the *forward*, *backward*, *left*, *right*, and *stop* movement buttons and verify that the characters "F", "B", "L", "R", and "S" are printed on the virtual Minibot's terminal.
 3. Press the *up arrow key*, *down arrow key*, *left arrow key*, *right arrow key* and *space bar* on your keyboard.  Verify that the characters "F", "B", "L", "R", and "S" are printed on the virtual Minibot's terminal.
 
 ### Ports Test
@@ -40,9 +40,38 @@ Please manually execute these tests before merging any PR.
 2. Click on the *Object Detection* button and verify that "O" is printed in the virtual Minibot's terminal.
 3. Click on the *Line Follow* button and verify that "T" is printed in the virtual Minibot's terminal.
 
-## Speech Recognition
+## Speech Recognition (Setup/Control)
+**Note:** The Speech Recognition feature might freeze at *Say Something!*, if you have a lot of background noise.  This is because it continuously listens until it thinks the user has stopped talking, and will only start *Converting from Speech to Text* when it stops hearing any loud sounds.  
 1. Start a virtual Minibot and connect to it.
-2. Press the *Start Speech Recognition* button and verify that *Say Something* is displayed in the feedback box.
+2. Click on the *Start Speech Recognition* button and verify that *Say Something* is displayed in the feedback box.
 3. Say "forward" and verify that *Minibot moves forward* is displayed in the feedback box.  Also verify that "F" is printed in the virtual Minibot's terminal.
+4. Say "left", "right", "backward", "stop" and verify that *Minibot moves left*, *Minibot moves right*, *Minibot moves backward*, and *Minibot stops* are displayed in the feedback box.  Also verify that "L", "R", "B", and "S" are printed in the virtual Minibot's terminal.
+5. Say something random and verify that *Invalid command* is displayed in the feedback box. 
+6. Click on the *Stop Speech Recognition* button and verify that the feedback box is emptied.
 
+## Overhead Vision (Setup/Control)
+1. Start a virtual Minibot and connect to it.
+2. Click on Display Bot.
+3. Click on the *stop* movement button, and verify "S" is printed in the virtual Minibot's terminal (This is to verify that making other requests is possible while the frontend is polling the backend for coordinates to display the location of the Minibot).
+4. Using the Postman Application, send a Post request to *localhost:8080/vision* with the following raw JSON body:
+```
+{
+    "id": 0,
+    "x": 0,
+    "y": 0,
+    "orientation": 0
+}
+```
+Verify that the Cup logo is displayed upright in the middle of the Vision grid.  
+5.  Send a Post request to *localhost:8080/vision* with the following raw JSON body:
+```
+{
+    "id": 0,
+    "x": -200,
+    "y": -200,
+    "orientation": 180
+}
+```
+Verify that the Cup logo is displayed upside down in the bottom left corner of the Vision grid.  
+6. Click on Display Bot, and send another Post request with some other random coordinates.  Verify that there is no change to the Cup logo.  
 
