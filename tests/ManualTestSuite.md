@@ -31,8 +31,8 @@ Please manually execute these tests before merging any PR.
 
 ### Ports Test
 1. Start a virtual Minibot and connect to it.
-2. Hover over the *Ports* dropdown menu, then the *Left Motor* dropdown, and finally click on 2.  You should see "2", "L", "M" printed in the virtual Minibot's terminal.  
-3. Hover over the *Ports* dropdown menu, then the *Infrared* dropdown, and finally click on 4.  You should see "4", "I" printed in the virtual Minibot's terminal.  
+2. Hover over the *Ports* dropdown menu, then the *Left Motor* dropdown, and finally click on 2.  Verify that "2", "L", "M" are printed in the virtual Minibot's terminal.  
+3. Hover over the *Ports* dropdown menu, then the *Infrared* dropdown, and finally click on 4.  Verify that "4", "I" are printed in the virtual Minibot's terminal.  
 4. Click on other random buttons in the *Ports* dropdown menu, and verify that you see corresponding messages in the virtual Minibot's terminal.
 
 ### Custom Modes Test
@@ -73,5 +73,14 @@ Verify that the Cup logo is displayed upright in the middle of the Vision grid.
 }
 ```
 Verify that the Cup logo is displayed upside down in the bottom left corner of the Vision grid.  
-6. Click on Display Bot, and send another Post request with some other random coordinates.  Verify that there is no change to the Cup logo.  
+6. Click on Display Bot, and send another Post request with some other random coordinates.  Verify that there is no change to the Cup logo.
 
+## Blockly (Coding)
+### Running Blockly Test
+1. Start a virtual Minibot and eonnect to it.  
+2. Drag the *repeat __ times do* block from the *Control* tab into the Blockly workspace.  
+3. Drag the *0* block from the *Math* tab into the Blockly workspace.  Change the number from 0 to 2.
+4. Drag the *Move forwards with 100% power for 0 seconds* block from the *Minibot* tab into the Blockly workspace.  Change the number from 0 to 4.
+5. Verify that the correct Python code is generated in the Python code box. 
+6. Click on the Setup/Control tab, and the click on the Coding tab again.  Verify that neither the Blockly or Python code does not disappear.
+7. Click on the *Run* button below the Blockly workspace.  Verify that "F", then "S", then "F" again, and then "S" again are printed in the virtual Minibot's terminal.
