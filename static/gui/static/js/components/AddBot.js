@@ -302,7 +302,8 @@ export default class AddBot extends React.Component {
 
     componentDidMount() {
         setInterval(this.refreshAvailableBots.bind(this), 500);
-        document.addEventListener("keydown", this.handleArrowKeyDown);
+        document.getElementById("setup_control_tab").addEventListener(
+            "keydown", this.handleArrowKeyDown);
     }
 
     /*
@@ -501,7 +502,9 @@ export default class AddBot extends React.Component {
     render() {
         const _this = this;
         return (
-            <div className="container-fluid control">
+            // Set tabindex to -1 so that this div is in focus to caputure 
+            // the keyboard event handler for arrow key movement
+            <div id="setup_control_tab" tabindex="-1" className="container-fluid control">
                 <div className="container">
                     <div className="row">
                         <div className="col text-center">

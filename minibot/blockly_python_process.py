@@ -58,7 +58,7 @@ class BlocklyPythonProcess:
         manager = Manager()
         self.result = manager.Value(c_char_p, "")
 
-        if self.proc:
+        if self.proc and self.proc.is_alive():
             self.kill_proc()
             self.result.value = (
                 "Another process is running....Killing the process now....." +
@@ -113,4 +113,3 @@ class BlocklyPythonProcess:
         except Exception as exception:
             str_exception = str(type(exception)) + ": " + str(exception)
             self.result.value = str_exception
-        self.proc = None
