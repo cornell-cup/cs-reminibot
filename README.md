@@ -64,7 +64,11 @@ To run the BaseStation, run the following command.  You should currently be in t
 ```
 ./run_BS.sh
 ```
+If you are using Windows Command Prompt, instead run the following command.
 
+```
+bash run_BS_windows.sh
+```
 Wait until you see the message *======= STARTING BASESTATION========* in your terminal.  Go to any browser on your computer and go to `localhost:8080/start` to see the GUI in action.
 If you are having trouble running the previous line, make sure that python3 is installed.
 You can check this by typing `python3` in your terminal.
@@ -155,8 +159,8 @@ brew install portaudio
 ```
 [Continue with the remaining installation steps](#Continue)
 
-<a name="Windows"></a>
-## Windows 10: Installing Initial Requirements
+<a name="Windows WSL"></a>
+## Windows 10 WSL: Installing Initial Requirements
 
 #### Windows Subsystem for Linux Installation
 1. Click on Start (or press *Windows Key + S*) to open the Windows Search Bar, and search for "Windows Features".  Select "Turn Windows Features on or off".
@@ -207,6 +211,25 @@ sudo npm install npm@latest -g
 Not supported for WSL.  
 [Continue with the remaining installation steps](#Continue)
 
+<a name="Windows Native"></a>
+## Windows 10 Native: Installing Initial Requirements
+
+#### Git installation:
+Install the latest version of Git at https://gitforwindows.org/. Don't change any of the default installation settings in the installation wizard.
+
+#### Python3 and Pip3 installation:
+Install the latest version of python3 at https://www.python.org/downloads/. On the initial screen of the installation wizard, check 'Add Python 3.x to PATH', then click 'Install Now'.
+
+#### Node.js and npm installation:
+Install the latest version of Node.js and npm at https://nodejs.org/. Don't change any of the default installation settings in the installation wizard.
+
+If you already had npm installed, upgrade npm to the lastest version by running:
+
+```
+npm install npm@latest -g
+```
+
+:warning: **The installation guide for Windows Native isn't complete**
 
 # Common Problems & Fixes:
 #### ERROR: EACCES when trying to run npm commands
