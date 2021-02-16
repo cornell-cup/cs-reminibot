@@ -39,7 +39,30 @@ cd cs-reminibot/basestation
 pip3 install -r requirements.txt
 cd ..
 ```
- 
+Alternatively, one can do this in a virtual environment. This procedure is hightly recommended.
+
+On Linux or MacOS:
+```
+cd cs-reminibot
+python3 -m venv venv
+```
+On Windows, open Git Bash and run these commands:
+```
+cd cs-reminibot
+python3 -m venv venv
+```
+
+Then, install your python packages as normal:
+```
+cd cs-reminibot/basestation
+pip3 install -r requirements.txt
+cd ..
+```
+
+If you use the virtual environment setup, be sure to activate the virtual environment before attempting to install any packages or run the base station.
+- Windows (git Bash): `source venv/Scripts/activate`
+- Linux and MacOS: `source venv/bin/activate`
+
 # Installing JavaScript Dependencies 
 Run the following commands to navigate to the gui directory in static/gui and install JavaScript dependencies.
 You should currently be in the cs-reminibot directory
@@ -58,17 +81,14 @@ The BaseStation is the intermediary that manages information flow between the mi
 hardware to the software and GUI. BaseStation runs on `cs-reminibot/basestation/base_station_interface.py` and is a
 simple web application that runs on HTTP.
 
-To run the BaseStation, run the following command.  You should currently be in the cs-reminibot directory.
+To run the BaseStation, run the following command.  You should currently be in the cs-reminibot directory, and your virtual environment shoud be activated if you are using virtual environments.
 **If you want the use the speech recognition feature of the Minibot platform, run this command in your regular terminal (not VSCode terminal).  This is because VSCode does not have permission to access your computer's microphone.**
  
 ```
 ./run_BS.sh
 ```
-If you are using Windows Command Prompt, instead run the following command.
+If you are using Windows, run this in Git Bash.
 
-```
-bash run_BS_windows.sh
-```
 Wait until you see the message *======= STARTING BASESTATION========* in your terminal.  Go to any browser on your computer and go to `localhost:8080/start` to see the GUI in action.
 If you are having trouble running the previous line, make sure that python3 is installed.
 You can check this by typing `python3` in your terminal.
@@ -215,7 +235,7 @@ Not supported for WSL.
 ## Windows 10 Native: Installing Initial Requirements
 
 #### Git installation:
-Install the latest version of Git at https://gitforwindows.org/. Don't change any of the default installation settings in the installation wizard.
+Install the latest version of Git at https://gitforwindows.org/. Don't change any of the default installation settings in the installation wizard. This should also install Git Bash.
 
 #### Python3 and Pip3 installation:
 Install the latest version of python3 at https://www.python.org/downloads/. On the initial screen of the installation wizard, check 'Add Python 3.x to PATH', then click 'Install Now'.
