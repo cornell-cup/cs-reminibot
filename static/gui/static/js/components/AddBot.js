@@ -18,8 +18,24 @@ class RefreshingList extends React.Component {
         this.updateCurrentBot = this.updateCurrentBot.bind(this);
     }
 
+    /**
+     * This function is called when the user presses on the Available Bots List
+     * This function simply tells the backend to listen for incoming Minibot
+     * broadcasts and update its internal list of active Minibots.  This 
+     * function doesn't update the WebGUI at all.  Instead, the refreshAvailableBots
+     * function, which runs continuously, fetches the updated active Minibots list
+     * from the backend.  refreshAvailableBots must run continuously to update the 
+     * Available Bots List in case a previously active Minibot disconnects.
+     * The reason we have a separate discoverBots function and a separate
+     * refreshAvailableBots function is because fetching the active Minibots 
+     * is inexpensive, so its okay if refreshAvailableBots runs continuously.
+     * However, making the Basestation listen for all active Minibots can be 
+     * relatively expensive, so we want to make the Basestation perform this
+     * not too frequently.  Hence, with this implementation, the Basestation will
+     * only need to perform this operation when the Available Bots List is clicked.
+     */
     discoverBots(event) {
-        console.log("Discvering bot");
+        console.log("Discovering new Minibot");
         axios({
             method: 'GET',
             url: '/discover-bots',
@@ -46,11 +62,10 @@ class RefreshingList extends React.Component {
     }
 
     render() {
-        console.log("Current bot ", this.state.currentBot)
         const _this = this;
         if (_this.state.availableBots.length === 0) {
             _this.state.currentBot = "";
-            return <select onClick={this.discoverBots}>
+            return <select className="available-bots" onClick={this.discoverBots}>
                 <option>Click to search for available bots</option>
             </select>
         }
@@ -60,6 +75,7 @@ class RefreshingList extends React.Component {
 
         return (
             <select
+                className="available-bots"
                 onChange={(e) => this.updateCurrentBot(e)}
                 onClick={this.discoverBots}
             >
@@ -75,7 +91,15 @@ function Ports(props) {
     let buttonList = [];
 
     for (let i = 0; i < ports.length; i++) {
-        buttonList.push(<li><button className="btn_ports" onClick={() => props.motorPorts(props.portName, ports[i])}>{ports[i]}</button></li>);
+        buttonList.push(
+            <li key={i}>
+                <button
+                    className="btn_ports"
+                    onClick={() => props.motorPorts(props.portName, ports[i])}>
+                    {ports[i]}
+                </button>
+            </li>
+        );
     }
     return (<ul> {buttonList} </ul>);
 };
@@ -96,7 +120,7 @@ function PortsList(props) {
     for (let i = 0; i < portNames.length; i++) {
         let link = <a>{portLabels[i]} &#8250;</a>
         let ports = <Ports portName={portNames[i]} motorPorts={props.motorPorts} />
-        let listElement = <li> {link} {ports} </li>
+        let listElement = <li key={i}> {link} {ports} </li>
         allListElements.push(listElement);
     }
 
@@ -183,7 +207,10 @@ class SpeechRecognition extends React.Component {
                 console.log("Speech Recognition", response.data);
             }
         }).catch(function (error) {
-            console.log("Speech Recognition", error);
+            if (error.response.data.error_msg.length > 0)
+                window.alert(error.response.data.error_msg);
+            else
+                console.log("Speech Recognition", error);
         })
 
         this.setState({ on: turnOn });
@@ -269,11 +296,14 @@ export default class AddBot extends React.Component {
         this.refreshingBotListRef = React.createRef();
         this.addBotListener = this.addBotListener.bind(this);
         this.buttonMapListener = this.buttonMapListener.bind(this);
+        this.handleArrowKeyDown = this.handleArrowKeyDown.bind(this);
         this.motorPorts = this.motorPorts.bind(this);
     }
 
     componentDidMount() {
         setInterval(this.refreshAvailableBots.bind(this), 500);
+        document.getElementById("setup_control_tab").addEventListener(
+            "keydown", this.handleArrowKeyDown);
     }
 
     /*
@@ -351,12 +381,32 @@ export default class AddBot extends React.Component {
                 direction: value,
                 power: _this.state.power,
             })
-        })
-            .then(function (response) {
-            })
-            .catch(function (error) {
+        }).catch(function (error) {
+            if (error.response.data.error_msg.length > 0)
+                window.alert(error.response.data.error_msg);
+            else
                 console.log(error);
-            })
+        })
+    }
+
+    /** Handles keyboard input to control the movement buttons */
+    handleArrowKeyDown(event) {
+        const directionArray = ["left", "forward", "right", "backward"]
+        const spaceBar = 32;
+        const leftArrow = 37;
+        const downArrow = 40;
+
+        // If user presses spacebar, make the Minibot stop
+        if (event.keyCode === spaceBar) {
+            // prevent spacebar from jumping to the end of the page
+            event.preventDefault()
+            this.buttonMapListener("stop");
+        // If user presses an arrow key, make the Minibot move in that direction
+        } else if (event.keyCode >= leftArrow && event.keyCode <= downArrow) {
+            // prevent arrow key from causing the page to scroll
+            event.preventDefault()
+            this.buttonMapListener(directionArray[event.keyCode - leftArrow])
+        }
     }
 
     /*motor ports*/
@@ -373,12 +423,12 @@ export default class AddBot extends React.Component {
                 ports: [name, String(port1)],
                 bot_name: _this.props.selectedBotName,
             })
-        })
-            .then(function (response) {
-            })
-            .catch(function (error) {
+        }).catch(function (error) {
+            if (error.response.data.error_msg.length > 0)
+                window.alert(error.response.data.error_msg);
+            else
                 console.log(error);
-            })
+        })
     }
 
     /* removes selected bot label and button */
@@ -417,13 +467,12 @@ export default class AddBot extends React.Component {
                 bot_name: _this.props.selectedBotName,
                 mode: "line_follow",
             })
-        })
-            .then(function (response) {
-                //do stuff after success
-            })
-            .catch(function (error) {
-                //handle errors
-            });
+        }).catch(function (error) {
+            if (error.response.data.error_msg.length > 0)
+                window.alert(error.response.data.error_msg);
+            else
+                console.log(error);
+        });
     }
 
     objectDetectionOnClick() {
@@ -439,13 +488,13 @@ export default class AddBot extends React.Component {
                 bot_name: _this.props.selectedBotName,
                 mode: "object_detection",
             })
-        })
-            .then(function (response) {
-                //do stuff after success
-            })
-            .catch(function (error) {
+        }).catch(function (error) {
+            if (error.response.data.error_msg.length > 0)
+                window.alert(error.response.data.error_msg);
+            else
+                console.log(error);
                 //handle errors
-            });
+        });
     }
 
 
@@ -453,92 +502,108 @@ export default class AddBot extends React.Component {
     render() {
         const _this = this;
         return (
-            <div className="container-fluid control">
-                <div className="row">
-                    <div className="col text-center">
-                        <p id="small_title">Minibot Setup </p>
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col horizontalDivCenter">
-                        <div className="element-wrapper">
-                            <label> Available Bots: </label>
-                            <RefreshingList ref={this.refreshingBotListRef} />
-                        </div>
-                        <Button id="add-bot" name="Add Bot" onClick={this.addBotListener} />
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col horizontalDivCenter">
-                        <div className="element-wrapper">
-                            <label id="selected-bot" style={this.props.selectedBotStyle} > Connected to: &nbsp;
-                            <span id="botName">{_this.getSelectedBotText()} </span>
-                            </label>
-                        </div>
-                        <Button id="remove-bot" name="Remove"
-                            onClick={() => _this.deleteBotListener()}
-                            style={_this.props.removeBotButtonStyle} />
-                    </div>
-                </div>
-                <br />
-                <div className="row">
-                    <div className="col horizontalDivCenter">
-                        <p id="small_title">Ports </p>
-                        <div className="element-wrapper in-front-of-other-elems">
-                            <PortsList motorPorts={this.motorPorts} />
+            // Set tabindex to -1 so that this div is in focus to caputure 
+            // the keyboard event handler for arrow key movement
+            <div id="setup_control_tab" tabindex="-1" className="container-fluid control">
+                <div className="container">
+                    <div className="row">
+                        <div className="col text-center">
+                            <br />
+                            <p className="small-title"> Minibot Setup </p>
                         </div>
                     </div>
-                </div>
-                <br />
-                <div className="row">
-                    <div className="col horizontalDivCenter">
-                        <p id="small_title">Movement </p>
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col text-center">
-                        <button className="btn_btn-dir_movement" onClick={() => this.buttonMapListener("forward")}>forward</button>
-                        <br />
-                        <button className="btn_btn-dir_movement" onClick={() => this.buttonMapListener("left")}>left</button>
-                        <button className="btn_btn-dir_movement" onClick={() => this.buttonMapListener("stop")}>stop</button>
-                        <button className="btn_btn-dir_movement" onClick={() => this.buttonMapListener("right")}>right</button>
-                        <br />
-                        <button className="btn_btn-dir_movement" onClick={() => this.buttonMapListener("backward")}>backward</button>
-                        <br />
-                        <br />
-                        <form className="horizontalDivCenter">
-                            <div>
-                                <label> Power: </label>
+                    <div className="row">
+                        <div className="col horizontalDivCenter">
+                            <div className="element-wrapper">
+                                <label className="white-label"> Available Bots: &nbsp; </label>
+                                <RefreshingList ref={this.refreshingBotListRef} />
                             </div>
-                            <input id="custom-range-1" className="custom-range" name="wheel_power" type="range" min="0" max="100"
-                                step="5" onChange={evt => this.updatePowerValue(evt)} />
-                        </form>
+                            <Button id="add-bot" name="Add Bot" onClick={this.addBotListener} />
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col horizontalDivCenter">
+                            <div className="element-wrapper">
+                                <label id="selected-bot" style={this.props.selectedBotStyle}>
+                                    Connected to: &nbsp; &nbsp;
+                                <span id="botName">
+                                        {_this.getSelectedBotText()}
+                                    </span>
+                                </label>
+                            </div>
+                            <Button id="remove-bot" name="Remove"
+                                onClick={() => _this.deleteBotListener()}
+                                style={_this.props.selectedBotStyle} />
+                        </div>
+                    </div>
+                    <br />
+                </div>
+                <br />
+                <div className="container">
+                    <div className="row">
+                        <div className="col horizontalDivCenter">
+                            <p className="small-title">Ports </p>
+                            <div className="element-wrapper in-front-of-other-elems">
+                                <PortsList motorPorts={this.motorPorts} />
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <br />
-                <div className="row">
+                <div className="container">
+                    <div className="row">
+                        <div className="col horizontalDivCenter">
+                            <p className="small-title">Movement </p>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col text-center">
+                            <button className="button-movement" onClick={() => this.buttonMapListener("forward")}>forward</button>
+                            <br />
+                            <button className="button-movement" onClick={() => this.buttonMapListener("left")}>left</button>
+                            <button className="button-stop" onClick={() => this.buttonMapListener("stop")}>stop</button>
+                            <button className="button-movement" onClick={() => this.buttonMapListener("right")}>right</button>
+                            <br />
+                            <button className="button-movement" onClick={() => this.buttonMapListener("backward")}>backward</button>
+                            <br />
+                            <br />
+                            <form className="horizontalDivCenter">
+                                <div>
+                                    <label className="white-label"> Power: &nbsp; </label>
+                                </div>
+                                <input id="custom-range-1" className="custom-range" name="wheel_power" type="range" min="0" max="100"
+                                    step="5" onChange={evt => this.updatePowerValue(evt)} />
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <div className="container">
+                    <div className="row">
+                        <div className="col horizontalDivCenter">
+                            <p className="small-title"> Speech Recognition </p>
+                        </div>
+                    </div>
                     <div className="col horizontalDivCenter">
-                        <p id="small_title"> Speech Recognition </p>
+                        <SpeechRecognition selectedBotName={this.props.selectedBotName}
+                            float="right" />
                     </div>
-                </div>
-                {/* button-wrapper is a custom class to add padding
-                    the rest is bootstrap css */}
-                <div className="col horizontalDivCenter">
-                    <SpeechRecognition selectedBotName={this.props.selectedBotName}
-                        float="right" />
-                </div>
-                <div className="col horizontalDivCenter">
-                    <label id="speech_recognition_feedback_box" />
-                </div>
-                <br />
-                <br />
-                <div className="row">
                     <div className="col horizontalDivCenter">
-                        <button className="btn btn-success element-wrapper mr-1" onClick={() => this.objectDetectionOnClick()}>Object Detection</button>
-                        <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.lineFollowOnClick()}>Line Follow</button>
+                        <label id="speech_recognition_feedback_box" />
                     </div>
                 </div>
                 <br />
+                <div className="container">
+                    <div className="row">
+                        <div className="col horizontalDivCenter">
+                            <p className="small-title"> Custom Modes </p>
+                            <button className="btn btn-success element-wrapper mr-1" onClick={() => this.objectDetectionOnClick()}>Object Detection</button>
+                            <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.lineFollowOnClick()}>Line Follow</button>
+                        </div>
+                    </div>
+                    <br />
+                </div>
+
                 <br />
             </div >
         );

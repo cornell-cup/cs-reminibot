@@ -16,9 +16,9 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 class Navbar extends React.Component {
   render() {
     return (
-      <div className="jumbotron text-center">
+      <div style={{ backgroundColor: "#212529", padding: "20px" }} className="jumbotron text-center">
         <img className="logo" src="./static/img/logo.png" />
-        <h1>MiniBot GUI</h1>
+        <h1 id="title"> MiniBot WebGUI </h1>
       </div>
     );
   }
@@ -31,19 +31,6 @@ class Platform extends React.Component {
   constructor(props) {
     super(props);
 
-    this.hiddenLabelStyle = {
-      borderStyle : 'solid', 
-      borderWidth : "1px", 
-      visibility: 'hidden',
-    };
-
-    this.visibleLabelStyle = {
-      borderStyle : 'solid', 
-      borderWidth : "1px", 
-      padding: '4px',
-      visibility: 'visible',
-    };
-
     this.hiddenStyle = {
       visibility: 'hidden',
     };
@@ -53,22 +40,40 @@ class Platform extends React.Component {
 
     this.state = {
       customBlockList: [],
-      blockly_xml: null,
+      blocklyXml: null,
+      pythonCode: "",
+      // pythonCodeState == -1:  Code is completely blockly generated, no user
+      //    changes have been made
+      // pythonCodeState == 0:  User has made changes to the Python code, but 
+      //    the user has not yet disallowed Blockly from overwiting these changes
+      // pythonCodeState == 1:  User has made changes to the Python code
+      //    and has disallowed Blockly from overwriting these changes.
+      pythonCodeState: -1,
       selectedBotName: '',
-      selectedBotStyle: this.hiddenLabelStyle,
-      removeBotButtonStyle: this.hiddenStyle,
+      selectedBotStyle: this.hiddenStyle,
     };
 
     this.setBlockly = this.setBlockly.bind(this);
+    this.setPythonCode = this.setPythonCode.bind(this)
     this.redefineCustomBlockList = this.redefineCustomBlockList.bind(this);
-    this.setSelectedBotName= this.setSelectedBotName.bind(this);
-    this.setSelectedBotStyle= this.setSelectedBotStyle.bind(this);
+    this.setSelectedBotName = this.setSelectedBotName.bind(this);
+    this.setSelectedBotStyle = this.setSelectedBotStyle.bind(this);
 
   }
 
   setBlockly(xmltext) {
-    const _this = this;
-    _this.setState({ blockly_xml: xmltext });
+    this.setState({ blocklyXml: xmltext });
+  }
+
+  /**
+   * Sets the Python code and code state.  See the comment in the constructor
+   * to understand the different values the code state can take.  
+   */
+  setPythonCode(code, state) {
+    this.setState({ 
+      pythonCode: code,
+      pythonCodeState: state,
+    });
   }
 
   redefineCustomBlockList(newCustomBlockList) {
@@ -76,19 +81,16 @@ class Platform extends React.Component {
   }
 
   setSelectedBotName(text) {
-    const _this = this;
-    _this.setState({ selectedBotName: text });
+    this.setState({ selectedBotName: text });
   }
 
   setSelectedBotStyle(style) {
     const _this = this;
     if (style === "hidden") {
-      _this.setState({ selectedBotStyle: this.hiddenLabelStyle });
-      _this.setState({ removeBotButtonStyle: this.hiddenStyle });
+      _this.setState({ selectedBotStyle: this.hiddenStyle });
     }
     else {
-      _this.setState({ selectedBotStyle: this.visibleLabelStyle });
-      _this.setState({ removeBotButtonStyle: this.visibleStyle });
+      _this.setState({ selectedBotStyle: this.visibleStyle });
     }
   }
 
@@ -97,8 +99,8 @@ class Platform extends React.Component {
       <div id="platform">
         <Tabs>
           <TabList>
-            <Tab>Setup</Tab>
-            <Tab>Coding/Control</Tab>
+            <Tab>Setup/Control</Tab>
+            <Tab>Coding</Tab>
             <Tab>Analytics</Tab>
           </TabList>
 
@@ -110,18 +112,20 @@ class Platform extends React.Component {
                   setSelectedBotName={this.setSelectedBotName}
                   selectedBotStyle={this.state.selectedBotStyle}
                   setSelectedBotStyle={this.setSelectedBotStyle}
-                  removeBotButtonStyle={this.state.removeBotButtonStyle}
                 />
               </div>
-              <div className="col">
+              <div className="col horizontalDivCenter">
                 <GridView />
               </div>
             </div>
           </TabPanel>
           <TabPanel>
             <Blockly
-              blockly_xml={this.state.blockly_xml}
+              blocklyXml={this.state.blocklyXml}
               setBlockly={this.setBlockly}
+              pythonCode={this.state.pythonCode}
+              pythonCodeState={this.state.pythonCodeState}
+              setPythonCode={this.setPythonCode}
               selectedBotName={this.state.selectedBotName}
               customBlockList={this.state.customBlockList}
               redefineCustomBlockList={this.redefineCustomBlockList}

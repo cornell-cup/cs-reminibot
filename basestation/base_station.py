@@ -183,7 +183,7 @@ class BaseStation:
         """
         bot = self.get_bot(bot_name)
         # ask the bot to reply whether its ACTIVE
-        bot.sendKV("BOTSTATUS", "ACTIVE")
+        bot.sendKV("BOTSTATUS", "")
         # read the newest message from the bot
         bot.readKV()
         if bot.is_connected():

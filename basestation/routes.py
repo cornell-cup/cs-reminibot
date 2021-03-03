@@ -16,6 +16,9 @@ from basestation import app
 
 base_station = BaseStation(app.debug)
 
+# Error messages
+NO_BOT_ERROR_MSG = "Please connect to a Minibot!"
+
 
 @app.route('/start', methods=['GET'])
 def start():
@@ -41,6 +44,9 @@ def wheels():
     """ Makes the Minibot move. """
     data = request.get_json()
     bot_name = data['bot_name']
+    if not bot_name:
+        error_json = {"error_msg": NO_BOT_ERROR_MSG}
+        return json.dumps(error_json), status.HTTP_400_BAD_REQUEST
     direction = data['direction']
     power = data['power']
     base_station.move_bot_wheels(bot_name, direction, power)
@@ -52,6 +58,9 @@ def script():
     """ Make Minibot run a Python script """
     data = request.get_json()
     bot_name = data['bot_name']
+    if not bot_name:
+        error_json = {"error_msg": NO_BOT_ERROR_MSG}
+        return json.dumps(error_json), status.HTTP_400_BAD_REQUEST
     script_code = data['script_code']
     base_station.send_bot_script(bot_name, script_code)
     return json.dumps(True), status.HTTP_200_OK
@@ -64,6 +73,9 @@ def ports():
     """
     data = request.get_json()
     bot_name = data['bot_name']
+    if not bot_name:
+        error_json = {"error_msg": NO_BOT_ERROR_MSG}
+        return json.dumps(error_json), status.HTTP_400_BAD_REQUEST
     ports = data['ports']
     base_station.set_bot_ports(bot_name, ports)
     return json.dumps(True), status.HTTP_200_OK
@@ -74,6 +86,9 @@ def mode():
     """ Makes the minibot run in either line follow or object detection mode """
     data = request.get_json()
     bot_name = data['bot_name']
+    if not bot_name:
+        error_json = {"error_msg": NO_BOT_ERROR_MSG}
+        return json.dumps(error_json), status.HTTP_400_BAD_REQUEST
     mode = data['mode']
     base_station.set_bot_mode(bot_name, mode)
     return json.dumps(True), status.HTTP_200_OK
@@ -95,6 +110,9 @@ def error_message_update():
     """Returns the result (either a successful execution or an error message) of running the user's code"""
     data = request.get_json()
     bot_name = data['bot_name']
+    if not bot_name:
+        error_json = {"error_msg": NO_BOT_ERROR_MSG}
+        return json.dumps(error_json), status.HTTP_400_BAD_REQUEST
     script_exec_result = base_station.get_bot_script_exec_result(bot_name)
     if not script_exec_result:
         code = -1
@@ -178,6 +196,9 @@ def speech_recognition():
     if request.method == 'POST':
         data = request.get_json()
         bot_name = data['bot_name']
+        if not bot_name:
+            error_json = {"error_msg": NO_BOT_ERROR_MSG}
+            return json.dumps(error_json), status.HTTP_400_BAD_REQUEST
         command = data["command"]
         base_station.toggle_speech_recognition(bot_name, command)
         return json.dumps(True), status.HTTP_200_OK

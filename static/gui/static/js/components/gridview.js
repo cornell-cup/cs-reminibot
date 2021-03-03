@@ -1,5 +1,7 @@
 import React from 'react';
 import axios from 'axios';
+import { Button } from './Util.js'
+
 /**
  * Component for the grid view of the simulated bots.
  */
@@ -181,20 +183,31 @@ export default class GridView extends React.Component {
         if (this.state.count % 2 == 0) {
             clearInterval(this.find);
         }
+        // if we make this interval too small (like 10ms), the backend can't
+        // process the requests fast enough and the server gets overloaded 
+        // and cannot handle any more requests.  If you want to poll faster,
+        // then we need to make the backend be able to handle requests 
+        // concurrently, or we need to use WebSockets which will hopefully
+        // allow for faster communication
         else {
-            this.find = setInterval(this.getVisionData.bind(this), 10);
+            this.find = setInterval(this.getVisionData.bind(this), 100);
         }
     }
 
     render() {
         return (
-
-            <div id="component_view" className="box">
-                <p id="small_title">Vision </p>
-                <button id="grid_recenter" onClick={this.displayRobot}>Display Bot</button>
-                <br />
-                <br />
-                <div id="view"></div>
+            <div className="container">
+                <div id="component_view" className="box">
+                    <p className="small-title">Vision &nbsp; &nbsp; </p>
+                    <Button
+                        id="grid_recenter"
+                        onClick={this.displayRobot}
+                        name={"Display Bot"}
+                    />
+                    <br />
+                    <br />
+                    <div id="view"></div>
+                </div >
             </div >
         );
     }

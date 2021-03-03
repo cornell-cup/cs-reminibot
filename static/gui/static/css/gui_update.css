@@ -11,6 +11,27 @@
     padding-bottom: 10px;
 }
 
+.button-login {
+    background: #d1150c;
+    color: white;
+    height: 40px;
+    font-weight: 650;
+    letter-spacing: 0.11em;
+}
+
+.button-gradient {
+    background-image: linear-gradient(to right, #e34850, rgb(255, 155, 0));
+    color: white;
+    border-radius: 5px;
+    padding: 5px;   
+    border: 0px;
+}
+
+.button-gradient:hover {
+    background-image: linear-gradient(to right, rgb(235, 0, 0), rgb(245, 145, 0));
+}
+
+
 .control {
     padding-left: 15px;
     padding-top: 15px;
@@ -20,6 +41,10 @@
     width: 100px;
     height: auto;
     display: inline-block;
+}
+
+.white-label {
+    color:white;
 }
 
 .element-wrapper {
@@ -46,14 +71,18 @@
 }
 
 .main-body {
-    background: white;
+    background: #212529;
+}
+
+.jumbotron {
+    background-color:#212529;
 }
 
 .navbar {
     width: 100vw;
     height: 8vh;
     size: 5em;
-    background: #323232;
+    background: #212529;
     color: white;
 }
 
@@ -77,11 +106,17 @@ table {
     text-align: center;
 }
 
-
 /*SETUP TAB*/
 
 #view {
     min-height: 0;
+}
+
+.available-bots {
+    background-color:#e34850;
+    color: white;
+    padding: 2px;
+    border-radius: 5px;
 }
 
 .gridControlTable {
@@ -98,14 +133,6 @@ table {
 
 
 /*CONTROL TAB*/
-
-#controltab {}
-
-#controlpanel {}
-
-#blockly {
-    height: 80vh;
-}
 
 .controlgrid {
     padding: 10px;
@@ -141,12 +168,15 @@ table {
     list-style: none;
     padding: 6px 12px;
     cursor: pointer;
+    color: white;
+    background-color:#3c434b ;
+    border-radius: 5px 5px 0 0;
 }
 
 .react-tabs__tab--selected {
     background: #fff;
     border-color: #aaa;
-    color: black;
+    color: #121212;
     border-radius: 5px 5px 0 0;
 }
 
@@ -179,17 +209,17 @@ table {
     background: #fff;
 }
 
-.btn_btn-dir {
-    background: #d1150c;
+.button-movement {
+    background: #e34850;
     color: white;
-    border-radius: 15px;
+    border-radius: 30px;
     height: 40px;
-    /* width: 120px; */
-    font-weight: 650;
+    width: 120px;
+    font-weight: 500;
     letter-spacing: 0.11em;
 }
 
-.btn_btn-dir_movement {
+.button-stop {
     background: #d1150c;
     color: white;
     border-radius: 30px;
@@ -200,12 +230,14 @@ table {
 }
 
 #title {
-    font-size: 40px;
+    font-size: 50px;
+    color: white
 }
 
-#small_title {
-    font-size: 30px;
+.small-title {
+    font-size: 30px; 
     font-weight: bold;
+    color: white
 }
 
 #main_nav ul {
@@ -293,9 +325,11 @@ table {
 
 #selected-bot {
     border-style: solid;
-    border-color: black;
-    border-width: 5px;
+    border-color: white;
+    border-width: 1px;
+    color: white;
     padding: 5px;
+    background-color:#3c434b ;
 }
 
 #speech_recognition_feedback_box {
@@ -307,5 +341,19 @@ table {
 }
 
 #botName {
-    color: red;
+    color: orange;
+    font-weight: bold;
+}
+
+
+.container{
+    background-color: #2c3137;
+    border-radius: 25px;
+    padding: 5px 1px 5px 1px; 
+}
+
+.container-coding{
+    background-color: #2c3137;
+    border-radius: 25px;
+    padding: 5px 5px 5px 5px; 
 }

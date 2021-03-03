@@ -255,7 +255,7 @@ def set_ports(ports):
         "RMOTOR" : "RM",
         "MOTOR3" : "M",
         "LINE" : "L",
-        "INFARED" : "I",
+        "INFRARED" : "I",
         "RFID" : "R",
         "ULTRASONIC" : "U"
     }

@@ -4,8 +4,12 @@ import React from 'react';
 export function Button(props) {
   return (
     <div className="element-wrapper">
-      <button id={props.id} onClick={props.onClick} style={props.style}>
-        {props.name}
+      <button 
+        id={props.id} 
+        className="button-gradient" 
+        onClick={props.onClick} 
+        style={props.style}>
+          {props.name}
       </button>
     </div>
   );
