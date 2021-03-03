@@ -405,3 +405,12 @@ class BaseStation:
     def login_email(self, email: str):
         """Sets the login email property"""
         self._login_email = email
+
+    
+
+
+
+
+    def get_user(self, email):
+        user = User.query.filter_by(email=email).first()
+        return user
