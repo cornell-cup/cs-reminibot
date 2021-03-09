@@ -55,6 +55,9 @@ export default class RequestButton extends React.Component {
 
     axios({
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
       url: '/builtin-script',
       data: JSON.stringify({
         op: "START",
@@ -91,6 +94,9 @@ export default class RequestButton extends React.Component {
     axios({
       method: 'POST',
       url: '/builtin-script',
+      headers: {
+        'Content-Type': 'application/json'
+      },
       data: JSON.stringify({
         op: "STOP",
         path: this.props.path,

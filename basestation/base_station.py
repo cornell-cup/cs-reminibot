@@ -110,6 +110,12 @@ class BaseStation:
         self.speech_recog_thread = None
         self.lock = threading.Lock()
 
+        # Keep track of any built-in scripts that are running / should run next
+        self.builtin_script_state = {
+            "procs": dict(),
+            "next_req_id": 0
+        }
+
     # ==================== VISION ====================
 
     def update_vision_log(self, value):

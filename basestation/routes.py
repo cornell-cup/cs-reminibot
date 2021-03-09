@@ -106,6 +106,7 @@ def mode():
 @app.route('/vision', methods=['POST', 'GET'])
 def vision():
     """Updates vision status"""
+    # TODO add FPS tracking on server side
     if request.method == 'POST':
         info = request.get_json()
         base_station.update_vision_log(info)

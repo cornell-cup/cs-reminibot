@@ -195,16 +195,17 @@ export default class GridView extends React.Component {
             return {
                 required: {
                     "Interior rows": "r",
-                    "Interior": "c"
+                    "Interior columns": "c"
                 },
                 optional: {
-                    "Tag Size, in inches": "-s"
+                    "Tag Size, in inches": "s",
+                    "Camera ID": "id"
                 }
             }
         } else if (name === "Calibrate Axes") {
             return {
                 "required": {
-                    ".calib file name": "f"
+                    "Calib file name": "f"
                 },
                 "optional": {
                     "Origin tag size, inches": "o",
