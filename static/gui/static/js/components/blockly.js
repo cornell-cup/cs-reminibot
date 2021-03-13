@@ -384,6 +384,7 @@ export default class MinibotBlockly extends React.Component {
     }
 
     customBlock(functionName, pythonTextBoxCode) {
+        console.log("Richie Called");
         const _this = this;
         let item = _this.props.customBlockList.find(element => element[0] === functionName);
         if (item == undefined) {
@@ -655,14 +656,14 @@ export default class MinibotBlockly extends React.Component {
                 loginErrorLabel: "",
                 isLoggedIn: true,
             });
-            if(temp[0][0]!==_this.state.emptyFunctionName && _this.props.customBlockList[0][0]!==_this.state.emptyFunctionName){
-                _this.props.customBlockList.push.apply(_this.props.customBlockList, temp);
-            }
-            if(temp[0][0]!==_this.state.emptyFunctionName && _this.props.customBlockList[0][0]===_this.state.emptyFunctionName){
-                _this.props.customBlockList.splice(0, 1);
-                _this.props.customBlockList.push.apply(_this.props.customBlockList[0], temp);
-            }
-
+            // Not sure what this code does, but it causes the duplicate customized functions issue.
+            // if(temp[0][0]!==_this.state.emptyFunctionName && _this.props.customBlockList[0][0]!==_this.state.emptyFunctionName){
+            //     _this.props.customBlockList.push.apply(_this.props.customBlockList, temp);
+            // }
+            // if(temp[0][0]!==_this.state.emptyFunctionName && _this.props.customBlockList[0][0]===_this.state.emptyFunctionName){
+            //     _this.props.customBlockList.splice(0, 1);
+            //     _this.props.customBlockList.push.apply(_this.props.customBlockList[0], temp);
+            // }
             _this.redefineCustomBlocks();
             _this.updateCustomBlocks();
         }).catch((error) => {
@@ -672,7 +673,6 @@ export default class MinibotBlockly extends React.Component {
                 loginSuccessLabel: "",
                 loginErrorLabel: error.response.data.error_msg
             });
-            console.log(error);
         });
     }
 
