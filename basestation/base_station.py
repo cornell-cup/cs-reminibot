@@ -406,11 +406,8 @@ class BaseStation:
         """Sets the login email property"""
         self._login_email = email
 
-    
-
-
-
-
     def get_user(self, email):
         user = User.query.filter_by(email=email).first()
         return user
+
+# TODO Mar 13, 2021: Recover/implement the storage of Python programs
