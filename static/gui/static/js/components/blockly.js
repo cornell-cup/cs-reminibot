@@ -384,7 +384,6 @@ export default class MinibotBlockly extends React.Component {
     }
 
     customBlock(functionName, pythonTextBoxCode) {
-        console.log("Richie Called");
         const _this = this;
         let item = _this.props.customBlockList.find(element => element[0] === functionName);
         if (item == undefined) {
@@ -656,7 +655,7 @@ export default class MinibotBlockly extends React.Component {
                 loginErrorLabel: "",
                 isLoggedIn: true,
             });
-            // Not sure what this code does, but it causes the duplicate customized functions issue.
+            // Not sure what this code does, but it causes the duplicate blockly function problem.
             // if(temp[0][0]!==_this.state.emptyFunctionName && _this.props.customBlockList[0][0]!==_this.state.emptyFunctionName){
             //     _this.props.customBlockList.push.apply(_this.props.customBlockList, temp);
             // }
@@ -673,6 +672,7 @@ export default class MinibotBlockly extends React.Component {
                 loginSuccessLabel: "",
                 loginErrorLabel: error.response.data.error_msg
             });
+            console.log(error);
         });
     }
 
