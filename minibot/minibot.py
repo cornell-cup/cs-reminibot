@@ -363,14 +363,23 @@ if __name__ == "__main__":
     parser.add_argument(
         '-p', type=int, dest="port_number", default=10000
     )
+    parser.add_argument(
+        '-m', type=int, dest="comm_mode", default=1
+    )
     args = parser.parse_args()
 
-    if args.is_simulation:
+    if args.is_simulation and args.comm_mode == 1:
         import scripts.ece_dummy_ops as ece
         BOT_LIB_FUNCS = "ece_dummy_ops"
-    else:
+    elif args.is_simulation and args.comm_mode == 2:
+        import scripts.ece_dummy_ops2 as ece
+        BOT_LIB_FUNCS = "ece_dummy_ops2"
+    elif args.comm_mode == 1:
         import scripts.pi_arduino as ece
         BOT_LIB_FUNCS = "pi_arduino"
+    elif args.comm_mode == 2:
+        import scripts.pi_arduino2 as ece
+        BOT_LIB_FUNCS = "pi_arduino2"
 
     minibot = Minibot(args.port_number)
     minibot.main()
