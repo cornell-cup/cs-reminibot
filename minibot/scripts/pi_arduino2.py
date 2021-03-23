@@ -3,11 +3,12 @@ import spidev
 import time
 import threading
 from statistics import median
+from crc import crc16
 
 spi = spidev.SpiDev()
 STOP_CMD = "S"
-START_TRASMISSION_CMD = "\n"
-END_TRASMISSION_CMD = "\r"
+START_TRASMISSION_CMD = "CUP"
+END_TRASMISSION_CMD = "PUC"
 
 
 class TransmitLock():
@@ -90,7 +91,7 @@ def setSlave(pi_bus):
     spi.mode = 0
     spi.max_speed_hz = 115200
 
-def transmit_once(cmd):
+def transmit_once(data):
     """ Sends each character in the cmd to the Arduino
 
     Arguments:
@@ -98,10 +99,13 @@ def transmit_once(cmd):
             (eg. "F" to tell the Arduino to start driving
              the Minibot forward)
     """
-    if type(cmd) == type([]):
-        spi.writebytes2([ord(c) for c in cmd])
+    if hasattr(data, '__len__'):
+        checksum = crc16(data)
+        checksum_b1 = checksum & 8
+        checksum_b2 = ((checksum >> 8) & 0xFF)
+        spi.writebytes2([checksum_b1, checksum_b2] + [ord(c) for c in data])
     else:
-        spi.writebytes([ord(cmd)])
+        spi.writebytes([ord(data)])
 
 def transmit_continuously(cmd):
     """ Transmits the cmd continuously to the Arduino 
@@ -156,7 +160,7 @@ def acquire_lock():
     # Send the starting character to tell the Arduino
     # that we will be starting to transmit commands to it
     setSlave(1)
-    transmit_once(START_TRASMISSION_CMD)
+    spi.writebytes2([ord(c) for c in START_TRASMISSION_CMD])
 
 def release_lock():
     """ Releases the lock that was used to send data over SPI to
@@ -164,7 +168,7 @@ def release_lock():
     to the Arduino to indicate to the Arduino that the Arduino
     will stop receiving commands from the Raspberry Pi
     """
-    transmit_once(END_TRASMISSION_CMD)
+    spi.writebytes2([ord(c) for c in END_TRASMISSION_CMD])
     spi.close()
     tlock.end_transmit()
     
@@ -172,28 +176,29 @@ def release_lock():
 def fwd(power):
     """ Move minibot forwards, (currently power field is not in use) """
     acquire_lock()
-    transmit_continuously(['F', power])
+    transmit_continuously(['F', None, int(power), None, None]) 
+    #Start/end transmission signals sent separately?
     release_lock()
 
 
 def back(power):
     """ Move minibot backwards """
     acquire_lock()
-    transmit_continuously('B') # TODO add parameters
+    transmit_continuously(['B', None, int(power), None, None]) # TODO add parameters
     release_lock()
 
 
 def left(power):
     """ Move minibot left """
     acquire_lock()
-    transmit_continuously('L')
+    transmit_continuously(['L', None, int(power), None, None])
     release_lock()
 
 
 def right(power):
     """ Move minibot right """
     acquire_lock()
-    transmit_continuously('R')
+    transmit_continuously(['R', None, int(power), None, None])
     release_lock()
 
 
@@ -201,17 +206,22 @@ def stop():
     """ Tell minibot to stop.  Send the command num_stops times just in 
     case there is some data loss over SPI
     """
+    # acquire_lock()
+    # num_stops = 10
+    # for _ in range(num_stops):
+    #     transmit_once(STOP_CMD)
+    # release_lock()
+
     acquire_lock()
-    num_stops = 10
-    for _ in range(num_stops):
-        transmit_once(STOP_CMD)
+    transmit_continuously([None, None, None, 'S', None])
     release_lock()
 
 
 def read_ultrasonic():
+    #TODO: what to do here??
     acquire_lock()
-    transmit_once("du")
-    return_val = read_once()
+    transmit_continuously(['d', 'u'])
+    return_val = read_once() #Problem that we readonce before passing the end trans signal? 
     release_lock()
     return return_val
 
@@ -221,9 +231,14 @@ def move_servo(angle):
     acquire_lock()
     # "ss" tells the Arduino that the next byte sent will correspond to 
     # the servo_motor's angle
-    transmit_once("ss")
-    print("Servo should move to {} angle".format(angle))
-    send_integer_once(int(angle))
+    # transmit_once("ss")
+    # print("Servo should move to {} angle".format(angle))
+    # send_integer_once(int(angle))
+
+    acquire_lock()
+    transmit_continuously([None, None, None, None, int(angle)])
+    release_lock()
+
     release_lock()
 
 
@@ -233,11 +248,12 @@ def line_follow():
     transmit_continuously('T')
     release_lock()
 
-def object_detection():
-    """ Tell minibot to detect objects using RFID """
-    acquire_lock()
-    transmit_continuously('O')
-    release_lock()
+#def object_detection():
+    #TODO: support objection detection - maybe add index to buffer? 
+    # """ Tell minibot to detect objects using RFID """
+    # acquire_lock()
+    # transmit_continuously('O')
+    # release_lock()
 
 def set_ports(ports):
     """ Tell minibot which motors and sensor correspond to
