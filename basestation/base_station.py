@@ -225,7 +225,10 @@ class BaseStation:
         for line in program_lines:
             match = regex.match(line)
             if match:
-                func = self.blockly_function_map[match.group(2)]
+                if match.group(2) in self.blockly_function_map:
+                    func = self.blockly_function_map[match.group(2)]
+                else:
+                    func = match.group(2)
                 args = match.group(3)
                 whitespace = match.group(1)
                 if not whitespace:
@@ -238,7 +241,6 @@ class BaseStation:
                 parsed_program.append(parsed_line)
             else:
                 parsed_program.append(line + '\n')  # "normal" Python
-
         parsed_program_string = "".join(parsed_program)
 
         # Now actually send to the bot
