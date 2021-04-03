@@ -36,7 +36,8 @@ CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat",
 
 # load our serialized model from disk
 print("[INFO] loading model...")
-net = cv2.dnn.readNetFromCaffe(args["prototxt"], args["model"])
+net = cv2.dnn.readNetFromCaffe(
+    "basestation\piVision\MobileNetSSD_deploy.prototxt", "basestation\piVision\MobileNetSSD_deploy.caffemodel")
 
 # initialize the consider set (class labels we care about and want
 # to count), the object count dictionary, and the frame  dictionary

@@ -18,6 +18,7 @@ import time
 import threading
 import pyaudio
 import speech_recognition as sr
+import subprocess
 
 MAX_VISION_LOG_LENGTH = 1000
 
@@ -212,7 +213,7 @@ class BaseStation:
 
         if mode == "object_detection":
             self.bot_vision_server = subprocess.Popen(
-                ['python3', 'piVision/server.py'])
+                ['python', './basestation/piVision/server.py'])
         else:
             if self.bot_vision_server:
                 self.bot_vision_server.kill()
