@@ -205,3 +205,22 @@ def speech_recognition():
     else:
         message = base_station.get_speech_recognition_status()
         return json.dumps(message), status.HTTP_200_OK
+
+
+@app.route('/user', methods=['GET'])
+def get_user():
+    email = request.args.get('email')
+    user = base_station.get_user(email)
+    if user is not None:
+        return json.dumps(user.serialize()), status.HTTP_200_OK
+    else:
+        return json.dumps("User doesn't exist"), 400
+
+
+@app.route('/submission', methods=['POST'])
+def create_submission():
+    submission = base_station.create_submission()
+    if submission is not None:
+        return json.dumps(submission.serialize()), status.HTTP_200_OK
+    else:
+        return json.dumps("Submission failed"), 400

@@ -3,7 +3,7 @@ Base Station for the MiniBot.
 """
 
 from basestation.bot import Bot
-from basestation.user_database import Program, User
+from basestation.user_database import Submission, User
 from basestation import db
 from basestation.util.stoppable_thread import StoppableThread, ThreadSafeVariable
 
@@ -407,3 +407,20 @@ class BaseStation:
     def login_email(self, email: str):
         """Sets the login email property"""
         self._login_email = email
+
+
+    # Baby test programs
+    def get_user(self, email):
+        user = User.query.filter_by(email=email).first()
+        return user
+
+    def create_submission(self):
+        submission = Submission(
+            code="hello world",
+            time="today",
+            duration=1,
+            user_id=self.get_user('rz327@cornell.edu').id
+        )
+        db.session.add(submission)
+        db.session.commit()
+        return submission
