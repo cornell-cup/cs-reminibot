@@ -10,8 +10,6 @@ import sys
 import time
 import argparse
 import signal
-from imutils.video import VideoStream
-from imagezmq import imagezmq
 
 # NOTE: Please add "flush=True" to all print statements so that our test
 # harness (test_minibot.py) can pipe the stdout output, and use it
@@ -300,10 +298,6 @@ class Minibot:
         # so that some of the commands get through.  Once the data loss issue
         # is fixed, we can implement a regular solution. If we did not have the
         # threads, our code execution pointer would get stuck in the infinite loop.
-        botVisionClient = None
-        vs = None
-        _, server = sock.recvfrom(4096)
-        server_ip = str(server[0])
         if key == "BOTSTATUS":
             # update status time of the basestation
             self.bs_repr.update_status_time()
@@ -314,13 +308,6 @@ class Minibot:
         elif key == "MODE":
             if value == "object_detection":
                 Thread(target=ece.object_detection).start()
-                print("On bot vision w/ server ip: " + server_ip)
-                if (botVisionClient):
-                    vs.start()
-                else:
-                    botVisionClient = Thread(
-                        target=startBotVisionClient, kwargs={'server_ip': server_ip}, daemon=True)
-                    botVisionClient.start()
             elif value == "line_follow":
                 Thread(target=ece.line_follow).start()
         elif key == "PORTS":
@@ -367,28 +354,6 @@ class Minibot:
         self.listener_sock.close()
         self.broadcast_sock.close()
         sys.exit(0)
-
-    def startBotVisionClient(server_ip):
-        import socket  # import needs to be here b/c same name as "from socket ..." on line 0
-        print("Entered the startBotVisionClient thread")
-        global vs
-
-        # initialize the ImageSender object with the socket address of server
-        sender = imagezmq.ImageSender(
-            connect_to="tcp://{}:5555".format(server_ip))
-
-        # get the host name, initialize the video stream, and allow the
-        # camera sensor to warmup
-        rpiName = socket.gethostname()
-        vs = VideoStream(usePiCamera=True, resolution=(240, 135), framerate=25)
-        vs.start()
-        # vs = VideoStream(src=0).start()
-        time.sleep(2.0)
-
-        while True:
-            # read the frame from the camera and send it to the server
-            frame = vs.read()
-            sender.send_image(rpiName, frame)
 
 
 if __name__ == "__main__":
