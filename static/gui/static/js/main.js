@@ -24,6 +24,21 @@ class Navbar extends React.Component {
   }
 }
 
+class Navbar2 extends React.Component {
+  render() {
+    return (
+      <div id="top-nav">
+        <nav class="navbar navbar-dark bg-dark">
+          <span class="navbar-brand heading" href="#">
+            <img src="./static/img/logo.png" width="85" height="85" class="d-inline-block align-top" alt="" />
+            Minibot
+          </span>
+        </nav>
+      </div>
+    )
+  }
+}
+
 /**
  * Top Level component for the GUI, includes two tabs
  */
@@ -145,8 +160,9 @@ class Platform extends React.Component {
 class ClientGUI extends React.Component {
   render() {
     return (
-      <div className="container-fluid main-body">
-        <Navbar />
+      <div className="container main-body">
+        {/* <Navbar /> */}
+        <Navbar2 />
         <Platform />
       </div>
     );

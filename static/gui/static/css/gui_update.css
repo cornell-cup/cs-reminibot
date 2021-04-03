@@ -1,4 +1,12 @@
 /* GlOBAL */
+@import url('https://fonts.googleapis.com/css2?family=Audiowide&display=swap');
+
+
+/*** NAVBAR ***/
+
+#top-nav .heading {
+    font-family: 'Audiowide', cursive;
+}
 
 .box {
     margin: 1vh;
