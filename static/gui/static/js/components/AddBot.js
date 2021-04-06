@@ -437,7 +437,6 @@ export default class AddBot extends React.Component {
         this.props.setSelectedBotStyle("hidden");
     }
 
-
     getVisionData() {
         const _this = this;
         axios({
@@ -504,8 +503,8 @@ export default class AddBot extends React.Component {
         return (
             // Set tabindex to -1 so that this div is in focus to caputure 
             // the keyboard event handler for arrow key movement
-            <div id="setup_control_tab" tabindex="-1" className="container-fluid control">
-                <div className="container">
+            <div id="setup_control_tab" tabIndex="-1" className="container-fluid control">
+                <div className="control-option">
                     <div className="row">
                         <div className="col text-center">
                             <br />
@@ -536,10 +535,8 @@ export default class AddBot extends React.Component {
                                 style={_this.props.selectedBotStyle} />
                         </div>
                     </div>
-                    <br />
                 </div>
-                <br />
-                <div className="container">
+                <div className="control-option">
                     <div className="row">
                         <div className="col horizontalDivCenter">
                             <p className="small-title">Ports </p>
@@ -549,8 +546,7 @@ export default class AddBot extends React.Component {
                         </div>
                     </div>
                 </div>
-                <br />
-                <div className="container">
+                <div className="control-option">
                     <div className="row">
                         <div className="col horizontalDivCenter">
                             <p className="small-title">Movement </p>
@@ -577,8 +573,7 @@ export default class AddBot extends React.Component {
                         </div>
                     </div>
                 </div>
-                <br />
-                <div className="container">
+                <div className="control-option">
                     <div className="row">
                         <div className="col horizontalDivCenter">
                             <p className="small-title"> Speech Recognition </p>
@@ -592,8 +587,8 @@ export default class AddBot extends React.Component {
                         <label id="speech_recognition_feedback_box" />
                     </div>
                 </div>
-                <br />
-                <div className="container">
+
+                <div className="control-option">
                     <div className="row">
                         <div className="col horizontalDivCenter">
                             <p className="small-title"> Custom Modes </p>
@@ -601,10 +596,7 @@ export default class AddBot extends React.Component {
                             <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.lineFollowOnClick()}>Line Follow</button>
                         </div>
                     </div>
-                    <br />
                 </div>
-
-                <br />
             </div >
         );
     }

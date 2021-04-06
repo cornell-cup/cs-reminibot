@@ -28,11 +28,13 @@ class Navbar2 extends React.Component {
   render() {
     return (
       <div id="top-nav">
-        <nav class="navbar navbar-dark bg-dark">
-          <span class="navbar-brand heading" href="#">
-            <img src="./static/img/logo.png" width="85" height="85" class="d-inline-block align-top" alt="" />
+        <nav className="navbar navbar-dark bg-dark">
+          <div className="container">
+          <span className="navbar-brand heading" href="#">
+            <img src="./static/img/logo.png" width="60" height="60" className="d-inline-block align-top" alt="" />
             Minibot
           </span>
+          </div>
         </nav>
       </div>
     )
@@ -160,10 +162,12 @@ class Platform extends React.Component {
 class ClientGUI extends React.Component {
   render() {
     return (
-      <div className="container main-body">
+      <div className="main-body">
         {/* <Navbar /> */}
         <Navbar2 />
-        <Platform />
+        <div className="container">
+          <Platform />
+        </div>
       </div>
     );
   }

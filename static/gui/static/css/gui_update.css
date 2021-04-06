@@ -6,6 +6,7 @@
 
 #top-nav .heading {
     font-family: 'Audiowide', cursive;
+    font-size: 3em;
 }
 
 .box {
@@ -86,13 +87,13 @@
     background-color:#212529;
 }
 
-.navbar {
+/* .navbar {
     width: 100vw;
     height: 8vh;
     size: 5em;
     background: #212529;
     color: white;
-}
+} */
 
 .logo {
     height: 7vh;
@@ -354,13 +355,13 @@ table {
 }
 
 
-.container{
+.control-option {
     background-color: #2c3137;
     border-radius: 25px;
     padding: 5px 1px 5px 1px; 
 }
 
-.container-coding{
+.container-coding {
     background-color: #2c3137;
     border-radius: 25px;
     padding: 5px 5px 5px 5px; 
