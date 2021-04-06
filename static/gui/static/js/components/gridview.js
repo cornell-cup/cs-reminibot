@@ -196,7 +196,7 @@ export default class GridView extends React.Component {
 
     render() {
         return (
-            <div className="container">
+            <div className="control-option">
                 <div id="component_view" className="box">
                     <p className="small-title">Vision &nbsp; &nbsp; </p>
                     <Button

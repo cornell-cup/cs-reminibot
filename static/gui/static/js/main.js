@@ -27,11 +27,11 @@ class Navbar extends React.Component {
 class Navbar2 extends React.Component {
   render() {
     return (
-      <div id="top-nav">
+      <div id="top-nav" className="mb-4">
         <nav className="navbar navbar-dark bg-dark">
           <div className="container">
           <span className="navbar-brand heading" href="#">
-            <img src="./static/img/logo.png" width="60" height="60" className="d-inline-block align-top" alt="" />
+            <img src="./static/img/logo.png" width="50" height="50" className="d-inline-block align-top" alt="" />
             Minibot
           </span>
           </div>
