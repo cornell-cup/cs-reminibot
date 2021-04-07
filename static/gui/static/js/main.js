@@ -30,9 +30,17 @@ class Navbar2 extends React.Component {
       <div id="top-nav" className="mb-4">
         <nav className="navbar navbar-dark bg-dark">
           <div className="container">
-          <span className="navbar-brand heading" href="#">
+          <span className="navbar-brand" href="#">
             <img src="./static/img/logo.png" width="50" height="50" className="d-inline-block align-top" alt="" />
-            Minibot
+            <h1>Minibot</h1>
+          </span>
+          <span className="pages">
+            <a href="/start">Setup</a>
+            <a href="/coding">Coding</a>
+          </span>
+          <span className="login">
+            <a href="/login">Login</a>
+            <a href="/signup">Sign Up</a>
           </span>
           </div>
         </nav>

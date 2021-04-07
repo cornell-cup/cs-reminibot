@@ -1,90 +1,110 @@
 /* GlOBAL */
-@import url('https://fonts.googleapis.com/css2?family=Audiowide&display=swap');
-
+@import url("https://fonts.googleapis.com/css2?family=Audiowide&display=swap");
 
 /*** NAVBAR ***/
+#top-nav {
+  font-family: "Audiowide", cursive;
+  font-size: 2.5em;
+}
 
-#top-nav .heading {
-    font-family: 'Audiowide', cursive;
-    font-size: 2.5em;
+/* container of the whole nav bar */
+.container {
+  display: flex;
+  flex-direction: row;
+}
+
+/* container of logo and title */
+.navbar-brand {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.navbar-brand h1 {
+  margin-left: 8px;
+  display: inline;
+}
+
+nav.navbar a {
+  margin-left: 15px;
+  font-size: 20pt;
+  color: white;
 }
 
 .box {
-    margin: 1vh;
-    padding: 1vh;
-    width: 560px;
+  margin: 1vh;
+  padding: 1vh;
+  width: 560px;
 }
 
 .button-wrapper {
-    padding-top: 10px;
-    padding-bottom: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 .button-login {
-    background: #d1150c;
-    color: white;
-    height: 40px;
-    font-weight: 650;
-    letter-spacing: 0.11em;
+  background: #d1150c;
+  color: white;
+  height: 40px;
+  font-weight: 650;
+  letter-spacing: 0.11em;
 }
 
 .button-gradient {
-    background-image: linear-gradient(to right, #e34850, rgb(255, 155, 0));
-    color: white;
-    border-radius: 5px;
-    padding: 5px;   
-    border: 0px;
+  background-image: linear-gradient(to right, #e34850, rgb(255, 155, 0));
+  color: white;
+  border-radius: 5px;
+  padding: 5px;
+  border: 0px;
 }
 
 .button-gradient:hover {
-    background-image: linear-gradient(to right, rgb(235, 0, 0), rgb(245, 145, 0));
+  background-image: linear-gradient(to right, rgb(235, 0, 0), rgb(245, 145, 0));
 }
 
-
 .control {
-    padding-left: 15px;
-    padding-top: 15px;
+  padding-left: 15px;
+  padding-top: 15px;
 }
 
 .divider {
-    width: 100px;
-    height: auto;
-    display: inline-block;
+  width: 100px;
+  height: auto;
+  display: inline-block;
 }
 
 .white-label {
-    color:white;
+  color: white;
 }
 
 .element-wrapper {
-    padding-right: 15px;
+  padding-right: 15px;
 }
 
 .horizontalDiv {
-    clear: both;
-    padding-top: 10px;
+  clear: both;
+  padding-top: 10px;
 }
 
 .horizontalDivCenter {
-    clear: both;
-    padding-top: 10px;
-    text-align: center;
+  clear: both;
+  padding-top: 10px;
+  text-align: center;
 }
 
 .horizontalDiv div {
-    float: left;
+  float: left;
 }
 
 .horizontalDivCenter div {
-    display: inline-block; 
+  display: inline-block;
 }
 
 .main-body {
-    background: #212529;
+  background: #212529;
 }
 
 .jumbotron {
-    background-color:#212529;
+  background-color: #212529;
 }
 
 /* .navbar {
@@ -96,274 +116,268 @@
 } */
 
 .logo {
-    height: 7vh;
-    width: 7vh;
-    padding: 0.5vh;
-    text-align: right;
+  height: 7vh;
+  width: 7vh;
+  padding: 0.5vh;
+  text-align: right;
 }
 
 .slightly_larger_text {
-    size: 5em;
-}
-
-
-table {
-    text-align: center;
+  size: 5em;
 }
 
 table {
-    text-align: center;
+  text-align: center;
+}
+
+table {
+  text-align: center;
 }
 
 /*SETUP TAB*/
 
 #view {
-    min-height: 0;
+  min-height: 0;
 }
 
 .available-bots {
-    background-color:#e34850;
-    color: white;
-    padding: 2px;
-    border-radius: 5px;
+  background-color: #e34850;
+  color: white;
+  padding: 2px;
+  border-radius: 5px;
 }
 
 .gridControlTable {
-    width: 40%;
+  width: 40%;
 }
 
 .gridControl {
-    width: 200%;
+  width: 200%;
 }
 
 #component_view {
-    min-height: 0;
+  min-height: 0;
 }
-
 
 /*CONTROL TAB*/
 
 .controlgrid {
-    padding: 10px;
+  padding: 10px;
 }
 
 #generatedPythonFromBlocklyBox {
-    background: #000000;
-    color: white;
-    border: 1px solid gray;
-    overflow: scroll;
-    font-family: Consolas, monospace;
-    font-size: 17px;
-    padding: 10px;
-    max-width: 39vw;
-    max-height: 67vh;
+  background: #000000;
+  color: white;
+  border: 1px solid gray;
+  overflow: scroll;
+  font-family: Consolas, monospace;
+  font-size: 17px;
+  padding: 10px;
+  max-width: 39vw;
+  max-height: 67vh;
 }
-
 
 /* REACT TABS */
 
 .react-tabs__tab-list {
-    border-bottom: 1px solid #aaa;
-    margin: 0 0 10px;
-    padding: 0;
+  border-bottom: 1px solid #aaa;
+  margin: 0 0 10px;
+  padding: 0;
 }
 
 .react-tabs__tab {
-    display: inline-block;
-    border: 1px solid transparent;
-    border-bottom: none;
-    bottom: -1px;
-    position: relative;
-    list-style: none;
-    padding: 6px 12px;
-    cursor: pointer;
-    color: white;
-    background-color:#3c434b ;
-    border-radius: 5px 5px 0 0;
+  display: inline-block;
+  border: 1px solid transparent;
+  border-bottom: none;
+  bottom: -1px;
+  position: relative;
+  list-style: none;
+  padding: 6px 12px;
+  cursor: pointer;
+  color: white;
+  background-color: #3c434b;
+  border-radius: 5px 5px 0 0;
 }
 
 .react-tabs__tab--selected {
-    background: #fff;
-    border-color: #aaa;
-    color: #121212;
-    border-radius: 5px 5px 0 0;
+  background: #fff;
+  border-color: #aaa;
+  color: #121212;
+  border-radius: 5px 5px 0 0;
 }
 
 .react-tabs__tab-panel {
-    display: none;
+  display: none;
 }
 
 .react-tabs__tab-panel--selected {
-    display: block;
+  display: block;
 }
 
 .react-tabs__tab--disabled {
-    color: GrayText;
-    cursor: default;
+  color: GrayText;
+  cursor: default;
 }
 
 .react-tabs__tab:focus {
-    box-shadow: 0 0 5px hsl(208, 99%, 50%);
-    border-color: hsl(208, 99%, 50%);
-    outline: none;
+  box-shadow: 0 0 5px hsl(208, 99%, 50%);
+  border-color: hsl(208, 99%, 50%);
+  outline: none;
 }
 
 .react-tabs__tab:focus:after {
-    content: "";
-    position: absolute;
-    height: 5px;
-    left: -4px;
-    right: -4px;
-    bottom: -5px;
-    background: #fff;
+  content: "";
+  position: absolute;
+  height: 5px;
+  left: -4px;
+  right: -4px;
+  bottom: -5px;
+  background: #fff;
 }
 
 .button-movement {
-    background: #e34850;
-    color: white;
-    border-radius: 30px;
-    height: 40px;
-    width: 120px;
-    font-weight: 500;
-    letter-spacing: 0.11em;
+  background: #e34850;
+  color: white;
+  border-radius: 30px;
+  height: 40px;
+  width: 120px;
+  font-weight: 500;
+  letter-spacing: 0.11em;
 }
 
 .button-stop {
-    background: #d1150c;
-    color: white;
-    border-radius: 30px;
-    height: 40px;
-    width: 120px;
-    font-weight: 650;
-    letter-spacing: 0.11em;
+  background: #d1150c;
+  color: white;
+  border-radius: 30px;
+  height: 40px;
+  width: 120px;
+  font-weight: 650;
+  letter-spacing: 0.11em;
 }
 
 #title {
-    font-size: 50px;
-    color: white
+  font-size: 50px;
+  color: white;
 }
 
 .small-title {
-    font-size: 30px; 
-    font-weight: bold;
-    color: white
+  font-size: 30px;
+  font-weight: bold;
+  color: white;
 }
 
 #main_nav ul {
-    background: transparent;
-    float: left;
-    -webkit-transition: .5s;
-    transition: .5s;
-    text-align: center;
-    color: white;
+  background: transparent;
+  float: left;
+  -webkit-transition: 0.5s;
+  transition: 0.5s;
+  text-align: center;
+  color: white;
 }
 
 #main_nav li {
-    float: right;
-    position: relative;
-    width: 150px;
-    list-style: none;
-    -webkit-transition: .5s;
-    transition: .5s;
-    text-align: center;
-    background: transparent;
-    color: white;
-
+  float: right;
+  position: relative;
+  width: 150px;
+  list-style: none;
+  -webkit-transition: 0.5s;
+  transition: 0.5s;
+  text-align: center;
+  background: transparent;
+  color: white;
 }
 
 #main_nav a {
-    display: block;
-    text-decoration: none;
-    padding: 5px 15px;
-    color: white;
-    text-align: center;
-    background-color:  #EA4C46;
+  display: block;
+  text-decoration: none;
+  padding: 5px 15px;
+  color: white;
+  text-align: center;
+  background-color: #ea4c46;
 }
 
 #main_nav ul ul {
-    position: absolute;
-    left: 75%;
-    top: 40%;
-    visibility: hidden;
-    opacity: 0;
+  position: absolute;
+  left: 75%;
+  top: 40%;
+  visibility: hidden;
+  opacity: 0;
 }
 
 #main_nav ul ul ul {
-    left: 75%;
-    top: 0%;
-    position: absolute;
+  left: 75%;
+  top: 0%;
+  position: absolute;
 }
 
-
-#main_nav li:hover>ul {
-    visibility: visible;
-    opacity: 1;
+#main_nav li:hover > ul {
+  visibility: visible;
+  opacity: 1;
 }
 
 .in-front-of-other-elems {
-    position: relative;
-    z-index: 10;
+  position: relative;
+  z-index: 10;
 }
 
 .btn_ports {
-    background: #ddd;
-    width: 150px;
-    border-radius: 0.5em;
-    color: white;
-    background-color: #F07470;
+  background: #ddd;
+  width: 150px;
+  border-radius: 0.5em;
+  color: white;
+  background-color: #f07470;
 }
 
 .modal {
-    background-color: white;
-    display: none;
-    position: fixed;
-    top: 45%;
-    left: 45%;
-    width: 400px;
-    max-width: 100%;
-    height: 200px;
-    max-height: 100%;
-    z-index: 1;
-    /* background-color: rgba(0, 0, 0, 0.25); */
+  background-color: white;
+  display: none;
+  position: fixed;
+  top: 45%;
+  left: 45%;
+  width: 400px;
+  max-width: 100%;
+  height: 200px;
+  max-height: 100%;
+  z-index: 1;
+  /* background-color: rgba(0, 0, 0, 0.25); */
 }
 
 .modal_content {
-    background-color: white;
-    position: absolute;
+  background-color: white;
+  position: absolute;
 }
 
 #selected-bot {
-    border-style: solid;
-    border-color: white;
-    border-width: 1px;
-    color: white;
-    padding: 5px;
-    background-color:#3c434b ;
+  border-style: solid;
+  border-color: white;
+  border-width: 1px;
+  color: white;
+  padding: 5px;
+  background-color: #3c434b;
 }
 
 #speech_recognition_feedback_box {
-    background-color : 	#ffb2b2;
-    border-style: solid;
-    border-width: 0.5px;
-    padding: 20px;
-    width: 320px;
+  background-color: #ffb2b2;
+  border-style: solid;
+  border-width: 0.5px;
+  padding: 20px;
+  width: 320px;
 }
 
 #botName {
-    color: orange;
-    font-weight: bold;
+  color: orange;
+  font-weight: bold;
 }
 
-
 .control-option {
-    background-color: #2c3137;
-    border-radius: 25px;
-    padding: 5px 1px 5px 1px; 
-    margin-bottom: 10px;
+  background-color: #2c3137;
+  border-radius: 25px;
+  padding: 5px 1px 5px 1px;
+  margin-bottom: 10px;
 }
 
 .container-coding {
-    background-color: #2c3137;
-    border-radius: 25px;
-    padding: 5px 5px 5px 5px; 
+  background-color: #2c3137;
+  border-radius: 25px;
+  padding: 5px 5px 5px 5px;
 }
