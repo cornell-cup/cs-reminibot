@@ -3,6 +3,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCogs, faCode } from '@fortawesome/free-solid-svg-icons';
+library.add(faCogs, faCode);
+
 import GridView from './components/gridview.js';
 import Blockly from './components/blockly.js';
 import AddBot from './components/AddBot.js';
@@ -35,8 +40,9 @@ class Navbar2 extends React.Component {
             Minibot
           </span>
           <span className="pages">
-            <a href="/start">Setup</a>
-            <a href="/coding">Coding</a>
+              <a href="/start"><FontAwesomeIcon icon="cogs"/> Setup</a>
+              
+              <a href="/coding"><FontAwesomeIcon icon="code"/> Coding</a>
           </span>
           <span className="login">
             <a href="/login">Login</a>
