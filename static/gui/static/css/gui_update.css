@@ -2,27 +2,27 @@
 @import url("https://fonts.googleapis.com/css2?family=Audiowide&display=swap");
 
 /*** NAVBAR ***/
-#top-nav {
+#top-nav, #top-nav .navbar-brand {
   font-family: "Audiowide", cursive;
-  font-size: 2.5em;
+  font-size: 1.5em;
 }
 
 /* container of the whole nav bar */
-.container {
+/* .container {
   display: flex;
   flex-direction: row;
-}
+} */
 
 /* container of logo and title */
-.navbar-brand {
+/* .navbar-brand {
   display: flex;
   flex-direction: row;
   align-items: center;
-}
-.navbar-brand h1 {
+} */
+/* .navbar-brand h1 {
   margin-left: 8px;
   display: inline;
-}
+} */
 
 nav.navbar a {
   margin-left: 15px;

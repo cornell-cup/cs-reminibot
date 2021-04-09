@@ -29,10 +29,10 @@ class Navbar2 extends React.Component {
     return (
       <div id="top-nav" className="mb-4">
         <nav className="navbar navbar-dark bg-dark">
-          <div className="container">
+          <div className="container d-flex flex-row">
           <span className="navbar-brand" href="#">
             <img src="./static/img/logo.png" width="50" height="50" className="d-inline-block align-top" alt="" />
-            <h1>Minibot</h1>
+            Minibot
           </span>
           <span className="pages">
             <a href="/start">Setup</a>
