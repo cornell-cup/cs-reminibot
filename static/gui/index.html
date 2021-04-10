@@ -6,8 +6,8 @@
 	<!-- IMPORTS -->
 	<link rel="stylesheet" href="{{ url_for('static', filename = 'css/gui_update.css') }}" />
 	<link rel="stylesheet" href="{{ url_for('static', filename = 'css/codemirror.css') }}" />
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css"
-		integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" 
+		integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
 	<link rel="icon" href="{{ url_for('static', filename = 'img/logo.png' )}}" />
 
 	<!-- blockly imports -->
@@ -108,7 +108,7 @@
 		</category>
 		<!-- ADDING CUSTOM BLOCKS -->
 	</xml>
-	<!-- basic imports -->
+	<!-- basic imports + bootstrap -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 	<!-- IMPORT CUSTOM BLOCKS -->
 	<script type="text/javascript" src="{{ url_for('static', filename='js/blocks/custom_blocks.js')}}"></script>

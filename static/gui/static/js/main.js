@@ -18,18 +18,21 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
  * Component for the Navbar on top
  * Currently this does nothing except display some text and an image
  */
-class Navbar extends React.Component {
-  render() {
-    return (
-      <div style={{ backgroundColor: "#212529", padding: "20px" }} className="jumbotron text-center">
-        <img className="logo" src="./static/img/logo.png" />
-        <h1 id="title"> MiniBot WebGUI </h1>
-      </div>
-    );
-  }
-}
+// class Navbar extends React.Component {
+//   render() {
+//     return (
+//       <div style={{ backgroundColor: "#212529", padding: "20px" }} className="jumbotron text-center">
+//         <img className="logo" src="./static/img/logo.png" />
+//         <h1 id="title"> MiniBot WebGUI </h1>
+//       </div>
+//     );
+//   }
+// }
 
-class Navbar2 extends React.Component {
+/**
+ * 
+ */
+class Navbar extends React.Component {
   render() {
     return (
       <div id="top-nav" className="mb-4">
@@ -41,7 +44,6 @@ class Navbar2 extends React.Component {
           </span>
           <span className="pages">
               <a href="/start"><FontAwesomeIcon icon="cogs"/> Setup</a>
-              
               <a href="/coding"><FontAwesomeIcon icon="code"/> Coding</a>
           </span>
           <span className="login">
@@ -137,7 +139,7 @@ class Platform extends React.Component {
 
           <TabPanel>
             <div className="row">
-              <div className="col">
+              <div className="col-md">
                 <AddBot
                   selectedBotName={this.state.selectedBotName}
                   setSelectedBotName={this.setSelectedBotName}
@@ -145,7 +147,7 @@ class Platform extends React.Component {
                   setSelectedBotStyle={this.setSelectedBotStyle}
                 />
               </div>
-              <div className="col horizontalDivCenter">
+              <div className="col-md horizontalDivCenter">
                 <GridView />
               </div>
             </div>
@@ -178,7 +180,7 @@ class ClientGUI extends React.Component {
     return (
       <div className="main-body">
         {/* <Navbar /> */}
-        <Navbar2 />
+        <Navbar />
         <div className="container">
           <Platform />
         </div>

@@ -262,7 +262,7 @@ table {
 }
 
 .small-title {
-  font-size: 30px;
+  font-size: 1.75em;
   font-weight: bold;
   color: white;
 }
@@ -373,8 +373,17 @@ table {
 .control-option {
   background-color: #2c3137;
   border-radius: 25px;
-  padding: 5px 1px 5px 1px;
+  padding: 20px 25px;
   margin-bottom: 10px;
+}
+
+.info-icon {
+  font-size: 0.75em;
+}
+
+#bot-setup .col-form-label {
+  text-align: right;
+  color: white;
 }
 
 .container-coding {

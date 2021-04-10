@@ -1,5 +1,9 @@
 import React from 'react';
 import axios from 'axios';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
+library.add(faInfoCircle);
 import { Button } from './Util.js'
 
 /*
@@ -134,6 +138,53 @@ function PortsList(props) {
             </ul>
         </nav>
     );
+}
+
+function SeparatePortsList(props) {
+    // const portNames = [
+    //     "LMOTOR", "RMOTOR", "MOTOR3", "LINE", "INFRARED", "RFID", "ULTRASONIC"
+    // ]
+
+    // const portLabels = [
+    //     "Left Motor", "Right Motor", "Motor 3", "Line Follower",
+    //     "Infrared", "RFID", "Ultrasonic"
+    // ]
+
+    // console.assert(portNames.length == portLabels.length);
+    // let allListElements = [];
+
+    // for (let i = 0; i < portNames.length; i++) {
+    //     let link = <a>{portLabels[i]} &#8250;</a>
+    //     let ports = <Ports portName={portNames[i]} motorPorts={props.motorPorts} />
+    //     let listElement = <li key={i}> {link} {ports} </li>
+    //     allListElements.push(listElement);
+    // }
+
+    // return (
+    //     <nav id="main_nav">
+    //         <ul>
+    //             <li>
+    //                 <a>Motor Ports &#187;</a>
+    //                 <ul> {allListElements} </ul>
+    //             </li>
+    //         </ul>
+    //     </nav>
+    // );
+    // const ports = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"];
+    // let buttonList = [];
+
+    // for (let i = 0; i < ports.length; i++) {
+    //     buttonList.push(
+    //         <li key={i}>
+    //             <button
+    //                 className="btn_ports"
+    //                 onClick={() => props.motorPorts(props.portName, ports[i])}>
+    //                 {ports[i]}
+    //             </button>
+    //         </li>
+    //     );
+    // }
+    // return (<ul> {buttonList} </ul>);
 }
 
 class SpeechRecognition extends React.Component {
@@ -504,11 +555,32 @@ export default class AddBot extends React.Component {
             // Set tabindex to -1 so that this div is in focus to caputure 
             // the keyboard event handler for arrow key movement
             <div id="setup_control_tab" tabIndex="-1" className="container-fluid control">
-                <div className="control-option">
+                <div id="bot-setup" className="control-option">
                     <div className="row">
+                        <div className="col">
+                            <h3 className="small-title text-center"> Minibot Setup <span class="info-icon"><FontAwesomeIcon icon='info-circle' /></span></h3>
+                        </div>
+                    </div>
+                    <div className="form-group row">
+                        <label className="col-sm-4 col-form-label">Select Bot:</label>
+                        <div className="col-sm-8">
+                            <RefreshingList ref={this.refreshingBotListRef} />
+                        </div>
+                    </div>
+                    <div className="form-group row">
+                        <label className="col-sm-4 col-form-label">Select Mode:</label>
+                        <div className="col-sm-8">
+                            <select className="form-control">
+                                <option defaultValue>Normal</option>
+                                <option>Object Detection</option>
+                                <option>Line Follow</option>
+                            </select>
+                        </div>
+                    </div>
+                    {/* <div className="row">
                         <div className="col text-center">
                             <br />
-                            <p className="small-title"> Minibot Setup </p>
+                            <h3 className="small-title"> Minibot Setup </h3>
                         </div>
                     </div>
                     <div className="row">
@@ -534,15 +606,15 @@ export default class AddBot extends React.Component {
                                 onClick={() => _this.deleteBotListener()}
                                 style={_this.props.selectedBotStyle} />
                         </div>
-                    </div>
+                    </div> */}
                 </div>
                 <div className="control-option">
                     <div className="row">
                         <div className="col horizontalDivCenter">
-                            <p className="small-title">Ports </p>
-                            <div className="element-wrapper in-front-of-other-elems">
+                            <h3 className="small-title">Port Configurations <span class="info-icon"><FontAwesomeIcon icon='info-circle' /></span></h3>
+                            {/* <div className="element-wrapper in-front-of-other-elems">
                                 <PortsList motorPorts={this.motorPorts} />
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 </div>
