@@ -424,3 +424,4 @@ class BaseStation:
         db.session.add(submission)
         db.session.commit()
         return submission
+    

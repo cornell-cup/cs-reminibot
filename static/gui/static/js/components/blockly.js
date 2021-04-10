@@ -310,18 +310,10 @@ export default class MinibotBlockly extends React.Component {
             blocklyFilename: 'FileName.xml',
             pyblock: "",
             showPopup: false,
-            loginEmail: "",
-            loginErrorLabel: "",
-            loginSuccessLabel: "",
             registerErrorLabel: "",
             registerSuccessLabel: "",
             functionName: "default_function",
             codingStart: -1,
-            isLoggedIn: false,
-            loginErrorLabel: "",
-            loginSuccessLabel: "",
-            registerErrorLabel: "",
-            registerSuccessLabel: "",
             emptyFunctionName: "Create Custom Block",
             workspace: null,
         };
@@ -336,6 +328,7 @@ export default class MinibotBlockly extends React.Component {
         this.register = this.register.bind(this);
         this.scriptToCode = this.scriptToCode.bind(this);
         this.handleLogin = this.handleLogin.bind(this);
+        this.printState = this.printState.bind(this);
         this.handleRegister = this.handleRegister.bind(this);
         this.logout = this.logout.bind(this);
         this.redefineCustomBlocks = this.redefineCustomBlocks.bind(this)
@@ -360,7 +353,8 @@ export default class MinibotBlockly extends React.Component {
     }
 
     updateCustomBlocks() {
-        if (!this.state.isLoggedIn) return;
+        // if (!this.state.isLoggedIn) return;
+        if (this.props.loginEmail == "") return;
         let formData = new FormData();
         formData.append("custom_function", JSON.stringify(this.props.customBlockList));
         axios({
@@ -641,14 +635,14 @@ export default class MinibotBlockly extends React.Component {
             method: 'POST',
             url: '/logout/',
         }).then((response) => {
-            this.setState({
-                loginEmail: "",
-                loginSuccessLabel: "",
-                loginErrorLabel: "",
-                registerSuccessLabel: "",
-                registerErrorLabel: "",
-                isLoggedIn: false,
-            });
+            // this.setState({
+            //     loginEmail: "",
+            //     loginSuccessLabel: "",
+            //     loginErrorLabel: "",
+            //     registerSuccessLabel: "",
+            //     registerErrorLabel: "",
+            //     isLoggedIn: false,
+            // });
             window.alert("Logout successful!");
         }).catch((err) => {
             window.alert("Logout error");
@@ -715,54 +709,71 @@ export default class MinibotBlockly extends React.Component {
             _this.props.redefineCustomBlockList(
                 JSON.parse(response.data.custom_function));
             // invokes component did update
-            this.setState({
-                loginEmail: formData.get("email"),
-                loginSuccessLabel: "Login Success",
-                loginErrorLabel: "",
-                isLoggedIn: true,
-            });
-            if (temp[0][0] !== _this.state.emptyFunctionName && _this.props.customBlockList[0][0] !== _this.state.emptyFunctionName) {
-                _this.props.customBlockList.push.apply(_this.props.customBlockList, temp);
-            }
-            if (temp[0][0] !== _this.state.emptyFunctionName && _this.props.customBlockList[0][0] === _this.state.emptyFunctionName) {
-                _this.props.customBlockList.splice(0, 1);
-                _this.props.customBlockList.push.apply(_this.props.customBlockList[0], temp);
-            }
+            // this.setState({
+            //     loginEmail: formData.get("email"),
+            //     loginSuccessLabel: "Login Success",
+            //     loginErrorLabel: "",
+            //     isLoggedIn: true,
+            // });
+            this.props.changeLoginEmail(formData.get("email"));
+            
+            // if (temp[0][0] !== _this.state.emptyFunctionName && _this.props.customBlockList[0][0] !== _this.state.emptyFunctionName) {
+            //     _this.props.customBlockList.push.apply(_this.props.customBlockList, temp);
+            // }
+            // if (temp[0][0] !== _this.state.emptyFunctionName && _this.props.customBlockList[0][0] === _this.state.emptyFunctionName) {
+            //     _this.props.customBlockList.splice(0, 1);
+            //     _this.props.customBlockList.push.apply(_this.props.customBlockList[0], temp);
+            // }
 
             _this.redefineCustomBlocks();
             _this.updateCustomBlocks();
         }).catch((error) => {
-            this.setState({
-                loginEmail: "",
-                loginSuccessLabel: "",
-                loginErrorLabel: error.response.data.error_msg
-            });
+            // this.setState({
+            //     loginEmail: "",
+            //     loginSuccessLabel: "",
+            //     loginErrorLabel: error.response.data.error_msg
+            // });
             console.log(error);
         });
     }
 
+    printState(event) {
+        console.log(this.props.loginEmail);
+    }
+
 
     render() {
+        var loginSuccessLabel = "";
+        var loginErrorLabel = "";
+        var registerSuccessLabel = "";
+        var registerErrorLabel = "";
+
+        if (this.props.loginEmail != "") {
+            loginSuccessLabel = "Login Success";
+            loginErrorLabel = "";
+        }
+        
         return (
             <div className="container-fluid">
                 <div className="row">
                     <div id="login and register" className="horizontalDiv" style={{ marginLeft: "40px" }}>
-                        {!this.state.isLoggedIn ? <Button id="register" name="Register" onClick={this.register} /> : null}
-                        {!this.state.isLoggedIn ? <Button id="login" name="Login" onClick={this.login} /> : null}
-                        {this.state.isLoggedIn ? <label className="white-label"> Logged in as: {this.state.loginEmail} &nbsp; </label> : null}
-                        {this.state.isLoggedIn ? <Button id="logout" name="Logout" onClick={this.logout}/> : null}
+                        {this.props.loginEmail == "" ? <Button id="register" name="Register" onClick={this.register} /> : null}
+                        {this.props.loginEmail == "" ? <Button id="login" name="Login" onClick={this.login} /> : null}
+                        {this.props.loginEmail != "" ? <label className="white-label"> Logged in as: {this.props.loginEmail} &nbsp; </label> : null}
+                        {this.props.loginEmail != "" ? <Button id="logout" name="Logout" onClick={this.logout} /> : null}
+                        {<Button id="print-state" name="Print State" onClick={this.printState}/>}
                         <UserAccountModal
                             modalType="register"
                             handleEvent={this.handleRegister}
-                            successLabel={this.state.registerSuccessLabel}
-                            errorLabel={this.state.registerErrorLabel}
+                            successLabel={registerSuccessLabel}
+                            errorLabel={registerErrorLabel}
                         />
 
                         <UserAccountModal
                             modalType="login"
                             handleEvent={this.handleLogin}
-                            successLabel={this.state.loginSuccessLabel}
-                            errorLabel={this.state.loginErrorLabel}
+                            successLabel={loginSuccessLabel}
+                            errorLabel={loginErrorLabel}
                         />
                     </div>
                 </div>
