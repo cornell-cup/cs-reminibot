@@ -1,5 +1,6 @@
 /* GlOBAL */
 @import url("https://fonts.googleapis.com/css2?family=Audiowide&display=swap");
+@import url("http://fonts.googleapis.com/css?family=Ubuntu:regular,bold&subset=Latin");
 
 /*** NAVBAR ***/
 #top-nav,
@@ -7,23 +8,6 @@
   font-family: "Audiowide", cursive;
   font-size: 1.5em;
 }
-
-/* container of the whole nav bar */
-/* .container {
-  display: flex;
-  flex-direction: row;
-} */
-
-/* container of logo and title */
-/* .navbar-brand {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-} */
-/* .navbar-brand h1 {
-  margin-left: 8px;
-  display: inline;
-} */
 
 .navbar a {
   margin-left: 15px;
@@ -141,9 +125,10 @@ table {
   min-height: 0;
 }
 
-.available-bots {
-  background-color: #e34850;
-  color: white;
+#bot-setup .form-control {
+  background-color: white;
+  color: #ff8d29;
+  margin-top: 10px;
   padding: 2px;
   border-radius: 5px;
 }
@@ -377,13 +362,31 @@ table {
   margin-bottom: 10px;
 }
 
+#port-config .small-title,
+#bot-setup .small-title {
+  font-family: "Audiowide", cursive;
+  color: #ff8484;
+  font-weight: 60;
+  font-size: 20pt;
+}
+
 .info-icon {
-  font-size: 0.75em;
+  font-size: 0.5em;
+  color: white;
 }
 
 #bot-setup .col-form-label {
+  font-family: "Ubuntu";
   text-align: right;
-  color: white;
+  color: #b1c7ff;
+  font-size: 18px;
+  padding-right: 0px;
+  letter-spacing: 0.02em;
+}
+
+#bot-setup .form-group {
+  margin-top: 13px;
+  align-items: center;
 }
 
 .container-coding {

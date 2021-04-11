@@ -69,8 +69,8 @@ class RefreshingList extends React.Component {
         const _this = this;
         if (_this.state.availableBots.length === 0) {
             _this.state.currentBot = "";
-            return <select className="available-bots" onClick={this.discoverBots}>
-                <option>Click to search for available bots</option>
+            return <select className="available-bots form-control" onClick={this.discoverBots}>
+                <option>-------Available Bots--------</option>
             </select>
         }
         if (_this.state.currentBot === "") {
@@ -547,6 +547,16 @@ export default class AddBot extends React.Component {
         });
     }
 
+    modeOnChange(value) { 
+        if (value == "obj-detection") {
+            this.objectDetectionOnClick();
+            // console.log("obj");
+        } else if (value == "line-follow") {
+            this.lineFollowOnClick();
+            // console.log("line");
+        }
+    }
+
 
 
     render() {
@@ -558,7 +568,7 @@ export default class AddBot extends React.Component {
                 <div id="bot-setup" className="control-option">
                     <div className="row">
                         <div className="col">
-                            <h3 className="small-title text-center"> Minibot Setup <span class="info-icon"><FontAwesomeIcon icon='info-circle' /></span></h3>
+                            <h3 className="small-title"> Setup the Bot <span class="info-icon"><FontAwesomeIcon icon='info-circle' /></span></h3>
                         </div>
                     </div>
                     <div className="form-group row">
@@ -570,10 +580,10 @@ export default class AddBot extends React.Component {
                     <div className="form-group row">
                         <label className="col-sm-4 col-form-label">Select Mode:</label>
                         <div className="col-sm-8">
-                            <select className="form-control">
-                                <option defaultValue>Normal</option>
-                                <option>Object Detection</option>
-                                <option>Line Follow</option>
+                            <select className="form-control" onChange={(event) => this.modeOnChange(event.target.value)}>
+                                <option value="">Normal</option>
+                                <option value="obj-detection">Object Detection</option>
+                                <option value="line-follow">Line Follow</option>
                             </select>
                         </div>
                     </div>
@@ -608,7 +618,7 @@ export default class AddBot extends React.Component {
                         </div>
                     </div> */}
                 </div>
-                <div className="control-option">
+                <div id="port-config" className="control-option">
                     <div className="row">
                         <div className="col horizontalDivCenter">
                             <h3 className="small-title">Port Configurations <span class="info-icon"><FontAwesomeIcon icon='info-circle' /></span></h3>
@@ -618,7 +628,7 @@ export default class AddBot extends React.Component {
                         </div>
                     </div>
                 </div>
-                <div className="control-option">
+                {/* <div className="control-option">
                     <div className="row">
                         <div className="col horizontalDivCenter">
                             <p className="small-title">Movement </p>
@@ -658,9 +668,9 @@ export default class AddBot extends React.Component {
                     <div className="col horizontalDivCenter">
                         <label id="speech_recognition_feedback_box" />
                     </div>
-                </div>
+                </div> */}
 
-                <div className="control-option">
+                {/* <div className="control-option">
                     <div className="row">
                         <div className="col horizontalDivCenter">
                             <p className="small-title"> Custom Modes </p>
@@ -668,7 +678,7 @@ export default class AddBot extends React.Component {
                             <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.lineFollowOnClick()}>Line Follow</button>
                         </div>
                     </div>
-                </div>
+                </div> */}
             </div >
         );
     }
