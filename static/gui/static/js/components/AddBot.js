@@ -90,23 +90,42 @@ class RefreshingList extends React.Component {
     }
 }
 
-function Ports(props) {
-    const ports = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"];
-    let buttonList = [];
+// function Ports(props) {
+//     const ports = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"];
+//     let buttonList = [];
 
-    for (let i = 0; i < ports.length; i++) {
-        buttonList.push(
-            <li key={i}>
-                <button
-                    className="btn_ports"
-                    onClick={() => props.motorPorts(props.portName, ports[i])}>
+//     for (let i = 0; i < ports.length; i++) {
+//         buttonList.push(
+//             <li key={i}>
+//                 <button
+//                     className="btn_ports"
+//                     onClick={() => props.motorPorts(props.portName, ports[i])}>
+//                     {ports[i]}
+//                 </button>
+//             </li>
+//         );
+//     }
+//     return (<ul> {buttonList} </ul>);
+// };
+
+    function Ports(props) {
+        const ports = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"];
+        let optionList = [];
+    
+        for (let i = 0; i < ports.length; i++) {
+            optionList.push(
+                <option key={i} value={ports[i]}>
+                    {/* <button
+                        className="btn_ports"
+                        onClick={() => props.motorPorts(props.portName, ports[i])}>
+                        {ports[i]}
+                    </button> */}
                     {ports[i]}
-                </button>
-            </li>
-        );
-    }
-    return (<ul> {buttonList} </ul>);
-};
+                </option>
+            );
+        }
+        return (<select className="form-control" name={props.portName} id={props.portName}> {optionList} </select>);
+    };
 
 function PortsList(props) {
     const portNames = [
@@ -122,36 +141,50 @@ function PortsList(props) {
     let allListElements = [];
 
     for (let i = 0; i < portNames.length; i++) {
-        let link = <a>{portLabels[i]} &#8250;</a>
-        let ports = <Ports portName={portNames[i]} motorPorts={props.motorPorts} />
-        let listElement = <li key={i}> {link} {ports} </li>
-        allListElements.push(listElement);
+        // let link = <a>{portLabels[i]} &#8250;</a>
+        // let ports = <Ports portName={portNames[i]} motorPorts={props.motorPorts} />
+        // let listElement = <li key={i}> {link} {ports} </li>
+        let element = (
+            <div key={i} className="form-group row">
+                <label htmlFor={portNames[i]} className="col-md-5">{portLabels[i]}:</label>
+                <div className="col-md-7">
+                    <Ports portName={portNames[i]} motorPorts={props.motorPorts} />
+                </div>
+            </div>
+        );
+        allListElements.push(element);
     }
 
     return (
-        <nav id="main_nav">
-            <ul>
-                <li>
-                    <a>Motor Ports &#187;</a>
-                    <ul> {allListElements} </ul>
-                </li>
-            </ul>
-        </nav>
+        <div className="port-form">
+            {allListElements}
+        </div>
     );
+
+    // return (
+    //     <nav id="main_nav">
+    //         <ul>
+    //             <li>
+    //                 <a>Motor Ports &#187;</a>
+    //                 <ul> {allListElements} </ul>
+    //             </li>
+    //         </ul>
+    //     </nav>
+    // );
 }
 
 function SeparatePortsList(props) {
-    // const portNames = [
-    //     "LMOTOR", "RMOTOR", "MOTOR3", "LINE", "INFRARED", "RFID", "ULTRASONIC"
-    // ]
+    const portNames = [
+        "LMOTOR", "RMOTOR", "MOTOR3", "LINE", "INFRARED", "RFID", "ULTRASONIC"
+    ]
 
-    // const portLabels = [
-    //     "Left Motor", "Right Motor", "Motor 3", "Line Follower",
-    //     "Infrared", "RFID", "Ultrasonic"
-    // ]
+    const portLabels = [
+        "Left Motor", "Right Motor", "Motor 3", "Line Follower",
+        "Infrared", "RFID", "Ultrasonic"
+    ]
 
-    // console.assert(portNames.length == portLabels.length);
-    // let allListElements = [];
+    console.assert(portNames.length == portLabels.length);
+    let allListElements = [];
 
     // for (let i = 0; i < portNames.length; i++) {
     //     let link = <a>{portLabels[i]} &#8250;</a>
@@ -568,7 +601,7 @@ export default class AddBot extends React.Component {
                 <div id="bot-setup" className="control-option">
                     <div className="row">
                         <div className="col">
-                            <h3 className="small-title"> Setup the Bot <span class="info-icon"><FontAwesomeIcon icon='info-circle' /></span></h3>
+                            <h3 className="small-title"> Setup the Bot <span className="info-icon"><FontAwesomeIcon icon='info-circle' /></span></h3>
                         </div>
                     </div>
                     <div className="form-group row">
@@ -620,8 +653,9 @@ export default class AddBot extends React.Component {
                 </div>
                 <div id="port-config" className="control-option">
                     <div className="row">
-                        <div className="col horizontalDivCenter">
-                            <h3 className="small-title">Port Configurations <span class="info-icon"><FontAwesomeIcon icon='info-circle' /></span></h3>
+                        <div className="col">
+                            <h3 className="small-title">Port Configurations <span className="info-icon"><FontAwesomeIcon icon='info-circle' /></span></h3>
+                            <PortsList motorPorts={this.motorPorts} />
                             {/* <div className="element-wrapper in-front-of-other-elems">
                                 <PortsList motorPorts={this.motorPorts} />
                             </div> */}

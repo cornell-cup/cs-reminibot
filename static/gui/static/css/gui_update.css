@@ -389,6 +389,15 @@ table {
   align-items: center;
 }
 
+.port-form {
+  font-family: "Ubuntu";
+  text-align: right;
+  color: #b1c7ff;
+  font-size: 18px;
+  padding-right: 0px;
+  letter-spacing: 0.02em;
+}
+
 .container-coding {
   background-color: #2c3137;
   border-radius: 25px;
