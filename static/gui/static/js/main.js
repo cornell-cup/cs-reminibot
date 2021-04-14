@@ -148,7 +148,14 @@ class Platform extends React.Component {
                 />
               </div>
               <div className="col-md horizontalDivCenter">
-                <GridView />
+                <div className="row">
+                  <GridView />
+                </div>
+                {/* movement controls */}
+                <div className="row">
+                  <div className="control-option">
+                  </div>
+                </div>
               </div>
             </div>
           </TabPanel>
