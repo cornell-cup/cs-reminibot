@@ -409,19 +409,26 @@ class BaseStation:
         self._login_email = email
 
 
-    # Baby test programs
-    def get_user(self, email):
+    ### data analytics
+    def get_user(self, email: str) -> User:
         user = User.query.filter_by(email=email).first()
         return user
 
-    def create_submission(self):
+    def save_submission(self, code: str, email: str) -> Submission:
         submission = Submission(
-            code="hello world",
-            time="today",
-            duration=1,
-            user_id=self.get_user('rz327@cornell.edu').id
+            code=code,
+            time=time.strftime("%H:%M:%S", time.localtime()),
+            duration=-1,
+            user_id=self.get_user(email).id
         )
         db.session.add(submission)
         db.session.commit()
         return submission
+
+    def update_result(self, result: str, submission_id: int):
+        print("UPDATE RESULT!!!")
+        print(result)
+        submission = Submission.query.filter_by(id=submission_id).first()
+        submission.result = result
+        db.session.commit()
     

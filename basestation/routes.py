@@ -18,6 +18,7 @@ base_station = BaseStation(app.debug)
 
 # Error messages
 NO_BOT_ERROR_MSG = "Please connect to a Minibot!"
+submission_id = None
 
 
 @app.route('/start', methods=['GET'])
@@ -56,12 +57,19 @@ def wheels():
 @app.route('/script', methods=['POST'])
 def script():
     """ Make Minibot run a Python script """
+    global submission_id
     data = request.get_json()
     bot_name = data['bot_name']
     if not bot_name:
         error_json = {"error_msg": NO_BOT_ERROR_MSG}
         return json.dumps(error_json), status.HTTP_400_BAD_REQUEST
     script_code = data['script_code']
+    login_email = data['login_email']
+    try:
+        submission = base_station.save_submission(script_code, login_email)
+        submission_id = submission.id
+    except Exception as exception:
+        print(exception)
     base_station.send_bot_script(bot_name, script_code)
     return json.dumps(True), status.HTTP_200_OK
 
@@ -116,10 +124,10 @@ def error_message_update():
     script_exec_result = base_station.get_bot_script_exec_result(bot_name)
     if not script_exec_result:
         code = -1
-    elif script_exec_result == "Successful execution":
-        code = 1
-    else:
-        code = 0
+    else: 
+        # invariant: submission_id is not None inside this block
+        base_station.update_result(script_exec_result, submission_id)
+        code = 1 if script_exec_result == "Successful execution" else 0
     response_dict = {"result": script_exec_result, "code": code}
     return json.dumps(response_dict), status.HTTP_200_OK
 

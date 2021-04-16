@@ -142,7 +142,8 @@ class PythonEditor extends React.Component {
             },
             data: JSON.stringify({
                 bot_name: this.props.selectedBotName,
-                script_code: this.props.pythonCode
+                script_code: this.props.pythonCode,
+                login_email: this.props.loginEmail
             }),
         }).then(function (response) {
             console.log('sent script');
@@ -179,7 +180,7 @@ class PythonEditor extends React.Component {
                     else {
                         // red
                         document.getElementById("error-message").style.color = "#FF0000";
-                    }
+                    } 
                     // result has arrived so go ahead and clear the interval (stop polling
                     // the server)
                     clearInterval(interval);
@@ -835,6 +836,7 @@ export default class MinibotBlockly extends React.Component {
                             pythonCodeState={this.props.pythonCodeState}
                             setPythonCode={this.props.setPythonCode}
                             stopBlockly={this.stopBlockly}
+                            loginEmail={this.props.loginEmail}
                         />
                         <br />
                         <br />
