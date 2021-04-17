@@ -187,6 +187,7 @@ class Minibot:
                 connection.setblocking(0)
                 # initialize basestation repr to the connection sock
                 self.bs_repr = BS_Repr(connection)
+                self.base_station_addr = base_station_addr
                 # we don't need to write anything right now, so don't add to
                 # writable socks
                 self.readable_socks.add(connection)
@@ -199,7 +200,6 @@ class Minibot:
                     # from the other end
                     data_str = sock.recv(
                         Minibot.SOCKET_BUFFER_SIZE).decode("utf-8")
-                    _, self.server = sock.recv(4096)
                 except ConnectionResetError:
                     data_str = ""
                 if data_str:
@@ -317,7 +317,7 @@ class Minibot:
         elif key == "MODE":
             if value == "object_detection":
                 # Thread(target=ece.object_detection).start()
-                server_ip = self.server[0]
+                server_ip = self.base_station_addr[0]
                 print("On bot vision w/ server ip: " + server_ip)
                 if (botVisionClient):
                     vs.start()
