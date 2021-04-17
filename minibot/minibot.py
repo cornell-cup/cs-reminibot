@@ -316,7 +316,7 @@ class Minibot:
             self.sendKV(sock, key, script_exec_result)
         elif key == "MODE":
             if value == "object_detection":
-                Thread(target=ece.object_detection).start()
+                # Thread(target=ece.object_detection).start()
                 server_ip = self.server[0]
                 print("On bot vision w/ server ip: " + server_ip)
                 if (botVisionClient):
