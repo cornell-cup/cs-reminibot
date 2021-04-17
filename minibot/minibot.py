@@ -71,6 +71,8 @@ class Minibot:
         self.blockly_python_proc = BlocklyPythonProcess(BOT_LIB_FUNCS)
         signal.signal(signal.SIGINT, self.sigint_handler)
 
+        self.server = None
+
     def main(self):
         """ Implements the main activity loop for the Minibot.  This activity 
         loop continuously listens for commands from the basestation, and 
@@ -143,7 +145,7 @@ class Minibot:
         try:
             # use sendto() instead of send() for UDP
             self.broadcast_sock.sendto(msg_byte_str, Minibot.BROADCAST_ADDRESS)
-            data = self.broadcast_sock.recv(4096)
+            data, self.server = self.broadcast_sock.recv(4096)
         except timeout:
             print("Timed out", flush=True)
 
@@ -302,8 +304,8 @@ class Minibot:
         # threads, our code execution pointer would get stuck in the infinite loop.
         botVisionClient = None
         vs = None
-        _, server = sock.recvfrom(4096)
-        server_ip = str(server[0])
+        # _, server = sock.recvfrom(4096)
+        # server_ip = str(server[0])
         if key == "BOTSTATUS":
             # update status time of the basestation
             self.bs_repr.update_status_time()
@@ -314,12 +316,13 @@ class Minibot:
         elif key == "MODE":
             if value == "object_detection":
                 Thread(target=ece.object_detection).start()
+                server_ip = self.server[0]
                 print("On bot vision w/ server ip: " + server_ip)
                 if (botVisionClient):
                     vs.start()
                 else:
                     botVisionClient = Thread(
-                        target=startBotVisionClient, kwargs={'server_ip': server_ip}, daemon=True)
+                        target=self.startBotVisionClient, kwargs={'server_ip': server_ip}, daemon=True)
                     botVisionClient.start()
             elif value == "line_follow":
                 Thread(target=ece.line_follow).start()
@@ -368,7 +371,7 @@ class Minibot:
         self.broadcast_sock.close()
         sys.exit(0)
 
-    def startBotVisionClient(server_ip):
+    def startBotVisionClient(self, server_ip):
         import socket  # import needs to be here b/c same name as "from socket ..." on line 0
         print("Entered the startBotVisionClient thread")
         global vs
