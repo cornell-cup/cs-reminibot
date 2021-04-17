@@ -23,7 +23,7 @@ class Minibot:
     as well as executing commands sent by the basestation.
 
     Note: sock stands for socket throughout this file.  A socket is one endpoint
-        of a communication channel. 
+        of a communication channel.
     """
     # address refers to ip_address and port
     # 255.255.255.255 to indicate that we are broadcasting to all addresses
@@ -74,8 +74,8 @@ class Minibot:
         self.server = None
 
     def main(self):
-        """ Implements the main activity loop for the Minibot.  This activity 
-        loop continuously listens for commands from the basestation, and 
+        """ Implements the main activity loop for the Minibot.  This activity
+        loop continuously listens for commands from the basestation, and
         connects/reconnects to the basestation if there is no connection.
         """
         self.create_listener_sock()
@@ -118,7 +118,7 @@ class Minibot:
                 self.basestation_disconnected(self.bs_repr.conn_sock)
 
     def create_listener_sock(self):
-        """ Creates a socket that listens for TCP connections from the 
+        """ Creates a socket that listens for TCP connections from the
         basestation.
         """
         self.listener_sock = socket(AF_INET, SOCK_STREAM)
@@ -132,8 +132,8 @@ class Minibot:
         self.listener_sock.listen()
 
     def broadcast_to_base_station(self):
-        """ Establishes a TCP connection to the basestation.  This connection is 
-        used to receive commands from the basestation, and send replies if 
+        """ Establishes a TCP connection to the basestation.  This connection is
+        used to receive commands from the basestation, and send replies if
         necessary.
         """
         print("Broadcasting message to basestation.", flush=True)
@@ -165,9 +165,9 @@ class Minibot:
                 print('Verification failed.', flush=True)
 
     def handle_readable_socks(self, read_ready_socks: List[socket]):
-        """ Reads from each of the sockets that have received some data.  
+        """ Reads from each of the sockets that have received some data.
         If a listener socket received data, we accept the incoming connection.
-        If a connection socket received data, we parse and execute, 
+        If a connection socket received data, we parse and execute,
         the incoming command.
 
         Arguments:
@@ -210,11 +210,11 @@ class Minibot:
                 # successfully
 
     def handle_writable_socks(self, write_ready_socks: List[socket]):
-        """ 
-        iterate through all the sockets in the write_ready_socks and 
+        """
+        iterate through all the sockets in the write_ready_socks and
         send over all messages in the socket's message_queue
         Arguments:
-            write_ready_socks: 
+            write_ready_socks:
                 All sockets that have had data written to them
         """
 
@@ -226,7 +226,7 @@ class Minibot:
             self.writable_socks.remove(sock)
 
     def handle_errorable_socks(self, errored_out_socks: List[socket]):
-        """ Iterate through all the sockets in the errored_out_socks and 
+        """ Iterate through all the sockets in the errored_out_socks and
         close these socks.  All these sockets have received some error code
         due to some failure.
 
@@ -240,7 +240,7 @@ class Minibot:
             self.close_sock(sock)
 
     def close_sock(self, sock: socket):
-        """ Removes the socket from the readable, writable and errorable 
+        """ Removes the socket from the readable, writable and errorable
         socket lists, and then closes the socket.
         """
         for sock_list in self.sock_lists:
@@ -252,8 +252,8 @@ class Minibot:
         """ Performs the following commands because the Minibot is
         now disconnected from the basestation:
         1. Calls the stop function to make the Minibot stop whatever its doing.
-        2. Closes the socket that the Minibot has been using, 
-           basestation  
+        2. Closes the socket that the Minibot has been using,
+           basestation
         """
         print("Basestation Disconnected", flush=True)
         Thread(target=ece.stop).start()
@@ -261,14 +261,14 @@ class Minibot:
         self.bs_repr = None
 
     def parse_and_execute_commands(self, sock: socket, data_str: str):
-        """ Parses the data string into individual commands.  
+        """ Parses the data string into individual commands.
 
-        Arguments: 
+        Arguments:
             sock: The socket that we just read the command from
             data_str: The raw data that we receive from the socket.
 
-        Example: 
-            If the data_str is 
+        Example:
+            If the data_str is
             "<<<<WHEELS,forward>>>><<<<WHEELS,backward>>>><<<<WHEELS,stop>>>>"
             the commands will be parsed and executed as:
 
@@ -290,7 +290,7 @@ class Minibot:
             data_str = data_str[end + token_len:]
 
     def execute_command(self, sock: socket, key: str, value: str):
-        """ Executes a command using the given key-value pair 
+        """ Executes a command using the given key-value pair
 
         Arguments:
             key: type of the command
@@ -325,7 +325,14 @@ class Minibot:
                     botVisionClient = Thread(
                         target=self.startBotVisionClient, kwargs={'server_ip': server_ip}, daemon=True)
                     botVisionClient.start()
-            elif value == "line_follow":
+            else:
+                server_ip = self.base_station_addr[0]
+                if (botVisionClient):
+                    print("Stop on bot vision w/ server ip: " + server_ip)
+                    vs.stop()
+                    # TODO: very important! this is not working, thus preventing the resource from being closed on the pi
+                    vs.stream.stream.release()
+            if value == "line_follow":
                 Thread(target=ece.line_follow).start()
         elif key == "PORTS":
             ece.set_ports(value)
@@ -364,7 +371,7 @@ class Minibot:
             self.writable_sock_message_queue_map[sock] = deque([message])
 
     def sigint_handler(self, sig: int, frame: object):
-        """ Closes open resources before terminating the program, when 
+        """ Closes open resources before terminating the program, when
         receives a CTRL + C
         """
         print("Minibot received CTRL + C", flush=True)
