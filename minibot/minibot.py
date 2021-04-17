@@ -145,7 +145,7 @@ class Minibot:
         try:
             # use sendto() instead of send() for UDP
             self.broadcast_sock.sendto(msg_byte_str, Minibot.BROADCAST_ADDRESS)
-            data, self.server = self.broadcast_sock.recv(4096)
+            data = self.broadcast_sock.recv(4096)
         except timeout:
             print("Timed out", flush=True)
 
@@ -199,6 +199,7 @@ class Minibot:
                     # from the other end
                     data_str = sock.recv(
                         Minibot.SOCKET_BUFFER_SIZE).decode("utf-8")
+                    _, self.server = sock.recv(4096)
                 except ConnectionResetError:
                     data_str = ""
                 if data_str:
