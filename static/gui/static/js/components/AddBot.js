@@ -128,6 +128,9 @@ class RefreshingList extends React.Component {
     };
 
 function PortsList(props) {
+
+    /* Left and right have default ports */
+
     const portNames = [
         "LMOTOR", "RMOTOR", "MOTOR3", "LINE", "INFRARED", "RFID", "ULTRASONIC"
     ]
@@ -174,6 +177,7 @@ function PortsList(props) {
 }
 
 function SeparatePortsList(props) {
+
     const portNames = [
         "LMOTOR", "RMOTOR", "MOTOR3", "LINE", "INFRARED", "RFID", "ULTRASONIC"
     ]
@@ -365,11 +369,6 @@ class SpeechRecognition extends React.Component {
     }
 }
 
-
-export default class MovementControls extends React.Component {
-    
-}
-
 export default class AddBot extends React.Component {
     constructor(props) {
         super(props);
@@ -378,6 +377,13 @@ export default class AddBot extends React.Component {
             availableBots: [], // bots connected to Base Station but not GUI
             botList: [],
             power: 50,
+
+            messageVisibility: false, // for flash messages displayed
+            messageType: "",
+            messageContent: "", // what is in the message
+
+            isSetupReady: false,
+            isSetup: false
         };
 
         // Needed to use a ref for react
@@ -595,14 +601,18 @@ export default class AddBot extends React.Component {
         }
     }
 
+    flashMessage(value) {
+
+    }
 
 
     render() {
         const _this = this;
         return (
-            // Set tabindex to -1 so that this div is in focus to caputure 
+            <div id="bot-setup-area">
+            {/* // Set tabindex to -1 so that this div is in focus to caputure 
             // the keyboard event handler for arrow key movement
-            <div id="setup_control_tab" tabIndex="-1" className="container-fluid control">
+            // <div id="setup_control_tab" tabIndex="-1" className="container-fluid control"> */}
                 <div id="bot-setup" className="control-option">
                     <div className="row">
                         <div className="col">
@@ -718,7 +728,8 @@ export default class AddBot extends React.Component {
                         </div>
                     </div>
                 </div> */}
-            </div >
+            {/* </div > */}
+            </div>
         );
     }
 }

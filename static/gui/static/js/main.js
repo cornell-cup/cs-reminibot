@@ -11,7 +11,7 @@ library.add(faCogs, faCode);
 import GridView from './components/gridview.js';
 import Blockly from './components/blockly.js';
 import AddBot from './components/AddBot.js';
-import MovementControls from './components/AddBot.js';
+import MovementControls from './components/MovementControl.js';
 import Dashboard from './components/dashboard.js';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 
@@ -139,23 +139,30 @@ class Platform extends React.Component {
           </TabList>
 
           <TabPanel>
-            <div className="row">
-              <div className="col-md">
-                <AddBot
-                  selectedBotName={this.state.selectedBotName}
-                  setSelectedBotName={this.setSelectedBotName}
-                  selectedBotStyle={this.state.selectedBotStyle}
-                  setSelectedBotStyle={this.setSelectedBotStyle}
-                />
-              </div>
-              <div className="col-md horizontalDivCenter">
-                <div className="row">
-                  <GridView />
+            {/* // Set tabindex to -1 so that this div is in focus to caputure 
+            // the keyboard event handler for arrow key movement */}
+            <div id="setup_control_tab" tabIndex="-1">
+              <div className="row">
+                <div className="col-md">
+                  <AddBot
+                    selectedBotName={this.state.selectedBotName}
+                    setSelectedBotName={this.setSelectedBotName}
+                    selectedBotStyle={this.state.selectedBotStyle}
+                    setSelectedBotStyle={this.setSelectedBotStyle}
+                  />
                 </div>
-                {/* movement controls */}
-                <div className="row">
-                  <div className="control-option">
-
+                <div className="col-md">
+                  <div className="row">
+                    <GridView />
+                  </div>
+                  {/* movement controls */}
+                  <div className="row">
+                    <MovementControls 
+                      selectedBotName={this.state.selectedBotName}
+                      setSelectedBotName={this.setSelectedBotName}
+                      selectedBotStyle={this.state.selectedBotStyle}
+                      setSelectedBotStyle={this.setSelectedBotStyle}
+                    />
                   </div>
                 </div>
               </div>
