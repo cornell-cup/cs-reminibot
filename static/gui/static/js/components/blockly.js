@@ -644,6 +644,7 @@ export default class MinibotBlockly extends React.Component {
             //     registerErrorLabel: "",
             //     isLoggedIn: false,
             // });
+            this.props.changeLoginEmail("");
             window.alert("Logout successful!");
         }).catch((err) => {
             window.alert("Logout error");
