@@ -365,6 +365,11 @@ class SpeechRecognition extends React.Component {
     }
 }
 
+
+export default class MovementControls extends React.Component {
+    
+}
+
 export default class AddBot extends React.Component {
     constructor(props) {
         super(props);

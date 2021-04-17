@@ -11,6 +11,7 @@ library.add(faCogs, faCode);
 import GridView from './components/gridview.js';
 import Blockly from './components/blockly.js';
 import AddBot from './components/AddBot.js';
+import MovementControls from './components/AddBot.js';
 import Dashboard from './components/dashboard.js';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 
@@ -154,6 +155,7 @@ class Platform extends React.Component {
                 {/* movement controls */}
                 <div className="row">
                   <div className="control-option">
+
                   </div>
                 </div>
               </div>
