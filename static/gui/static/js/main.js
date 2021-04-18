@@ -132,11 +132,11 @@ class Platform extends React.Component {
     return (
       <div id="platform">
         <Tabs>
-          <TabList>
+          {/* <TabList>
             <Tab>Setup/Control</Tab>
             <Tab>Coding</Tab>
             <Tab>Analytics</Tab>
-          </TabList>
+          </TabList> */}
 
           <TabPanel>
             {/* // Set tabindex to -1 so that this div is in focus to caputure 

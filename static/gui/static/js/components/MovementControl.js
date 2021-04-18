@@ -2,8 +2,8 @@ import React from 'react';
 import axios from 'axios';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faInfoCircle, faMicrophone } from '@fortawesome/free-solid-svg-icons';
-library.add(faInfoCircle, faMicrophone);
+import { faInfoCircle, faMicrophone, faCaretDown, faCaretLeft, faCaretRight, faCaretUp, faStop } from '@fortawesome/free-solid-svg-icons';
+library.add(faInfoCircle, faMicrophone, faCaretDown, faCaretLeft, faCaretRight, faCaretUp, faStop );
 
 // SPEECH RECOGNITION
 class SpeechRecognition extends React.Component {
@@ -143,10 +143,14 @@ class SpeechRecognition extends React.Component {
             "Stop Speech Recognition" : "Start Speech Recognition";
         return (
             <div>
-                <button className="btn btn-danger element-wrapper"
-                    onClick={this.toggle}>{x}</button>
+                <button className="btn btn-danger element-wrapper btn-speech"
+                    onClick={this.toggle}>
+                    <div className="row">
+                      <span className="col-md-1 align-self-center"><FontAwesomeIcon icon='microphone'/></span>
+                      <span className="col-md align-self-center">{x}</span>
+                    </div>
+                </button>
             </div>
-
         );
     }
 }
@@ -211,14 +215,33 @@ export default class MovementControls extends React.Component {
             <div className="control-option">
                 {/* <h3 className="small-title"> Setup the Bot <span className="info-icon"><FontAwesomeIcon icon='info-circle' /></span></h3> */}
             <div className="row">
-                <div className="col-md">
-                    <div className="tr"></div>
-                    <div className="tr"></div>
-                    <div className="tr"></div>
-                    <div className="tr"></div>
-                    <button className="btn btn-danger">STOP</button>
+                <div className="col-md button-movement">
+                    <div className="row align-items-start justify-content-center">
+                        <button className="btn-lg btn-secondary" onClick={() => this.buttonMapListener("forward")}>
+                            <FontAwesomeIcon icon="caret-up"/>
+                        </button>
+                    </div>
+                    {/* <br /> */}
+                    <div className="row align-items-center justify-content-center">
+                        <button className="btn-lg btn-secondary" onClick={() => this.buttonMapListener("left")}>
+                            <FontAwesomeIcon icon="caret-left"/>
+                        </button>
+                        <button className="btn-lg btn-danger btn-stop" onClick={() => this.buttonMapListener("stop")}>
+                            <FontAwesomeIcon icon="stop"/>
+                        </button>
+                        <button className="btn-lg btn-secondary" onClick={() => this.buttonMapListener("right")}>
+                            <FontAwesomeIcon icon="caret-right"/>
+                        </button>
+                    </div>
+                    {/* <br /> */}
+                    <div className="row align-items-end justify-content-center">
+                        <button className="btn-lg btn-secondary" onClick={() => this.buttonMapListener("backward")}>
+                            <FontAwesomeIcon icon="caret-down"/>
+                        </button>
+                    </div>
+                    {/* <br /> */}
                 </div>
-                <div className="col-md">
+                <div className="col-md align-self-center">
                     <SpeechRecognition selectedBotName={this.props.selectedBotName}/>
                 </div>
             </div>
