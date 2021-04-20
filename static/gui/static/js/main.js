@@ -18,6 +18,7 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 /**
  * Component for the Navbar on top
  * Currently this does nothing except display some text and an image
+ * This is an old navbar
  */
 // class Navbar extends React.Component {
 //   render() {
@@ -44,6 +45,11 @@ class Navbar extends React.Component {
             Minibot
           </span>
           <span className="pages">
+          {/* <TabList>
+            <Tab>Setup/Control</Tab>
+            <Tab>Coding</Tab>
+            <Tab>Analytics</Tab>
+          </TabList> */}
               <a href="/start"><FontAwesomeIcon icon="cogs"/> Setup</a>
               <a href="/coding"><FontAwesomeIcon icon="code"/> Coding</a>
           </span>
@@ -132,11 +138,12 @@ class Platform extends React.Component {
     return (
       <div id="platform">
         <Tabs>
-          {/* <TabList>
+          {/* keeping this here so the tab mechanism is known */}
+          <TabList>
             <Tab>Setup/Control</Tab>
             <Tab>Coding</Tab>
             <Tab>Analytics</Tab>
-          </TabList> */}
+          </TabList>
 
           <TabPanel>
             {/* // Set tabindex to -1 so that this div is in focus to caputure 
@@ -164,6 +171,14 @@ class Platform extends React.Component {
                       setSelectedBotStyle={this.setSelectedBotStyle}
                     />
                   </div>
+                </div>
+              </div>
+              <div className="row">
+                <div className="col">
+                    <button className="btn btn-secondary">Finish Bot Setup</button>
+                </div>
+                <div className="col">
+
                 </div>
               </div>
             </div>
@@ -195,7 +210,6 @@ class ClientGUI extends React.Component {
   render() {
     return (
       <div className="main-body">
-        {/* <Navbar /> */}
         <Navbar />
         <div className="container">
           <Platform />

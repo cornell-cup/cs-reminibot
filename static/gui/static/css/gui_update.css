@@ -224,9 +224,15 @@ table {
 .button-movement .row {
   margin: 4px 0;
 }
-.button-movement button {
+.button-movement .movement {
   margin: 0 4px;
+  line-height: 0;
+  font-size: 2.5em;
   box-shadow: none;
+}
+
+.button-movement .vertical-btn {
+  padding: 0 15px;
 }
 
 #setup_control_tab > .row {
@@ -399,7 +405,6 @@ table {
   padding-bottom: 21.27%; /* = width / 1.41 */
 /* position: relative;
   overflow: hidden; */
-*/
 /* } */
 
 /* .tr:before {
@@ -416,6 +421,12 @@ table {
 
 .btn-speech, .btn-stop {
   background-color: #f07470;
+}
+
+#stop {
+  padding: 13px 15px;
+  line-height: 0;
+  font-size: 1.76em;
 }
 
 .container-coding {

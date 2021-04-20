@@ -217,29 +217,26 @@ export default class MovementControls extends React.Component {
             <div className="row">
                 <div className="col-md button-movement">
                     <div className="row align-items-start justify-content-center">
-                        <button className="btn-lg btn-secondary" onClick={() => this.buttonMapListener("forward")}>
+                        <button className="btn btn-secondary movement vertical-btn" onClick={() => this.buttonMapListener("forward")}>
                             <FontAwesomeIcon icon="caret-up"/>
                         </button>
                     </div>
-                    {/* <br /> */}
                     <div className="row align-items-center justify-content-center">
-                        <button className="btn-lg btn-secondary" onClick={() => this.buttonMapListener("left")}>
+                        <button className="btn btn-secondary movement side-btn" onClick={() => this.buttonMapListener("left")}>
                             <FontAwesomeIcon icon="caret-left"/>
                         </button>
-                        <button className="btn-lg btn-danger btn-stop" onClick={() => this.buttonMapListener("stop")}>
+                        <button className="btn btn-danger btn-stop" id="stop" onClick={() => this.buttonMapListener("stop")}>
                             <FontAwesomeIcon icon="stop"/>
                         </button>
-                        <button className="btn-lg btn-secondary" onClick={() => this.buttonMapListener("right")}>
+                        <button className="btn btn-secondary movement side-btn" onClick={() => this.buttonMapListener("right")}>
                             <FontAwesomeIcon icon="caret-right"/>
                         </button>
                     </div>
-                    {/* <br /> */}
                     <div className="row align-items-end justify-content-center">
-                        <button className="btn-lg btn-secondary" onClick={() => this.buttonMapListener("backward")}>
+                        <button className="btn btn-secondary movement vertical-btn" onClick={() => this.buttonMapListener("backward")}>
                             <FontAwesomeIcon icon="caret-down"/>
                         </button>
                     </div>
-                    {/* <br /> */}
                 </div>
                 <div className="col-md align-self-center">
                     <SpeechRecognition selectedBotName={this.props.selectedBotName}/>

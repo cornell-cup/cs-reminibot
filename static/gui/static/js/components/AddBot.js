@@ -615,8 +615,9 @@ export default class AddBot extends React.Component {
             // <div id="setup_control_tab" tabIndex="-1" className="container-fluid control"> */}
                 <div id="bot-setup" className="control-option">
                     <div className="row">
-                        <div className="col">
+                        <div className="col d-flex">
                             <h3 className="small-title"> Setup the Bot <span className="info-icon"><FontAwesomeIcon icon='info-circle' /></span></h3>
+                            <button className="btn btn-secondary ml-auto">Search for bots</button>
                         </div>
                     </div>
                     <div className="form-group row">
