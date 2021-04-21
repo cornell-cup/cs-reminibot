@@ -54,6 +54,10 @@ class Navbar extends React.Component {
               <a href="/coding"><FontAwesomeIcon icon="code"/> Coding</a>
           </span>
           <span className="login">
+            {/* <Switch>
+              <Route exact path='/login' component={login}/>
+              <Route exact path='/signup' component={Signup}/>
+            </Switch> */}
             <a href="/login">Login</a>
             <a href="/signup">Sign Up</a>
           </span>

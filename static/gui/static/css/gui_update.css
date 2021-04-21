@@ -419,7 +419,8 @@ table {
   transform: rotate(45deg);
 } */
 
-.btn-speech, .btn-stop {
+.btn-speech,
+.btn-stop {
   background-color: #f07470;
 }
 
