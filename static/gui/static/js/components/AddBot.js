@@ -109,49 +109,52 @@ class RefreshingList extends React.Component {
 // };
 
     function Ports(props) {
-        const ports = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"];
+
+        const portNames = [
+            "LMOTOR", "RMOTOR", "MOTOR3", "LINE", "INFRARED", "RFID", "ULTRASONIC"
+        ]
+    
+        const portLabels = [
+            "Left Motor", "Right Motor", "Motor 3", "Line Follower",
+            "Infrared", "RFID", "Ultrasonic"
+        ]
+
+        console.assert(portNames.length == portLabels.length);
+
         let optionList = [];
     
-        for (let i = 0; i < ports.length; i++) {
+        for (let i = 0; i < portNames.length; i++) {
             optionList.push(
-                <option key={i} value={ports[i]}>
+                <option key={i} value={portNames[i]}>
                     {/* <button
                         className="btn_ports"
                         onClick={() => props.motorPorts(props.portName, ports[i])}>
                         {ports[i]}
                     </button> */}
-                    {ports[i]}
+                    {portLabels[i]}
                 </option>
             );
         }
-        return (<select className="form-control" name={props.portName} id={props.portName}> {optionList} </select>);
+        return (<select className="form-control" name={props.port} id={props.port}> {optionList} </select>);
     };
 
 function PortsList(props) {
 
     /* Left and right have default ports */
 
-    const portNames = [
-        "LMOTOR", "RMOTOR", "MOTOR3", "LINE", "INFRARED", "RFID", "ULTRASONIC"
-    ]
+    const ports = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"];
 
-    const portLabels = [
-        "Left Motor", "Right Motor", "Motor 3", "Line Follower",
-        "Infrared", "RFID", "Ultrasonic"
-    ]
-
-    console.assert(portNames.length == portLabels.length);
     let allListElements = [];
 
-    for (let i = 0; i < portNames.length; i++) {
+    for (let i = 0; i < ports.length; i++) {
         // let link = <a>{portLabels[i]} &#8250;</a>
         // let ports = <Ports portName={portNames[i]} motorPorts={props.motorPorts} />
         // let listElement = <li key={i}> {link} {ports} </li>
         let element = (
             <div key={i} className="form-group row">
-                <label htmlFor={portNames[i]} className="col-md-5">{portLabels[i]}:</label>
+                <label htmlFor={ports[i]} className="col-md-5">Port {ports[i]}:</label>
                 <div className="col-md-7">
-                    <Ports portName={portNames[i]} motorPorts={props.motorPorts} />
+                    <Ports portName={ports[i]} motorPorts={props.motorPorts} />
                 </div>
             </div>
         );
@@ -176,53 +179,6 @@ function PortsList(props) {
     // );
 }
 
-function SeparatePortsList(props) {
-
-    const portNames = [
-        "LMOTOR", "RMOTOR", "MOTOR3", "LINE", "INFRARED", "RFID", "ULTRASONIC"
-    ]
-
-    const portLabels = [
-        "Left Motor", "Right Motor", "Motor 3", "Line Follower",
-        "Infrared", "RFID", "Ultrasonic"
-    ]
-
-    console.assert(portNames.length == portLabels.length);
-    let allListElements = [];
-
-    // for (let i = 0; i < portNames.length; i++) {
-    //     let link = <a>{portLabels[i]} &#8250;</a>
-    //     let ports = <Ports portName={portNames[i]} motorPorts={props.motorPorts} />
-    //     let listElement = <li key={i}> {link} {ports} </li>
-    //     allListElements.push(listElement);
-    // }
-
-    // return (
-    //     <nav id="main_nav">
-    //         <ul>
-    //             <li>
-    //                 <a>Motor Ports &#187;</a>
-    //                 <ul> {allListElements} </ul>
-    //             </li>
-    //         </ul>
-    //     </nav>
-    // );
-    // const ports = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"];
-    // let buttonList = [];
-
-    // for (let i = 0; i < ports.length; i++) {
-    //     buttonList.push(
-    //         <li key={i}>
-    //             <button
-    //                 className="btn_ports"
-    //                 onClick={() => props.motorPorts(props.portName, ports[i])}>
-    //                 {ports[i]}
-    //             </button>
-    //         </li>
-    //     );
-    // }
-    // return (<ul> {buttonList} </ul>);
-}
 
 class SpeechRecognition extends React.Component {
     /** Implements the SpeechRecognition Toggle button */
