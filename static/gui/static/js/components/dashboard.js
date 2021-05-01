@@ -98,12 +98,9 @@ export default class Dashboard extends React.Component {
 
 
                 <div className="row">
-
-
                     <div className="card col-md-6">
                         <LineChartComponent></LineChartComponent>
                     </div>
-
                 </div>
             </div>
 

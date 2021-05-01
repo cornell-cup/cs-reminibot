@@ -1,6 +1,7 @@
 import React from 'react';
 import axios from 'axios';
-import { Button } from './Util.js'
+import { Button } from './Util.js';
+import LineChartComponent from './linechart.js';
 
 /**
  * Component for the grid view of the simulated bots.
@@ -196,19 +197,34 @@ export default class GridView extends React.Component {
 
     render() {
         return (
-            <div className="container">
-                <div id="component_view" className="box">
-                    <p className="small-title">Vision &nbsp; &nbsp; </p>
-                    <Button
-                        id="grid_recenter"
-                        onClick={this.displayRobot}
-                        name={"Display Bot"}
-                    />
+            <div>
+                <div className="container">
+                    <div id="component_view" className="box">
+                        <p className="small-title">Vision &nbsp; &nbsp; </p>
+                        <Button
+                            id="grid_recenter"
+                            onClick={this.displayRobot}
+                            name={"Display Bot"}
+                        />
+                        <br />
+                        <br />
+                        <div id="view"></div>
+                    </div>
+                </div>
+                <br />
+                <br />
+
+                {/* real-time sensor data */}
+                <div className="container">
+                    <p className="small-title">Real-time Sensor Data</p>
+                    <Button name="Activate"/>
                     <br />
                     <br />
-                    <div id="view"></div>
-                </div >
-            </div >
+                    <div className="card col-12"> 
+                        <LineChartComponent/>
+                    </div>
+                </div>
+            </div>
         );
     }
 }
