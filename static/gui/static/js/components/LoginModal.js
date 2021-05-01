@@ -8,7 +8,7 @@ export default class LoginModal extends React.Component {
 
     render() {
         return (
-            <div className="modal" tabindex="-1" id="loginModal">
+            <div className="modal fade" tabIndex="-1" id="loginModal">
             <div className="modal-dialog">
                 <div className="modal-content">
                 <div className="modal-header">

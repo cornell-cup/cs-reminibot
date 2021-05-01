@@ -10,7 +10,7 @@ library.add(faCogs, faCode);
 
 import GridView from './components/gridview.js';
 // import Signup from './components/signup.js';
-import { BrowserRouter as Router, Link} from 'react-router-dom';
+// import { BrowserRouter as Router, Link} from 'react-router-dom';
 import Blockly from './components/blockly.js';
 import AddBot from './components/AddBot.js';
 import MovementControls from './components/MovementControl.js';
@@ -58,6 +58,8 @@ class Navbar extends React.Component {
               <a id="coding-link" data-toggle="tab" href="#coding-tab" role="tab"><FontAwesomeIcon icon="code"/> Coding</a>
           </span>
           <span className="login">
+              <button type="button" data-toggle="modal" data-target="#loginModal">Login</button>
+              <button type="button" data-toggle="modal" data-target="#registerModal">Signup</button>
             {/* <Switch>
               <Route exact path='/login' component={login}/>
               <Route exact path='/signup' component={Signup}/>
@@ -70,6 +72,8 @@ class Navbar extends React.Component {
           </span>
           </div>
         </nav>
+        <LoginModal />
+          <RegisterModal />
       </div>
     )
   }
@@ -231,8 +235,6 @@ class ClientGUI extends React.Component {
         <div className="container">
           <Platform />
         </div>
-        <LoginModal />
-        <RegisterModal />
       </div>
     );
   }
