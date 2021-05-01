@@ -15,7 +15,7 @@ export default class GridView extends React.Component {
 
         this.state = {
             width: 520,
-            height: 350,
+            height: 500,
             xcor: 0,
             ycor: 0,
             count: 0,

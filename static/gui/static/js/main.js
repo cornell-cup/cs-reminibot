@@ -14,6 +14,8 @@ import AddBot from './components/AddBot.js';
 import MovementControls from './components/MovementControl.js';
 import Dashboard from './components/dashboard.js';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import LoginModal from './components/LoginModal.js';
+import RegisterModal from './components/RegisterModal.js';
 
 /**
  * Component for the Navbar on top
@@ -44,14 +46,14 @@ class Navbar extends React.Component {
             <img src="./static/img/logo.png" width="50" height="50" className="d-inline-block align-top" alt="" />
             Minibot
           </span>
-          <span className="pages">
+          <span className="pages nav-pills" id="fakeTabs" role="tablist">
           {/* <TabList>
             <Tab>Setup/Control</Tab>
             <Tab>Coding</Tab>
             <Tab>Analytics</Tab>
           </TabList> */}
-              <a href="/start"><FontAwesomeIcon icon="cogs"/> Setup</a>
-              <a href="/coding"><FontAwesomeIcon icon="code"/> Coding</a>
+              <a id="setup-control-link" data-toggle="tab" href="#setup_control_tab" role="tab"><FontAwesomeIcon icon="cogs"/> Setup</a>
+              <a id="coding-link" data-toggle="tab" href="#coding-tab" role="tab"><FontAwesomeIcon icon="code"/> Coding</a>
           </span>
           <span className="login">
             {/* <Switch>
@@ -141,18 +143,18 @@ class Platform extends React.Component {
   render() {
     return (
       <div id="platform">
-        <Tabs>
+        {/* <Tabs> */}
           {/* keeping this here so the tab mechanism is known */}
-          <TabList>
+          {/* <TabList>
             <Tab>Setup/Control</Tab>
             <Tab>Coding</Tab>
             <Tab>Analytics</Tab>
-          </TabList>
-
-          <TabPanel>
+          </TabList> */}
+          <div className="tab-content">
+          {/* <TabPanel> */}
             {/* // Set tabindex to -1 so that this div is in focus to caputure 
             // the keyboard event handler for arrow key movement */}
-            <div id="setup_control_tab" tabIndex="-1">
+            <div id="setup_control_tab" tabIndex="-1" className="tab-pane active" role="tabpanel">
               <div className="row">
                 <div className="col-md">
                   <AddBot
@@ -186,25 +188,31 @@ class Platform extends React.Component {
                 </div>
               </div>
             </div>
-          </TabPanel>
-          <TabPanel>
-            <Blockly
-              blocklyXml={this.state.blocklyXml}
-              setBlockly={this.setBlockly}
-              pythonCode={this.state.pythonCode}
-              pythonCodeState={this.state.pythonCodeState}
-              setPythonCode={this.setPythonCode}
-              selectedBotName={this.state.selectedBotName}
-              customBlockList={this.state.customBlockList}
-              redefineCustomBlockList={this.redefineCustomBlockList}
-            />
-          </TabPanel>
-          <TabPanel>
+          {/* </TabPanel>
+          <TabPanel> */}
+            <div id="coding-tab" className="tab-pane" role="tabpanel">
+              <Blockly
+                blocklyXml={this.state.blocklyXml}
+                setBlockly={this.setBlockly}
+                pythonCode={this.state.pythonCode}
+                pythonCodeState={this.state.pythonCodeState}
+                setPythonCode={this.setPythonCode}
+                selectedBotName={this.state.selectedBotName}
+                customBlockList={this.state.customBlockList}
+                redefineCustomBlockList={this.redefineCustomBlockList}
+              />
+            </div>
+          {/* </TabPanel>
+          <TabPanel> */}
+          {/* hiding this page for now */}
+          <div className="tab-pane" role="tabpanel"> 
             <Dashboard>
 
             </Dashboard>
-          </TabPanel>
-        </Tabs>
+            </div>
+          {/* </TabPanel> */}
+        {/* </Tabs> */}
+        </div>
       </div>
     );
   }
@@ -218,10 +226,14 @@ class ClientGUI extends React.Component {
         <div className="container">
           <Platform />
         </div>
+        <LoginModal />
+        <RegisterModal />
       </div>
     );
   }
 }
+
+// insert something here about localStorage function
 
 let root = document.getElementById('root');
 ReactDOM.render(<ClientGUI />, root);

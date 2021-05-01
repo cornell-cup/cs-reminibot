@@ -212,7 +212,7 @@ export default class MovementControls extends React.Component {
     render() {
         const _this = this;
         return (
-            <div className="control-option">
+            <div className="control-option" id="movement-control">
                 {/* <h3 className="small-title"> Setup the Bot <span className="info-icon"><FontAwesomeIcon icon='info-circle' /></span></h3> */}
             <div className="row">
                 <div className="col-md button-movement">

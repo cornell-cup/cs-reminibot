@@ -152,8 +152,8 @@ function PortsList(props) {
         // let listElement = <li key={i}> {link} {ports} </li>
         let element = (
             <div key={i} className="form-group row">
-                <label htmlFor={ports[i]} className="col-md-5">Port {ports[i]}:</label>
-                <div className="col-md-7">
+                <label htmlFor={ports[i]} className="col-md-4 d-flex justify-content-center">Port {ports[i]}:</label>
+                <div className="col-md-8">
                     <Ports portName={ports[i]} motorPorts={props.motorPorts} />
                 </div>
             </div>

@@ -744,7 +744,7 @@ export default class MinibotBlockly extends React.Component {
 
     render() {
         return (
-            <div className="container-fluid">
+            <div className="">
                 <div className="row">
                     <div id="login and register" className="horizontalDiv" style={{ marginLeft: "40px" }}>
                         {!this.state.isLoggedIn ? <Button id="register" name="Register" onClick={this.register} /> : null}
@@ -766,9 +766,7 @@ export default class MinibotBlockly extends React.Component {
                         />
                     </div>
                 </div>
-                <br />
                 <div className="container-coding">
-                    <br />
                     <div className="row">
                         <div className="col">
                             <div className="row">
@@ -778,7 +776,7 @@ export default class MinibotBlockly extends React.Component {
                             </div>
                             <div className="row">
                                 <div className="col">
-                                    <div id="blocklyDiv" style={{ height: "520px", width: "575px", padding: "10px" }}></div>
+                                    <div id="blocklyDiv" style={{ height: "488px", width: "540px", padding: "10px" }}></div>
                                 </div>
                             </div>
                             <div className="row">
@@ -825,14 +823,8 @@ export default class MinibotBlockly extends React.Component {
                             setPythonCode={this.props.setPythonCode}
                             stopBlockly={this.stopBlockly}
                         />
-                        <br />
-                        <br />
                     </div>
-                    <br />
-                    <br />
                 </div>
-                <br />
-                <br />
             </div>
         );
     }
