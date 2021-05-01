@@ -9,6 +9,8 @@ import { faCogs, faCode } from '@fortawesome/free-solid-svg-icons';
 library.add(faCogs, faCode);
 
 import GridView from './components/gridview.js';
+// import Signup from './components/signup.js';
+import { BrowserRouter as Router, Link} from 'react-router-dom';
 import Blockly from './components/blockly.js';
 import AddBot from './components/AddBot.js';
 import MovementControls from './components/MovementControl.js';
@@ -60,8 +62,11 @@ class Navbar extends React.Component {
               <Route exact path='/login' component={login}/>
               <Route exact path='/signup' component={Signup}/>
             </Switch> */}
-            <a href="/login">Login</a>
-            <a href="/signup">Sign Up</a>
+            {/* <Router> */}
+              {/* <Link to="/login">Login</Link> */}
+              {/* <a href="/login">Sign Up</a>
+              <Route path="/login" component = {Signup}/>
+            </Router> */}
           </span>
           </div>
         </nav>
@@ -163,6 +168,14 @@ class Platform extends React.Component {
                     selectedBotStyle={this.state.selectedBotStyle}
                     setSelectedBotStyle={this.setSelectedBotStyle}
                   />
+                  <div className="row">
+                    <div className="col-6">
+
+                    </div>
+                    <div className="col-6">
+                      <button className="btn btn-secondary">Finish Bot Setup</button>
+                    </div>
+                  </div>
                 </div>
                 <div className="col-md">
                   <div className="row">
@@ -177,14 +190,6 @@ class Platform extends React.Component {
                       setSelectedBotStyle={this.setSelectedBotStyle}
                     />
                   </div>
-                </div>
-              </div>
-              <div className="row">
-                <div className="col">
-                    <button className="btn btn-secondary">Finish Bot Setup</button>
-                </div>
-                <div className="col">
-
                 </div>
               </div>
             </div>
