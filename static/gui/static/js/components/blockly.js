@@ -321,8 +321,8 @@ export default class MinibotBlockly extends React.Component {
 
         this.handleInputChange = this.handleInputChange.bind(this);
         this.download = this.download.bind(this);
-        this.runBlockly = this.runBlockly.bind(this);
-        this.stopBlockly = this.stopBlockly.bind(this);
+        // this.runBlockly = this.runBlockly.bind(this);
+        // this.stopBlockly = this.stopBlockly.bind(this);
         this.dblock = this.dblock.bind(this);
         this.dblockAll = this.dblockAll.bind(this);
         this.login = this.login.bind(this);
@@ -581,46 +581,48 @@ export default class MinibotBlockly extends React.Component {
 
     /* Target function for the button "Run". Send python code
          corresponding to blockly to backend. */
-    runBlockly(event) {
-        const _this = this;
-        axios({
-            method: 'POST',
-            url: '/script',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            data: JSON.stringify({
-                bot_name: _this.props.selectedBotName,
-                script_code: _this.props.pythonCode
-            }),
-        }).catch(function (error) {
-            if (error.response.data.error_msg.length > 0)
-                window.alert(error.response.data.error_msg);
-            else
-                console.log(error);
-        });
-    }
+    // runBlockly(event) {
+    //     const _this = this;
+    //     console.log("run blockly");
+    //     axios({
+    //         method: 'POST',
+    //         url: '/script',
+    //         headers: {
+    //             'Content-Type': 'application/json'
+    //         },
+    //         data: JSON.stringify({
+    //             bot_name: _this.props.selectedBotName,
+    //             script_code: _this.props.pythonCode,
+    //             login_email: _this.props.loginEmail
+    //         }),
+    //     }).catch(function (error) {
+    //         // if (error.response.data.error_msg.length > 0)
+    //         //     window.alert(error.response.data.error_msg);
+    //         // else
+    //             console.log(error);
+    //     });
+    // }
 
-    stopBlockly() {
-        axios({
-            method: 'POST',
-            url: '/wheels',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            data: JSON.stringify({
-                bot_name: this.props.selectedBotName,
-                direction: "stop",
-                power: 0,
-            })
-        }).catch(function (error) {
-            if (error.response.data.error_msg.length > 0)
-                window.alert(error.response.data.error_msg);
-            else
-                console.log(error);
-            console.log(error);
-        })
-    }
+    // stopBlockly() {
+    //     axios({
+    //         method: 'POST',
+    //         url: '/wheels',
+    //         headers: {
+    //             'Content-Type': 'application/json'
+    //         },
+    //         data: JSON.stringify({
+    //             bot_name: this.props.selectedBotName,
+    //             direction: "stop",
+    //             power: 0,
+    //         })
+    //     }).catch(function (error) {
+    //         if (error.response.data.error_msg.length > 0)
+    //             window.alert(error.response.data.error_msg);
+    //         else
+    //             console.log(error);
+    //         console.log(error);
+    //     })
+    // }
 
     login(event) {
         const modal = document.getElementById("loginModal")
@@ -821,8 +823,8 @@ export default class MinibotBlockly extends React.Component {
                             <div className="row">
                                 <div className="col horizontalDiv">
                                     <div className="element-wrapper" style={{ paddingLeft: "20px" }}>
-                                        <Button id="blocklyRun" name="Run" onClick={this.runBlockly} />
-                                        <Button id="blocklyStop" name="Stop" onClick={this.stopBlockly} />
+                                        {/* <Button id="blocklyRun" name="Run" onClick={this.runBlockly} /> */}
+                                        {/* <Button id="blocklyStop" name="Stop" onClick={this.stopBlockly} /> */}
                                     </div>
                                 </div>
                             </div>
