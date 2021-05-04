@@ -303,8 +303,8 @@ class Minibot:
         # so that some of the commands get through.  Once the data loss issue
         # is fixed, we can implement a regular solution. If we did not have the
         # threads, our code execution pointer would get stuck in the infinite loop.
+        global botVisionClient
         botVisionClient = None
-        vs = None
         # _, server = sock.recvfrom(4096)
         # server_ip = str(server[0])
         if key == "BOTSTATUS":
@@ -320,8 +320,10 @@ class Minibot:
                 server_ip = self.base_station_addr[0]
                 print("On bot vision w/ server ip: " + server_ip)
                 if (botVisionClient):
+                    print("vs starting")
                     vs.start()
                 else:
+                    print("new botVisionClient thread")
                     botVisionClient = Thread(
                         target=self.startBotVisionClient, kwargs={'server_ip': server_ip}, daemon=True)
                     botVisionClient.start()
@@ -330,9 +332,10 @@ class Minibot:
                 if (botVisionClient):
                     print("Stop on bot vision w/ server ip: " + server_ip)
                     vs.stop()
-                    # TODO: very important! this is not working, thus preventing the resource from being closed on the pi
+                    # TODO: very important! this is not working, thus preventing the resource from being closed on the p
                     vs.stream.stream.release()
             if value == "line_follow":
+                print("line follow")
                 Thread(target=ece.line_follow).start()
         elif key == "PORTS":
             ece.set_ports(value)
@@ -391,7 +394,8 @@ class Minibot:
         # get the host name, initialize the video stream, and allow the
         # camera sensor to warmup
         rpiName = socket.gethostname()
-        vs = VideoStream(usePiCamera=True, resolution=(240, 144), framerate=25)
+        if (vs == None):
+             vs = VideoStream(usePiCamera=True, resolution=(240, 144), framerate=25)
         vs.start()
         # vs = VideoStream(src=0).start()
         time.sleep(2.0)
@@ -418,6 +422,8 @@ if __name__ == "__main__":
     else:
         import scripts.pi_arduino as ece
         BOT_LIB_FUNCS = "pi_arduino"
+
+    vs = None
 
     minibot = Minibot(args.port_number)
     minibot.main()
