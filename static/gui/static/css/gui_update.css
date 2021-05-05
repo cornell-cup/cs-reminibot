@@ -9,10 +9,21 @@
   font-size: 1.5em;
 }
 
-.navbar a, .navbar button{
+.navbar a {
   margin-left: 15px;
   font-size: 20pt;
   color: white;
+}
+
+.navbar button {
+  margin-left: 15px;
+  font-size: 20pt;
+  background: none;
+  color: white;
+  border: none;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
 }
 
 .navbar a:hover {
