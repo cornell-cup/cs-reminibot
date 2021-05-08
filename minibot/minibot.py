@@ -334,8 +334,11 @@ class Minibot:
                     vs.stop()
                     # TODO: very important! this is not working, thus preventing the resource from being closed on the p
                     vs.stream.stream.release()
+                    botVisionClient._stop()
             if value == "line_follow":
                 print("line follow")
+                if (vs is not None):
+                    vs.stop()
                 Thread(target=ece.line_follow).start()
         elif key == "PORTS":
             ece.set_ports(value)
@@ -394,8 +397,7 @@ class Minibot:
         # get the host name, initialize the video stream, and allow the
         # camera sensor to warmup
         rpiName = socket.gethostname()
-        if (vs == None):
-             vs = VideoStream(usePiCamera=True, resolution=(240, 144), framerate=25)
+        vs = VideoStream(usePiCamera=True, resolution=(240, 144), framerate=25)
         vs.start()
         # vs = VideoStream(src=0).start()
         time.sleep(2.0)
