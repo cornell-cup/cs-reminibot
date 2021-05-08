@@ -1,25 +1,28 @@
+"""
+Use this file to experiment with SPI.
+The boilerplate is set up for you.
+"""
+
 import binascii
 import spidev
 import time
-from message_utils import send_message, read_data, make_message
+from message_utils import *
 
-print("Setting up SPI")
 spi = spidev.SpiDev()
-print(spi.cshigh)
 bus = 0
 device = 0
 spi.open(bus,device)
 spi.mode = 0
 spi.max_speed_hz = 115200
 
-# done = False
-# for count in range(1,10000):
-#     msg = [ord(x) for x in "HELLO"]
-#     spi.xfer(msg)
+#############################################################
+# Write your code here...
 
-def validator(msg):
-    return msg[0] == ord('C') and msg[3] == ord('T')
+init_msg = "Good Game!"
+byte_msg = make_crc_message(init_msg)
+send_message(spi, byte_msg)
 
-data = read_data(spi, make_message("RED"), 4, validator, max_tries=100)
 
+#############################################################
+# Do not write anything below this line
 spi.close()

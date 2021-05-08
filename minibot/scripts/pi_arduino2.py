@@ -3,7 +3,7 @@ import spidev
 import time
 import threading
 from statistics import median
-from crc import crc16
+from scripts.crc import crc16
 
 spi = spidev.SpiDev()
 STOP_CMD = "S"
@@ -99,11 +99,14 @@ def transmit_once(data):
             (eg. "F" to tell the Arduino to start driving
              the Minibot forward)
     """
+    print("Sending Data: {}".format(data))
     if hasattr(data, '__len__'):
-        checksum = crc16(data)
+        checksum = crc16(bytes([ord(c) if type(c) == type('c') else c for c in data]))
         checksum_b1 = checksum & 8
         checksum_b2 = ((checksum >> 8) & 0xFF)
-        spi.writebytes2([checksum_b1, checksum_b2] + [ord(c) for c in data])
+        message = [checksum_b1, checksum_b2] + [ord(c) if type(c) == type('c') else c for c in data]
+        print("Message: {}".format(message))
+        spi.writebytes2(data)
     else:
         spi.writebytes([ord(data)])
 
@@ -176,7 +179,7 @@ def release_lock():
 def fwd(power):
     """ Move minibot forwards, (currently power field is not in use) """
     acquire_lock()
-    transmit_continuously(['F', None, int(power), None, None]) 
+    transmit_continuously(['F', 0, int(power), 0, 0]) 
     #Start/end transmission signals sent separately?
     release_lock()
 
