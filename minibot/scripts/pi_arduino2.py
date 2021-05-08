@@ -4,12 +4,9 @@ import time
 import threading
 from statistics import median
 from scripts.crc import crc16
+import scripts.message_utils as msglib
 
 spi = spidev.SpiDev()
-STOP_CMD = "S"
-START_TRASMISSION_CMD = "CUP"
-END_TRASMISSION_CMD = "PUC"
-
 
 class TransmitLock():
     # TODO: implement this class with condition variables
@@ -91,164 +88,72 @@ def setSlave(pi_bus):
     spi.mode = 0
     spi.max_speed_hz = 115200
 
-def transmit_once(data):
-    """ Sends each character in the cmd to the Arduino
-
-    Arguments:
-        cmd: (str) The command to be sent to the Arduino
-            (eg. "F" to tell the Arduino to start driving
-             the Minibot forward)
-    """
-    print("Sending Data: {}".format(data))
-    if hasattr(data, '__len__'):
-        checksum = crc16(bytes([ord(c) if type(c) == type('c') else c for c in data]))
-        checksum_b1 = checksum & 8
-        checksum_b2 = ((checksum >> 8) & 0xFF)
-        message = [checksum_b1, checksum_b2] + [ord(c) if type(c) == type('c') else c for c in data]
-        print("Message: {}".format(message))
-        spi.writebytes2(data)
-    else:
-        spi.writebytes([ord(data)])
-
-def transmit_continuously(cmd):
-    """ Transmits the cmd continuously to the Arduino 
-    
-    Arguments: 
-        cmd: (str) The command to be sent to the Arduino
-    """
-    while tlock.can_continue_transmitting():
-        transmit_once(cmd)
-    spi.writebytes([ord(STOP_CMD)])
-
-def send_integer_once(num):
-    """ Sends a numerical value to the Arduino
-    
-    Arguments:
-        num: (int) The integer to be sent to the Arduino
-    """
-    print(num)
-    spi.xfer([num])
-
-def read_once():
-    """ Reads from the Arduino multiple times and then returns the
-    median value.  Hence, it essentially reads from the Arduino
-    once but also filters out noise.
-
-    Returns: (int) The median value of reading from the Arduino
-        "num_reads" times.  
-    """
-    num_reads = 5
-    print("Reading from Arduino")
-    values = []
-    for _ in range(num_reads):
-        values += spi.readbytes(1)
-        # Need a short delay between each read from the Arduino
-        # Without the delay, the Arduino will return 0
-        time.sleep(0.02)
-    print("Original values: {}".format(values))
-    val = median(values)
-    print("Median value read is {}".format(val))
-    return val
-
-
 def acquire_lock():
     """ Acquires the lock to start sending data over SPI to
-    the Arduino.  It also sends the starting character
-    to the Arduino to indicate to the Arduino that the Arduino
-    will start receiving commands from the Raspberry Pi
+    the Arduino. 
     """
     priority = time.time()
     while not tlock.start_transmit(priority):
         time.sleep(0.01)
-    # Send the starting character to tell the Arduino
-    # that we will be starting to transmit commands to it
     setSlave(1)
-    spi.writebytes2([ord(c) for c in START_TRASMISSION_CMD])
 
 def release_lock():
     """ Releases the lock that was used to send data over SPI to
-    the Arduino.  It also sends the ending character
-    to the Arduino to indicate to the Arduino that the Arduino
-    will stop receiving commands from the Raspberry Pi
+    the Arduino.
     """
-    spi.writebytes2([ord(c) for c in END_TRASMISSION_CMD])
     spi.close()
     tlock.end_transmit()
     
 
-def fwd(power):
-    """ Move minibot forwards, (currently power field is not in use) """
+def motor(id, dir, power, time):
+    """
+    Ask the Arduino to move the motor identified with [id] in direction [dir] at
+    [power]% power for [time] seconds.
+    """
     acquire_lock()
-    transmit_continuously(['F', 0, int(power), 0, 0]) 
-    #Start/end transmission signals sent separately?
+    data = [ord('M'), id, ord('D'), dir, ord('P'), power, ord('T'), time]
+    msg = msglib.make_crc_message(data)
+    msglib.send_message(spi,msg)
     release_lock()
 
 
-def back(power):
-    """ Move minibot backwards """
+def servo(id, angle):
+    """
+    Ask the Arduino to move the servo identified with [id] to the angle
+    [angle] (in degrees)
+    """
     acquire_lock()
-    transmit_continuously(['B', None, int(power), None, None]) # TODO add parameters
-    release_lock()
-
-
-def left(power):
-    """ Move minibot left """
-    acquire_lock()
-    transmit_continuously(['L', None, int(power), None, None])
-    release_lock()
-
-
-def right(power):
-    """ Move minibot right """
-    acquire_lock()
-    transmit_continuously(['R', None, int(power), None, None])
+    # Angle is 0 to 180 so no need for 2 bytes
+    data = [ord('S'), ord('R'), ord('V'), ord('O'), id, ord('A'), angle]
+    msg = msglib.make_crc_message(data)
+    msglib.send_message(spi,msg)
     release_lock()
 
 
 def stop():
-    """ Tell minibot to stop.  Send the command num_stops times just in 
-    case there is some data loss over SPI
-    """
-    # acquire_lock()
-    # num_stops = 10
-    # for _ in range(num_stops):
-    #     transmit_once(STOP_CMD)
-    # release_lock()
-
     acquire_lock()
-    transmit_continuously([None, None, None, 'S', None])
+    data = "STOP"
+    msg = msglib.make_crc_message(data)
+    msglib.send_message(msg)
     release_lock()
 
 
-def read_ultrasonic():
-    #TODO: what to do here??
+def sensor(id):
     acquire_lock()
-    transmit_continuously(['d', 'u'])
-    return_val = read_once() #Problem that we readonce before passing the end trans signal? 
+    load_req = [ord('L'), ord('O'), ord('A'), ord('D'), id]
+    load_msg = msglib.make_crc_message(load_req)
+    data, numTries = msglib.read_data(spi, load_msg, 22, msglib.validate_crc_message)
+    data = msglib.unpack_crc_message(data)
     release_lock()
-    return return_val
-
-
-def move_servo(angle):
-    """ Tell the Arduino to move its servo motor to a specific angle """
-    acquire_lock()
-    # "ss" tells the Arduino that the next byte sent will correspond to 
-    # the servo_motor's angle
-    # transmit_once("ss")
-    # print("Servo should move to {} angle".format(angle))
-    # send_integer_once(int(angle))
-
-    acquire_lock()
-    transmit_continuously([None, None, None, None, int(angle)])
-    release_lock()
-
-    release_lock()
+    return data
 
 
 def line_follow():
     """ Tell minibot to follow a line """
     acquire_lock()
-    transmit_continuously('T')
+    data = "LINE"
+    msg = msglib.make_crc_message(data)
+    msglib.send_message(spi, msg)
     release_lock()
 
 #def object_detection():

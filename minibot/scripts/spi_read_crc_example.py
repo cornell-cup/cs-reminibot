@@ -8,7 +8,7 @@ Here's an example of how you might do that...
 import binascii
 import spidev
 import time
-from message_utils import make_message, send_message
+from message_utils import *
 
 # Set up SPI instance
 spi = spidev.SpiDev()
