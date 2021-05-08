@@ -30,7 +30,6 @@ def send_message(spi, msg, max_tries=100):
     numTries = 0
     if type(msg) == bytes:
         msg = list(msg)
-        print(msg)
     buf = msg.copy()
     while not done and numTries < max_tries:
         # Send the message
@@ -65,8 +64,10 @@ def read_data(spi, msg, nbytes, validator, max_tries=100):
         max_tries:  The maximum number of tries to send the message
                     before giving up
     """
+    if type(msg) == bytes:
+        msg = list(msg)
     lod_msg = msg.copy()
-    print("Send load req msg")
+    # print("Send load req msg")
     send_message(spi, lod_msg) # request data load
     buf = [0] * nbytes
     done = False
@@ -74,20 +75,20 @@ def read_data(spi, msg, nbytes, validator, max_tries=100):
     numTries = 0
     while not done and numTries < max_tries:
         # Send empty buffer (to read)
-        print("Sent {}: {} | {}".format(len(buf), "".join([chr(c) for c in buf]), buf))
+        # print("Sent {}: {} | {}".format(len(buf), "".join([chr(c) for c in buf]), buf))
         spi.xfer(buf)
         numTries += 1
         # Validate data
-        print("Received {}: {} | {}".format(len(buf), "".join([chr(c) for c in buf]), buf))
+        # print("Received {}: {} | {}".format(len(buf), "".join([chr(c) for c in buf]), buf))
         if validator(buf):
-            print("Data OK")
+            # print("Data OK")
             data = buf.copy()
             done = True
         else:
             # Ask to resend
-            print("Send load req msg")
+            # print("Send load req msg")
             send_message(spi,lod_msg)
-    print("Read {} in {} tries".format(buf, numTries))
+    # print("Read {} in {} tries".format(buf, numTries))
     return data
 
 
@@ -109,7 +110,7 @@ def make_crc_message(data):
         data.append(0)
     start = bytes([ord(x) for x in "CC"])
     data_hash = crc16(data)
-    print(data_hash)
+    # print(data_hash)
     data_hash_bytes = data_hash.to_bytes(2, "big") #2-byte CRC
     end = bytes([ord(x) for x in "RT"])
 

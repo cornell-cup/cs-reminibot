@@ -18,7 +18,7 @@ spi.max_speed_hz = 115200
 #############################################################
 # Write your code here...
 
-init_msg = "Good Game!"
+init_msg = "Well Played!"
 byte_msg = make_crc_message(init_msg)
 send_message(spi, byte_msg)
 
