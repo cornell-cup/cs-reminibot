@@ -38,7 +38,7 @@ static const int table[] = {
   0x6e17, 0x7e36, 0x4e55, 0x5e74, 0x2e93, 0x3eb2, 0x0ed1, 0x1ef0
 };
 
-int encode(int arr[], int len) {
+int encode(char arr[], int len) {
   // Length implementations can be wacky, so take len in as input
   int crc = 0xFFFF;
   for (int i = 0; i < len; i++) {
@@ -61,10 +61,15 @@ int validate_msg(char arr[], int len) {
   // Message
   // S = Start byte, H = CRC hash byte, D = Data byte, E = end byte
   // message is [SSHHDDDD....DDEE]
+  // Check start and end
   bool start_ok = (arr[0] == 'C') && (arr[1] == 'C');
-  bool end_ok = (arr[0] == 'R') && (arr[1] == 'T');
+  bool end_ok = (arr[len-2] == 'R') && (arr[len-1] == 'T');
+
+  // Compute hash of data
   int data_hash = encode(arr+4, len-6);
-  int msg_hash = (arr[2] << 8) | arr[3];
+
+  // Read hash from message and compare
+  unsigned int msg_hash = word(arr[2], arr[3]);
   bool hash_ok = (data_hash == msg_hash);
   return start_ok && end_ok && msg_hash;
 }
