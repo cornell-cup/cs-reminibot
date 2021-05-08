@@ -160,6 +160,9 @@ export default class MovementControls extends React.Component {
 
     constructor(props) {
         super(props);
+        this.state = {
+            power: 50
+        }
         // this.refreshingBotListRef = React.createRef();
         // this.addBotListener = this.addBotListener.bind(this);
         this.buttonMapListener = this.buttonMapListener.bind(this);
@@ -209,6 +212,10 @@ export default class MovementControls extends React.Component {
         }
     }
 
+    updatePowerValue(event) {
+        this.state.power = event.target.value;
+    }
+
     render() {
         const _this = this;
         return (
@@ -237,6 +244,11 @@ export default class MovementControls extends React.Component {
                             <FontAwesomeIcon icon="caret-down"/>
                         </button>
                     </div>
+                    <div>
+                            <label className="white-label"> Power:</label>
+                        </div>
+                        <input id="custom-range-1" className="custom-range" name="wheel_power" type="range" min="0" max="100"
+                            step="5" onChange={evt => this.updatePowerValue(evt)} />
                 </div>
                 <div className="col-md align-self-center">
                     <SpeechRecognition selectedBotName={this.props.selectedBotName}/>

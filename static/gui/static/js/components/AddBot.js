@@ -69,7 +69,7 @@ class RefreshingList extends React.Component {
         const _this = this;
         if (_this.state.availableBots.length === 0) {
             _this.state.currentBot = "";
-            return <select className="available-bots form-control" onClick={this.discoverBots}>
+            return <select className="available-bots custom-select custom-select-sm" onClick={this.discoverBots}>
                 <option>-------Available Bots--------</option>
             </select>
         }
@@ -90,6 +90,124 @@ class RefreshingList extends React.Component {
     }
 }
 
+class BotSearch extends React.Component {
+    // COPIED OVER FROM ABOVE
+    constructor(props) {
+        super(props);
+        this.state = {
+            availableBots: [],
+            currentBot: ""
+        }
+
+        this.update = this.update.bind(this);
+        this.updateCurrentBot = this.updateCurrentBot.bind(this);
+    }
+
+    /**
+     * This function is called when the user presses on the Available Bots List
+     * This function simply tells the backend to listen for incoming Minibot
+     * broadcasts and update its internal list of active Minibots.  This 
+     * function doesn't update the WebGUI at all.  Instead, the refreshAvailableBots
+     * function, which runs continuously, fetches the updated active Minibots list
+     * from the backend.  refreshAvailableBots must run continuously to update the 
+     * Available Bots List in case a previously active Minibot disconnects.
+     * The reason we have a separate discoverBots function and a separate
+     * refreshAvailableBots function is because fetching the active Minibots 
+     * is inexpensive, so its okay if refreshAvailableBots runs continuously.
+     * However, making the Basestation listen for all active Minibots can be 
+     * relatively expensive, so we want to make the Basestation perform this
+     * not too frequently.  Hence, with this implementation, the Basestation will
+     * only need to perform this operation when the Available Bots List is clicked.
+     */
+    discoverBots(event) {
+        console.log("Discovering new Minibot");
+        axios({
+            method: 'GET',
+            url: '/discover-bots',
+        });
+    }
+
+    update(newbots) {
+        this.state.availableBots = newbots;
+        // current bot will automatically be updated when the component
+        // renders (see render function)
+        if (!newbots.includes(this.state.currentBot)) {
+            this.state.currentBot = "";
+        }
+        this.setState({ state: this.state }) // forces re-render
+    }
+
+    updateCurrentBot(event) {
+        const _this = this;
+        let newBotName = event.target.value;
+        this.state.currentBot = newBotName;
+
+        console.log("Refreshing list updated current bot ", newBotName);
+        this.setState({ state: this.state })
+    }
+
+    // render() {
+    //     const _this = this;
+    //     if (_this.state.availableBots.length === 0) {
+    //         _this.state.currentBot = "";
+    //         return <select className="available-bots custom-select custom-select-sm" onClick={this.discoverBots}>
+    //             <option>-------Available Bots--------</option>
+    //         </select>
+    //     }
+    //     if (_this.state.currentBot === "") {
+    //         _this.state.currentBot = _this.state.availableBots[0]
+    //     }
+
+    //     return (
+    //         <select
+    //             className="available-bots"
+    //             onChange={(e) => this.updateCurrentBot(e)}
+    //             onClick={this.discoverBots}
+    //         >
+    //             {_this.state.availableBots.map(
+    //                 (name, idx) => <option key={idx}> {name} </option>)}
+    //         </select>
+    //     );
+    // }
+
+    render() {
+        const _this = this;
+        if (_this.state.availableBots.length === 0) {
+            _this.state.currentBot = "";
+            return <select className="available-bots custom-select custom-select-sm" onClick={this.discoverBots}>
+                <option>-------Available Bots--------</option>
+            </select>
+        }
+        if (_this.state.currentBot === "") {
+            _this.state.currentBot = _this.state.availableBots[0]
+        }
+        return (
+            <div>
+            <div className="row">
+                <div className="col d-flex">
+                    <h3 className="small-title"> Setup the Bot <span className="info-icon"><FontAwesomeIcon icon='info-circle' /></span></h3>
+                    <button className="btn btn-secondary ml-auto" onClick={this.discoverBots}>Search for bots</button>
+                </div>
+            </div>
+            <div className="form-group row">
+                <label className="col-sm-4 col-form-label">Select Bot:</label>
+                <div className="col-sm-8">
+                    {_this.state.availableBots.length === 0 ?
+                        <select className="available-bots custom-select custom-select-sm">
+                            <option>-------Available Bots--------</option>
+                        </select> : ""}
+                    {_this.state.currentBot === "" ?
+                        _this.state.currentBot = _this.state.availableBots[0]
+                        : ""
+                    }
+                </div>
+            </div>
+            </div>
+        )
+    }
+
+}
+
 // function Ports(props) {
 //     const ports = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"];
 //     let buttonList = [];
@@ -108,35 +226,30 @@ class RefreshingList extends React.Component {
 //     return (<ul> {buttonList} </ul>);
 // };
 
-    function Ports(props) {
+function Ports(props) {
 
-        const portNames = [
-            "LMOTOR", "RMOTOR", "MOTOR3", "LINE", "INFRARED", "RFID", "ULTRASONIC"
-        ]
-    
-        const portLabels = [
-            "Left Motor", "Right Motor", "Motor 3", "Line Follower",
-            "Infrared", "RFID", "Ultrasonic"
-        ]
+    const connectionNames = [
+        "", "LMOTOR", "RMOTOR", "MOTOR3", "LINE", "INFRARED", "RFID", "ULTRASONIC"
+    ]
 
-        console.assert(portNames.length == portLabels.length);
+    const connectionLabels = [
+        "Select connection...", "Left Motor", "Right Motor", "Motor 3", "Line Follower",
+        "Infrared", "RFID", "Ultrasonic"
+    ]
 
-        let optionList = [];
-    
-        for (let i = 0; i < portNames.length; i++) {
-            optionList.push(
-                <option key={i} value={portNames[i]}>
-                    {/* <button
-                        className="btn_ports"
-                        onClick={() => props.motorPorts(props.portName, ports[i])}>
-                        {ports[i]}
-                    </button> */}
-                    {portLabels[i]}
-                </option>
-            );
-        }
-        return (<select className="form-control" name={props.port} id={props.port}> {optionList} </select>);
-    };
+    console.assert(connectionNames.length == connectionLabels.length);
+
+    let optionList = [];
+
+    for (let i = 0; i < connectionNames.length; i++) {
+        optionList.push(
+            <option key={i} value={connectionNames[i]}>
+                {connectionLabels[i]}
+            </option>
+        );
+    }
+    return (<select className="custom-select custom-select-sm" name={props.port} id={props.port}> {optionList} </select>);
+};
 
 function PortsList(props) {
 
@@ -585,7 +698,7 @@ export default class AddBot extends React.Component {
                     <div className="form-group row">
                         <label className="col-sm-4 col-form-label">Select Mode:</label>
                         <div className="col-sm-8">
-                            <select className="form-control" onChange={(event) => this.modeOnChange(event.target.value)}>
+                            <select className="custom-select custom-select-sm" onChange={(event) => this.modeOnChange(event.target.value)}>
                                 <option value="">Normal</option>
                                 <option value="obj-detection">Object Detection</option>
                                 <option value="line-follow">Line Follow</option>

@@ -7,14 +7,14 @@ require('codemirror/mode/python/python');
 
 function UserAccountModal(props) {
     const s = props.modalType;
-    const modalId = s + "Modal";
+    const modalId = s + "Modal2";
     const formId = s + "Form";
     const closeId = s + "Close";
     // Make first letter of s uppercase
     const sUpperCased = s.charAt(0).toUpperCase() + s.slice(1)
     const title = sUpperCased + " Window";
     return (
-        <div id={modalId} className="modal">
+        <div id={modalId} className="modal2">
             <span id={closeId} className="close">&times;</span>
             <p>{title}</p>
             <form id={formId}>
@@ -628,7 +628,7 @@ export default class MinibotBlockly extends React.Component {
     }
 
     login(event) {
-        const modal = document.getElementById("loginModal")
+        const modal = document.getElementById("loginModal2")
         const closeBtn = document.getElementById("loginClose")
         modal.style.display = "block";
         closeBtn.addEventListener("click", () => {
@@ -656,7 +656,7 @@ export default class MinibotBlockly extends React.Component {
     }
 
     register(event) {
-        const registerModal = document.getElementById("registerModal")
+        const registerModal = document.getElementById("registerModal2")
         const closeBtn = document.getElementById("registerClose")
         registerModal.style.display = "block";
         closeBtn.addEventListener("click", () => {
@@ -746,7 +746,7 @@ export default class MinibotBlockly extends React.Component {
         return (
             <div className="">
                 <div className="row">
-                    <div id="login and register" className="horizontalDiv" style={{ marginLeft: "40px" }}>
+                    <div id="loginandregister" className="horizontalDiv" style={{ marginLeft: "40px" }}>
                         {!this.state.isLoggedIn ? <Button id="register" name="Register" onClick={this.register} /> : null}
                         {!this.state.isLoggedIn ? <Button id="login" name="Login" onClick={this.login} /> : null}
                         {this.state.isLoggedIn ? <label className="white-label"> Logged in as: {this.state.loginEmail} &nbsp; </label> : null}
@@ -757,7 +757,6 @@ export default class MinibotBlockly extends React.Component {
                             successLabel={this.state.registerSuccessLabel}
                             errorLabel={this.state.registerErrorLabel}
                         />
-
                         <UserAccountModal
                             modalType="login"
                             handleEvent={this.handleLogin}

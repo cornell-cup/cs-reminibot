@@ -22,7 +22,7 @@ import RegisterModal from './components/RegisterModal.js';
 /**
  * Component for the Navbar on top
  * Currently this does nothing except display some text and an image
- * This is an old navbar
+ * This is the old navbar
  */
 // class Navbar extends React.Component {
 //   render() {
@@ -36,7 +36,8 @@ import RegisterModal from './components/RegisterModal.js';
 // }
 
 /**
- * 
+ * New component for the Navbar on top
+ * This switches pages and renders login info
  */
 class Navbar extends React.Component {
   render() {
@@ -48,32 +49,18 @@ class Navbar extends React.Component {
             <img src="./static/img/logo.png" width="50" height="50" className="d-inline-block align-top" alt="" />
             Minibot
           </span>
-          <span className="pages nav-pills" id="fakeTabs" role="tablist">
-          {/* <TabList>
-            <Tab>Setup/Control</Tab>
-            <Tab>Coding</Tab>
-            <Tab>Analytics</Tab>
-          </TabList> */}
-              <a id="setup-control-link" data-toggle="tab" href="#setup_control_tab" role="tab"><FontAwesomeIcon icon="cogs"/> Setup</a>
+          <span className="pages nav nav-pills" id="fakeTabs" role="tablist">
+              <a id="setup-control-link" data-toggle="tab" href="#setup_control_tab" role="tab"><FontAwesomeIcon icon="cogs"/> Setup/Movement</a>
               <a id="coding-link" data-toggle="tab" href="#coding-tab" role="tab"><FontAwesomeIcon icon="code"/> Coding</a>
           </span>
           <span className="login">
               <button type="button" data-toggle="modal" data-target="#loginModal">Login</button>
               <button type="button" data-toggle="modal" data-target="#registerModal">Signup</button>
-            {/* <Switch>
-              <Route exact path='/login' component={login}/>
-              <Route exact path='/signup' component={Signup}/>
-            </Switch> */}
-            {/* <Router> */}
-              {/* <Link to="/login">Login</Link> */}
-              {/* <a href="/login">Sign Up</a>
-              <Route path="/login" component = {Signup}/>
-            </Router> */}
           </span>
           </div>
         </nav>
         <LoginModal />
-          <RegisterModal />
+        <RegisterModal />
       </div>
     )
   }
@@ -156,9 +143,9 @@ class Platform extends React.Component {
           {/* keeping this here so the tab mechanism is known */}
           {/* <TabList>
             <Tab>Setup/Control</Tab>
-            <Tab>Coding</Tab>
-            <Tab>Analytics</Tab>
-          </TabList> */}
+            <Tab>Coding</Tab> */}
+            {/* <Tab>Analytics</Tab> */}
+          {/* </TabList> */}
           <div className="tab-content">
           {/* <TabPanel> */}
             {/* // Set tabindex to -1 so that this div is in focus to caputure 
@@ -197,8 +184,8 @@ class Platform extends React.Component {
                 </div>
               </div>
             </div>
-          {/* </TabPanel>
-          <TabPanel> */}
+          {/* </TabPanel> */}
+          {/* <TabPanel> */}
             <div id="coding-tab" className="tab-pane" role="tabpanel">
               <Blockly
                 blocklyXml={this.state.blocklyXml}
@@ -211,17 +198,17 @@ class Platform extends React.Component {
                 redefineCustomBlockList={this.redefineCustomBlockList}
               />
             </div>
-          {/* </TabPanel>
-          <TabPanel> */}
+          {/* </TabPanel> */}
+          {/* <TabPanel> */}
           {/* hiding this page for now */}
-          <div className="tab-pane" role="tabpanel"> 
+          {/* <div className="tab-pane" role="tabpanel"> 
             <Dashboard>
 
             </Dashboard>
-            </div>
+            </div> */}
           {/* </TabPanel> */}
+          </div>
         {/* </Tabs> */}
-        </div>
       </div>
     );
   }
@@ -231,16 +218,16 @@ class ClientGUI extends React.Component {
   render() {
     return (
       <div className="main-body">
-        <Navbar />
-        <div className="container">
-          <Platform />
-        </div>
+          <Navbar />
+          <div className="container">
+            <Platform />
+          </div>
       </div>
     );
   }
 }
 
-// insert something here about localStorage function
+// insert something here about localStorage function for first time tutorial
 
 let root = document.getElementById('root');
 ReactDOM.render(<ClientGUI />, root);
