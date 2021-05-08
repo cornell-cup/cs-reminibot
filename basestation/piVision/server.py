@@ -9,6 +9,8 @@ from imagezmq import imagezmq
 import argparse
 import imutils
 import cv2
+import time
+from queue import Queue
 
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
@@ -65,6 +67,18 @@ mH = args["montageH"]
 print("[INFO] detecting: {}...".format(", ".join(obj for obj in
                                                  CONSIDER)))
 
+# used to record the time when we processed last frame
+prev_frame_time = 0
+
+# used to record the time at which we processed current frame
+new_frame_time = 0
+
+frame_count = 0
+
+fps = 0
+
+frame_time_queue = Queue(maxsize=5)
+
 # start looping over all the frames
 while True:
     # receive RPi name and frame from the RPi and acknowledge
@@ -80,6 +94,28 @@ while True:
     # record the last active time for the device from which we just
     # received a frame
     lastActive[rpiName] = datetime.now()
+
+    frame_count += 1
+
+    # calculate the frame rate as the average of the last 5 frames
+    if (frame_count <= 4):
+        prev_frame_time = new_frame_time
+        new_frame_time = time.time()
+        fps = frame_count/new_frame_time
+        frame_time_queue.put(new_frame_time)
+    else:
+        prev_frame_time = new_frame_time
+        new_frame_time = time.time()
+        last_frame_time = frame_time_queue.get()
+        fps = 5/(new_frame_time - last_frame_time)
+        frame_time_queue.put(new_frame_time)
+
+    # converting the fps into integer
+    fps = int(fps)
+
+    # converting the fps to string so that we can display it on frame
+    # by using putText function
+    fps = str(fps)
 
     # resize the frame to have a maximum width of 400 pixels, then
     # grab the frame dimensions and construct a blob
@@ -129,6 +165,10 @@ while True:
     # draw the sending device name on the frame
     cv2.putText(frame, rpiName, (10, 25),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+
+    # puting the FPS count on the frame
+    cv2.putText(frame, fps, (650, 30), cv2.FONT_HERSHEY_SIMPLEX,
+                1, (100, 255, 0), 3, cv2.LINE_AA)
 
     # draw the object count on the frame
     # label = ", ".join("{}: {}".format(obj, count) for (obj, count) in
