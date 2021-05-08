@@ -131,6 +131,10 @@ def servo(id, angle):
 
 
 def stop():
+    """
+    Ask the Arduino to stop moving all motors.
+    To stop an individual motor, set its power to 0 with motor()
+    """
     acquire_lock()
     data = "STOP"
     msg = msglib.make_crc_message(data)
@@ -139,6 +143,9 @@ def stop():
 
 
 def sensor(id):
+    """
+    Ask the Arduino to read a value from the sensor identified by [id].
+    """
     acquire_lock()
     load_req = [ord('L'), ord('O'), ord('A'), ord('D'), id]
     load_msg = msglib.make_crc_message(load_req)
