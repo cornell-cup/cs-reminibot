@@ -1,9 +1,58 @@
 import React from 'react';
+import axios from 'axios';
 // import { Form, Button, Card } from 'react-bootstrap';
 
 export default class RegisterModal extends React.Component {
     constructor(props) {
-        super();
+        // super();
+        super(props);
+        this.state = {
+            email : "",
+            email_confirmation : "",
+            password : "",
+            password_confirmation : "",
+            registrationErrors : ""
+        };
+
+        // this.register = this.register.bind(this);
+        this.handleRegister = this.handleRegister.bind(this);
+        this.handleChange = this.handleChange.bind(this);
+    }
+
+    handleChange(event) {
+        console.log("handle changes");
+        this.setState({
+            [event.target.name] : event.target.value
+        })
+    }
+
+    handleRegister(event) {
+        console.log("handle register");
+        event.preventDefault();
+        let formData = new FormData(document.getElementById("registerForm"));
+        if (formData.get('email') == formData.get('email_confirmation') 
+                && formData.get('password') == formData.get('password_confirmation')){
+            axios({
+                method: 'POST',
+                url: '/register/',
+                data: formData,
+                // data: {
+                //     email: this.state.email,
+                //     password: this.state.password
+                // },
+                headers: { 'Content-Type': 'multipart/form-data' },
+            },
+                { withCredentials : true}
+            ).then((response) => {
+                    console.log("registration res", response);
+                })
+                .catch((error) => {
+                    console.log("fail");
+                    console.log(error);
+                });
+        } else {
+            registrationErrors: "The email/password does not match."
+        }
     }
 
     render() {
@@ -18,30 +67,41 @@ export default class RegisterModal extends React.Component {
                     </button>
                 </div>
                 <div className="modal-body">
-                <form className="signup">
+                <form className="signup" id="registerForm" onSubmit={this.handleRegister}>
                     <div className="form-group">
                         <label for="email" className="col-form-label">Email:</label>
-                        <input id="email" type="email" name="signup_email" className="form-control" required />
+                        <input id="email" type="email" name="email" className="form-control" value={this.state.email} onChange={this.handleChange} required />
                     </div>
 
                     <div className="form-group">
                         <label for="confirm_email" className="col-form-label">Please confirm your email:</label>
-                        <input id="confirm_email" type="email" name="signup_confirm_email" className="form-control" required />
+                        <input id="confirm_email" type="email" name="email_confirmation" className="form-control" value={this.state.email_confirmation} onChange={this.handleChange} required />
                     </div>
 
                     <div className="form-group">
                         <label for="password" className="col-form-label">Password:</label>
-                        <input id="password" type="password" name="signup_password" className="form-control" required />
+                        <input id="password" type="password" name="password" className="form-control" value={this.state.password} onChange={this.handleChange} required />
                     </div>
 
                     <div className="form-group">
                         <label for="confirm_password" className="col-form-label">Confirm Password:</label>
-                        <input id="confirm_password" type="password" name="signup_confirm_password" className="form-control" required />
+                        <input id="confirm_password" type="password" name="password_confirmation" className="form-control" value={this.state.password_confirmation} onChange={this.handleChange} required />
                     </div>
 
                     {/* <div className="align-right">
                         <button name="signup" type="submit">Sign Up</button>
                     </div> */}
+
+                    <div className="w-100 text-center mt-2">
+                        Already have an account? <a href="#" data-dismiss="modal" data-toggle="modal" data-target="#loginModal">Login</a>
+                    </div>
+
+                    <div className="modal-footer">
+                        {/* <button type="button" className="btn btn-secondary" data-dismiss="modal">Close</button> */}
+                        <button type="submit" className="btn btn-primary">Sign Up</button>
+                    </div>
+
+                    {/* <label style={{ color: 'red' }}> {this.props.errorLabel} </label> */}
                 </form>
 
                 {/* <Card>
@@ -67,14 +127,14 @@ export default class RegisterModal extends React.Component {
                         </Form>
                     </Card.Body>
                     </Card> */}
-                    <div className="w-100 text-center mt-2">
+                    {/* <div className="w-100 text-center mt-2">
                         Already have an account? <a href="#" data-dismiss="modal" data-toggle="modal" data-target="#loginModal">Login</a>
-                    </div>
+                    </div> */}
                 </div>
-                <div className="modal-footer">
+                {/* <div className="modal-footer">
                     <button type="button" className="btn btn-secondary" data-dismiss="modal">Close</button>
                     <button type="button" className="btn btn-primary">Sign Up</button>
-                </div>
+                </div> */}
                 </div>
             </div>
             </div>

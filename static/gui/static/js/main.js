@@ -40,6 +40,13 @@ import RegisterModal from './components/RegisterModal.js';
  * This switches pages and renders login info
  */
 class Navbar extends React.Component {
+//   constructor(props) {
+//     super(props);
+//     this.state = {
+//         isLoggedIn: false,
+//         loginEmail: "",
+//     }
+// }
   render() {
     return (
       <div id="top-nav" className="mb-4">
@@ -54,8 +61,12 @@ class Navbar extends React.Component {
               <a id="coding-link" data-toggle="tab" href="#coding-tab" role="tab"><FontAwesomeIcon icon="code"/> Coding</a>
           </span>
           <span className="login">
-              <button type="button" data-toggle="modal" data-target="#loginModal">Login</button>
-              <button type="button" data-toggle="modal" data-target="#registerModal">Signup</button>
+            <button type="button" data-toggle="modal" data-target="#loginModal">Login</button> 
+            <button type="button" data-toggle="modal" data-target="#registerModal">Signup</button>
+            {/* {!this.state.isLoggedIn ? <button type="button" data-toggle="modal" data-target="#loginModal">Login</button> : null}
+            {!this.state.isLoggedIn ? <button type="button" data-toggle="modal" data-target="#registerModal">Signup</button> : null} */}
+            {/* {this.state.isLoggedIn ? <label className="white-label"> Logged in as: {this.state.loginEmail} &nbsp; </label> : null}
+            {this.state.isLoggedIn ? <Button id="logout" name="Logout" onClick={this.logout}/> : null} */}
           </span>
           </div>
         </nav>

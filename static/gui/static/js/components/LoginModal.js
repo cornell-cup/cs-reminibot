@@ -1,10 +1,124 @@
 import React from 'react';
 
+// function UserAccountModal(props) {
+//     const s = props.modalType;
+//     const modalId = s + "Modal2";
+//     const formId = s + "Form";
+//     const closeId = s + "Close";
+//     // Make first letter of s uppercase
+//     const sUpperCased = s.charAt(0).toUpperCase() + s.slice(1)
+//     const title = sUpperCased + " Window";
+//     return (
+//         <div id={modalId} className="modal2">
+//             <span id={closeId} className="close">&times;</span>
+//             <p>{title}</p>
+//             <form id={formId}>
+//                 <input type="text" placeholder="Email" name="email" ></input>
+//                 <input type="password" placeholder="Password" name="password" ></input>
+//                 <input className="button-login" type="button" value={sUpperCased} onClick={props.handleEvent}></input>
+//                 <label style={{ color: 'green' }}> {props.successLabel} </label>
+//                 <br />
+//                 <label style={{ color: 'red' }}> {props.errorLabel} </label>
+//             </form>
+//         </div>
+//     )
+// }
 
 export default class LoginModal extends React.Component {
     constructor(props) {
-        super();
+        // super();
+        super(props);
+        this.state = {
+            // blocklyFilename: 'FileName.xml',
+            // pyblock: "",
+            // showPopup: false,
+            loginEmail: "",
+            loginErrorLabel: "",
+            loginSuccessLabel: "",
+            // registerErrorLabel: "",
+            // registerSuccessLabel: "",
+            // functionName: "default_function",
+            // codingStart: -1,
+            isLoggedIn: false,
+            // loginErrorLabel: "",
+            // loginSuccessLabel: "",
+            // registerErrorLabel: "",
+            // registerSuccessLabel: "",
+            // emptyFunctionName: "Create Custom Block",
+            // workspace: null,
+        };
+
+        // this.login = this.login.bind(this);
+        this.handleLogin = this.handleLogin.bind(this);
+        // this.logout = this.logout.bind(this);
     }
+
+    handleLogin(event) {
+        const _this = this;
+        let formData = new FormData(document.getElementById("loginForm"));
+        // let temp = _this.props.customBlockList;
+        axios({
+            method: 'POST',
+            url: '/login/',
+            data: formData,
+            headers: { 'Content-Type': 'multipart/form-data' }
+        }).then((response) => {
+            // _this.props.redefineCustomBlockList(
+            //     JSON.parse(response.data.custom_function));
+            // invokes component did update
+            this.setState({
+                loginEmail: formData.get("email"),
+                loginSuccessLabel: "Login Success",
+                loginErrorLabel: "",
+                isLoggedIn: true,
+            });
+            // if (temp[0][0] !== _this.state.emptyFunctionName && _this.props.customBlockList[0][0] !== _this.state.emptyFunctionName) {
+            //     _this.props.customBlockList.push.apply(_this.props.customBlockList, temp);
+            // }
+            // if (temp[0][0] !== _this.state.emptyFunctionName && _this.props.customBlockList[0][0] === _this.state.emptyFunctionName) {
+            //     _this.props.customBlockList.splice(0, 1);
+            //     _this.props.customBlockList.push.apply(_this.props.customBlockList[0], temp);
+            // }
+
+            // _this.redefineCustomBlocks();
+            // _this.updateCustomBlocks();
+        }).catch((error) => {
+            this.setState({
+                loginEmail: "",
+                loginSuccessLabel: "",
+                loginErrorLabel: error.response.data.error_msg
+            });
+            console.log(error);
+        });
+    }
+
+    // login(event) {
+    //     const modal = document.getElementById("loginModal")
+    //     const closeBtn = document.getElementById("Close")
+    //     modal.style.display = "block";
+    //     closeBtn.addEventListener("click", () => {
+    //         modal.style.display = "none";
+    //     })
+    // }
+
+    // logout(event) {
+    //     axios({
+    //         method: 'POST',
+    //         url: '/logout/',
+    //     }).then((response) => {
+    //         this.setState({
+    //             loginEmail: "",
+    //             loginSuccessLabel: "",
+    //             loginErrorLabel: "",
+    //             registerSuccessLabel: "",
+    //             registerErrorLabel: "",
+    //             isLoggedIn: false,
+    //         });
+    //         window.alert("Logout successful!");
+    //     }).catch((err) => {
+    //         window.alert("Logout error");
+    //     })
+    // }
 
     render() {
         return (
@@ -18,11 +132,11 @@ export default class LoginModal extends React.Component {
                     </button>
                 </div>
                 <div className="modal-body">
-                    <form className="login">
+                    <form className="login" id="loginForm" onSubmit={this.handleLogin}>
                         {/* <div class="group_label_input"> */}
                         <div className="form-group">
-                            <label for="username" className="col-form-label">Username:</label>
-                            <input id="username" type="text" name="login_username" className="form-control" required />
+                            <label for="email" className="col-form-label">Email:</label>
+                            <input id="email" type="email" name="login_email" className="form-control" required />
                         </div>
                         {/* </div> */}
 
@@ -30,12 +144,11 @@ export default class LoginModal extends React.Component {
                             <label for="password" className="col-form-label">Password:</label>
                             <input id="password" type="password" name="login_password" className="form-control" required />
                         </div>
-
+                        <div className="modal-footer">
+                            {/* <button type="button" className="btn btn-secondary" data-dismiss="modal">Close</button> */}
+                            <button type="submit" className="btn btn-primary">Login</button>
+                         </div>
                     </form>
-                </div>
-                <div className="modal-footer">
-                    <button type="button" className="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" className="btn btn-primary">Login</button>
                 </div>
                 </div>
             </div>
