@@ -265,3 +265,6 @@ def set_ports(ports):
     arr = list(port_number) + list(ports_dict[port_name])
     transmit_once(arr)
     release_lock()
+
+def ECE_wheel_pwr(left, right):
+    raise NotImplementedError()

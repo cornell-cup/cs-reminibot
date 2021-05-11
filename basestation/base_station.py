@@ -426,6 +426,8 @@ class BaseStation:
         return submission
 
     def update_result(self, result: str, submission_id: int):
+        if not submission_id:
+            return # i.e. a user isn't logged in
         print("UPDATE RESULT!!!")
         print(result)
         submission = Submission.query.filter_by(id=submission_id).first()
