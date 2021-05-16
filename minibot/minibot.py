@@ -335,10 +335,11 @@ class Minibot:
                     # TODO: very important! this is not working, thus preventing the resource from being closed on the p
                     vs.stream.stream.release()
                     botVisionClient._stop()
-            if value == "stop":
-                print("stop")
-                if (vs):
+            if value == "line_follow":
+                print("line follow")
+                if (vs is not None):
                     vs.stop()
+                Thread(target=ece.line_follow).start()
         elif key == "PORTS":
             ece.set_ports(value)
         elif key == "SCRIPTS":
