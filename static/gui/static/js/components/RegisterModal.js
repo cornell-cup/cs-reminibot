@@ -74,7 +74,7 @@ export default class RegisterModal extends React.Component {
                     </button>
                 </div>
                 <div className="modal-body">
-                <form className="signup" id="registerForm" onSubmit={this.handleRegister}>
+                <form className="signup" id="registerForm" onSubmit={this.handleRegister} method="POST">
                     <div className="form-group">
                         <label for="email" className="col-form-label">Email:</label>
                         <input id="email" type="email" name="email" className="form-control" value={this.state.email} onChange={this.handleChange} required />

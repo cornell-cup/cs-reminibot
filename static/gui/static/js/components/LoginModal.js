@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from 'axios';
 
 // function UserAccountModal(props) {
 //     const s = props.modalType;
@@ -56,6 +57,7 @@ export default class LoginModal extends React.Component {
     handleLogin(event) {
         const _this = this;
         let formData = new FormData(document.getElementById("loginForm"));
+        event.preventDefault();
         // let temp = _this.props.customBlockList;
         axios({
             method: 'POST',
@@ -132,7 +134,7 @@ export default class LoginModal extends React.Component {
                     </button>
                 </div>
                 <div className="modal-body">
-                    <form className="login" id="loginForm" onSubmit={this.handleLogin}>
+                    <form className="login" id="loginForm" onSubmit={this.handleLogin} method="POST">
                         {/* <div class="group_label_input"> */}
                         <div className="form-group">
                             <label for="email" className="col-form-label">Email:</label>
