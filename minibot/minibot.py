@@ -337,9 +337,8 @@ class Minibot:
                     botVisionClient._stop()
             if value == "line_follow":
                 print("line follow")
-                if (vs is not None):
+                if (vs):
                     vs.stop()
-                Thread(target=ece.line_follow).start()
         elif key == "PORTS":
             ece.set_ports(value)
         elif key == "SCRIPTS":
