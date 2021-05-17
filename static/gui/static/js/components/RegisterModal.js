@@ -7,6 +7,7 @@ export default class RegisterModal extends React.Component {
         // super();
         super(props);
         this.state = {
+            // showModal: false,
             email : "",
             email_confirmation : "",
             password : "",
@@ -17,6 +18,7 @@ export default class RegisterModal extends React.Component {
         // this.register = this.register.bind(this);
         this.handleRegister = this.handleRegister.bind(this);
         this.handleChange = this.handleChange.bind(this);
+        this.handleCloseModal = this.handleCloseModal.bind(this);
     }
 
     handleChange(event) {
@@ -25,6 +27,10 @@ export default class RegisterModal extends React.Component {
             [event.target.name] : event.target.value
         })
     }
+
+    // handleCloseModal () {
+    // 	$('#registerForm').modal("hide")
+  	// }
 
     handleRegister(event) {
         console.log("handle register");
@@ -45,6 +51,7 @@ export default class RegisterModal extends React.Component {
                 { withCredentials : true}
             ).then((response) => {
                     console.log("registration res", response);
+                    // this.handleCloseModal();
                 })
                 .catch((error) => {
                     console.log("fail");
@@ -98,7 +105,7 @@ export default class RegisterModal extends React.Component {
 
                     <div className="modal-footer">
                         {/* <button type="button" className="btn btn-secondary" data-dismiss="modal">Close</button> */}
-                        <button type="submit" className="btn btn-primary">Sign Up</button>
+                        <button type="submit" className="btn btn-primary" data-dismiss="modal">Sign Up</button>
                     </div>
 
                     {/* <label style={{ color: 'red' }}> {this.props.errorLabel} </label> */}
