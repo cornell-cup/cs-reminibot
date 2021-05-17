@@ -18,7 +18,7 @@ export default class RegisterModal extends React.Component {
         // this.register = this.register.bind(this);
         this.handleRegister = this.handleRegister.bind(this);
         this.handleChange = this.handleChange.bind(this);
-        this.handleCloseModal = this.handleCloseModal.bind(this);
+        // this.handleCloseModal = this.handleCloseModal.bind(this);
     }
 
     handleChange(event) {
