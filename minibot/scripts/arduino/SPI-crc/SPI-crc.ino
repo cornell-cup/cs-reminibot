@@ -22,6 +22,7 @@ volatile byte updated;
 volatile byte c;
 int interruptPin = 10;
 
+volatile int lightValue = 0;
 
 void setup() {
   // put your setup code here, to run once:
@@ -63,6 +64,7 @@ ISR (SPI_STC_vect) {
 }
 
 void loop() {
+  // Check messages
   if (process) {
     if (checkBuffer() && !spiRead) {
       useBuffer();
@@ -80,12 +82,12 @@ bool checkBuffer(){
 }
 
 void useBuffer() {
-  // print the message you just got
-  Serial.print("Received message: ");
-  for (int i = START_SEQ_SIZE + 2; i < limit - END_SEQ_SIZE; i++) {
-    Serial.print(buf[i]);
-  }
-  Serial.print("\n");
+  // print the message you just got, but can decrease reliability
+//  Serial.print("Received message: ");
+//  for (int i = START_SEQ_SIZE + 2; i < limit - END_SEQ_SIZE; i++) {
+//    Serial.print(buf[i]);
+//  }
+//  Serial.print("\n");
 
   // Respond to message
   if (buf[4]=='L' && buf[5]=='O' && buf[6]=='A' && buf[7]=='D') {
@@ -95,13 +97,25 @@ void useBuffer() {
         dataBuf[0] = 'C'; dataBuf[1] = 'C';
         dataBuf[20] = 'R'; dataBuf[21] = 'T';
 
+
+        if (buf[8] == 4) {
+          // light sensor
+          lightValue = analogRead(A0);
+          dataBuf[4] = (lightValue >> 24) & 0xFF;
+          dataBuf[5] = (lightValue >> 16) & 0xFF;
+          dataBuf[6] = (lightValue  >> 8)  & 0xFF;
+          dataBuf[7] = lightValue & 0xFF;
+          Serial.print("Light value is: ");
+          Serial.println(lightValue);
+        }
+        
+        
         // Add checksum
         int hash = encode(dataBuf+4, 22-6);
         dataBuf[3] = (byte)(hash & 0xFF);
         dataBuf[2] = (byte)((hash>>8) & 0xFF);
 
-        // Add dummy data that depends on the ID asked for
-        dataBuf[4] = 5 * buf[8]; 
+        
         
         spiRead = true;
         SPDR = dataBuf[0];
