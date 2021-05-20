@@ -144,9 +144,9 @@ class Platform extends React.Component {
             />
           </TabPanel>
           <TabPanel>
-            <Dashboard>
-
-            </Dashboard>
+            <Dashboard
+              loginEmail={this.state.loginEmail}
+            />
           </TabPanel>
             <TabPanel>
             <History 

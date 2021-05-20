@@ -4,11 +4,18 @@ import { render } from 'react-dom';
 import BarChartComponent from './barchart';
 import LineChartComponent from './linechart';
 import PieChartComponent from './piechart';
+import { BarChart } from 'recharts';
+import MonthtlyResultBarChart from './monthlyResultsBarChart'
 
 
 export default class Dashboard extends React.Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
+
+        const _this = this
+        this.state = {
+            loginEmail: _this.props.loginEmail
+        }
     }
 
     render() {
@@ -82,14 +89,14 @@ export default class Dashboard extends React.Component {
                         <div className="card shadow mb-4">
 
                             <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                <h6 className="m-0 text-danger font-weight-bold text-primary">Errors Overview </h6>
+                                <h6 className="m-0 text-danger font-weight-bold text-primary">Monthtly Error Statistics </h6>
 
                             </div>
 
                             <div className="card-body">
                                 <div className="chart-area">
                                     <canvas id="myAreaChart"></canvas>
-                                    <BarChartComponent></BarChartComponent>
+                                    <MonthtlyResultBarChart loginEmail = {this.state.loginEmail}/>
                                 </div>
                             </div>
                         </div>
