@@ -9,31 +9,43 @@ export default class History extends React.Component {
         this.getUser = this.getUser.bind(this);
     }
 
+    componentDidMount() {
+        this.getUser(); 
+    }
+
     getUser(event) {
-        document.getElementById("sub").style.color="#000000"
+        document.getElementById("sub").style.color="#FFFFFF"
         if(this.props.loginEmail !=""){
             axios.get('/user?email=' + this.props.loginEmail).then(function (response) {
                 console.log(response.data); 
-                document.getElementById("sub").value = JSON.stringify(response.data["submissions"]); 
+                var subs = response.data["submissions"]; 
+                var len = Object.keys(subs).length; 
+                var s = ""; 
+                for(var i = 0; i<len; i++){
+                    s = s+ "Time: " + subs[i]["time"] + "\n"; 
+                    s = s + "Duration: " + subs[i]["duration"] + "\n"; 
+                    s = s + "Code: " + subs[i]["code"] + "\n"; 
+                    s = s + "Result: " + subs[i]["result"] + "\n\n"; 
+                }
+                document.getElementById("sub").value = s; 
                 return response.data; 
+
             }).catch(function (error) {
                 document.getElementById("sub").value = "Error was encountered."; 
             })
         }
         else{
-            document.getElementById("sub").value = "No user logged in"; 
+            document.getElementById("sub").value = "Please log in before viewing submission history."; 
         }
     }
 
     render() {
         return(
             <div>
-                <Button id="print-state" name="View User History" onClick={this.getUser}/>
-                <br></br>
-                <textarea id="sub"
+                <p className="small-title"> Code Submission History </p>
+                <textarea readOnly="true" id="sub"
                 placeholder="User info"
-                rows="40"
-                cols="100"/>
+                cols="100" rows="15" style={{backgroundColor: "#212529"}}>{this.props.text}</textarea>
             </div>
         );
         

@@ -417,7 +417,7 @@ class BaseStation:
     def save_submission(self, code: str, email: str) -> Submission:
         submission = Submission(
             code=code,
-            time=time.strftime("%H:%M:%S", time.localtime()),
+            time=time.strftime("%Y/%b/%d %H:%M:%S", time.localtime()),
             duration=-1,
             user_id=self.get_user(email).id
         )
@@ -426,9 +426,16 @@ class BaseStation:
         return submission
 
     def update_result(self, result: str, submission_id: int):
+        if submission_id is None:
+            return
         print("UPDATE RESULT!!!")
         print(result)
         submission = Submission.query.filter_by(id=submission_id).first()
         submission.result = result
         db.session.commit()
+
+    def get_all_submissions(self, user: User) -> []:
+        submissions = []
+        submissions = Submission.query.filter_by(user_id=User.id)
+        return submissions
     

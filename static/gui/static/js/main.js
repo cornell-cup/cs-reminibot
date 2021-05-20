@@ -1,6 +1,6 @@
 /* ES6 */
 
-import React from 'react';
+import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 
 import GridView from './components/gridview.js';
@@ -9,6 +9,7 @@ import AddBot from './components/AddBot.js';
 import Dashboard from './components/dashboard.js';
 import History from './components/submissionHistory';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+
 
 /**
  * Component for the Navbar on top
@@ -64,7 +65,9 @@ class Platform extends React.Component {
   }
 
   changeLoginEmail(newEmail){
+    this.loginEmail = newEmail; 
     this.setState({loginEmail: newEmail});
+    console.log(this); 
   }
 
   setBlockly(xmltext) {
@@ -141,19 +144,18 @@ class Platform extends React.Component {
             />
           </TabPanel>
           <TabPanel>
-            <Dashboard>
-
-            </Dashboard>
-          </TabPanel>
-          <TabPanel>
-            <History 
+            <Dashboard
               loginEmail={this.state.loginEmail}
             />
+          </TabPanel>
+            <TabPanel>
+            <History 
+              loginEmail={this.state.loginEmail}/>
           </TabPanel>
         </Tabs>
       </div>
     );
-  }
+    }
 }
 
 class ClientGUI extends React.Component {

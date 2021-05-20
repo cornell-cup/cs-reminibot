@@ -9,6 +9,7 @@ import os.path
 import json
 import sys
 import time
+import datetime
 
 # Minibot imports.
 from basestation.base_station import BaseStation
@@ -232,3 +233,31 @@ def create_submission():
         return json.dumps(submission.serialize()), status.HTTP_200_OK
     else:
         return json.dumps("Submission failed"), 400
+
+@app.route('/analytics', methods=['GET'])
+def analytics():
+    email = request.args.get('email')
+    user = base_station.get_user(email)
+    if user is not None:
+        submissions = base_station.get_all_submissions(user)
+        
+        successful_executions_per_month = {"January":0, "February":0, "March":0, "April":0, "May":0, "June":0, "July":0, "August":0, "September":0, "October":0, "November":0, "December":0}
+        errors_per_month = {"January":0, "February":0, "March":0, "April":0, "May":0, "June":0, "July":0, "August":0, "September":0, "October":0, "November":0, "December":0}
+
+        monthly_statistics = [successful_executions_per_month, errors_per_month]
+        
+        for submission in submissions:
+            month = datetime.datetime.strptime(submission.time, "%Y/%b/%d %H:%M:%S").month
+            year = datetime.datetime.strptime(submission.time, "%Y/%b/%d %H:%M:%S").year
+            month_str = datetime.datetime.strptime(str(month), "%m").strftime("%B")
+
+            if year == time.localtime().tm_year:
+                if submission.result != "Successful execution":
+                    errors_per_month[month_str] += 1
+                else:
+                    successful_executions_per_month[month_str] += 1
+
+        return json.dumps(monthly_statistics), status.HTTP_200_OK
+
+    else:
+        return json.dumps("Failed, not logged in"), 400
