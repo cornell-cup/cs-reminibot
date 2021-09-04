@@ -359,11 +359,21 @@ table {
 }
 
 #speech_recognition_feedback_box {
-  background-color: #ffb2b2;
+  background-color: #aaa;
+  width: 90%;
+  height: 140px;
+  /* padding: 10px; */
+  border-radius: 5px;
+  text-align: center;
+  /* background-color: #ffb2b2;
   border-style: solid;
-  border-width: 0.5px;
-  padding: 20px;
-  width: 320px;
+  border-width: 0.5px; */
+  padding: 10px;
+  /* width: 320px; */
+}
+
+#speech-button {
+  margin-bottom: 10px;
 }
 
 #botName {
@@ -372,6 +382,7 @@ table {
 }
 
 .control-option {
+  box-sizing: border-box;
   width: 100%;
   /* background-color: #2c3137; */
   border-radius: 15px;
@@ -381,7 +392,7 @@ table {
 }
 
 #movement-control {
-  padding: 10px 15px;
+  padding: 10px 20px;
   background-color: #2c3137;
 }
 

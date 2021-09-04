@@ -3,7 +3,7 @@ import axios from 'axios';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle, faMicrophone, faCaretDown, faCaretLeft, faCaretRight, faCaretUp, faStop } from '@fortawesome/free-solid-svg-icons';
-library.add(faInfoCircle, faMicrophone, faCaretDown, faCaretLeft, faCaretRight, faCaretUp, faStop );
+library.add(faInfoCircle, faMicrophone, faCaretDown, faCaretLeft, faCaretRight, faCaretUp, faStop);
 
 // SPEECH RECOGNITION
 class SpeechRecognition extends React.Component {
@@ -139,22 +139,24 @@ class SpeechRecognition extends React.Component {
     }
 
     render() {
-        let x = (this.state.on) ?
-            "Stop Speech Recognition" : "Start Speech Recognition";
         return (
-            <div>
-                <button className="btn btn-danger element-wrapper btn-speech"
-                    onClick={this.toggle}>
-                    <div className="row">
-                      <span className="col-md-1 align-self-center"><FontAwesomeIcon icon='microphone'/></span>
-                      <span className="col-md align-self-center">{x}</span>
-                    </div>
-                </button>
-            </div>
+            <React.Fragment>
+                <div id="speech-button" className="row">
+                    <button className="btn btn-danger element-wrapper btn-speech"
+                        onClick={this.toggle}>
+                        <div className="row">
+                            <span className="col-md-1 align-self-center"><FontAwesomeIcon icon='microphone' /></span>
+                            <span className="col-md align-self-center">{(this.state.on) ? "Stop Speech Recognition" : "Start Speech Recognition"}</span>
+                        </div>
+                    </button>
+                </div>
+                <div className="row">
+                    <div id="speech_recognition_feedback_box" />
+                </div>
+            </React.Fragment>
         );
     }
 }
-
 
 export default class MovementControls extends React.Component {
 
@@ -170,7 +172,7 @@ export default class MovementControls extends React.Component {
         // this.motorPorts = this.motorPorts.bind(this);
     }
 
-        /*listener for direction buttons*/
+    /*listener for direction buttons*/
     buttonMapListener(value) {
         const _this = this;
         axios({
@@ -204,7 +206,7 @@ export default class MovementControls extends React.Component {
             // prevent spacebar from jumping to the end of the page
             event.preventDefault()
             this.buttonMapListener("stop");
-        // If user presses an arrow key, make the Minibot move in that direction
+            // If user presses an arrow key, make the Minibot move in that direction
         } else if (event.keyCode >= leftArrow && event.keyCode <= downArrow) {
             // prevent arrow key from causing the page to scroll
             event.preventDefault()
@@ -220,40 +222,37 @@ export default class MovementControls extends React.Component {
         const _this = this;
         return (
             <div className="control-option" id="movement-control">
-                {/* <h3 className="small-title"> Setup the Bot <span className="info-icon"><FontAwesomeIcon icon='info-circle' /></span></h3> */}
-            <div className="row">
-                <div className="col-md button-movement">
-                    <div className="row align-items-start justify-content-center">
-                        <button className="btn btn-secondary movement vertical-btn" onClick={() => this.buttonMapListener("forward")}>
-                            <FontAwesomeIcon icon="caret-up"/>
-                        </button>
-                    </div>
-                    <div className="row align-items-center justify-content-center">
-                        <button className="btn btn-secondary movement side-btn" onClick={() => this.buttonMapListener("left")}>
-                            <FontAwesomeIcon icon="caret-left"/>
-                        </button>
-                        <button className="btn btn-danger btn-stop" id="stop" onClick={() => this.buttonMapListener("stop")}>
-                            <FontAwesomeIcon icon="stop"/>
-                        </button>
-                        <button className="btn btn-secondary movement side-btn" onClick={() => this.buttonMapListener("right")}>
-                            <FontAwesomeIcon icon="caret-right"/>
-                        </button>
-                    </div>
-                    <div className="row align-items-end justify-content-center">
-                        <button className="btn btn-secondary movement vertical-btn" onClick={() => this.buttonMapListener("backward")}>
-                            <FontAwesomeIcon icon="caret-down"/>
-                        </button>
-                    </div>
-                    <div>
-                            <label className="white-label"> Power:</label>
+                <div className="row">
+                    <div className="col-md button-movement">
+                        <div className="row align-items-start justify-content-center">
+                            <button className="btn btn-secondary movement vertical-btn" onClick={() => this.buttonMapListener("forward")}>
+                                <FontAwesomeIcon icon="caret-up" />
+                            </button>
                         </div>
+                        <div className="row align-items-center justify-content-center">
+                            <button className="btn btn-secondary movement side-btn" onClick={() => this.buttonMapListener("left")}>
+                                <FontAwesomeIcon icon="caret-left" />
+                            </button>
+                            <button className="btn btn-danger btn-stop" id="stop" onClick={() => this.buttonMapListener("stop")}>
+                                <FontAwesomeIcon icon="stop" />
+                            </button>
+                            <button className="btn btn-secondary movement side-btn" onClick={() => this.buttonMapListener("right")}>
+                                <FontAwesomeIcon icon="caret-right" />
+                            </button>
+                        </div>
+                        <div className="row align-items-end justify-content-center">
+                            <button className="btn btn-secondary movement vertical-btn" onClick={() => this.buttonMapListener("backward")}>
+                                <FontAwesomeIcon icon="caret-down" />
+                            </button>
+                        </div>
+                        <label className="white-label" style={{ display: 'block' }}> Power:</label>
                         <input id="custom-range-1" className="custom-range" name="wheel_power" type="range" min="0" max="100"
                             step="5" onChange={evt => this.updatePowerValue(evt)} />
+                    </div>
+                    <div className="col-md align-self-center">
+                        <SpeechRecognition selectedBotName={this.props.selectedBotName} />
+                    </div>
                 </div>
-                <div className="col-md align-self-center">
-                    <SpeechRecognition selectedBotName={this.props.selectedBotName}/>
-                </div>
-            </div>
             </div>
         );
     }
