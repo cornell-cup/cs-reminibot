@@ -40,34 +40,34 @@ import RegisterModal from './components/RegisterModal.js';
  * This switches pages and renders login info
  */
 class Navbar extends React.Component {
-//   constructor(props) {
-//     super(props);
-//     this.state = {
-//         isLoggedIn: false,
-//         loginEmail: "",
-//     }
-// }
+  //   constructor(props) {
+  //     super(props);
+  //     this.state = {
+  //         isLoggedIn: false,
+  //         loginEmail: "",
+  //     }
+  // }
   render() {
     return (
       <div id="top-nav" className="mb-4">
         <nav className="navbar navbar-dark bg-dark">
           <div className="container d-flex flex-row">
-          <span className="navbar-brand" href="#">
-            <img src="./static/img/logo.png" width="50" height="50" className="d-inline-block align-top" alt="" />
-            Minibot
-          </span>
-          <span className="pages nav nav-pills" id="fakeTabs" role="tablist">
-              <a id="setup-control-link" data-toggle="tab" href="#setup_control_tab" role="tab"><FontAwesomeIcon icon="cogs"/> Setup/Movement</a>
-              <a id="coding-link" data-toggle="tab" href="#coding-tab" role="tab"><FontAwesomeIcon icon="code"/> Coding</a>
-          </span>
-          <span className="login">
-            <button type="button" data-toggle="modal" data-target="#loginModal">Login</button> 
-            <button type="button" data-toggle="modal" data-target="#registerModal">Signup</button>
-            {/* {!this.state.isLoggedIn ? <button type="button" data-toggle="modal" data-target="#loginModal">Login</button> : null}
+            <span className="navbar-brand" href="#">
+              <img src="./static/img/logo.png" width="50" height="50" className="d-inline-block align-top" alt="" />
+              Minibot
+            </span>
+            <span className="pages nav nav-pills" id="fakeTabs" role="tablist">
+              <a id="setup-control-link" data-toggle="tab" href="#setup_control_tab" role="tab"><FontAwesomeIcon icon="cogs" /> Setup/Movement</a>
+              <a id="coding-link" data-toggle="tab" href="#coding-tab" role="tab"><FontAwesomeIcon icon="code" /> Coding</a>
+            </span>
+            <span className="login">
+              <button type="button" data-toggle="modal" data-target="#loginModal">Login</button>
+              <button type="button" data-toggle="modal" data-target="#registerModal">Signup</button>
+              {/* {!this.state.isLoggedIn ? <button type="button" data-toggle="modal" data-target="#loginModal">Login</button> : null}
             {!this.state.isLoggedIn ? <button type="button" data-toggle="modal" data-target="#registerModal">Signup</button> : null} */}
-            {/* {this.state.isLoggedIn ? <label className="white-label"> Logged in as: {this.state.loginEmail} &nbsp; </label> : null}
+              {/* {this.state.isLoggedIn ? <label className="white-label"> Logged in as: {this.state.loginEmail} &nbsp; </label> : null}
             {this.state.isLoggedIn ? <Button id="logout" name="Logout" onClick={this.logout}/> : null} */}
-          </span>
+            </span>
           </div>
         </nav>
         <LoginModal />
@@ -123,7 +123,7 @@ class Platform extends React.Component {
    * to understand the different values the code state can take.  
    */
   setPythonCode(code, state) {
-    this.setState({ 
+    this.setState({
       pythonCode: code,
       pythonCodeState: state,
     });
@@ -151,64 +151,64 @@ class Platform extends React.Component {
     return (
       <div id="platform">
         {/* <Tabs> */}
-          {/* keeping this here so the tab mechanism is known */}
-          {/* <TabList>
+        {/* keeping this here so the tab mechanism is known */}
+        {/* <TabList>
             <Tab>Setup/Control</Tab>
             <Tab>Coding</Tab> */}
-            {/* <Tab>Analytics</Tab> */}
-          {/* </TabList> */}
-          <div className="tab-content">
+        {/* <Tab>Analytics</Tab> */}
+        {/* </TabList> */}
+        <div className="tab-content">
           {/* <TabPanel> */}
-            {/* // Set tabindex to -1 so that this div is in focus to caputure 
+          {/* // Set tabindex to -1 so that this div is in focus to caputure 
             // the keyboard event handler for arrow key movement */}
-            <div id="setup_control_tab" tabIndex="-1" className="tab-pane active" role="tabpanel">
-              <div className="row">
-                <div className="col-md">
-                  <AddBot
-                    selectedBotName={this.state.selectedBotName}
-                    setSelectedBotName={this.setSelectedBotName}
-                    selectedBotStyle={this.state.selectedBotStyle}
-                    setSelectedBotStyle={this.setSelectedBotStyle}
-                  />
-                  <div className="row">
+          <div id="setup_control_tab" tabIndex="-1" className="tab-pane active" role="tabpanel">
+            <div className="row">
+              <div className="col-md">
+                <AddBot
+                  selectedBotName={this.state.selectedBotName}
+                  setSelectedBotName={this.setSelectedBotName}
+                  selectedBotStyle={this.state.selectedBotStyle}
+                  setSelectedBotStyle={this.setSelectedBotStyle}
+                />
+                {/* <div className="row">
                     <div className="col-6">
 
                     </div>
                     <div className="col-6">
                       <button className="btn btn-secondary">Finish Bot Setup</button>
                     </div>
-                  </div>
+                  </div> */}
+              </div>
+              <div className="col-md">
+                <div className="row">
+                  <GridView />
                 </div>
-                <div className="col-md">
-                  <div className="row">
-                    <GridView />
-                  </div>
-                  {/* movement controls */}
-                  <div className="row">
-                    <MovementControls 
-                      selectedBotName={this.state.selectedBotName}
-                      setSelectedBotName={this.setSelectedBotName}
-                      selectedBotStyle={this.state.selectedBotStyle}
-                      setSelectedBotStyle={this.setSelectedBotStyle}
-                    />
-                  </div>
+                {/* movement controls */}
+                <div className="row">
+                  <MovementControls
+                    selectedBotName={this.state.selectedBotName}
+                    setSelectedBotName={this.setSelectedBotName}
+                    selectedBotStyle={this.state.selectedBotStyle}
+                    setSelectedBotStyle={this.setSelectedBotStyle}
+                  />
                 </div>
               </div>
             </div>
+          </div>
           {/* </TabPanel> */}
           {/* <TabPanel> */}
-            <div id="coding-tab" className="tab-pane" role="tabpanel">
-              <Blockly
-                blocklyXml={this.state.blocklyXml}
-                setBlockly={this.setBlockly}
-                pythonCode={this.state.pythonCode}
-                pythonCodeState={this.state.pythonCodeState}
-                setPythonCode={this.setPythonCode}
-                selectedBotName={this.state.selectedBotName}
-                customBlockList={this.state.customBlockList}
-                redefineCustomBlockList={this.redefineCustomBlockList}
-              />
-            </div>
+          <div id="coding-tab" className="tab-pane" role="tabpanel">
+            <Blockly
+              blocklyXml={this.state.blocklyXml}
+              setBlockly={this.setBlockly}
+              pythonCode={this.state.pythonCode}
+              pythonCodeState={this.state.pythonCodeState}
+              setPythonCode={this.setPythonCode}
+              selectedBotName={this.state.selectedBotName}
+              customBlockList={this.state.customBlockList}
+              redefineCustomBlockList={this.redefineCustomBlockList}
+            />
+          </div>
           {/* </TabPanel> */}
           {/* <TabPanel> */}
           {/* hiding this page for now */}
@@ -218,7 +218,7 @@ class Platform extends React.Component {
             </Dashboard>
             </div> */}
           {/* </TabPanel> */}
-          </div>
+        </div>
         {/* </Tabs> */}
       </div>
     );
@@ -229,10 +229,10 @@ class ClientGUI extends React.Component {
   render() {
     return (
       <div className="main-body">
-          <Navbar />
-          <div className="container">
-            <Platform />
-          </div>
+        <Navbar />
+        <div className="container">
+          <Platform />
+        </div>
       </div>
     );
   }

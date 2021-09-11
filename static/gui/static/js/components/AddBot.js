@@ -146,62 +146,32 @@ class BotSearch extends React.Component {
         this.setState({ state: this.state })
     }
 
-    // render() {
-    //     const _this = this;
-    //     if (_this.state.availableBots.length === 0) {
-    //         _this.state.currentBot = "";
-    //         return <select className="available-bots custom-select custom-select-sm" onClick={this.discoverBots}>
-    //             <option>-------Available Bots--------</option>
-    //         </select>
-    //     }
-    //     if (_this.state.currentBot === "") {
-    //         _this.state.currentBot = _this.state.availableBots[0]
-    //     }
-
-    //     return (
-    //         <select
-    //             className="available-bots"
-    //             onChange={(e) => this.updateCurrentBot(e)}
-    //             onClick={this.discoverBots}
-    //         >
-    //             {_this.state.availableBots.map(
-    //                 (name, idx) => <option key={idx}> {name} </option>)}
-    //         </select>
-    //     );
-    // }
-
     render() {
         const _this = this;
-        if (_this.state.availableBots.length === 0) {
-            _this.state.currentBot = "";
-            return <select className="available-bots custom-select custom-select-sm" onClick={this.discoverBots}>
-                <option>-------Available Bots--------</option>
-            </select>
-        }
         if (_this.state.currentBot === "") {
             _this.state.currentBot = _this.state.availableBots[0]
         }
         return (
             <div>
-            <div className="row">
-                <div className="col d-flex">
-                    <h3 className="small-title"> Setup the Bot <span className="info-icon"><FontAwesomeIcon icon='info-circle' /></span></h3>
-                    <button className="btn btn-secondary ml-auto" onClick={this.discoverBots}>Search for bots</button>
+                <div className="row">
+                    <div className="col d-flex">
+                        <h3 className="small-title"> Setup the Bot <span className="info-icon"><FontAwesomeIcon icon='info-circle' /></span></h3>
+                        <button className="btn btn-secondary ml-auto" onClick={this.discoverBots()}>Search for bots</button>
+                    </div>
                 </div>
-            </div>
-            <div className="form-group row">
-                <label className="col-sm-4 col-form-label">Select Bot:</label>
-                <div className="col-sm-8">
-                    {_this.state.availableBots.length === 0 ?
-                        <select className="available-bots custom-select custom-select-sm">
-                            <option>-------Available Bots--------</option>
-                        </select> : ""}
-                    {_this.state.currentBot === "" ?
-                        _this.state.currentBot = _this.state.availableBots[0]
-                        : ""
-                    }
+                <div className="form-group row">
+                    <label className="col-sm-4 col-form-label">Select Bot:</label>
+                    <div className="col-sm-8">
+                        <select className="available-bots custom-select custom-select-sm" onChange={(e) => this.updateCurrentBot(e)}>
+                            {
+                                _this.state.availableBots.length === 0 ?
+                                    <option>-------Available Bots--------</option>
+                                    :
+                                    _this.state.availableBots.map((name, idx) => <option key={idx}> {name} </option>)
+                            }
+                        </select>
+                    </div>
                 </div>
-            </div>
             </div>
         )
     }
@@ -237,7 +207,7 @@ function Ports(props) {
         "Infrared", "RFID", "Ultrasonic"
     ]
 
-    console.assert(connectionNames.length == connectionLabels.length);
+    console.assert(connectionNames.length === connectionLabels.length);
 
     let optionList = [];
 
@@ -291,7 +261,6 @@ function PortsList(props) {
     //     </nav>
     // );
 }
-
 
 class SpeechRecognition extends React.Component {
     /** Implements the SpeechRecognition Toggle button */
@@ -565,7 +534,7 @@ export default class AddBot extends React.Component {
             // prevent spacebar from jumping to the end of the page
             event.preventDefault()
             this.buttonMapListener("stop");
-        // If user presses an arrow key, make the Minibot move in that direction
+            // If user presses an arrow key, make the Minibot move in that direction
         } else if (event.keyCode >= leftArrow && event.keyCode <= downArrow) {
             // prevent arrow key from causing the page to scroll
             event.preventDefault()
@@ -656,11 +625,11 @@ export default class AddBot extends React.Component {
                 window.alert(error.response.data.error_msg);
             else
                 console.log(error);
-                //handle errors
+            //handle errors
         });
     }
 
-    modeOnChange(value) { 
+    modeOnChange(value) {
         if (value == "obj-detection") {
             this.objectDetectionOnClick();
             // console.log("obj");
@@ -674,16 +643,19 @@ export default class AddBot extends React.Component {
 
     }
 
+    finishBotSetup(event) {
+        // TODO: run all commands for bot setup here
+    }
 
     render() {
         const _this = this;
         return (
             <div id="bot-setup-area">
-            {/* // Set tabindex to -1 so that this div is in focus to caputure 
+                {/* // Set tabindex to -1 so that this div is in focus to caputure 
             // the keyboard event handler for arrow key movement
             // <div id="setup_control_tab" tabIndex="-1" className="container-fluid control"> */}
                 <div id="bot-setup" className="control-option">
-                    <div className="row">
+                    {/* <div className="row">
                         <div className="col d-flex">
                             <h3 className="small-title"> Setup the Bot <span className="info-icon"><FontAwesomeIcon icon='info-circle' /></span></h3>
                             <button className="btn btn-secondary ml-auto">Search for bots</button>
@@ -694,7 +666,8 @@ export default class AddBot extends React.Component {
                         <div className="col-sm-8">
                             <RefreshingList ref={this.refreshingBotListRef} />
                         </div>
-                    </div>
+                    </div> */}
+                    <BotSearch ref={this.refreshingBotListRef} />
                     <div className="form-group row">
                         <label className="col-sm-4 col-form-label">Select Mode:</label>
                         <div className="col-sm-8">
@@ -798,7 +771,14 @@ export default class AddBot extends React.Component {
                         </div>
                     </div>
                 </div> */}
-            {/* </div > */}
+                {/* </div > */}
+                <div className="control-option">
+                    <div className="row">
+                        <div className="col d-flex justify-content-end">
+                            <button className="btn btn-secondary" onClick={this.addBotListener}>Finish Bot Setup</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }
