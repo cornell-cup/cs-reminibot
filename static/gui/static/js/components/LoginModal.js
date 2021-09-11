@@ -57,6 +57,7 @@ export default class LoginModal extends React.Component {
     handleLogin(event) {
         console.log("handle Login");
         const _this = this;
+        console.log(document.getElementById("loginForm"));
         let formData = new FormData(document.getElementById("loginForm"));
         event.preventDefault();
         // let temp = _this.props.customBlockList;
@@ -91,6 +92,7 @@ export default class LoginModal extends React.Component {
                 loginSuccessLabel: "",
                 loginErrorLabel: error.response.data.error_msg
             });
+            // alert(this.loginErrorLabel);
             console.log(error);
         });
     }
@@ -153,7 +155,7 @@ export default class LoginModal extends React.Component {
                                 </div>
                             </div>
                             <div className="modal-footer">
-                                <button type="submit" className="btn btn-primary" data-dismiss="modal" onClick={this.handleLogin()} >Login</button>
+                                <button type="submit" value="submit" className="btn btn-primary" data-dismiss="modal" onClick={this.handleLogin}>Login</button>
                             </div>
                         </form>
                     </div>
