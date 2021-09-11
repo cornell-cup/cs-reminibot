@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 library.add(faInfoCircle);
 import { Button } from './Util.js'
+import SetupBoxModal from './SetupBoxModal.js';
 
 /*
  *  A RefreshingList is a list designed to refresh when its update()
@@ -155,7 +156,11 @@ class BotSearch extends React.Component {
             <div>
                 <div className="row">
                     <div className="col d-flex">
-                        <h3 className="small-title"> Setup the Bot <span className="info-icon"><FontAwesomeIcon icon='info-circle' /></span></h3>
+                        <h3 className="small-title"> Setup the Bot 
+                            <button className="info-box" type="button" data-toggle="modal" data-target="#SetupBox">
+                                <FontAwesomeIcon icon='info-circle' />
+                            </button>
+                        </h3>
                         <button className="btn btn-secondary ml-auto" onClick={this.discoverBots()}>Search for bots</button>
                     </div>
                 </div>
@@ -172,6 +177,7 @@ class BotSearch extends React.Component {
                         </select>
                     </div>
                 </div>
+                <SetupBoxModal />
             </div>
         )
     }
