@@ -3,6 +3,7 @@ import axios from 'axios';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
+import VisionBox from './VisionBoxModal.js';
 library.add(faInfoCircle);
 import { Button } from './Util.js'
 
@@ -203,14 +204,19 @@ export default class GridView extends React.Component {
             <div className="control-option">
                 {/* <div id="component_view" className="box"> */}
                 <div className="mb-3 d-flex">
-                    <h3 className="small-title"> Vision <span className="info-icon"><FontAwesomeIcon icon='info-circle' /></span></h3>
+                    <h3 className="small-title"> Vision 
+                        <button className="info-box" type="button" data-toggle="modal" data-target="#VisionBox">
+                            <FontAwesomeIcon icon='info-circle' />
+                        </button>
+                    </h3>
                     <button onClick={this.displayRobot}
                         name={"Display Bot"}
                         className="btn btn-secondary ml-auto">Display Bot</button>
                 </div>
                 <div id="view" className="mx-auto"></div>
                 {/* </div > */}
-            </div >
+                <VisionBox />
+            </div>
         );
     }
 }
