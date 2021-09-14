@@ -165,7 +165,7 @@ class BotSearch extends React.Component {
                         <select className="available-bots custom-select custom-select-sm" onChange={(e) => this.updateCurrentBot(e)}>
                             {
                                 _this.state.availableBots.length === 0 ?
-                                    <option>-------Available Bots--------</option>
+                                    <option defaultValue>-------Available Bots--------</option>
                                     :
                                     _this.state.availableBots.map((name, idx) => <option key={idx}> {name} </option>)
                             }
@@ -177,24 +177,6 @@ class BotSearch extends React.Component {
     }
 
 }
-
-// function Ports(props) {
-//     const ports = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"];
-//     let buttonList = [];
-
-//     for (let i = 0; i < ports.length; i++) {
-//         buttonList.push(
-//             <li key={i}>
-//                 <button
-//                     className="btn_ports"
-//                     onClick={() => props.motorPorts(props.portName, ports[i])}>
-//                     {ports[i]}
-//                 </button>
-//             </li>
-//         );
-//     }
-//     return (<ul> {buttonList} </ul>);
-// };
 
 function Ports(props) {
 
@@ -420,6 +402,9 @@ export default class AddBot extends React.Component {
             messageType: "",
             messageContent: "", // what is in the message
 
+            // setup stuff?
+            setupMode: "normal",
+            buttonStatus: false,
             isSetupReady: false,
             isSetup: false
         };
@@ -451,6 +436,9 @@ export default class AddBot extends React.Component {
             url: '/active-bots',
         }).then(function (response) {
             _this.state.availableBots = response.data;
+
+            if (response.data.length > 0) _this.state.buttonStatus = false;
+
             // If the Selected Bot (the currently connected bot)
             // is no longer active, remove it from the Selected Bot label (the 
             // currently connected bot label)
@@ -644,7 +632,16 @@ export default class AddBot extends React.Component {
     }
 
     finishBotSetup(event) {
+        // let _this = this;
         // TODO: run all commands for bot setup here
+        this.addBotListener(event);
+        // if (_this.state.setupMode == "obj-detection") {
+        //     _this.objectDetectionOnClick();
+        //     // console.log("obj");
+        // } else if (_this.state.setupMode == "line-follow") {
+        //     _this.lineFollowOnClick();
+        //     // console.log("line");
+        // }
     }
 
     render() {
@@ -671,7 +668,7 @@ export default class AddBot extends React.Component {
                     <div className="form-group row">
                         <label className="col-sm-4 col-form-label">Select Mode:</label>
                         <div className="col-sm-8">
-                            <select className="custom-select custom-select-sm" onChange={(event) => this.modeOnChange(event.target.value)}>
+                            <select className="custom-select custom-select-sm" onChange={(event) => this.state.setupMode = event.target.value}>
                                 <option value="">Normal</option>
                                 <option value="obj-detection">Object Detection</option>
                                 <option value="line-follow">Line Follow</option>
@@ -775,7 +772,7 @@ export default class AddBot extends React.Component {
                 <div className="control-option">
                     <div className="row">
                         <div className="col d-flex justify-content-end">
-                            <button className="btn btn-secondary" onClick={this.addBotListener}>Finish Bot Setup</button>
+                            <button className="btn btn-secondary" disabled={this.state.buttonStatus} onClick={this.finishBotSetup}>Finish Bot Setup</button>
                         </div>
                     </div>
                 </div>

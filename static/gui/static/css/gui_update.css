@@ -220,7 +220,7 @@ table {
 }
 
 .react-tabs__tab--disabled {
-  color: GrayText;
+  color: gray;
   cursor: default;
 }
 
@@ -369,6 +369,7 @@ table {
   border-style: solid;
   border-width: 0.5px; */
   padding: 10px;
+  margin: 0 auto;
   /* width: 320px; */
 }
 
@@ -452,6 +453,10 @@ table {
   transform-origin: 0 100%;
   transform: rotate(45deg);
 } */
+
+.btn-speech {
+  margin: 0 auto;
+}
 
 .btn-speech,
 .btn-stop {

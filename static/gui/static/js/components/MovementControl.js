@@ -39,27 +39,9 @@ class SpeechRecognition extends React.Component {
     /** Turns the button on or off */
     toggle() {
         const _this = this;
+
         // If button was previously off, turn_on should be True.
         let turnOn = !this.state.on;
-
-        // If we are turning the speech recognition service on, 
-        // start polling the backend server for status messages to be 
-        // displayed on the GUI
-        if (turnOn) {
-            this.speechRecognitionInterval = setInterval(
-                this.getSpeechRecognitionData.bind(this), 500
-            );
-        }
-        // If we are turning the speech recognition service off, stop polling
-        // the backend
-        else {
-            clearInterval(this.speechRecognitionInterval);
-            let feedbackBox = document.getElementById(
-                'speech_recognition_feedback_box'
-            );
-            feedbackBox.innerHTML = "";
-            this.queue = [""];
-        }
 
         // Tell the backend server to start / stop the speech recognition service 
         axios({
@@ -75,6 +57,29 @@ class SpeechRecognition extends React.Component {
         }).then(function (response) {
             if (response.data) {
                 console.log("Speech Recognition", response.data);
+
+                // WAS PLACED OUTSIDE BEFORE
+
+                // If we are turning the speech recognition service on, 
+                // start polling the backend server for status messages to be 
+                // displayed on the GUI
+                if (turnOn) {
+                    this.speechRecognitionInterval = setInterval(
+                        this.getSpeechRecognitionData.bind(this), 500
+                    );
+                }
+                // If we are turning the speech recognition service off, stop polling
+                // the backend
+                else {
+                    clearInterval(this.speechRecognitionInterval);
+                    let feedbackBox = document.getElementById(
+                        'speech_recognition_feedback_box'
+                    );
+                    feedbackBox.innerHTML = "";
+                    this.queue = [""];
+                }
+
+                this.setState({ on: turnOn });
             }
         }).catch(function (error) {
             if (error.response.data.error_msg.length > 0)
@@ -83,7 +88,6 @@ class SpeechRecognition extends React.Component {
                 console.log("Speech Recognition", error);
         })
 
-        this.setState({ on: turnOn });
     }
 
     /** Get the messages from the speech recognition service from the
