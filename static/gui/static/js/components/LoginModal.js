@@ -55,7 +55,9 @@ export default class LoginModal extends React.Component {
     }
 
     handleLogin(event) {
+        console.log("handle Login");
         const _this = this;
+        console.log(document.getElementById("loginForm"));
         let formData = new FormData(document.getElementById("loginForm"));
         event.preventDefault();
         // let temp = _this.props.customBlockList;
@@ -90,6 +92,7 @@ export default class LoginModal extends React.Component {
                 loginSuccessLabel: "",
                 loginErrorLabel: error.response.data.error_msg
             });
+            // alert(this.loginErrorLabel);
             console.log(error);
         });
     }
@@ -125,35 +128,38 @@ export default class LoginModal extends React.Component {
     render() {
         return (
             <div className="modal" tabIndex="-1" id="loginModal">
-            <div className="modal-dialog">
-                <div className="modal-content">
-                <div className="modal-header">
-                    <h5 className="modal-title">Login</h5>
-                    <button type="button" className="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div className="modal-body">
-                    <form className="login" id="loginForm" onSubmit={this.handleLogin} method="POST">
-                        {/* <div class="group_label_input"> */}
-                        <div className="form-group">
-                            <label for="email" className="col-form-label">Email:</label>
-                            <input id="email" type="email" name="login_email" className="form-control" required />
+                <div className="modal-dialog">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h5 className="modal-title">Login</h5>
+                            <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                            </button>
                         </div>
-                        {/* </div> */}
+                        <form className="login" id="loginForm" method="POST">
+                            <div className="modal-body">
+                                {/* <div class="group_label_input"> */}
+                                <div className="form-group">
+                                    <label for="email" className="col-form-label">Email:</label>
+                                    <input id="email" type="email" name="login_email" className="form-control" required />
+                                </div>
+                                {/* </div> */}
 
-                        <div className="form-group">
-                            <label for="password" className="col-form-label">Password:</label>
-                            <input id="password" type="password" name="login_password" className="form-control" required />
-                        </div>
-                        <div className="modal-footer">
-                            {/* <button type="button" className="btn btn-secondary" data-dismiss="modal">Close</button> */}
-                            <button type="submit" className="btn btn-primary">Login</button>
-                         </div>
-                    </form>
+                                <div className="form-group">
+                                    <label for="password" className="col-form-label">Password:</label>
+                                    <input id="password" type="password" name="login_password" className="form-control" required />
+                                </div>
+
+                                <div className="w-100 text-center mt-2">
+                                    Don't have an account yet? <a href="#" data-dismiss="modal" data-toggle="modal" data-target="#registerModal">Sign Up Here</a>
+                                </div>
+                            </div>
+                            <div className="modal-footer">
+                                <button type="submit" value="submit" className="btn btn-primary" data-dismiss="modal" onClick={this.handleLogin}>Login</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-                </div>
-            </div>
             </div>
         );
     }
