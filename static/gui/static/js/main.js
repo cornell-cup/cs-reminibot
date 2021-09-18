@@ -8,16 +8,16 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCogs, faCode } from '@fortawesome/free-solid-svg-icons';
 library.add(faCogs, faCode);
 
-import GridView from './components/gridview.js';
+import GridView from './components/BotControl/gridview.js';
 // import Signup from './components/signup.js';
 // import { BrowserRouter as Router, Link} from 'react-router-dom';
-import Blockly from './components/blockly.js';
-import AddBot from './components/AddBot.js';
-import MovementControls from './components/MovementControl.js';
-import Dashboard from './components/dashboard.js';
+import Blockly from './components/BotCode/blockly.js';
+import AddBot from './components/BotControl/AddBot.js';
+import MovementControls from './components/BotControl/MovementControl.js';
+import Dashboard from './components/Analytics/dashboard.js';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
-import LoginModal from './components/LoginModal.js';
-import RegisterModal from './components/RegisterModal.js';
+import LoginModal from './components/Login/LoginModal.js';
+import RegisterModal from './components/Login/RegisterModal.js';
 
 /**
  * Component for the Navbar on top

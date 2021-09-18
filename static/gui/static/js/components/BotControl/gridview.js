@@ -3,9 +3,9 @@ import axios from 'axios';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
-import VisionBox from './VisionBoxModal.js';
+import VisionBox from '../utils/VisionBoxModal.js';
 library.add(faInfoCircle);
-import { Button } from './Util.js'
+import { Button } from '../utils/Util.js'
 
 /**
  * Component for the grid view of the simulated bots.
@@ -204,7 +204,7 @@ export default class GridView extends React.Component {
             <div className="control-option">
                 {/* <div id="component_view" className="box"> */}
                 <div className="mb-3 d-flex">
-                    <h3 className="small-title"> Vision 
+                    <h3 className="small-title"> Vision
                         <button className="info-box" type="button" data-toggle="modal" data-target="#VisionBox">
                             <FontAwesomeIcon icon='info-circle' />
                         </button>

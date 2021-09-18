@@ -4,9 +4,9 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 library.add(faInfoCircle);
-import { Button } from './Util.js'
-import SetupBoxModal from './SetupBoxModal.js';
-import PortBox from './PortBoxModal.js';
+import { Button } from '../utils/Util.js'
+import SetupBoxModal from '../utils/SetupBoxModal.js';
+import PortBox from '../utils/PortBoxModal.js';
 
 /*
  *  A RefreshingList is a list designed to refresh when its update()
@@ -157,7 +157,7 @@ class BotSearch extends React.Component {
             <div>
                 <div className="row">
                     <div className="col d-flex">
-                        <h3 className="small-title"> Setup the Bot 
+                        <h3 className="small-title"> Setup the Bot
                             <button className="info-box" type="button" data-toggle="modal" data-target="#SetupBox">
                                 <FontAwesomeIcon icon='info-circle' />
                             </button>
@@ -716,7 +716,7 @@ export default class AddBot extends React.Component {
                 <div id="port-config" className="control-option">
                     <div className="row">
                         <div className="col">
-                            <h3 className="small-title">Port Configurations 
+                            <h3 className="small-title">Port Configurations
                                 <button className="info-box" type="button" data-toggle="modal" data-target="#PortBox">
                                     <FontAwesomeIcon icon='info-circle' />
                                 </button>
