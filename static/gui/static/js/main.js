@@ -8,12 +8,16 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCogs, faCode } from '@fortawesome/free-solid-svg-icons';
 library.add(faCogs, faCode);
 
+import BotControl from './components/BotControl/BotControl.js';
+
 import GridView from './components/BotControl/gridview.js';
+import AddBot from './components/BotControl/AddBot.js';
+import MovementControls from './components/BotControl/MovementControl.js';
+
+
 // import Signup from './components/signup.js';
 // import { BrowserRouter as Router, Link} from 'react-router-dom';
 import Blockly from './components/BotCode/blockly.js';
-import AddBot from './components/BotControl/AddBot.js';
-import MovementControls from './components/BotControl/MovementControl.js';
 import Dashboard from './components/Analytics/dashboard.js';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import LoginModal from './components/Login/LoginModal.js';
@@ -80,6 +84,10 @@ class Navbar extends React.Component {
 /**
  * Top Level component for the GUI, includes two tabs
  */
+const BLOCKLY_GENERATED = -1 //Code is completely blockly generated, no user changes have been made
+const BLOCKLY_OVERWRITE_PERM = 0
+const NO_BLOCKLY_OVERWRITE_PERM = 1
+
 class Platform extends React.Component {
   constructor(props) {
     super(props);
@@ -158,45 +166,17 @@ class Platform extends React.Component {
         {/* <Tab>Analytics</Tab> */}
         {/* </TabList> */}
         <div className="tab-content">
-          {/* <TabPanel> */}
           {/* // Set tabindex to -1 so that this div is in focus to caputure 
             // the keyboard event handler for arrow key movement */}
           <div id="setup_control_tab" tabIndex="-1" className="tab-pane active" role="tabpanel">
-            <div className="row">
-              <div className="col-md">
-                <AddBot
-                  selectedBotName={this.state.selectedBotName}
-                  setSelectedBotName={this.setSelectedBotName}
-                  selectedBotStyle={this.state.selectedBotStyle}
-                  setSelectedBotStyle={this.setSelectedBotStyle}
-                />
-                {/* <div className="row">
-                    <div className="col-6">
-
-                    </div>
-                    <div className="col-6">
-                      <button className="btn btn-secondary">Finish Bot Setup</button>
-                    </div>
-                  </div> */}
-              </div>
-              <div className="col-md">
-                <div className="row">
-                  <GridView />
-                </div>
-                {/* movement controls */}
-                <div className="row">
-                  <MovementControls
-                    selectedBotName={this.state.selectedBotName}
-                    setSelectedBotName={this.setSelectedBotName}
-                    selectedBotStyle={this.state.selectedBotStyle}
-                    setSelectedBotStyle={this.setSelectedBotStyle}
-                  />
-                </div>
-              </div>
-            </div>
+            <BotControl
+              selectedBotName={this.state.selectedBotName}
+              setSelectedBotName={this.setSelectedBotName}
+              selectedBotStyle={this.state.selectedBotStyle}
+              setSelectedBotStyle={this.setSelectedBotStyle}
+            />
           </div>
-          {/* </TabPanel> */}
-          {/* <TabPanel> */}
+
           <div id="coding-tab" className="tab-pane" role="tabpanel">
             <Blockly
               blocklyXml={this.state.blocklyXml}
@@ -209,8 +189,6 @@ class Platform extends React.Component {
               redefineCustomBlockList={this.redefineCustomBlockList}
             />
           </div>
-          {/* </TabPanel> */}
-          {/* <TabPanel> */}
           {/* hiding this page for now */}
           {/* <div className="tab-pane" role="tabpanel"> 
             <Dashboard>
