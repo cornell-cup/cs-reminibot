@@ -25,7 +25,6 @@ import Dashboard from './components/dashboard.js';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import LoginModal from './components/LoginModal.js';
 import RegisterModal from './components/RegisterModal.js';
-import TestComponent from './components/TestComponent.js';
 
 /**
  * Component for the Navbar on top
@@ -65,10 +64,11 @@ class Navbar extends React.Component {
               Minibot
             </span>
             <span className="pages nav nav-pills" id="fakeTabs" role="tablist">
-              <Router>
-                <Link to="/about"><FontAwesomeIcon icon="cogs" /> Setup/Movement</Link></Router>
-              <a id="setup-control-link" data-toggle="tab" href="#setup_control_tab" role="tab"><FontAwesomeIcon icon="cogs" /> Setup/Movement</a>
-              <a id="coding-link" data-toggle="tab" href="#coding-tab" role="tab"><FontAwesomeIcon icon="code" /> Coding</a>
+              <Link id="setup-control-link" to="/start"><FontAwesomeIcon icon="cogs" /> Setup/Movement</Link>
+              <Link id="coding-link" to="/coding"><FontAwesomeIcon icon="code" /> Coding</Link>
+
+              {/* <a id="setup-control-link" data-toggle="tab" href="#setup_control_tab" role="tab"><FontAwesomeIcon icon="cogs" /> Setup/Movement</a> */}
+              {/* <a id="coding-link" data-toggle="tab" href="#coding-tab" role="tab"><FontAwesomeIcon icon="code" /> Coding</a> */}
             </span>
             <span className="login">
               <button type="button" data-toggle="modal" data-target="#loginModal">Login</button>
@@ -167,28 +167,24 @@ class Platform extends React.Component {
   render() {
     return (
       <div id="platform">
-        {/* <Tabs> */}
-        {/* keeping this here so the tab mechanism is known */}
-        {/* <TabList>
-            <Tab>Setup/Control</Tab>
-            <Tab>Coding</Tab> */}
-        {/* <Tab>Analytics</Tab> */}
-        {/* </TabList> */}
         <div className="tab-content">
-          {/* <TabPanel> */}
-          {/* // Set tabindex to -1 so that this div is in focus to caputure 
+          <Switch>
+
+            {/* // Set tabindex to -1 so that this div is in focus to caputure 
             // the keyboard event handler for arrow key movement */}
-          <div id="setup_control_tab" tabIndex="-1" className="tab-pane active" role="tabpanel">
-            <div className="row">
-              <div className="col-md">
-                <AddBot
-                  email={this.state.email}
-                  selectedBotName={this.state.selectedBotName}
-                  setSelectedBotName={this.setSelectedBotName}
-                  selectedBotStyle={this.state.selectedBotStyle}
-                  setSelectedBotStyle={this.setSelectedBotStyle}
-                />
-                {/* <div className="row">
+            <Route path="/start">
+              <div id="setup_control_tab" tabIndex="-1">
+
+                <div className="row">
+                  <div className="col-md">
+                    <AddBot
+                      email={this.state.email}
+                      selectedBotName={this.state.selectedBotName}
+                      setSelectedBotName={this.setSelectedBotName}
+                      selectedBotStyle={this.state.selectedBotStyle}
+                      setSelectedBotStyle={this.setSelectedBotStyle}
+                    />
+                    {/* <div className="row">
                     <div className="col-6">
 
                     </div>
@@ -196,49 +192,51 @@ class Platform extends React.Component {
                       <button className="btn btn-secondary">Finish Bot Setup</button>
                     </div>
                   </div> */}
-              </div>
-              <div className="col-md">
-                <div className="row">
-                  <GridView />
+                  </div>
+                  <div className="col-md">
+                    <div className="row">
+                      <GridView />
+                    </div>
+                    {/* movement controls */}
+                    <div className="row">
+                      <MovementControls
+                        selectedBotName={this.state.selectedBotName}
+                        setSelectedBotName={this.setSelectedBotName}
+                        selectedBotStyle={this.state.selectedBotStyle}
+                        setSelectedBotStyle={this.setSelectedBotStyle}
+                      />
+                    </div>
+                  </div>
                 </div>
-                {/* movement controls */}
-                <div className="row">
-                  <MovementControls
-                    selectedBotName={this.state.selectedBotName}
-                    setSelectedBotName={this.setSelectedBotName}
-                    selectedBotStyle={this.state.selectedBotStyle}
-                    setSelectedBotStyle={this.setSelectedBotStyle}
-                  />
-                </div>
               </div>
-            </div>
-          </div>
-          {/* </TabPanel> */}
-          {/* <TabPanel> */}
-          <div id="coding-tab" className="tab-pane" role="tabpanel">
-            <Blockly
-              onEmailChange={this.onEmailChange}
-              blocklyXml={this.state.blocklyXml}
-              setBlockly={this.setBlockly}
-              pythonCode={this.state.pythonCode}
-              pythonCodeState={this.state.pythonCodeState}
-              setPythonCode={this.setPythonCode}
-              selectedBotName={this.state.selectedBotName}
-              customBlockList={this.state.customBlockList}
-              redefineCustomBlockList={this.redefineCustomBlockList}
-            />
-          </div>
-          {/* </TabPanel> */}
-          {/* <TabPanel> */}
-          {/* hiding this page for now */}
-          {/* <div className="tab-pane" role="tabpanel"> 
+            </Route>
+
+            {/* </TabPanel> */}
+            {/* <TabPanel> */}
+            <Route path="/coding">
+              <div id="coding-tab">
+
+                <Blockly
+                  onEmailChange={this.onEmailChange}
+                  blocklyXml={this.state.blocklyXml}
+                  setBlockly={this.setBlockly}
+                  pythonCode={this.state.pythonCode}
+                  pythonCodeState={this.state.pythonCodeState}
+                  setPythonCode={this.setPythonCode}
+                  selectedBotName={this.state.selectedBotName}
+                  customBlockList={this.state.customBlockList}
+                  redefineCustomBlockList={this.redefineCustomBlockList}
+                />
+              </div>
+            </Route>
+            {/* hiding this page for now */}
+            {/* <div className="tab-pane" role="tabpanel"> 
             <Dashboard>
 
             </Dashboard>
             </div> */}
-          {/* </TabPanel> */}
+          </Switch>
         </div>
-        {/* </Tabs> */}
       </div>
     );
   }
@@ -256,11 +254,12 @@ class ClientGUI extends React.Component {
   render() {
     return (
       <div className="main-body">
-        <Navbar />
-        <div className="container">
-          <Platform />
-        </div>
-        <TestComponent title="testing" items={itemList} />
+        <Router>
+          <Navbar />
+          <div className="container">
+            <Platform />
+          </div>
+        </Router>
       </div>
     );
   }

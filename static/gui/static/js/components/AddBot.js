@@ -157,7 +157,7 @@ class BotSearch extends React.Component {
             <div>
                 <div className="row">
                     <div className="col d-flex">
-                        <h3 className="small-title"> Setup the Bot 
+                        <h3 className="small-title"> Setup the Bot
                             <button className="info-box" type="button" data-toggle="modal" data-target="#SetupBox">
                                 <FontAwesomeIcon icon='info-circle' />
                             </button>
@@ -427,8 +427,8 @@ export default class AddBot extends React.Component {
 
     componentDidMount() {
         setInterval(this.refreshAvailableBots.bind(this), 500);
-        document.getElementById("setup_control_tab").addEventListener(
-            "keydown", this.handleArrowKeyDown);
+        // document.getElementById("setup_control_tab").addEventListener(
+        //     "keydown", this.handleArrowKeyDown);
     }
 
     /*
@@ -716,7 +716,7 @@ export default class AddBot extends React.Component {
                 <div id="port-config" className="control-option">
                     <div className="row">
                         <div className="col">
-                            <h3 className="small-title">Port Configurations 
+                            <h3 className="small-title">Port Configurations
                                 <button className="info-box" type="button" data-toggle="modal" data-target="#PortBox">
                                     <FontAwesomeIcon icon='info-circle' />
                                 </button>
