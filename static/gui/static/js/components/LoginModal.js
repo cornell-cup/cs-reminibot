@@ -67,6 +67,7 @@ export default class LoginModal extends React.Component {
             data: formData,
             headers: { 'Content-Type': 'multipart/form-data' }
         }).then((response) => {
+            console.log(response);
             // _this.props.redefineCustomBlockList(
             //     JSON.parse(response.data.custom_function));
             // invokes component did update
@@ -93,7 +94,7 @@ export default class LoginModal extends React.Component {
                 loginErrorLabel: error.response.data.error_msg
             });
             // alert(this.loginErrorLabel);
-            console.log(error);
+            console.log(error.response.data);
         });
     }
 
@@ -133,7 +134,7 @@ export default class LoginModal extends React.Component {
                         <div className="modal-header">
                             <h5 className="modal-title">Login</h5>
                             <button type="button" className="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
+                                <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
                         <form className="login" id="loginForm" method="POST">

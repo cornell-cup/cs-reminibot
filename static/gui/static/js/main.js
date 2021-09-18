@@ -8,6 +8,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCogs, faCode } from '@fortawesome/free-solid-svg-icons';
 library.add(faCogs, faCode);
 
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link
+} from "react-router-dom";
+
 import GridView from './components/gridview.js';
 // import Signup from './components/signup.js';
 // import { BrowserRouter as Router, Link} from 'react-router-dom';
@@ -18,6 +25,7 @@ import Dashboard from './components/dashboard.js';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import LoginModal from './components/LoginModal.js';
 import RegisterModal from './components/RegisterModal.js';
+
 
 /**
  * Component for the Navbar on top
@@ -57,6 +65,8 @@ class Navbar extends React.Component {
               Minibot
             </span>
             <span className="pages nav nav-pills" id="fakeTabs" role="tablist">
+              <Router>
+                <Link to="/about"><FontAwesomeIcon icon="cogs" /> Setup/Movement</Link></Router>
               <a id="setup-control-link" data-toggle="tab" href="#setup_control_tab" role="tab"><FontAwesomeIcon icon="cogs" /> Setup/Movement</a>
               <a id="coding-link" data-toggle="tab" href="#coding-tab" role="tab"><FontAwesomeIcon icon="code" /> Coding</a>
             </span>
