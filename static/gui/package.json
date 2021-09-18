@@ -14,7 +14,7 @@
     "babel-loader": "^7.1.2",
     "codemirror": "^5.58.0",
     "jest": "^22.4.3",
-    "react": "^16.0.0",
+    "react": "^17.0.2",
     "react-codemirror": "^1.0.0",
     "react-dom": "^16.0.0",
     "react-tabs": "^2.0.0",
