@@ -25,7 +25,7 @@ import Dashboard from './components/dashboard.js';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import LoginModal from './components/LoginModal.js';
 import RegisterModal from './components/RegisterModal.js';
-
+import TestComponent from './components/TestComponent.js';
 
 /**
  * Component for the Navbar on top
@@ -114,6 +114,7 @@ class Platform extends React.Component {
       pythonCodeState: -1,
       selectedBotName: '',
       selectedBotStyle: this.hiddenStyle,
+      email: "",
     };
 
     this.setBlockly = this.setBlockly.bind(this);
@@ -121,6 +122,7 @@ class Platform extends React.Component {
     this.redefineCustomBlockList = this.redefineCustomBlockList.bind(this);
     this.setSelectedBotName = this.setSelectedBotName.bind(this);
     this.setSelectedBotStyle = this.setSelectedBotStyle.bind(this);
+    this.onEmailChange = this.onEmailChange.bind(this);
 
   }
 
@@ -157,6 +159,11 @@ class Platform extends React.Component {
     }
   }
 
+  onEmailChange(email) {
+    console.log("email", email);
+    this.setState({ email: email });
+
+  }
   render() {
     return (
       <div id="platform">
@@ -175,6 +182,7 @@ class Platform extends React.Component {
             <div className="row">
               <div className="col-md">
                 <AddBot
+                  email={this.state.email}
                   selectedBotName={this.state.selectedBotName}
                   setSelectedBotName={this.setSelectedBotName}
                   selectedBotStyle={this.state.selectedBotStyle}
@@ -209,6 +217,7 @@ class Platform extends React.Component {
           {/* <TabPanel> */}
           <div id="coding-tab" className="tab-pane" role="tabpanel">
             <Blockly
+              onEmailChange={this.onEmailChange}
               blocklyXml={this.state.blocklyXml}
               setBlockly={this.setBlockly}
               pythonCode={this.state.pythonCode}
@@ -235,6 +244,14 @@ class Platform extends React.Component {
   }
 }
 
+let itemList = [
+  "hello",
+  "hello2",
+  "sir",
+  "yes",
+  "no"
+]
+
 class ClientGUI extends React.Component {
   render() {
     return (
@@ -243,6 +260,7 @@ class ClientGUI extends React.Component {
         <div className="container">
           <Platform />
         </div>
+        <TestComponent title="testing" items={itemList} />
       </div>
     );
   }
@@ -251,4 +269,38 @@ class ClientGUI extends React.Component {
 // insert something here about localStorage function for first time tutorial
 
 let root = document.getElementById('root');
+
+// function handleUnload(e) {
+//   e.preventDefault();
+//   console.log("user email", "testing@gmail.com")
+//   var url = '/chatbot_context/' + "testing@gmail.com"
+//   axios({
+//     method: 'POST',
+//     url: url,
+//     headers: {
+//       'Content-Type': 'application/json'
+//     },
+//     // params: {
+//     //     email: this.props.email
+//     // },
+//     data: JSON.stringify({
+//       bot_name: _this.props.selectedBotName,
+//       // TODO send currently logged in user in email field via props lifting??
+//       context: "on close",
+//     })
+//   }).then(function (response) {
+//     if (response.data) {
+//       console.log("Chatbot", response.data);
+//     }
+//   }).catch(function (error) {
+//     if (error.response.data.error_msg.length > 0)
+//       window.alert(error.response.data.error_msg);
+//     else
+//       console.log("Chatbot", error);
+//   })
+//   return false;
+// }
+// window.addEventListener('beforeunload', (e) => handleUnload(e))
+
+
 ReactDOM.render(<ClientGUI />, root);
