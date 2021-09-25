@@ -21,6 +21,8 @@ import speech_recognition as sr
 
 MAX_VISION_LOG_LENGTH = 1000
 
+x = 5
+
 
 def make_thread_safe(func):
     """ Decorator which wraps the specified function with a lock.  This makes
