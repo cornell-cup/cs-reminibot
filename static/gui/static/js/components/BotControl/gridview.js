@@ -3,7 +3,8 @@ import axios from 'axios';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
-import VisionBox from '../utils/VisionBoxModal.js';
+import InformationBoxModal from '../utils/InformationBoxModal.js';
+import { INFOBOXTYPE } from '../utils/Constants.js';
 library.add(faInfoCircle);
 import { Button } from '../utils/Util.js'
 
@@ -215,7 +216,7 @@ export default class GridView extends React.Component {
                 </div>
                 <div id="view" className="mx-auto"></div>
                 {/* </div > */}
-                <VisionBox />
+                <InformationBoxModal type={INFOBOXTYPE.VISION} />
             </div>
         );
     }

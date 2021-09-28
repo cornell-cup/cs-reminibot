@@ -23,21 +23,6 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import LoginModal from './components/Login/LoginModal.js';
 import RegisterModal from './components/Login/RegisterModal.js';
 
-/**
- * Component for the Navbar on top
- * Currently this does nothing except display some text and an image
- * This is the old navbar
- */
-// class Navbar extends React.Component {
-//   render() {
-//     return (
-//       <div style={{ backgroundColor: "#212529", padding: "20px" }} className="jumbotron text-center">
-//         <img className="logo" src="./static/img/logo.png" />
-//         <h1 id="title"> MiniBot WebGUI </h1>
-//       </div>
-//     );
-//   }
-// }
 
 /**
  * New component for the Navbar on top
