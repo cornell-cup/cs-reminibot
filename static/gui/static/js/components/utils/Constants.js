@@ -9,5 +9,5 @@ export const INFOBOXTYPE = {
 export const INFOBOXID = {
   PORT: "PortBox",
   SETUP: "SetupBox",
-  VISON: "VisionBox"
+  VISION: "VisionBox"
 }

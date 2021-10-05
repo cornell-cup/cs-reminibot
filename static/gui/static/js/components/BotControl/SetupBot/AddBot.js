@@ -30,7 +30,9 @@ export default class AddBot extends React.Component {
             setupMode: "normal",
             buttonStatus: false,
             isSetupReady: false,
-            isSetup: false
+            isSetup: false,
+
+            showPorts: false
         };
 
         // Needed to use a ref for react
@@ -338,6 +340,9 @@ export default class AddBot extends React.Component {
                                     <FontAwesomeIcon icon='info-circle' />
                                 </button>
                             </h3>
+                            <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#ports-list" aria-expanded="false" aria-controls="collapseExample">
+                                Ports List Btn
+                            </button>
                             <PortsList motorPorts={this.motorPorts} />
                             {/* <div className="element-wrapper in-front-of-other-elems">
                                 <PortsList motorPorts={this.motorPorts} />

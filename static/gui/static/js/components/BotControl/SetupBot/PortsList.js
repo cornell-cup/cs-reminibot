@@ -25,7 +25,7 @@ function Ports(props) {
   return (<select className="custom-select custom-select-sm" name={props.port} id={props.port}> {optionList} </select>);
 };
 
-export default function PortsList(props) {
+export default function PortsList({ motorPorts }) {
 
   /* Left and right have default ports */
 
@@ -41,7 +41,7 @@ export default function PortsList(props) {
       <div key={i} className="form-group row">
         <label htmlFor={ports[i]} className="col-md-4 d-flex justify-content-center">Port {ports[i]}:</label>
         <div className="col-md-8">
-          <Ports portName={ports[i]} motorPorts={props.motorPorts} />
+          <Ports portName={ports[i]} motorPorts={motorPorts} />
         </div>
       </div>
     );
@@ -49,7 +49,7 @@ export default function PortsList(props) {
   }
 
   return (
-    <div className="port-form">
+    <div className="port-form collapse" id="ports-list">
       {allListElements}
     </div>
   );

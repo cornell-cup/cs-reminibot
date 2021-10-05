@@ -3,7 +3,7 @@ import axios from 'axios';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import InformationBoxModal from '../../utils/InformationBoxModal.js';
-import { INFOBOXTYPE, INFOBOXID } from '../../utils/Constants.js';
+import { INFOBOXID, INFOBOXTYPE } from '../../utils/Constants.js';
 
 export default class BotSearch extends React.Component {
   constructor(props) {

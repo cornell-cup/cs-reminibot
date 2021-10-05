@@ -3,7 +3,7 @@ import { INFOBOXTYPE, INFOBOXID } from './Constants';
 import { PortBoxModalText, SetupBoxModalText, VisionBoxModalText } from './Constants';
 
 
-function InformationBoxModal(type) {
+function InformationBoxModal({ type }) {
     const [boxText, setBoxText] = useState("");
     const [boxID, setBoxID] = useState("");
 
@@ -16,7 +16,7 @@ function InformationBoxModal(type) {
             setBoxID(INFOBOXID.PORT);
         } else {
             setBoxText(VisionBoxModalText);
-            setBoxID(INFOBOXID.VISON);
+            setBoxID(INFOBOXID.VISION);
         }
     }, [type])
 
