@@ -205,3 +205,55 @@ def speech_recognition():
     else:
         message = base_station.get_speech_recognition_status()
         return json.dumps(message), status.HTTP_200_OK
+
+
+@app.route('/user', methods=['GET'])
+def get_user():
+    email = request.args.get('email')
+    user = base_station.get_user(email)
+    if user is not None:
+        return json.dumps(user.serialize()), status.HTTP_200_OK
+    else:
+        return json.dumps("User doesn't exist"), 400
+
+
+@app.route('/submission', methods=['POST'])
+def create_submission():
+    submission = base_station.create_submission()
+    if submission is not None:
+        return json.dumps(submission.serialize()), status.HTTP_200_OK
+    else:
+        return json.dumps("Submission failed"), 400
+
+@app.route('/analytics', methods=['GET'])
+def analytics():
+    email = request.args.get('email')
+    user = base_station.get_user(email)
+
+    if user is not None:
+        submissions = base_station.get_all_submissions(user)
+        
+        successful_executions_per_month = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        errors_per_month = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        errors_this_month = []
+        
+        monthly_statistics = [successful_executions_per_month, errors_per_month, errors_this_month]
+        
+        for submission in submissions:
+            month = datetime.datetime.strptime(submission.time, "%Y/%b/%d %H:%M:%S").month
+            year = datetime.datetime.strptime(submission.time, "%Y/%b/%d %H:%M:%S").year
+
+            if year == time.localtime().tm_year:
+                if submission.result != "Successful execution":
+                    errors_per_month[month-1] += 1
+                else:
+                    successful_executions_per_month[month-1] += 1
+
+                if month == time.localtime().tm_mon:
+                    errors_this_month.append(submission.result)
+
+
+        return json.dumps(monthly_statistics), status.HTTP_200_OK
+
+    else:
+        return json.dumps("Failed, not logged in"), 400

@@ -4,7 +4,9 @@ import { render } from 'react-dom';
 import BarChartComponent from './barchart';
 import LineChartComponent from './linechart';
 import PieChartComponent from './piechart';
-
+import { BarChart } from 'recharts';
+import MonthtlyResultBarChart from './monthlyResultsBarChart'
+import MonthlyErrorPieChart from './monthlyErrorPieChart'
 
 export default class Dashboard extends React.Component {
     constructor() {
@@ -72,7 +74,8 @@ export default class Dashboard extends React.Component {
                             <div className="card-body">
                                 <div className="chart-area">
                                     <canvas id="myAreaChart"></canvas>
-                                    <PieChartComponent></PieChartComponent>
+                                    {/* <PieChartComponent></PieChartComponent> */}
+                                    <MonthlyErrorPieChart loginEmail = {this.state.loginEmail}/>
                                 </div>
                             </div>
                         </div>
