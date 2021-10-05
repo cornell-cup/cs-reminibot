@@ -3,7 +3,7 @@ Base Station for the MiniBot.
 """
 
 from basestation.bot import Bot
-from basestation.user_database import Program, User
+from basestation.user_database import Submission, User
 from basestation import db
 from basestation.util.stoppable_thread import StoppableThread, ThreadSafeVariable
 
@@ -225,7 +225,10 @@ class BaseStation:
         for line in program_lines:
             match = regex.match(line)
             if match:
-                func = self.blockly_function_map[match.group(2)]
+                if match.group(2) in self.blockly_function_map:
+                    func = self.blockly_function_map[match.group(2)]
+                else:
+                    func = match.group(2)
                 args = match.group(3)
                 whitespace = match.group(1)
                 if not whitespace:
@@ -238,7 +241,6 @@ class BaseStation:
                 parsed_program.append(parsed_line)
             else:
                 parsed_program.append(line + '\n')  # "normal" Python
-
         parsed_program_string = "".join(parsed_program)
 
         # Now actually send to the bot
@@ -405,3 +407,34 @@ class BaseStation:
     def login_email(self, email: str):
         """Sets the login email property"""
         self._login_email = email
+
+    # data analytics
+
+    def get_user(self, email: str) -> User:
+        user = User.query.filter_by(email=email).first()
+        return user
+
+    def save_submission(self, code: str, email: str) -> Submission:
+        submission = Submission(
+            code=code,
+            time=time.strftime("%Y/%b/%d %H:%M:%S", time.localtime()),
+            duration=-1,
+            user_id=self.get_user(email).id
+        )
+        db.session.add(submission)
+        db.session.commit()
+        return submission
+
+    def update_result(self, result: str, submission_id: int):
+        if submission_id is None:
+            return
+        print("UPDATE RESULT!!!")
+        print(result)
+        submission = Submission.query.filter_by(id=submission_id).first()
+        submission.result = result
+        db.session.commit()
+
+    def get_all_submissions(self, user: User) -> []:
+        submissions = []
+        submissions = Submission.query.filter_by(user_id=User.id)
+        return submissions

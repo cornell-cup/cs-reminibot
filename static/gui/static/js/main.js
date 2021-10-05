@@ -1,13 +1,15 @@
 /* ES6 */
 
-import React from 'react';
+import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 
 import GridView from './components/gridview.js';
 import Blockly from './components/blockly.js';
 import AddBot from './components/AddBot.js';
 import Dashboard from './components/dashboard.js';
+import History from './components/submissionHistory';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+
 
 /**
  * Component for the Navbar on top
@@ -51,6 +53,7 @@ class Platform extends React.Component {
       pythonCodeState: -1,
       selectedBotName: '',
       selectedBotStyle: this.hiddenStyle,
+      loginEmail: ""
     };
 
     this.setBlockly = this.setBlockly.bind(this);
@@ -58,7 +61,13 @@ class Platform extends React.Component {
     this.redefineCustomBlockList = this.redefineCustomBlockList.bind(this);
     this.setSelectedBotName = this.setSelectedBotName.bind(this);
     this.setSelectedBotStyle = this.setSelectedBotStyle.bind(this);
+    this.changeLoginEmail = this.changeLoginEmail.bind(this);
+  }
 
+  changeLoginEmail(newEmail) {
+    this.loginEmail = newEmail;
+    this.setState({ loginEmail: newEmail });
+    console.log(this);
   }
 
   setBlockly(xmltext) {
@@ -70,7 +79,7 @@ class Platform extends React.Component {
    * to understand the different values the code state can take.  
    */
   setPythonCode(code, state) {
-    this.setState({ 
+    this.setState({
       pythonCode: code,
       pythonCodeState: state,
     });
@@ -102,6 +111,7 @@ class Platform extends React.Component {
             <Tab>Setup/Control</Tab>
             <Tab>Coding</Tab>
             <Tab>Analytics</Tab>
+            <Tab>History</Tab>
           </TabList>
 
           <TabPanel>
@@ -129,12 +139,18 @@ class Platform extends React.Component {
               selectedBotName={this.state.selectedBotName}
               customBlockList={this.state.customBlockList}
               redefineCustomBlockList={this.redefineCustomBlockList}
+              loginEmail={this.state.loginEmail}
+              changeLoginEmail={this.changeLoginEmail}
             />
           </TabPanel>
           <TabPanel>
-            <Dashboard>
-
-            </Dashboard>
+            <Dashboard
+              loginEmail={this.state.loginEmail}
+            />
+          </TabPanel>
+          <TabPanel>
+            <History
+              loginEmail={this.state.loginEmail} />
           </TabPanel>
         </Tabs>
       </div>
