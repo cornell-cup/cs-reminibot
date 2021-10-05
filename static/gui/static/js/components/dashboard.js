@@ -92,7 +92,8 @@ export default class Dashboard extends React.Component {
                             <div className="card-body">
                                 <div className="chart-area">
                                     <canvas id="myAreaChart"></canvas>
-                                    <BarChartComponent></BarChartComponent>
+                                    {/* <BarChartComponent></BarChartComponent> */}
+                                    <MonthtlyResultBarChart loginEmail={this.state.loginEmail} />
                                 </div>
                             </div>
                         </div>
