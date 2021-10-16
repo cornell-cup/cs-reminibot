@@ -69,7 +69,7 @@ export default class BotSearch extends React.Component {
       <div>
         <div className="row">
           <div className="col d-flex">
-            <h3 className="small-title"> Setup the Bot
+            <h3 className="small-title"> Setup the Bot &nbsp;
               <button className="info-box" type="button" data-toggle="modal" data-target={"#" + INFOBOXID.SETUP}>
                 <FontAwesomeIcon icon='info-circle' />
               </button>

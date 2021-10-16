@@ -335,14 +335,16 @@ export default class AddBot extends React.Component {
                 <div id="port-config" className="control-option">
                     <div className="row">
                         <div className="col">
-                            <h3 className="small-title">Port Configurations
+                            <h3 className="small-title">Port Configurations &nbsp;
                                 <button className="info-box" type="button" data-toggle="modal" data-target={"#" + INFOBOXID.PORT}>
                                     <FontAwesomeIcon icon='info-circle' />
                                 </button>
                             </h3>
                             <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#ports-list" aria-expanded="false" aria-controls="collapseExample">
-                                Ports List Btn
+                                Edit Port Configurations
                             </button>
+                            <br/>
+                            <br/>
                             <PortsList motorPorts={this.motorPorts} />
                             {/* <div className="element-wrapper in-front-of-other-elems">
                                 <PortsList motorPorts={this.motorPorts} />

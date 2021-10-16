@@ -205,7 +205,7 @@ export default class GridView extends React.Component {
             <div className="control-option">
                 {/* <div id="component_view" className="box"> */}
                 <div className="mb-3 d-flex">
-                    <h3 className="small-title"> Vision
+                    <h3 className="small-title"> Vision &nbsp;
                         <button className="info-box" type="button" data-toggle="modal" data-target={"#" + INFOBOXID.VISION}>
                             <FontAwesomeIcon icon='info-circle' />
                         </button>
