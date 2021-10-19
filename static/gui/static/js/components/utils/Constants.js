@@ -6,3 +6,8 @@ export const INFOBOXTYPE = {
   SETUP: 2,
   VISION: 3
 };
+export const INFOBOXID = {
+  PORT: "PortBox",
+  SETUP: "SetupBox",
+  VISION: "VisionBox"
+}

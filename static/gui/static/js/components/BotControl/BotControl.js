@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-import AddBot from './AddBot.js';
-import MovementControls from './MovementControl.js';
+import AddBot from './SetupBot/AddBot.js';
+import MovementControls from './MovementControl/MovementControl.js';
 import GridView from './gridview.js';
 
 function BotControl({ selectedBotName, setSelectedBotName, selectedBotStyle, setSelectedBotStyle }) {

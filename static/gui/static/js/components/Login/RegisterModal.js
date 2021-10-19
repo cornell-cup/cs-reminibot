@@ -8,11 +8,11 @@ export default class RegisterModal extends React.Component {
         super(props);
         this.state = {
             // showModal: false,
-            email : "",
-            email_confirmation : "",
-            password : "",
-            password_confirmation : "",
-            registrationErrors : ""
+            email: "",
+            email_confirmation: "",
+            password: "",
+            password_confirmation: "",
+            registrationErrors: ""
         };
 
         // this.register = this.register.bind(this);
@@ -24,20 +24,20 @@ export default class RegisterModal extends React.Component {
     handleChange(event) {
         console.log("handle changes");
         this.setState({
-            [event.target.name] : event.target.value
+            [event.target.name]: event.target.value
         })
     }
 
     // handleCloseModal () {
     // 	$('#registerForm').modal("hide")
-  	// }
+    // }
 
     handleRegister(event) {
         console.log("handle register");
         // event.preventDefault();
         let formData = new FormData(document.getElementById("registerForm"));
-        if (formData.get('email') == formData.get('email_confirmation') 
-                && formData.get('password') == formData.get('password_confirmation')){
+        if (formData.get('email') == formData.get('email_confirmation')
+            && formData.get('password') == formData.get('password_confirmation')) {
             axios({
                 method: 'POST',
                 url: '/register/',
@@ -48,11 +48,11 @@ export default class RegisterModal extends React.Component {
                 // },
                 headers: { 'Content-Type': 'multipart/form-data' },
             },
-                { withCredentials : true}
+                { withCredentials: true }
             ).then((response) => {
-                    console.log("registration res", response);
-                    // this.handleCloseModal();
-                })
+                console.log("registration res", response);
+                // this.handleCloseModal();
+            })
                 .catch((error) => {
                     console.log("fail");
                     console.log(error);
@@ -70,7 +70,7 @@ export default class RegisterModal extends React.Component {
                         <div className="modal-header">
                             <h5 className="modal-title text-center mb-4">Sign Up</h5>
                             <button type="button" className="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
+                                <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
                         <form className="signup" id="registerForm" method="POST">
@@ -101,7 +101,7 @@ export default class RegisterModal extends React.Component {
                             </div>
 
                             <div className="modal-footer">
-                                <button type="submit" value="submit"  className="btn btn-primary" data-dismiss="modal" onClick={this.handleRegister}>Sign Up</button>
+                                <button type="submit" value="submit" className="btn btn-primary" data-dismiss="modal" onClick={this.handleRegister}>Sign Up</button>
                             </div>
                         </form>
                     </div>

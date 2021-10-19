@@ -10,9 +10,9 @@ library.add(faCogs, faCode);
 
 import BotControl from './components/BotControl/BotControl.js';
 
-import GridView from './components/BotControl/gridview.js';
-import AddBot from './components/BotControl/AddBot.js';
-import MovementControls from './components/BotControl/MovementControl.js';
+// import GridView from './components/BotControl/gridview.js';
+import AddBot from './components/BotControl/SetupBot/AddBot.js';
+import MovementControls from './components/BotControl/MovementControl/MovementControl.js';
 
 
 // import Signup from './components/signup.js';
