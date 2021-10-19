@@ -638,18 +638,18 @@ export default class AddBot extends React.Component {
 
     }
 
-    finishBotSetup(event) {
-        // let _this = this;
-        // TODO: run all commands for bot setup here
-        this.addBotListener(event);
-        // if (_this.state.setupMode == "obj-detection") {
-        //     _this.objectDetectionOnClick();
-        //     // console.log("obj");
-        // } else if (_this.state.setupMode == "line-follow") {
-        //     _this.lineFollowOnClick();
-        //     // console.log("line");
-        // }
-    }
+    // finishBotSetup(event) {
+    //     // let _this = this;
+    //     // TODO: run all commands for bot setup here
+    //     this.addBotListener(event);
+    //     // if (_this.state.setupMode == "obj-detection") {
+    //     //     _this.objectDetectionOnClick();
+    //     //     // console.log("obj");
+    //     // } else if (_this.state.setupMode == "line-follow") {
+    //     //     _this.lineFollowOnClick();
+    //     //     // console.log("line");
+    //     // }
+    // }
 
     render() {
         const _this = this;
@@ -713,6 +713,14 @@ export default class AddBot extends React.Component {
                         </div>
                     </div> */}
                 </div>
+                <div className="control-option">
+                    <div className="row">
+                        <div className="col d-flex justify-content-end">
+                            <button className="btn btn-secondary" disabled={this.state.buttonStatus} onClick={this.addBotListener}>Finish Bot Setup</button>
+                        </div>
+                    </div>
+                </div>
+                <br /><br />
                 <div id="port-config" className="control-option">
                     <div className="row">
                         <div className="col">
@@ -781,13 +789,7 @@ export default class AddBot extends React.Component {
                     </div>
                 </div> */}
                 {/* </div > */}
-                <div className="control-option">
-                    <div className="row">
-                        <div className="col d-flex justify-content-end">
-                            <button className="btn btn-secondary" disabled={this.state.buttonStatus} onClick={this.finishBotSetup}>Finish Bot Setup</button>
-                        </div>
-                    </div>
-                </div>
+
             </div>
         );
     }

@@ -19,10 +19,6 @@ function BotControl({ selectedBotName, setSelectedBotName, selectedBotStyle, set
 
       <div className="col-md">
 
-        <div className="row">
-          <GridView />
-        </div>
-
         {/* movement controls */}
         <div className="row">
           <MovementControls
@@ -31,6 +27,10 @@ function BotControl({ selectedBotName, setSelectedBotName, selectedBotStyle, set
             selectedBotStyle={selectedBotStyle}
             setSelectedBotStyle={setSelectedBotStyle}
           />
+        </div>
+        <br />
+        <div className="row">
+          <GridView />
         </div>
       </div>
     </div>
