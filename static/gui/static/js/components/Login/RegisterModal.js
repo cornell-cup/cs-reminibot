@@ -1,8 +1,10 @@
 import React from 'react';
 import axios from 'axios';
+import { withCookies, Cookies } from 'react-cookie';
 // import { Form, Button, Card } from 'react-bootstrap';
 
-export default class RegisterModal extends React.Component {
+class RegisterModal extends React.Component {
+    
     constructor(props) {
         // super();
         super(props);
@@ -12,7 +14,8 @@ export default class RegisterModal extends React.Component {
             email_confirmation: "",
             password: "",
             password_confirmation: "",
-            registrationErrors: ""
+            registrationErrors: "",
+            current_user_email: props.cookies.get('current_user_email') || ""
         };
 
         // this.register = this.register.bind(this);
@@ -51,6 +54,10 @@ export default class RegisterModal extends React.Component {
                 { withCredentials: true }
             ).then((response) => {
                 console.log("registration res", response);
+
+
+                this.props.cookies.set('current_user_email', formData.get('email'), { path: '/' });
+    this.setState({ current_user_email :  formData.get('email')});
                 // this.handleCloseModal();
             })
                 .catch((error) => {
@@ -110,3 +117,5 @@ export default class RegisterModal extends React.Component {
         );
     }
 }
+
+export default withCookies(RegisterModal);

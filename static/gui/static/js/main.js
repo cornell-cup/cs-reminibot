@@ -4,7 +4,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCogs, faCode } from '@fortawesome/free-solid-svg-icons';
 library.add(faCogs, faCode);
 
@@ -20,51 +19,11 @@ import MovementControls from './components/BotControl/MovementControl/MovementCo
 import Blockly from './components/BotCode/blockly.js';
 import Dashboard from './components/Analytics/dashboard.js';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
-import LoginModal from './components/Login/LoginModal.js';
-import RegisterModal from './components/Login/RegisterModal.js';
+
+import Navbar from './components/Navbar.js';
+import { CookiesProvider } from 'react-cookie';
 
 
-/**
- * New component for the Navbar on top
- * This switches pages and renders login info
- */
-class Navbar extends React.Component {
-  //   constructor(props) {
-  //     super(props);
-  //     this.state = {
-  //         isLoggedIn: false,
-  //         loginEmail: "",
-  //     }
-  // }
-  render() {
-    return (
-      <div id="top-nav" className="mb-4">
-        <nav className="navbar navbar-dark bg-dark">
-          <div className="container d-flex flex-row">
-            <span className="navbar-brand" href="#">
-              <img src="./static/img/logo.png" width="50" height="50" className="d-inline-block align-top" alt="" />
-              Minibot
-            </span>
-            <span className="pages nav nav-pills" id="fakeTabs" role="tablist">
-              <a id="setup-control-link" data-toggle="tab" href="#setup_control_tab" role="tab"><FontAwesomeIcon icon="cogs" /> Setup/Movement</a>
-              <a id="coding-link" data-toggle="tab" href="#coding-tab" role="tab"><FontAwesomeIcon icon="code" /> Coding</a>
-            </span>
-            <span className="login">
-              <button type="button" data-toggle="modal" data-target="#loginModal">Login</button>
-              <button type="button" data-toggle="modal" data-target="#registerModal">Signup</button>
-              {/* {!this.state.isLoggedIn ? <button type="button" data-toggle="modal" data-target="#loginModal">Login</button> : null}
-            {!this.state.isLoggedIn ? <button type="button" data-toggle="modal" data-target="#registerModal">Signup</button> : null} */}
-              {/* {this.state.isLoggedIn ? <label className="white-label"> Logged in as: {this.state.loginEmail} &nbsp; </label> : null}
-            {this.state.isLoggedIn ? <Button id="logout" name="Logout" onClick={this.logout}/> : null} */}
-            </span>
-          </div>
-        </nav>
-        <LoginModal />
-        <RegisterModal />
-      </div>
-    )
-  }
-}
 
 /**
  * Top Level component for the GUI, includes two tabs
@@ -204,4 +163,4 @@ class ClientGUI extends React.Component {
 // insert something here about localStorage function for first time tutorial
 
 let root = document.getElementById('root');
-ReactDOM.render(<ClientGUI />, root);
+ReactDOM.render(<CookiesProvider><ClientGUI /></CookiesProvider>, root);

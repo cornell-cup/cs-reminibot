@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+import { withCookies, Cookies } from 'react-cookie';
 
 // function UserAccountModal(props) {
 //     const s = props.modalType;
@@ -25,22 +26,23 @@ import axios from 'axios';
 //     )
 // }
 
-export default class LoginModal extends React.Component {
+class LoginModal extends React.Component {
     constructor(props) {
         // super();
         super(props);
+        const current_user_email = props.cookies.get('current_user_email') || ""
         this.state = {
             // blocklyFilename: 'FileName.xml',
             // pyblock: "",
             // showPopup: false,
-            loginEmail: "",
+            loginEmail: current_user_email,
             loginErrorLabel: "",
             loginSuccessLabel: "",
             // registerErrorLabel: "",
             // registerSuccessLabel: "",
             // functionName: "default_function",
             // codingStart: -1,
-            isLoggedIn: false,
+            isLoggedIn: current_user_email !== "",
             // loginErrorLabel: "",
             // loginSuccessLabel: "",
             // registerErrorLabel: "",
@@ -71,6 +73,7 @@ export default class LoginModal extends React.Component {
             // _this.props.redefineCustomBlockList(
             //     JSON.parse(response.data.custom_function));
             // invokes component did update
+            this.props.cookies.set('current_user_email', formData.get('email'), { path: '/' });
             this.setState({
                 loginEmail: formData.get("email"),
                 loginSuccessLabel: "Login Success",
@@ -89,7 +92,6 @@ export default class LoginModal extends React.Component {
             // _this.updateCustomBlocks();
         }).catch((error) => {
             this.setState({
-                loginEmail: "",
                 loginSuccessLabel: "",
                 loginErrorLabel: error.response.data.error_msg
             });
@@ -165,3 +167,5 @@ export default class LoginModal extends React.Component {
         );
     }
 }
+
+export default withCookies(LoginModal);
