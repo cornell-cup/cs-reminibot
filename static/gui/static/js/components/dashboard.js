@@ -75,7 +75,7 @@ export default class Dashboard extends React.Component {
                                 <div className="chart-area">
                                     <canvas id="myAreaChart"></canvas>
                                     {/* <PieChartComponent></PieChartComponent> */}
-                                    <MonthlyErrorPieChart loginEmail={this.state.loginEmail} />
+                                    <MonthlyErrorPieChart loginEmail={this.props.loginEmail} />
                                 </div>
                             </div>
                         </div>
@@ -93,7 +93,7 @@ export default class Dashboard extends React.Component {
                                 <div className="chart-area">
                                     <canvas id="myAreaChart"></canvas>
                                     {/* <BarChartComponent></BarChartComponent> */}
-                                    <MonthtlyResultBarChart loginEmail={this.state.loginEmail} />
+                                    <MonthtlyResultBarChart loginEmail={this.props.loginEmail} />
                                 </div>
                             </div>
                         </div>
