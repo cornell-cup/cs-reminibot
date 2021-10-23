@@ -6,46 +6,85 @@ import axios from 'axios';
 export default class History extends React.Component {
 	constructor() {
 		super();
+
+		this.onClick = this.onClick.bind(this);
+		this.disHistory = this.disHistory.bind(this);
 		this.getUser = this.getUser.bind(this);
+		this.getData = this.getData.bind(this);
+
+		this.state = {submissions: null, history: <p></p>};
+
 	}
 
-	componentDidMount() {
-		this.getUser();
+
+	disHistory(){
+		try{
+			var subs = this.state.submissions 
+			const listItems = subs.map((subs) =>
+  				<li onClick = {() => this.onClick(subs["time"])}>{subs["time"]}</li>
+			);	
+
+			
+			this.setState({history: listItems});
+
+		} catch(error) {
+			alert(error);
+		}
 	}
 
-	getUser(event) {
-		document.getElementById("sub").style.color = "#FFFFFF"
-		if (this.props.loginEmail != "") {
-			axios.get('/user?email=' + this.props.loginEmail).then(function (response) {
-				console.log(response.data);
+	async getData(){
+		if (this.getUser()){
+			try{
+				var response = await axios.get('/user?email=' + this.props.loginEmail)
 				var subs = response.data["submissions"];
-				var len = Object.keys(subs).length;
-				var s = "";
-				for (var i = 0; i < len; i++) {
-					s = s + "Time: " + subs[i]["time"] + "\n";
-					s = s + "Duration: " + subs[i]["duration"] + "\n";
-					s = s + "Code: " + subs[i]["code"] + "\n";
-					s = s + "Result: " + subs[i]["result"] + "\n\n";
-				}
-				document.getElementById("sub").value = s;
-				return response.data;
+				this.setState({submissions: subs});
+			} catch (err){
+				console.log(err);
+			}
+		}
+	}
 
-			}).catch(function (error) {
-				document.getElementById("sub").value = "Error was encountered.";
-			})
+	getUser(){
+		if (this.props.loginEmail != "") {
+			return true;
 		}
 		else {
-			document.getElementById("sub").value = "Please log in before viewing submission history.";
+			alert("Please log in before viewing submission history.");
+			return false;
 		}
+	}
+
+	onClick(disMessage){
+		this.setState({ message: disMessage});
+	}
+
+	async componentDidMount() {
+		await this.getData();
+		this.disHistory();
 	}
 
 	render() {
+		const infoStyle	= {
+			color: "white",
+			width: "50%",
+			float: "right"
+		}
+
 		return (
+		
 			<div>
-				<p className="small-title"> Code Submission History </p>
-				<textarea readOnly="true" id="sub"
-					placeholder="User info"
-					cols="100" rows="15" style={{ backgroundColor: "#212529" }}>{this.props.text}</textarea>
+				<div style={infoStyle}>
+					{this.state.message}
+				</div>
+			
+
+				<div style={{ color: "white" }}>
+					<p className="small-title"> Code Submission History </p>
+					<ul>
+						{this.state.history}
+					</ul>
+				</div>
+			
 			</div>
 		);
 
