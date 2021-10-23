@@ -60,7 +60,8 @@ export default class LoginModal extends React.Component {
         console.log(document.getElementById("loginForm"));
         let formData = new FormData(document.getElementById("loginForm"));
         event.preventDefault();
-        // let temp = _this.props.customBlockList;
+
+
         axios({
             method: 'POST',
             url: '/login/',
@@ -133,21 +134,21 @@ export default class LoginModal extends React.Component {
                         <div className="modal-header">
                             <h5 className="modal-title">Login</h5>
                             <button type="button" className="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
+                                <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
                         <form className="login" id="loginForm" method="POST">
                             <div className="modal-body">
                                 {/* <div class="group_label_input"> */}
                                 <div className="form-group">
-                                    <label for="email" className="col-form-label">Email:</label>
-                                    <input id="email" type="email" name="login_email" className="form-control" required />
+                                    <label for="login_email" className="col-form-label">Email:</label>
+                                    <input id="login_email" type="email" name="email" className="form-control" required />
                                 </div>
                                 {/* </div> */}
 
                                 <div className="form-group">
-                                    <label for="password" className="col-form-label">Password:</label>
-                                    <input id="password" type="password" name="login_password" className="form-control" required />
+                                    <label for="login_password" className="col-form-label">Password:</label>
+                                    <input id="login_password" type="password" name="password" className="form-control" required />
                                 </div>
 
                                 <div className="w-100 text-center mt-2">

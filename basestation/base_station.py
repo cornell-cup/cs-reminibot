@@ -264,6 +264,8 @@ class BaseStation:
     # ==================== DATABASE ====================
     def login(self, email: str, password: str) -> Tuple[int, Optional[str]]:
         """Logs in the user if the email and password are valid"""
+        print("email:" + email)
+        print("password" + password)
         if not email:
             return -1, None
         if not password:
