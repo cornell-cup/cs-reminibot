@@ -11,3 +11,5 @@ export const INFOBOXID = {
   SETUP: "SetupBox",
   VISION: "VisionBox"
 }
+export const CARROT_COLLAPSED = "./static/img/carrot_orange_collapsed.png";
+export const CARROT_EXPAND = "./static/img/carrot_orange_expand.png";

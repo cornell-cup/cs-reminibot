@@ -6,7 +6,7 @@ import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 library.add(faInfoCircle);
 import { Button } from '../../utils/Util.js';
 import InformationBoxModal from '../../utils/InformationBoxModal.js';
-import { INFOBOXTYPE, INFOBOXID } from '../../utils/Constants.js';
+import { INFOBOXTYPE, INFOBOXID, CARROT_COLLAPSED, CARROT_EXPAND } from '../../utils/Constants.js';
 
 import RefreshingList from '../GarbageMaybe/RefreshingList.js';
 import BotSearch from './BotSearch.js';
@@ -42,6 +42,18 @@ export default class AddBot extends React.Component {
         this.buttonMapListener = this.buttonMapListener.bind(this);
         this.handleArrowKeyDown = this.handleArrowKeyDown.bind(this);
         this.motorPorts = this.motorPorts.bind(this);
+        this.portConfigBttnOnClick = this.portConfigBttnOnClick.bind(this);
+    }
+
+    portConfigBttnOnClick() {
+        let bttn = document.getElementById("portConfigBttn");
+        this.setState({ showPorts: !this.state.showPorts });
+        console.log(this.state.showPorts);
+        if (this.state.showPorts) {
+            bttn.src = CARROT_COLLAPSED;
+        } else {
+            bttn.src = CARROT_EXPAND;
+        }
     }
 
     componentDidMount() {
@@ -343,16 +355,14 @@ export default class AddBot extends React.Component {
                 <div id="port-config" className="control-option">
                     <div className="row">
                         <div className="col">
-                            <h3 className="small-title">Port Configurations &nbsp;
+
+                            <h3 className="small-title"> <input id="portConfigBttn" width="25" height="25" type="image" data-toggle="collapse" data-target="#ports-list" aria-expanded={this.state.showPorts} aria-controls="collapseExample" src={CARROT_COLLAPSED} onClick={this.portConfigBttnOnClick} /> <span style={{ leftMargin: "0.5em" }}></span> Port Configurations &nbsp;
                                 <button className="info-box" type="button" data-toggle="modal" data-target={"#" + INFOBOXID.PORT}>
                                     <FontAwesomeIcon icon='info-circle' />
                                 </button>
                             </h3>
-                            <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#ports-list" aria-expanded="false" aria-controls="collapseExample">
-                                Edit Port Configurations
-                            </button>
-                            <br/>
-                            <br/>
+                            <br />
+                            <br />
                             <PortsList motorPorts={this.motorPorts} />
                             {/* <div className="element-wrapper in-front-of-other-elems">
                                 <PortsList motorPorts={this.motorPorts} />
@@ -414,7 +424,7 @@ export default class AddBot extends React.Component {
                 </div> */}
                 {/* </div > */}
 
-            </div>
+            </div >
         );
     }
 }
