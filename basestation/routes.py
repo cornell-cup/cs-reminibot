@@ -245,27 +245,40 @@ def analytics():
 
         successful_executions_per_month = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         errors_per_month = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        errors_this_month = []
-
-        monthly_statistics = [
-            successful_executions_per_month, errors_per_month, errors_this_month]
+        programs_this_month = 0
+        programs_this_week = 0
+        errors_this_month = 0
+        errors_this_week = 0
 
         for submission in submissions:
             month = datetime.datetime.strptime(
                 submission.time, "%Y/%b/%d %H:%M:%S").month
             year = datetime.datetime.strptime(
                 submission.time, "%Y/%b/%d %H:%M:%S").year
+            week = datetime.datetime.strptime(
+                submission.time, "%Y/%b/%d %H:%M:%S").isocalendar()[1]
+
 
             if year == time.localtime().tm_year:
                 if submission.result != "Successful execution":
                     errors_per_month[month-1] += 1
                 else:
                     successful_executions_per_month[month-1] += 1
-
+                
                 if month == time.localtime().tm_mon:
-                    errors_this_month.append(submission.result)
+                    programs_this_month += 1
+                    print(programs_this_month)
+                    if submission.result != "Successful execution":
+                        errors_this_month += 1
 
-        return json.dumps(monthly_statistics), status.HTTP_200_OK
+                    if week == datetime.date.today().isocalendar()[1]:
+                        programs_this_week += 1
+                        if submission.result != "Successful execution":
+                            errors_this_week += 1
+        statistics = [
+            successful_executions_per_month, errors_per_month, programs_this_month, programs_this_week, errors_this_month, errors_this_week]
+
+        return json.dumps(statistics), status.HTTP_200_OK
 
     else:
         return json.dumps("Failed, not logged in"), 400
