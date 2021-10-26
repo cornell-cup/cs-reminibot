@@ -19,11 +19,12 @@ export default class History extends React.Component {
 
 	disHistory() {
 		try {
-			var subs = this.state.submissions
+			var subs = this.state.submissions;
 			const listItems = subs.map((subs) =>
-				<li class="list-group-item" onClick={() => this.onClick(subs["time"])}>{subs["time"]}</li>
+				subs["result"] == "Successful execution" ? 
+				<li class="list-group-item list-group-item-success" onClick={() => this.onClick(subs["code"])}>{subs["time"]}</li>
+				: <li class="list-group-item list-group-item-danger" onClick={() => this.onClick(subs["code"])}>{subs["time"]}</li>
 			);
-
 
 			this.setState({ history: listItems });
 
@@ -61,6 +62,7 @@ export default class History extends React.Component {
 	async componentDidMount() {
 		await this.getData();
 		this.disHistory();
+		console.log(this.state.submissions);
 	}
 
 	render() {
@@ -86,8 +88,5 @@ export default class History extends React.Component {
 				</div>
 			</div>
 		);
-		/* <textarea readOnly="true" id="sub"
-			placeholder="User info"
-			cols="100" rows="15" style={{ backgroundColor: "#212529" }}>{this.props.text}</textarea> */
 	}
 }
