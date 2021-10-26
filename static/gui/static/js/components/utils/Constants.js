@@ -13,3 +13,4 @@ export const INFOBOXID = {
 }
 export const CARROT_COLLAPSED = "./static/img/carrot_orange_collapsed.png";
 export const CARROT_EXPAND = "./static/img/carrot_orange_expand.png";
+export const INFO_ICON = "./static/img/info_icon.png";

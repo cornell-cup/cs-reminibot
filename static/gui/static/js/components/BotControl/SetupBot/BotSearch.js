@@ -3,7 +3,7 @@ import axios from 'axios';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import InformationBoxModal from '../../utils/InformationBoxModal.js';
-import { INFOBOXID, INFOBOXTYPE } from '../../utils/Constants.js';
+import { INFOBOXID, INFOBOXTYPE, INFO_ICON } from '../../utils/Constants.js';
 
 export default class BotSearch extends React.Component {
   constructor(props) {
@@ -69,10 +69,14 @@ export default class BotSearch extends React.Component {
       <div>
         <div className="row">
           <div className="col d-flex">
-            <h3 className="small-title"> Setup the Bot &nbsp;
-              <button className="info-box" type="button" data-toggle="modal" data-target={"#" + INFOBOXID.SETUP}>
-                <FontAwesomeIcon icon='info-circle' />
-              </button>
+            <h3 className="small-title">
+              Setup the Bot
+              <span style={{ leftMargin: "0.5em" }}> </span>
+              <input className="info-box" type="image"
+                data-toggle="modal"
+                data-target={"#" + INFOBOXID.SETUP}
+                src={INFO_ICON}
+                width="18" height="18" />
             </h3>
             <button className="btn btn-secondary ml-auto" onClick={this.discoverBots()}>Search for bots</button>
           </div>

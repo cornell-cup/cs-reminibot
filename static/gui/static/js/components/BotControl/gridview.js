@@ -4,7 +4,7 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import InformationBoxModal from '../utils/InformationBoxModal.js';
-import { INFOBOXTYPE, INFOBOXID } from '../utils/Constants.js';
+import { INFOBOXTYPE, INFOBOXID, INFO_ICON } from '../utils/Constants.js';
 library.add(faInfoCircle);
 import { Button } from '../utils/Util.js'
 
@@ -205,10 +205,14 @@ export default class GridView extends React.Component {
             <div className="control-option">
                 {/* <div id="component_view" className="box"> */}
                 <div className="mb-3 d-flex">
-                    <h3 className="small-title"> Vision &nbsp;
-                        <button className="info-box" type="button" data-toggle="modal" data-target={"#" + INFOBOXID.VISION}>
-                            <FontAwesomeIcon icon='info-circle' />
-                        </button>
+                    <h3 className="small-title">
+                        Vision
+                        <span style={{ leftMargin: "0.5em" }}> </span>
+                        <input className="info-box" type="image"
+                            data-toggle="modal"
+                            data-target={"#" + INFOBOXID.VISION}
+                            src={INFO_ICON}
+                            width="18" height="18" />
                     </h3>
                     <button onClick={this.displayRobot}
                         name={"Display Bot"}

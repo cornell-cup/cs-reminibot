@@ -6,12 +6,16 @@ import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 library.add(faInfoCircle);
 import { Button } from '../../utils/Util.js';
 import InformationBoxModal from '../../utils/InformationBoxModal.js';
-import { INFOBOXTYPE, INFOBOXID, CARROT_COLLAPSED, CARROT_EXPAND } from '../../utils/Constants.js';
-
 import RefreshingList from '../GarbageMaybe/RefreshingList.js';
 import BotSearch from './BotSearch.js';
 import PortsList from './PortsList.js';
-
+import {
+    INFOBOXTYPE,
+    INFOBOXID,
+    CARROT_COLLAPSED,
+    CARROT_EXPAND,
+    INFO_ICON
+} from '../../utils/Constants.js';
 
 export default class AddBot extends React.Component {
     constructor(props) {
@@ -356,12 +360,25 @@ export default class AddBot extends React.Component {
                     <div className="row">
                         <div className="col">
 
-                            <h3 className="small-title"> <input id="portConfigBttn" width="25" height="25" type="image" data-toggle="collapse" data-target="#ports-list" aria-expanded={this.state.showPorts} aria-controls="collapseExample" src={CARROT_COLLAPSED} onClick={this.portConfigBttnOnClick} /> <span style={{ leftMargin: "0.5em" }}></span> Port Configurations &nbsp;
-                                <button className="info-box" type="button" data-toggle="modal" data-target={"#" + INFOBOXID.PORT}>
-                                    <FontAwesomeIcon icon='info-circle' />
-                                </button>
+                            <h3 className="small-title">
+                                <input id="portConfigBttn"
+                                    width="25" height="25" type="image"
+                                    data-toggle="collapse"
+                                    data-target="#ports-list"
+                                    aria-expanded={this.state.showPorts}
+                                    aria-controls="collapseExample"
+                                    src={CARROT_COLLAPSED}
+                                    onClick={this.portConfigBttnOnClick} />
+                                <span style={{ leftMargin: "0.5em" }}> </span>
+                                Port Configurations
+                                <span style={{ leftMargin: "0.5em" }}> </span>
+                                <input className="info-box" type="image"
+                                    data-toggle="modal"
+                                    data-target={"#" + INFOBOXID.PORT}
+                                    src={INFO_ICON}
+                                    width="18" height="18" />
+
                             </h3>
-                            <br />
                             <br />
                             <PortsList motorPorts={this.motorPorts} />
                             {/* <div className="element-wrapper in-front-of-other-elems">
