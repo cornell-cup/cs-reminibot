@@ -4,8 +4,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faCogs, faCode } from '@fortawesome/free-solid-svg-icons';
-library.add(faCogs, faCode);
+import { faCogs, faCode, faBullseye } from '@fortawesome/free-solid-svg-icons';
+library.add(faCogs, faCode, faBullseye);
 
 import BotControl from './components/BotControl/BotControl.js';
 
@@ -134,11 +134,11 @@ class Platform extends React.Component {
             />
           </div>
           {/* hiding this page for now */}
-          {/* <div className="tab-pane" role="tabpanel"> 
+          <div id="analytics-tab" className="tab-pane" role="tabpanel">
             <Dashboard>
 
             </Dashboard>
-            </div> */}
+          </div>
           {/* </TabPanel> */}
         </div>
         {/* </Tabs> */}

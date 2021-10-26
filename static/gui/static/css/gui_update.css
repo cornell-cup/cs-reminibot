@@ -12,18 +12,18 @@
 }
 
 .navbar a {
-  margin-left: 15px;
-  font-size: 20pt;
+  margin-left: 30px;
+  font-size: 17pt;
   color: white;
 }
 
 .navbar button {
   margin-left: 15px;
-  font-size: 20pt;
   background: none;
   color: white;
   border: none;
   font: inherit;
+  font-size: 15pt;
   cursor: pointer;
   outline: inherit;
 }
