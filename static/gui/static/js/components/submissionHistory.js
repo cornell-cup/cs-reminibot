@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import { Button, LabeledTextBox } from './Util.js';
 import axios from 'axios';
 
+import CodeMirror from 'react-codemirror';
+require('codemirror/mode/python/python');
+
 
 export default class History extends React.Component {
 	constructor() {
@@ -14,6 +17,7 @@ export default class History extends React.Component {
 
 		this.state = { submissions: null, history: <p></p> };
 
+		this.codeRef = React.createRef();
 	}
 
 
@@ -57,12 +61,15 @@ export default class History extends React.Component {
 
 	onClick(disMessage) {
 		this.setState({ message: disMessage });
+		this.codeRef["current"].getCodeMirror().setValue(disMessage);
 	}
 
 	async componentDidMount() {
 		await this.getData();
 		this.disHistory();
 		console.log(this.state.submissions);
+		console.log(this.codeRef);
+		console.log(this.codeRef["current"]);
 	}
 
 	render() {
@@ -72,11 +79,22 @@ export default class History extends React.Component {
 			float: "right"
 		}
 
-		return (
+		let options = {
+            lineNumbers: true,
+            mode: 'python'
+        };
 
+		let message = this.state.message;
+		console.log(message);
+
+		return (
 			<div>
-				<div style={infoStyle}>
-					{this.state.message}
+				<div style={infoStyle} id="code">
+					<CodeMirror
+						ref={this.codeRef}
+						value={message}
+						options={options}
+					/>
 				</div>
 
 
@@ -86,6 +104,7 @@ export default class History extends React.Component {
 						{this.state.history}
 					</ul>
 				</div>
+
 			</div>
 		);
 	}
