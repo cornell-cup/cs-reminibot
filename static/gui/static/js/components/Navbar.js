@@ -28,29 +28,32 @@ const Navbar = (props) => {
     setLoginEmail("");
   }
   return (
+
     <div id="top-nav" className="mb-4">
-      <nav className="navbar navbar-dark bg-dark">
-        <div className="container d-flex flex-row">
-          <span className="navbar-brand" href="#">
+      <nav className="container navbar navbar-dark bg-dark">
+          <a className="navbar-brand" href="#">
             <img src="./static/img/logo.png" width="50" height="50" className="d-inline-block align-top" alt="" />
             Minibot
-          </span>
-          <span className="pages nav nav-pills" id="fakeTabs" role="tablist">
-            <a id="setup-control-link" data-toggle="tab" href="#setup_control_tab" role="tab"><FontAwesomeIcon icon="cogs" /> Setup/Movement</a>
-            <a id="coding-link" data-toggle="tab" href="#coding-tab" role="tab"><FontAwesomeIcon icon="code" /> Coding</a>
+          </a>
+          <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div className="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul className="navbar-nav mr-auto">
+            <li className="nav-item" ><a id="setup-control-link" data-toggle="tab" href="#setup_control_tab" className="nav-link"><FontAwesomeIcon icon="cogs" /> Setup/Movement</a></li>
+            <li className="nav-item" ><a id="coding-link" data-toggle="tab" href="#coding-tab" className="nav-link"><FontAwesomeIcon icon="code" /> Coding</a></li>
             {isLoggedIn &&
               /**TODO: fix the icon for analytics to be something more suited for analytics*/
-              <a id="analytics-link" data-toggle="tab" href="#analytics-tab" role="tab"><FontAwesomeIcon icon="cogs" /> Analytics</a>
+              <li className="nav-item"><a id="analytics-link" data-toggle="tab" href="#analytics-tab" className="nav-link"><FontAwesomeIcon icon="cogs" /> Analytics</a></li>
             }
-          </span>
-          <span className="login">
-            {isLoggedIn ? <button type="button" onClick={handleLogout}>Logout</button> : <button type="button" data-toggle="modal" data-target="#loginModal">Login</button>}
-            {isLoggedIn ? <button><FontAwesomeIcon icon={Icons.faUser} /></button> : <button type="button" data-toggle="modal" data-target="#registerModal">Signup</button>}
+
+            <li className="nav-item" >{isLoggedIn ? <a className="nav-link" onClick={handleLogout}>Logout</a> : <a className="nav-link" data-toggle="modal" data-target="#loginModal">Login</a>}</li>
+            <li className="nav-item" >{isLoggedIn ? <a className="nav-link"><FontAwesomeIcon icon={Icons.faUser} /></a> : <button className="nav-link" data-toggle="modal" data-target="#registerModal">Signup</button>}</li>
             {/* {!this.state.isLoggedIn ? <button type="button" data-toggle="modal" data-target="#loginModal">Login</button> : null}
             {!this.state.isLoggedIn ? <button type="button" data-toggle="modal" data-target="#registerModal">Signup</button> : null} */}
             {/* {this.state.isLoggedIn ? <label className="white-label"> Logged in as: {this.state.loginEmail} &nbsp; </label> : null}
             {this.state.isLoggedIn ? <Button id="logout" name="Logout" onClick={this.logout}/> : null} */}
-          </span>
+</ul>
         </div>
       </nav>
       <LoginModal />
