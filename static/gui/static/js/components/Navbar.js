@@ -25,6 +25,11 @@ const Navbar = (props) => {
 
   function handleLogout(e) {
     console.log("logout")
+    if(activeIndex === 2){
+      document.querySelector("#analytics-tab").classList.remove("active");
+      document.querySelector("#setup_control_tab").classList.add("active");
+      setActiveIndex(0);
+    }
     const current_user_email = props.cookies.remove('current_user_email');
     setIsLoggedIn(false);
     setLoginEmail("");
