@@ -15,7 +15,7 @@ export default class History extends React.Component {
 		this.getUser = this.getUser.bind(this);
 		this.getData = this.getData.bind(this);
 
-		this.state = { submissions: null, history: <p></p> };
+		this.state = { submissions: null, history: <p></p>, visibility: "hidden", focusedList: null};
 
 		this.codeRef = React.createRef();
 	}
@@ -24,10 +24,15 @@ export default class History extends React.Component {
 	disHistory() {
 		try {
 			var subs = this.state.submissions;
-			const listItems = subs.map((subs) =>
+			var submissionNums = [];
+			for(var i = 0; i < subs.length; i++){
+				submissionNums.push(i);
+			}
+
+			const listItems = subs.map((subs,submissionNums) =>
 				subs["result"] == "Successful execution" ? 
-				<li class="list-group-item list-group-item-success" onClick={() => this.onClick(subs["code"])}>{subs["time"]}</li>
-				: <li class="list-group-item list-group-item-danger" onClick={() => this.onClick(subs["code"])}>{subs["time"]}</li>
+				<li id={submissionNums} class="list-group-item list-group-item-success" onClick={() => this.onClick(subs["code"], submissionNums)}>{subs["time"]}</li>
+				: <li id={submissionNums} class="list-group-item list-group-item-danger" onClick={() => this.onClick(subs["code"], submissionNums)}>{subs["time"]}</li>,
 			);
 
 			this.setState({ history: listItems });
@@ -59,53 +64,53 @@ export default class History extends React.Component {
 		}
 	}
 
-	onClick(disMessage) {
-		this.setState({ message: disMessage });
+	onClick(disMessage, id) {
+		if(this.state.visibility != "visible") this.setState({visibility: "visible"});
+		if(this.state.focusedList != null) this.state.focusedList.style.fontWeight = "normal";
+
+		//Not storing message in the state, because the value of the CodeMirror doesn't update when the state is changed. 
+		//If we switch to CodeMirror2, this would be a good way to store the submission code.
+		//this.setState({ message: disMessage });
 		this.codeRef["current"].getCodeMirror().setValue(disMessage);
+
+		var listItem = document.getElementById(id);
+		listItem.style.fontWeight = "bold";
+		
+		this.setState({focusedList: listItem });
 	}
 
 	async componentDidMount() {
 		await this.getData();
 		this.disHistory();
-		console.log(this.state.submissions);
-		console.log(this.codeRef);
-		console.log(this.codeRef["current"]);
 	}
 
 	render() {
-		const infoStyle = {
-			color: "white",
-			width: "50%",
-			float: "right"
+		var stateVis = this.state.visibility;
+
+		var visStyle = {
+			visibility: stateVis
 		}
 
 		let options = {
             lineNumbers: true,
-            mode: 'python'
+            mode: 'python',
         };
-
-		let message = this.state.message;
-		console.log(message);
-
 		return (
-			<div>
-				<div style={infoStyle} id="code">
-					<CodeMirror
-						ref={this.codeRef}
-						value={message}
-						options={options}
-					/>
+				<div class="row">
+					<div class="col">
+						<p className="small-title"> Code Submission History </p>
+						<ul class="list-group">
+							{this.state.history}
+						</ul>
+					</div>
+					<div class="col col-offset-2" style={visStyle}>
+						<CodeMirror
+							ref={this.codeRef}
+							options={options}
+							width="null"
+						/>
+					</div>
 				</div>
-
-
-				<div style={{ color: "black" }}>
-					<p className="small-title"> Code Submission History </p>
-					<ul class="list-group">
-						{this.state.history}
-					</ul>
-				</div>
-
-			</div>
 		);
 	}
 }
