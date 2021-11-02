@@ -59,10 +59,10 @@ const Navbar = (props) => {
   <a id="coding-link" data-toggle="tab" href="#coding-tab" className={`nav-link ${activeIndex === 1 ? "active" : ""}`} onClick={(e)=>{setActiveIndex(1)}}><FontAwesomeIcon icon="code" /> Coding</a>
   {isLoggedIn &&
               /**TODO: fix the icon for analytics to be something more suited for analytics*/
-              <a id="analytics-link" data-toggle="tab" href="#analytics-tab" className={`nav-link ${activeIndex === 2 ? "active" : ""}`} onClick={(e)=>{setActiveIndex(2)}}><FontAwesomeIcon icon="cogs" /> Analytics</a>
+              <a id="analytics-link" data-toggle="tab" href="#analytics-tab" className={`nav-link ${activeIndex === 2 ? "active" : ""}`} onClick={(e)=>{setActiveIndex(2)}}><FontAwesomeIcon icon={Icons.faChartBar} /> Analytics</a>
             }
-  {isLoggedIn ? <a className="nav-link" onClick={handleLogout}>Logout</a> : <a className="nav-link" data-toggle="modal" data-target="#loginModal">Login</a>}
-  {!isLoggedIn && <a className="nav-link" data-toggle="modal" data-target="#registerModal">Signup</a>}
+  {isLoggedIn ? <a className="nav-link" onClick={handleLogout}><FontAwesomeIcon icon={Icons.faSignOutAlt} /> Logout</a> : <a className="nav-link" data-toggle="modal" data-target="#loginModal"><FontAwesomeIcon icon={Icons.faSignInAlt} /> Login</a>}
+  {!isLoggedIn && <a className="nav-link" data-toggle="modal" data-target="#registerModal"><FontAwesomeIcon icon={Icons.faUserPlus} /> Signup</a>}
 </div>
 
     <div id="top-nav" className="mb-4">
