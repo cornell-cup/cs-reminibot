@@ -149,6 +149,11 @@
   text-decoration: none;
 }
 
+.sidenav a.active {
+  color: #f1f1f1;
+  text-decoration: none;
+}
+
 /* Position and style the close button (top right corner) */
 .sidenav .closebtn {
   position: absolute;

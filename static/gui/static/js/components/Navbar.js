@@ -12,6 +12,7 @@ const Navbar = (props) => {
   const [loginEmail, setLoginEmail] = useState(props.cookies.get('current_user_email') || "");
   const [isLoggedIn, setIsLoggedIn] = useState(props.cookies.get(isLoggedIn !== ""));
   const [isSideNavOpen, setIsSideNavOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
     const current_user_email = props.cookies.get('current_user_email') || "";
@@ -54,11 +55,11 @@ const Navbar = (props) => {
 <div id="mySidenav" class="sidenav">
   <a href="#" class="closebtn" onClick={closeNav}>&times;</a>
   {isLoggedIn && <a className="nav-link"><FontAwesomeIcon icon={Icons.faUser} /> &nbsp; {loginEmail.substring(0, loginEmail.indexOf('@'))}</a> }
-  <a id="setup-control-link" data-toggle="tab" href="#setup_control_tab" className="nav-link"><FontAwesomeIcon icon="cogs" /> Setup/Movement</a>
-  <a id="coding-link" data-toggle="tab" href="#coding-tab" className="nav-link"><FontAwesomeIcon icon="code" /> Coding</a>
+  <a id="setup-control-link" data-toggle="tab" href="#setup_control_tab" className={`nav-link ${activeIndex === 0 ? "active" : ""}`} onClick={(e)=>{setActiveIndex(0)}}><FontAwesomeIcon icon="cogs" /> Setup/Movement</a>
+  <a id="coding-link" data-toggle="tab" href="#coding-tab" className={`nav-link ${activeIndex === 1 ? "active" : ""}`} onClick={(e)=>{setActiveIndex(1)}}><FontAwesomeIcon icon="code" /> Coding</a>
   {isLoggedIn &&
               /**TODO: fix the icon for analytics to be something more suited for analytics*/
-              <a id="analytics-link" data-toggle="tab" href="#analytics-tab" className="nav-link"><FontAwesomeIcon icon="cogs" /> Analytics</a>
+              <a id="analytics-link" data-toggle="tab" href="#analytics-tab" className={`nav-link ${activeIndex === 2 ? "active" : ""}`} onClick={(e)=>{setActiveIndex(2)}}><FontAwesomeIcon icon="cogs" /> Analytics</a>
             }
   {isLoggedIn ? <a className="nav-link" onClick={handleLogout}>Logout</a> : <a className="nav-link" data-toggle="modal" data-target="#loginModal">Login</a>}
   {!isLoggedIn && <a className="nav-link" data-toggle="modal" data-target="#registerModal">Signup</a>}
