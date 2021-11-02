@@ -1,4 +1,5 @@
 from cv2 import *
+import cv2
 import numpy as np
 import json
 """
@@ -18,7 +19,7 @@ def get_image(camera):
 
     """
     frame = []
-    while (not VideoCapture.isOpened(camera)):  # reopen camera if needed
+    while (not cv2.VideoCapture.isOpened(camera)):  # reopen camera if needed
         camera.open()
     while (len(frame) == 0):  # Read from the camera
         read_ok, frame_ret = camera.read()
