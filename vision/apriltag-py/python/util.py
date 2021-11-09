@@ -162,7 +162,7 @@ def compute_tag_undistorted_pose(camera_matrix, dist_coeffs, transform_matrix, d
     obj_points[2] = (x, x, 0.0)
     obj_points[3] = (-x, x, 0.0)
     ret, rvec, tvec = \
-        solvePnP(obj_points, img_points, camera_matrix, dist_coeffs)
+        cv2.solvePnP(obj_points, img_points, camera_matrix, dist_coeffs)
 
     # Make tag_to_camera matrix (homogenous transform matrix)
     """
@@ -173,7 +173,7 @@ def compute_tag_undistorted_pose(camera_matrix, dist_coeffs, transform_matrix, d
     dst[2,0] dst[2,1] dst[2,2] tvec[2,0]
     0           0       0       1
     """
-    dst, jac = Rodrigues(rvec)  # dst is a 3 x 3 rotation matrix
+    dst, jac = cv2.Rodrigues(rvec)  # dst is a 3 x 3 rotation matrix
     dst = np.append(dst, tvec, axis=1)
     tag_to_camera = np.append(dst, np.array([[0, 0, 0, 1]]), axis=0)
 

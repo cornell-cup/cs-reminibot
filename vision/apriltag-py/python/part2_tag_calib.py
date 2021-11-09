@@ -6,10 +6,14 @@ import numpy as np
 import time
 import util
 import json
+import math
 
+PAPER_WIDTH = 8.5
+PAPER_HEIGHT = 11
 BOARD_TAG_SIZE = 6.5  # The length of a side of a tag on the axis board, in inches
 ORIGIN_TAG_SIZE = 6.5  # The length of a side of a tag used to calibrate the origin
-NUM_DETECTIONS = 4  # The number of tags to detect, usually 4
+COLUMNS = 8
+ROWS = 3
 
 
 def main():
@@ -17,7 +21,18 @@ def main():
     BOARD_TAG_SIZE = args["board"]
     ORIGIN_TAG_SIZE = args["origin"]
     calib_file_name = args["file"]
+    NUM_DETECTIONS = COLUMNS * ROWS  # The number of tags to detect, usually 4
+    COMBINED_PAPER_WIDTH_MARGIN = PAPER_WIDTH - BOARD_TAG_SIZE
+    COMBINED_PAPER_HEIGHT_MARGIN = PAPER_HEIGHT - BOARD_TAG_SIZE
 
+    #FOR TESTING REMOVE LATER
+    middle_column, middle_row = get_middle_column_and_row(COLUMNS, ROWS)
+    print("id,x1,x2,y1,y2")
+    for id in range(NUM_DETECTIONS):
+        x1,x2,y1,y2 = get_corner_coordinate_components(COLUMNS, ROWS, PAPER_WIDTH, PAPER_HEIGHT, BOARD_TAG_SIZE, COMBINED_PAPER_WIDTH_MARGIN, COMBINED_PAPER_HEIGHT_MARGIN, id, middle_column, middle_row)
+        print(str(id)+","+str(x1)+","+str(x2)+","+str(y1)+","+str(y2))
+    #FOR TESTING REMOVE LATER
+    
     # offsets to reposition where (0,0) is
     x_offset = 0
     y_offset = 0
@@ -28,7 +43,7 @@ def main():
     calib_file, calib_data = util.read_calib_json(calib_file_name)
     camera_matrix = util.get_numpy_matrix(calib_data, "camera_matrix")
     dist_coeffs = util.get_numpy_matrix(calib_data, "dist_coeffs")
-    new_mat = util.get_numpy_matrix(calib_data, "new_mat")
+    new_mat = util.get_numpy_matrix(calib_data, "new_camera_matrix")
     calib_file.close()
     print("Read from calibration file")
     print("CAMERA MATRIX: {}".format(camera_matrix))
@@ -69,50 +84,73 @@ def main():
 
         x_offset = 0
         y_offset = 0
+        overall_x_center = 0
+        overall_y_center = 0
 
         for i in range(len(detections)):
             d = detections[i]
             id = int(d.tag_id)
+            if id == 0 or id == 7 or id == 16 or id == 23:
+                print(str(id),":",d.center)
 
             # Add to offsets
             (ctr_x, ctr_y) = d.center
             x_offset += ctr_x
             y_offset += ctr_y
+            overall_x_center += ctr_x
+            overall_y_center += ctr_y
 
             # Draw onto the frame
             cv2.circle(frame, (int(ctr_x), int(ctr_y)), 5, (0, 0, 255), 3)
+            # pose, e0, e1 = detector.detection_pose(d,
+            #                                       options.camera_params,
+            #                                       options.tag_size)
 
+            #     _draw_pose(overlay,
+            #                options.camera_params,
+            #                options.tag_size,
+            #                pose)
+        corner_center_x = (detections[0].corners[3][0]+ detections[23].corners[1][0])/2
+        corner_center_y = (detections[0].corners[3][1]+ detections[23].corners[1][1])/2
+
+        overall_x_center /= 1 if len(detections) == 0 else len(detections)
+        overall_y_center /= 1 if len(detections) == 0 else len(detections)
         # Draw origin
-        if len(detections) == 4:
-            cv2.circle(frame, (int(x_offset / 4), int(y_offset / 4)), 5, (255, 0, 0), 3)
+        # if len(detections) == 4:
+        #     cv2.circle(frame, (int(x_offset / 4), int(y_offset / 4)), 5, (255, 0, 0), 3)
+        # Draw origin of more than 4 tags 
+        cv2.circle(frame, (int(overall_x_center), int(overall_y_center)), 5, (255, 0, 0), 3)
+        cv2.circle(frame, (int(corner_center_x), int(corner_center_y)), 5, (0, 255, 0), 3)
+        
         cv2.imshow("Calibration board", frame)
         if cv2.waitKey(1) & 0xFF == ord(" "):
             break
-        else:
-            continue
+    print("passed")
     cv2.destroyAllWindows()
 
     # Compute transformation via PnP
     # TODO What's the reasoning from this math?
     # This was from a tutorial somehwhere and was directly
     # transcribed from the C++ system.
+    print("id,d.corners[0][0]"+","+str("d.corners[0][1]")+","+str("d.corners[1][0]")+","+str("d.corners[1][1]")+","+str("d.corners[2][0]")+","+str("d.corners[2][1]")+","+str("d.corners[3][0]")+","+str("d.corners[3][1]")+","+str("x1")+","+str("y1")+","+str("x2")+","+str("y1")+","+str("x2")+","+str("y2")+","+str("x1")+","+str("y2"))
+    
+    middle_column, middle_row = get_middle_column_and_row(COLUMNS, ROWS)
     for d in detections:
         id = int(d.tag_id)
         img_points[0 + 4 * id] = d.corners[0]
         img_points[1 + 4 * id] = d.corners[1]
         img_points[2 + 4 * id] = d.corners[2]
         img_points[3 + 4 * id] = d.corners[3]
-        a = (id % 2) * 2 + 1
-        b = -((id / 2) * 2 - 1)
-        # 8.5 and 11 are letter paper dimensions!
-        x1 = -0.5 * BOARD_TAG_SIZE + a * 8.5 * 0.5
-        x2 = 0.5 * BOARD_TAG_SIZE + a * 8.5 * 0.5
-        y1 = -0.5 * BOARD_TAG_SIZE + b * 11 * 0.5
-        y2 = 0.5 * BOARD_TAG_SIZE + b * 11 * 0.5
-        obj_points[0 + 4 * id] = (x1, y1, 0.0)
-        obj_points[1 + 4 * id] = (x2, y1, 0.0)
-        obj_points[2 + 4 * id] = (x2, y2, 0.0)
-        obj_points[3 + 4 * id] = (x1, y2, 0.0)
+        print("corner: ",d.corners[0])
+
+        x1, x2, y1, y2 = get_corner_coordinate_components(COLUMNS, ROWS, PAPER_WIDTH, PAPER_HEIGHT, BOARD_TAG_SIZE, COMBINED_PAPER_WIDTH_MARGIN, COMBINED_PAPER_HEIGHT_MARGIN, id, middle_column, middle_row)
+
+        #ADD IN CONSTANT Z DISTANCE (POSSIBLY FROM ARGUMENT GIVEN TO PROGRAM) FOR ALL POINTS AND FUDGE FACTOR RESULT
+        obj_points[0 + 4 * id] = [x1, y1, 0.0]
+        obj_points[1 + 4 * id] = [x2, y1, 0.0]
+        obj_points[2 + 4 * id] = [x2, y2, 0.0]
+        obj_points[3 + 4 * id] = [x1, y2, 0.0]
+        #print(str(id)+","+str(d.corners[0][0])+","+str(d.corners[0][1])+","+str(d.corners[1][0])+","+str(d.corners[1][1])+","+str(d.corners[2][0])+","+str(d.corners[2][1])+","+str(d.corners[3][0])+","+str(d.corners[3][1])+","+str(x1)+","+str(y1)+","+str(x2)+","+str(y1)+","+str(x2)+","+str(y2)+","+str(x1)+","+str(y2))
 
     # Make transform matrices
     ret, rvec, tvec = cv2.solvePnP(obj_points, img_points, camera_matrix, dist_coeffs)
@@ -169,7 +207,7 @@ def main():
         )
         cv2.circle(frame, (int(x_offset), int(y_offset)), 5, (255, 0, 0), 3)
 
-        util.imshow("Origin tag", frame)
+        cv2.imshow("Origin tag", frame)
         if cv2.waitKey(1) & 0xFF == ord(" "):
             break
         else:
@@ -186,6 +224,32 @@ def main():
     print("Finished writing data to calibration file")
     pass
 
+def get_middle_column_and_row(COLUMNS, ROWS):
+    middle_column = (COLUMNS - 1)//2
+    middle_row = (ROWS - 1)//2
+    return middle_column, middle_row
+
+def get_corner_coordinate_components(COLUMNS, ROWS, PAPER_WIDTH, PAPER_HEIGHT, BOARD_TAG_SIZE, COMBINED_PAPER_WIDTH_MARGIN, COMBINED_PAPER_HEIGHT_MARGIN, id, middle_column, middle_row):
+    
+    x1,x2,y1,y2 = 0, 0, 0, 0
+    column = id % COLUMNS
+    row = id // COLUMNS
+
+    #calculating x components of corners
+    COMBINED_PAPER_WIDTH_MARGINs_from_center = (column - middle_column)
+    BOARD_TAGs_from_center = COMBINED_PAPER_WIDTH_MARGINs_from_center+.5
+    even_column_offset = -PAPER_WIDTH/2 * (1-COLUMNS%2)
+    x2 = COMBINED_PAPER_WIDTH_MARGIN * COMBINED_PAPER_WIDTH_MARGINs_from_center + (BOARD_TAGs_from_center)*BOARD_TAG_SIZE + even_column_offset
+    x1 = x2 - BOARD_TAG_SIZE
+
+    #calculating y components of corners
+    COMBINED_PAPER_HEIGHT_MARGINs_from_center = (middle_row - row)
+    BOARD_TAGs_from_center = COMBINED_PAPER_HEIGHT_MARGINs_from_center+.5
+    even_row_offset = PAPER_HEIGHT/2 * (1-ROWS%2)
+    y2 = COMBINED_PAPER_HEIGHT_MARGIN * COMBINED_PAPER_HEIGHT_MARGINs_from_center + (BOARD_TAGs_from_center)*BOARD_TAG_SIZE + even_row_offset
+    y1 = y2 - BOARD_TAG_SIZE
+
+    return x1,x2,y1,y2
 
 def get_args():
     """
