@@ -37,8 +37,11 @@ def main():
     transform_matrix = util.get_numpy_matrix(calib_data, "transform_matrix")
     camera_matrix = util.get_numpy_matrix(calib_data, "camera_matrix")
     dist_coeffs = util.get_numpy_matrix(calib_data, "dist_coeffs")
-    x_offset = calib_data["offsets"]["x"]
-    y_offset = calib_data["offsets"]["y"]
+    x_scale_factor = calib_data["scale_factors"]["x"]
+    y_scale_factor = calib_data["scale_factors"]["y"]
+    overall_center_x_offset = calib_data["overall_center_offset"]["x"]
+    overall_center_y_offset = calib_data["overall_center_offset"]["y"]
+    center_cell_offsets = calib_data["cell_center_offsets"]
     calib_file.close()
 
     # calib_file, camera_matrix, dist_coeffs = get_matrices_from_file(
@@ -101,10 +104,14 @@ def main():
             # Scale the coordinates, and print for debugging
             # prints Device ID :: tag id :: x y z angle
             # TODO debug offset method - is better, but not perfect.
-            x = MULT_FACTOR * (x + x_offset)
-            y = MULT_FACTOR * (y + y_offset)
+            center_cell_offset = center_cell_offsets[str(d.tag_id)]
+            x_without_ff = x_scale_factor * (x + overall_center_x_offset)
+            y_without_ff = y_scale_factor * (y + overall_center_y_offset)
+            x = x_scale_factor * (x + overall_center_x_offset) + center_cell_offset["x"]
+            y = y_scale_factor * (y + overall_center_y_offset) + center_cell_offset["y"]
             # print(tag_xyz)
-            print("{} :: {} :: {} {} {} {}".format(DEVICE_ID, d.tag_id, x, y, z, angle))
+            # print("{} :: {} :: {} {} {} {}".format(DEVICE_ID, d.tag_id, x, y, z, angle))
+            print("{},{},{},{},{}".format(d.tag_id, x_without_ff, y_without_ff, z, angle))
 
             # Send the data to the URL specified.
             # This is usually a URL to the base station.

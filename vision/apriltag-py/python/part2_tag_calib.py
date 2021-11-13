@@ -110,8 +110,7 @@ def main():
             #                options.camera_params,
             #                options.tag_size,
             #                pose)
-        corner_center_x = (detections[0].corners[3][0]+ detections[23].corners[1][0])/2
-        corner_center_y = (detections[0].corners[3][1]+ detections[23].corners[1][1])/2
+
 
         overall_x_center /= 1 if len(detections) == 0 else len(detections)
         overall_y_center /= 1 if len(detections) == 0 else len(detections)
@@ -120,7 +119,7 @@ def main():
         #     cv2.circle(frame, (int(x_offset / 4), int(y_offset / 4)), 5, (255, 0, 0), 3)
         # Draw origin of more than 4 tags 
         cv2.circle(frame, (int(overall_x_center), int(overall_y_center)), 5, (255, 0, 0), 3)
-        cv2.circle(frame, (int(corner_center_x), int(corner_center_y)), 5, (0, 255, 0), 3)
+        
         
         cv2.imshow("Calibration board", frame)
         if cv2.waitKey(1) & 0xFF == ord(" "):
@@ -133,7 +132,7 @@ def main():
     # This was from a tutorial somehwhere and was directly
     # transcribed from the C++ system.
     print("id,d.corners[0][0]"+","+str("d.corners[0][1]")+","+str("d.corners[1][0]")+","+str("d.corners[1][1]")+","+str("d.corners[2][0]")+","+str("d.corners[2][1]")+","+str("d.corners[3][0]")+","+str("d.corners[3][1]")+","+str("x1")+","+str("y1")+","+str("x2")+","+str("y1")+","+str("x2")+","+str("y2")+","+str("x1")+","+str("y2"))
-    
+    object_center_points = []
     middle_column, middle_row = get_middle_column_and_row(COLUMNS, ROWS)
     for d in detections:
         id = int(d.tag_id)
@@ -144,7 +143,7 @@ def main():
         print("corner: ",d.corners[0])
 
         x1, x2, y1, y2 = get_corner_coordinate_components(COLUMNS, ROWS, PAPER_WIDTH, PAPER_HEIGHT, BOARD_TAG_SIZE, COMBINED_PAPER_WIDTH_MARGIN, COMBINED_PAPER_HEIGHT_MARGIN, id, middle_column, middle_row)
-
+        object_center_points.append(((x1+x2)/2, (y1+y2)/2))
         #ADD IN CONSTANT Z DISTANCE (POSSIBLY FROM ARGUMENT GIVEN TO PROGRAM) FOR ALL POINTS AND FUDGE FACTOR RESULT
         obj_points[0 + 4 * id] = [x1, y1, 0.0]
         obj_points[1 + 4 * id] = [x2, y1, 0.0]
@@ -202,10 +201,74 @@ def main():
 
         if len(detections) == 0:
             continue
-        (x_offset, y_offset, _, _) = util.compute_tag_undistorted_pose(
-            camera_matrix, dist_coeffs, camera_to_origin, detections[0], ORIGIN_TAG_SIZE
-        )
-        cv2.circle(frame, (int(x_offset), int(y_offset)), 5, (255, 0, 0), 3)
+        
+        detected_x_coords = []
+        detected_y_coords = []
+        max_id = -1
+        for detection_index in range(len(detections)):
+            (detected_x, detected_y, detected_z, detected_angle) = util.compute_tag_undistorted_pose(
+                camera_matrix, dist_coeffs, camera_to_origin, detections[detection_index], BOARD_TAG_SIZE
+            )
+            (actual_x, actual_y) = object_center_points[detection_index]
+            max_id = int(detections[detection_index].tag_id) if int(detections[detection_index].tag_id) > max_id else max_id
+            
+            detected_x_coords.append(detected_x)
+            detected_y_coords.append(detected_y)
+
+        # Center_x_offset is the actual coordinate the of center of all the detected x values, and it will be used
+        # to offset all the other points. We do this because we are treating the center of all detected x values
+        # as the origin of our coordinate plane.
+        # Center_y_offset is the same thing. Both of these values are negative so we can add it to other coordinates,
+        # which generally come with very large values.      
+        center_x_offset = -sum(detected_x_coords)/len(detected_x_coords)
+        center_y_offset = -sum(detected_y_coords)/len(detected_y_coords)
+        calib_data["overall_center_offset"] = {
+            "x": center_x_offset,
+            "y": center_y_offset
+        }
+
+        
+        #Store the scale factor for every set of points (x,y) in these lists
+        x_scale_factors = []
+        y_scale_factors = []
+        for detection_index in range(len(detections)):
+            (detected_x, detected_y, detected_z, detected_angle) = util.compute_tag_undistorted_pose(
+                camera_matrix, dist_coeffs, camera_to_origin, detections[detection_index], BOARD_TAG_SIZE
+            )
+            (actual_x, actual_y) = object_center_points[detection_index]
+            center_offset_detected_x = detected_x+center_x_offset
+            center_offset_detected_y = detected_y+center_y_offset
+            if actual_x != 0 and detected_x != 0:
+                x_scale_factors.append(actual_x/center_offset_detected_x)
+            if actual_y != 0 and detected_y != 0:
+                y_scale_factors.append(actual_y/center_offset_detected_y)
+
+        #A general scale factor for every point calculated using the average of the individual scale factors
+        x_scale_factor = sum(x_scale_factors)/len(x_scale_factors)
+        y_scale_factor = sum(y_scale_factors)/len(y_scale_factors)
+        calib_data["scale_factors"] = {
+            "x": x_scale_factor,
+            "y": y_scale_factor
+        }
+
+        #These will store the scaled points with fudge factors that move the detected center point of each
+        #april tag closer to the ideal center point. 
+        x_offsets = []
+        y_offsets = []
+        for detection_index in range(len(detections)):
+            (detected_x, detected_y, detected_z, detected_angle) = util.compute_tag_undistorted_pose(
+                camera_matrix, dist_coeffs, camera_to_origin, detections[detection_index], BOARD_TAG_SIZE
+            )
+            
+            (actual_x, actual_y) = object_center_points[detection_index]
+            center_offset_detected_x = detected_x+center_x_offset
+            center_offset_detected_y = detected_y+center_y_offset
+            x_offsets.append(actual_x - x_scale_factor*center_offset_detected_x)
+            y_offsets.append(actual_y - y_scale_factor*center_offset_detected_y)
+
+            
+        
+        cv2.circle(frame, (int(overall_x_center), int(overall_y_center)), 5, (255, 0, 0), 3)
 
         cv2.imshow("Origin tag", frame)
         if cv2.waitKey(1) & 0xFF == ord(" "):
@@ -214,10 +277,10 @@ def main():
             continue
 
     # Write offsets
-    calib_data["offsets"] = {
-        "x": -1 * x_offset,
-        "y": -1 * y_offset
-    }
+    calib_data["cell_center_offsets"] = {str(detections[detection_index].tag_id) : {
+        "x": x_offsets[detection_index],
+        "y": y_offsets[detection_index]
+    } for detection_index in range(len(detections)) if True}
     with open(calib_file_name, "w") as calib_file:
         json.dump(calib_data, calib_file)
 
