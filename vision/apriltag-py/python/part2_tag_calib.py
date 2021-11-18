@@ -8,28 +8,32 @@ import util
 import json
 import math
 
-PAPER_WIDTH = 8.5
-PAPER_HEIGHT = 11
-BOARD_TAG_SIZE = 6.5  # The length of a side of a tag on the axis board, in inches
-ORIGIN_TAG_SIZE = 6.5  # The length of a side of a tag used to calibrate the origin
-COLUMNS = 8
-ROWS = 3
+# PAPER_WIDTH = 8.5
+# PAPER_HEIGHT = 11
+# BOARD_TAG_SIZE = 6.5  # The length of a side of a tag on the axis board, in inches
+# ORIGIN_TAG_SIZE = 6.5  # The length of a side of a tag used to calibrate the origin
+
 
 
 def main():
     args = get_args()
     BOARD_TAG_SIZE = args["board"]
-    ORIGIN_TAG_SIZE = args["origin"]
-    calib_file_name = args["file"]
-    NUM_DETECTIONS = COLUMNS * ROWS  # The number of tags to detect, usually 4
-    COMBINED_PAPER_WIDTH_MARGIN = PAPER_WIDTH - BOARD_TAG_SIZE
-    COMBINED_PAPER_HEIGHT_MARGIN = PAPER_HEIGHT - BOARD_TAG_SIZE
+    # ORIGIN_TAG_SIZE = args["origin"]
+    calib_file_name = args["calibration_file"]
+    tag_positions_file_name = args["positions_file"]
+    COLUMNS = args["columns"]
+    ROWS = args["rows"]
+    map_width = args["map_width"]
+    map_height = args["map_height"]
+    NUM_DETECTIONS = COLUMNS * ROWS
+    horizontal_distance_between_april_tags = (map_width - COLUMNS*BOARD_TAG_SIZE)/(1 if COLUMNS <= 1 else (COLUMNS - 1))
+    vertical_distance_between_april_tags = (map_height - ROWS*BOARD_TAG_SIZE)/(1 if ROWS <= 1 else (ROWS - 1))
 
     #FOR TESTING REMOVE LATER
     middle_column, middle_row = get_middle_column_and_row(COLUMNS, ROWS)
     print("id,x1,x2,y1,y2")
     for id in range(NUM_DETECTIONS):
-        x1,x2,y1,y2 = get_corner_coordinate_components(COLUMNS, ROWS, PAPER_WIDTH, PAPER_HEIGHT, BOARD_TAG_SIZE, COMBINED_PAPER_WIDTH_MARGIN, COMBINED_PAPER_HEIGHT_MARGIN, id, middle_column, middle_row)
+        x1,x2,y1,y2 = get_corner_coordinate_components(COLUMNS, ROWS, BOARD_TAG_SIZE, horizontal_distance_between_april_tags, vertical_distance_between_april_tags, id, middle_column, middle_row)
         print(str(id)+","+str(x1)+","+str(x2)+","+str(y1)+","+str(y2))
     #FOR TESTING REMOVE LATER
     
@@ -142,7 +146,7 @@ def main():
         img_points[3 + 4 * id] = d.corners[3]
         print("corner: ",d.corners[0])
 
-        x1, x2, y1, y2 = get_corner_coordinate_components(COLUMNS, ROWS, PAPER_WIDTH, PAPER_HEIGHT, BOARD_TAG_SIZE, COMBINED_PAPER_WIDTH_MARGIN, COMBINED_PAPER_HEIGHT_MARGIN, id, middle_column, middle_row)
+        x1, x2, y1, y2 = get_corner_coordinate_components(COLUMNS, ROWS, BOARD_TAG_SIZE, horizontal_distance_between_april_tags, vertical_distance_between_april_tags, id, middle_column, middle_row)
         object_center_points.append(((x1+x2)/2, (y1+y2)/2))
         #ADD IN CONSTANT Z DISTANCE (POSSIBLY FROM ARGUMENT GIVEN TO PROGRAM) FOR ALL POINTS AND FUDGE FACTOR RESULT
         obj_points[0 + 4 * id] = [x1, y1, 0.0]
@@ -202,71 +206,35 @@ def main():
         if len(detections) == 0:
             continue
         
-        detected_x_coords = []
-        detected_y_coords = []
-        max_id = -1
-        for detection_index in range(len(detections)):
-            (detected_x, detected_y, detected_z, detected_angle) = util.compute_tag_undistorted_pose(
-                camera_matrix, dist_coeffs, camera_to_origin, detections[detection_index], BOARD_TAG_SIZE
-            )
-            (actual_x, actual_y) = object_center_points[detection_index]
-            max_id = int(detections[detection_index].tag_id) if int(detections[detection_index].tag_id) > max_id else max_id
-            
-            detected_x_coords.append(detected_x)
-            detected_y_coords.append(detected_y)
-
-        # Center_x_offset is the actual coordinate the of center of all the detected x values, and it will be used
-        # to offset all the other points. We do this because we are treating the center of all detected x values
-        # as the origin of our coordinate plane.
-        # Center_y_offset is the same thing. Both of these values are negative so we can add it to other coordinates,
-        # which generally come with very large values.      
-        center_x_offset = -sum(detected_x_coords)/len(detected_x_coords)
-        center_y_offset = -sum(detected_y_coords)/len(detected_y_coords)
+        center_x_offset, center_y_offset = get_world_center_offsets(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, camera_to_origin)
         calib_data["overall_center_offset"] = {
             "x": center_x_offset,
             "y": center_y_offset
         }
 
         
-        #Store the scale factor for every set of points (x,y) in these lists
-        x_scale_factors = []
-        y_scale_factors = []
-        for detection_index in range(len(detections)):
-            (detected_x, detected_y, detected_z, detected_angle) = util.compute_tag_undistorted_pose(
-                camera_matrix, dist_coeffs, camera_to_origin, detections[detection_index], BOARD_TAG_SIZE
-            )
-            (actual_x, actual_y) = object_center_points[detection_index]
-            center_offset_detected_x = detected_x+center_x_offset
-            center_offset_detected_y = detected_y+center_y_offset
-            if actual_x != 0 and detected_x != 0:
-                x_scale_factors.append(actual_x/center_offset_detected_x)
-            if actual_y != 0 and detected_y != 0:
-                y_scale_factors.append(actual_y/center_offset_detected_y)
-
-        #A general scale factor for every point calculated using the average of the individual scale factors
-        x_scale_factor = sum(x_scale_factors)/len(x_scale_factors)
-        y_scale_factor = sum(y_scale_factors)/len(y_scale_factors)
+        x_scale_factor, y_scale_factor = get_world_scale_factors(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, camera_to_origin, center_x_offset, center_y_offset)
         calib_data["scale_factors"] = {
             "x": x_scale_factor,
             "y": y_scale_factor
         }
 
-        #These will store the scaled points with fudge factors that move the detected center point of each
-        #april tag closer to the ideal center point. 
-        x_offsets = []
-        y_offsets = []
-        for detection_index in range(len(detections)):
-            (detected_x, detected_y, detected_z, detected_angle) = util.compute_tag_undistorted_pose(
-                camera_matrix, dist_coeffs, camera_to_origin, detections[detection_index], BOARD_TAG_SIZE
-            )
-            
-            (actual_x, actual_y) = object_center_points[detection_index]
-            center_offset_detected_x = detected_x+center_x_offset
-            center_offset_detected_y = detected_y+center_y_offset
-            x_offsets.append(actual_x - x_scale_factor*center_offset_detected_x)
-            y_offsets.append(actual_y - y_scale_factor*center_offset_detected_y)
+        detected_xs, detected_ys, x_offsets, y_offsets = get_cell_offsets_with_original_detections(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, camera_to_origin, center_x_offset, center_y_offset, x_scale_factor, y_scale_factor)
 
-            
+        # Write offsets old
+        # calib_data["cell_center_offsets"] = {str(detections[detection_index].tag_id) : {
+        #     "x": x_offsets[detection_index],
+        #     "y": y_offsets[detection_index]
+        # } for detection_index in range(len(detections)) if True} 
+
+        # Write offsets new
+        calib_data["cell_center_offsets"] = [{
+            "reference_point_x": detected_xs[detection_index],
+            "reference_point_y": detected_ys[detection_index],
+            "x_offset": x_offsets[detection_index],
+            "y_offset": y_offsets[detection_index]
+        } for detection_index in range(len(detections)) if True] 
+          
         
         cv2.circle(frame, (int(overall_x_center), int(overall_y_center)), 5, (255, 0, 0), 3)
 
@@ -276,40 +244,101 @@ def main():
         else:
             continue
 
-    # Write offsets
-    calib_data["cell_center_offsets"] = {str(detections[detection_index].tag_id) : {
-        "x": x_offsets[detection_index],
-        "y": y_offsets[detection_index]
-    } for detection_index in range(len(detections)) if True}
+    
     with open(calib_file_name, "w") as calib_file:
         json.dump(calib_data, calib_file)
 
     print("Finished writing data to calibration file")
     pass
 
+def get_cell_offsets_with_original_detections(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, camera_to_origin, center_x_offset, center_y_offset, x_scale_factor, y_scale_factor):
+    #These will store the scaled points with fudge factors that move the detected center point of each
+    #april tag closer to the ideal center point. 
+    x_offsets = []
+    y_offsets = []
+    detected_xs = []
+    detected_ys = []
+    for detection_index in range(len(detections)):
+        (detected_x, detected_y, detected_z, detected_angle) = util.compute_tag_undistorted_pose(
+                camera_matrix, dist_coeffs, camera_to_origin, detections[detection_index], BOARD_TAG_SIZE
+            )
+            
+        (actual_x, actual_y) = object_center_points[detection_index]
+        center_offset_detected_x = detected_x+center_x_offset
+        center_offset_detected_y = detected_y+center_y_offset
+        x_offsets.append(actual_x - x_scale_factor*center_offset_detected_x)
+        y_offsets.append(actual_y - y_scale_factor*center_offset_detected_y)
+        detected_xs.append(detected_x)
+        detected_ys.append(detected_y)
+    return detected_xs, detected_ys, x_offsets, y_offsets
+
+def get_world_scale_factors(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, camera_to_origin, center_x_offset, center_y_offset):
+    #Store the scale factor for every set of points (x,y) in these lists
+    x_scale_factors = []
+    y_scale_factors = []
+    for detection_index in range(len(detections)):
+        (detected_x, detected_y, detected_z, detected_angle) = util.compute_tag_undistorted_pose(
+                camera_matrix, dist_coeffs, camera_to_origin, detections[detection_index], BOARD_TAG_SIZE
+            )
+        (actual_x, actual_y) = object_center_points[detection_index]
+        center_offset_detected_x = detected_x+center_x_offset
+        center_offset_detected_y = detected_y+center_y_offset
+        if actual_x != 0 and detected_x != 0:
+            x_scale_factors.append(actual_x/center_offset_detected_x)
+        if actual_y != 0 and detected_y != 0:
+            y_scale_factors.append(actual_y/center_offset_detected_y)
+
+        #A general scale factor for every point calculated using the average of the individual scale factors
+    x_scale_factor = sum(x_scale_factors)/len(x_scale_factors)
+    y_scale_factor = sum(y_scale_factors)/len(y_scale_factors)
+    return x_scale_factor,y_scale_factor
+
+def get_world_center_offsets(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, camera_to_origin):
+    detected_x_coords = []
+    detected_y_coords = []
+    max_id = -1
+    for detection_index in range(len(detections)):
+        (detected_x, detected_y, detected_z, detected_angle) = util.compute_tag_undistorted_pose(
+                camera_matrix, dist_coeffs, camera_to_origin, detections[detection_index], BOARD_TAG_SIZE
+            )
+        (actual_x, actual_y) = object_center_points[detection_index]
+        max_id = int(detections[detection_index].tag_id) if int(detections[detection_index].tag_id) > max_id else max_id
+            
+        detected_x_coords.append(detected_x)
+        detected_y_coords.append(detected_y)
+
+        # Center_x_offset is the actual coordinate the of center of all the detected x values, and it will be used
+        # to offset all the other points. We do this because we are treating the center of all detected x values
+        # as the origin of our coordinate plane.
+        # Center_y_offset is the same thing. Both of these values are negative so we can add it to other coordinates,
+        # which generally come with very large values.      
+    center_x_offset = -sum(detected_x_coords)/len(detected_x_coords)
+    center_y_offset = -sum(detected_y_coords)/len(detected_y_coords)
+    return center_x_offset,center_y_offset
+
 def get_middle_column_and_row(COLUMNS, ROWS):
     middle_column = (COLUMNS - 1)//2
     middle_row = (ROWS - 1)//2
     return middle_column, middle_row
 
-def get_corner_coordinate_components(COLUMNS, ROWS, PAPER_WIDTH, PAPER_HEIGHT, BOARD_TAG_SIZE, COMBINED_PAPER_WIDTH_MARGIN, COMBINED_PAPER_HEIGHT_MARGIN, id, middle_column, middle_row):
+def get_corner_coordinate_components(COLUMNS, ROWS, BOARD_TAG_SIZE, horizontal_distance_between_april_tags, vertical_distance_between_april_tags, id, middle_column, middle_row):
     
     x1,x2,y1,y2 = 0, 0, 0, 0
     column = id % COLUMNS
     row = id // COLUMNS
 
     #calculating x components of corners
-    COMBINED_PAPER_WIDTH_MARGINs_from_center = (column - middle_column)
-    BOARD_TAGs_from_center = COMBINED_PAPER_WIDTH_MARGINs_from_center+.5
-    even_column_offset = -PAPER_WIDTH/2 * (1-COLUMNS%2)
-    x2 = COMBINED_PAPER_WIDTH_MARGIN * COMBINED_PAPER_WIDTH_MARGINs_from_center + (BOARD_TAGs_from_center)*BOARD_TAG_SIZE + even_column_offset
+    horizontal_distance_between_april_tags_from_center = (column - middle_column)
+    BOARD_TAGs_from_center = horizontal_distance_between_april_tags_from_center+.5
+    even_column_offset = -(horizontal_distance_between_april_tags+BOARD_TAG_SIZE)/2 * (1-COLUMNS%2)
+    x2 = horizontal_distance_between_april_tags * horizontal_distance_between_april_tags_from_center + (BOARD_TAGs_from_center)*BOARD_TAG_SIZE + even_column_offset
     x1 = x2 - BOARD_TAG_SIZE
 
     #calculating y components of corners
-    COMBINED_PAPER_HEIGHT_MARGINs_from_center = (middle_row - row)
-    BOARD_TAGs_from_center = COMBINED_PAPER_HEIGHT_MARGINs_from_center+.5
-    even_row_offset = PAPER_HEIGHT/2 * (1-ROWS%2)
-    y2 = COMBINED_PAPER_HEIGHT_MARGIN * COMBINED_PAPER_HEIGHT_MARGINs_from_center + (BOARD_TAGs_from_center)*BOARD_TAG_SIZE + even_row_offset
+    vertical_distance_between_april_tags_from_center = (middle_row - row)
+    BOARD_TAGs_from_center = vertical_distance_between_april_tags_from_center+.5
+    even_row_offset = (vertical_distance_between_april_tags+BOARD_TAG_SIZE)/2 * (1-ROWS%2)
+    y2 = vertical_distance_between_april_tags * vertical_distance_between_april_tags_from_center + (BOARD_TAGs_from_center)*BOARD_TAG_SIZE + even_row_offset
     y1 = y2 - BOARD_TAG_SIZE
 
     return x1,x2,y1,y2
@@ -321,9 +350,9 @@ def get_args():
     parser = argparse.ArgumentParser(description="Calibrate camera axes")
 
     parser.add_argument(
-        "-f",
-        "--file",
-        metavar="<calib file name>",
+        "-cf",
+        "--calibration_file",
+        metavar="<calibration file name>",
         type=str,
         required=True,
         help=".calib file to use for un-distortion",
@@ -334,21 +363,85 @@ def get_args():
         "--board",
         metavar="<board tag size>",
         type=float,
-        required=False,
+        required=True,
         default=6.5,
         help="size of one side of a tag on the axis calibration \
                             board, in inches",
     )
 
     parser.add_argument(
-        "-o",
-        "--origin",
-        metavar="<origin tag size>",
+        "-r",
+        "--rows",
+        metavar="<number of rows in map>",
+        type=int,
+        required=True,
+        default=3,
+        help="number of rows of april tags in your april tag map",
+    )
+
+    parser.add_argument(
+        "-c",
+        "--columns",
+        metavar="<number of columns in map>",
+        type=int,
+        required=True,
+        default=8,
+        help="number of columns of april tags in your april tag map",
+    )
+
+    # parser.add_argument(
+    #     "-o",
+    #     "--origin",
+    #     metavar="<origin tag size>",
+    #     type=float,
+    #     required=False,
+    #     default=6.5,
+    #     help="size of one side of the tag to calibrate \
+    #                         the origin, in inches",
+    # )
+
+    parser.add_argument(
+        "-pf",
+        "--positions_file",
+        metavar="<tag positions file name>",
+        type=str,
+        required=False,
+        default=None,
+        help="CSV file containg positions \
+                            of the april tags for calibration",
+    )
+
+    parser.add_argument(
+        "-mw",
+        "--map_width",
+        metavar="<width of map>",
         type=float,
         required=False,
-        default=6.5,
-        help="size of one side of the tag to calibrate \
-                            the origin, in inches",
+        default=2,
+        help="horizontal distance between the left edge of one of the leftmost april \
+            tag and the right edge of one of the rightmost april tag in inches. \
+            NOTE: For and accurate calibration: \
+            Measure from the edge of the april tags pattern itself, not the ege of the paper. \
+            The tags must be in evenly spaced rows in columns. \
+            The tag ids increase by 1 as they go from left to right and downwards \
+            The map_height argument (--map_height <height of map>) must be specified",
+    )
+
+    parser.add_argument(
+        "-mh",
+        "--map_height",
+        metavar="<vertical distance of the \
+            outer edges of the april tag map in inches>",
+        type=float,
+        required=False,
+        default=4.5,
+        help="vertical distance between the top edge of one of the topmost april \
+            tag and the bottom edge of one of the bottommost april tag in inches. \
+            NOTE: For and accurate calibration: \
+            Measure from the edge of the april tags pattern itself, not the ege of the paper. \
+            The tags must be in evenly spaced rows in columns. \
+            The tag ids increase by 1 as they go from left to right and downwards \
+            The map_width argument (--map_width <width of map>) must be specified",
     )
 
     options = parser.parse_args()

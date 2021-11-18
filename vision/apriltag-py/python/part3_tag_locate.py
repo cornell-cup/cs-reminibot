@@ -87,13 +87,17 @@ def main():
         # Uncomment this if needed
         # dst = undistort_image(frame, camera_matrix, dist_coeffs)
         # gray = cvtColor(dst, COLOR_BGR2GRAY)
-        detections, det_image = detector.detect(gray, return_image=True)
+        detections = []
+        try:
+            detections, det_image = detector.detect(gray, return_image=True)
+        except Exception:
+            pass
         if len(detections) == 0:
             continue  # Try again if we don't get anything
 
         print("Found " + str(len(detections)) + " apriltags")
 
-        for d in detections:
+        for i, d in enumerate(detections):
             # TODO draw tag - might be better to generalize, because
             # locate_cameras does this too.
 
@@ -104,14 +108,18 @@ def main():
             # Scale the coordinates, and print for debugging
             # prints Device ID :: tag id :: x y z angle
             # TODO debug offset method - is better, but not perfect.
-            center_cell_offset = center_cell_offsets[str(d.tag_id)]
+            center_cell_offset = get_closest_reference_point_offset(x,y,center_cell_offsets)
             x_without_ff = x_scale_factor * (x + overall_center_x_offset)
             y_without_ff = y_scale_factor * (y + overall_center_y_offset)
-            x = x_scale_factor * (x + overall_center_x_offset) + center_cell_offset["x"]
-            y = y_scale_factor * (y + overall_center_y_offset) + center_cell_offset["y"]
+            x = x_scale_factor * (x + overall_center_x_offset) + center_cell_offset["x_offset"]
+            y = y_scale_factor * (y + overall_center_y_offset) + center_cell_offset["y_offset"]
+            (ctr_x, ctr_y) = d.center
+            cv2.putText(frame, str((round(x,3),round(y,3))),(int(ctr_x), int(ctr_y+(20 if i %2 == 0 else -20))), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 0, 255),2)
+            cv2.circle(frame, (int(ctr_x), int(ctr_y)), 3, (255, 0, 0), 3)
+            
             # print(tag_xyz)
             # print("{} :: {} :: {} {} {} {}".format(DEVICE_ID, d.tag_id, x, y, z, angle))
-            print("{},{},{},{},{}".format(d.tag_id, x_without_ff, y_without_ff, z, angle))
+            print("{},{},{},{},{}".format(d.tag_id, x, y, z, angle))
 
             # Send the data to the URL specified.
             # This is usually a URL to the base station.
@@ -133,6 +141,11 @@ def main():
                             num_frames / (time.time() - past_time)
                         )
                     )
+        cv2.imshow("Origin tag", frame)
+        if cv2.waitKey(1) & 0xFF == ord(" "):
+            break
+        else:
+            continue
     pass
 
 
@@ -194,7 +207,9 @@ def get_args():
     args = vars(options)  # get dict of args parsed
 
     return args
-
+    
+def get_closest_reference_point_offset(x, y, center_cell_offsets):
+    return min(center_cell_offsets, key=lambda item: util.distance(x, y, item["reference_point_x"],item["reference_point_y"]))
 
 if __name__ == "__main__":
     main()

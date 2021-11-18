@@ -2,6 +2,8 @@ from cv2 import *
 import cv2
 import numpy as np
 import json
+import math
+
 """
 Utility module for common actions in this module and in OpenCV.
 """
@@ -276,3 +278,7 @@ def get_tag_angle(corners):
         # compensate for arrcos always computing the shorter angle
         return (2*np.pi) - np.arccos( (tr[X] - br[X]) / side_length)
     return np.arccos( (tr[X] - br[X]) / side_length)
+
+def distance(x1, y1, x2, y2):
+    return math.sqrt((x2-x1)**2 + (y2-y1)**2)
+
