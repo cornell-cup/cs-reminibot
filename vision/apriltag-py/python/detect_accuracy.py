@@ -311,7 +311,7 @@ def undistort_image(frame, filename):
     frame - image to be undistorted
     filename - name of the calibration data file
     """
-    calib_file, calib_data = util.read_calib_json(filename)
+    calib_file, calib_data = util.read_json(filename)
     mat = util.get_numpy_matrix(calib_data, "camera_matrix")
     dist = util.get_numpy_matrix(calib_data, "dist_coeffs")
     new_mtx = util.get_numpy_matrix(calib_data, "new_camera_matrix")
@@ -341,7 +341,7 @@ def apply_transform(detections, filename):
     filename - name of the calibration data file
     """
     # TODO apply the transform from calibration to the frame
-    calib_file, calib_data = util.read_calib_json(filename)
+    calib_file, calib_data = util.read_json(filename)
     transform_matrix = util.get_numpy_matrix(calib_data, "transform_matrix")
     camera_matrix = util.get_numpy_matrix(calib_data, "camera_matrix")
     dist_coeffs = util.get_numpy_matrix(calib_data, "dist_coeffs")

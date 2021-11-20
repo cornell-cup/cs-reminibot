@@ -232,7 +232,7 @@ def undistort_image(frame, camera_matrix, dist_coeffs):
     dst = dst[y:y+h, x:x+w]
     return dst
 
-def read_calib_json(filename):
+def read_json(filename):
     calib_file = None
     try:
         calib_file = open(filename)

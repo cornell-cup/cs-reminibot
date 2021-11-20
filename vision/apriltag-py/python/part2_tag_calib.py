@@ -20,21 +20,29 @@ def main():
     BOARD_TAG_SIZE = args["board"]
     # ORIGIN_TAG_SIZE = args["origin"]
     calib_file_name = args["calibration_file"]
-    tag_positions_file_name = args["positions_file"]
+    positions_file_name = args["positions_file"]
     COLUMNS = args["columns"]
     ROWS = args["rows"]
+    NUM_DETECTIONS = COLUMNS * ROWS
     map_width = args["map_width"]
     map_height = args["map_height"]
-    NUM_DETECTIONS = COLUMNS * ROWS
     horizontal_distance_between_april_tags = (map_width - COLUMNS*BOARD_TAG_SIZE)/(1 if COLUMNS <= 1 else (COLUMNS - 1))
     vertical_distance_between_april_tags = (map_height - ROWS*BOARD_TAG_SIZE)/(1 if ROWS <= 1 else (ROWS - 1))
 
+    #position file information takes precedence over rows and columns arguments
+    positions_file, positions_data = None, None
+    if positions_file_name != None:
+        positions_file, positions_data = util.read_json(positions_file_name)
+        NUM_DETECTIONS = len(positions_data)
+
+    
+
     #FOR TESTING REMOVE LATER
-    middle_column, middle_row = get_middle_column_and_row(COLUMNS, ROWS)
-    print("id,x1,x2,y1,y2")
-    for id in range(NUM_DETECTIONS):
-        x1,x2,y1,y2 = get_corner_coordinate_components(COLUMNS, ROWS, BOARD_TAG_SIZE, horizontal_distance_between_april_tags, vertical_distance_between_april_tags, id, middle_column, middle_row)
-        print(str(id)+","+str(x1)+","+str(x2)+","+str(y1)+","+str(y2))
+    # middle_column, middle_row = get_middle_column_and_row(COLUMNS, ROWS)
+    # print("id,x1,x2,y1,y2")
+    # for id in range(NUM_DETECTIONS):
+    #     x1,x2,y1,y2 = get_corner_coordinate_components(COLUMNS, ROWS, BOARD_TAG_SIZE, horizontal_distance_between_april_tags, vertical_distance_between_april_tags, id, middle_column, middle_row)
+    #     print(str(id)+","+str(x1)+","+str(x2)+","+str(y1)+","+str(y2))
     #FOR TESTING REMOVE LATER
     
     # offsets to reposition where (0,0) is
@@ -44,7 +52,7 @@ def main():
     camera = util.get_camera(0)
 
     # Get matrices from file
-    calib_file, calib_data = util.read_calib_json(calib_file_name)
+    calib_file, calib_data = util.read_json(calib_file_name)
     camera_matrix = util.get_numpy_matrix(calib_data, "camera_matrix")
     dist_coeffs = util.get_numpy_matrix(calib_data, "dist_coeffs")
     new_mat = util.get_numpy_matrix(calib_data, "new_camera_matrix")
@@ -94,8 +102,7 @@ def main():
         for i in range(len(detections)):
             d = detections[i]
             id = int(d.tag_id)
-            if id == 0 or id == 7 or id == 16 or id == 23:
-                print(str(id),":",d.center)
+            
 
             # Add to offsets
             (ctr_x, ctr_y) = d.center
@@ -135,25 +142,50 @@ def main():
     # TODO What's the reasoning from this math?
     # This was from a tutorial somehwhere and was directly
     # transcribed from the C++ system.
-    print("id,d.corners[0][0]"+","+str("d.corners[0][1]")+","+str("d.corners[1][0]")+","+str("d.corners[1][1]")+","+str("d.corners[2][0]")+","+str("d.corners[2][1]")+","+str("d.corners[3][0]")+","+str("d.corners[3][1]")+","+str("x1")+","+str("y1")+","+str("x2")+","+str("y1")+","+str("x2")+","+str("y2")+","+str("x1")+","+str("y2"))
     object_center_points = []
     middle_column, middle_row = get_middle_column_and_row(COLUMNS, ROWS)
-    for d in detections:
-        id = int(d.tag_id)
-        img_points[0 + 4 * id] = d.corners[0]
-        img_points[1 + 4 * id] = d.corners[1]
-        img_points[2 + 4 * id] = d.corners[2]
-        img_points[3 + 4 * id] = d.corners[3]
-        print("corner: ",d.corners[0])
+    if positions_file_name == None:
+        filtered_detections = []
+        for detection in detections:
+            if get_position_with_id(positions_data, detection.tag_id) != None:
+                filtered_detections.append(detection)
+        detections = filtered_detections
 
-        x1, x2, y1, y2 = get_corner_coordinate_components(COLUMNS, ROWS, BOARD_TAG_SIZE, horizontal_distance_between_april_tags, vertical_distance_between_april_tags, id, middle_column, middle_row)
+
+    #detections = detections if positions_file_name == None else [detection for detection in detections if get_position_with_id(positions_data, detection.tag_id) != None]
+    for i, d in enumerate(detections):
+        if i >= NUM_DETECTIONS:
+            print(f"Waring:\nToo many tags detected. tags with id: {id} will be ignored")
+            continue
+
+        id = int(d.tag_id)
+        img_points[0 + 4 * i] = d.corners[0]
+        img_points[1 + 4 * i] = d.corners[1]
+        img_points[2 + 4 * i] = d.corners[2]
+        img_points[3 + 4 * i] = d.corners[3]
+        # print("corner: ",d.corners[0])
+        x1, x2, y1, y2 = 0,0,0,0
+        if positions_file_name == None:
+            x1, x2, y1, y2 = get_corner_coordinate_components(COLUMNS, ROWS, BOARD_TAG_SIZE, horizontal_distance_between_april_tags, vertical_distance_between_april_tags, id, middle_column, middle_row)
+        else:
+            position = get_position_with_id(positions_data, id)
+            if position == None:
+                print(f"Waring:\nid: {id} not found in {positions_file_name}")
+                continue
+            print(f"position: {position}")
+            center_x = position["x"]
+            center_y = position["y"]
+            
+            x1 = center_x - BOARD_TAG_SIZE/2
+            y1 = center_y - BOARD_TAG_SIZE/2
+            x2 = center_x + BOARD_TAG_SIZE/2
+            y2 = center_y + BOARD_TAG_SIZE/2
         object_center_points.append(((x1+x2)/2, (y1+y2)/2))
-        #ADD IN CONSTANT Z DISTANCE (POSSIBLY FROM ARGUMENT GIVEN TO PROGRAM) FOR ALL POINTS AND FUDGE FACTOR RESULT
-        obj_points[0 + 4 * id] = [x1, y1, 0.0]
-        obj_points[1 + 4 * id] = [x2, y1, 0.0]
-        obj_points[2 + 4 * id] = [x2, y2, 0.0]
-        obj_points[3 + 4 * id] = [x1, y2, 0.0]
-        #print(str(id)+","+str(d.corners[0][0])+","+str(d.corners[0][1])+","+str(d.corners[1][0])+","+str(d.corners[1][1])+","+str(d.corners[2][0])+","+str(d.corners[2][1])+","+str(d.corners[3][0])+","+str(d.corners[3][1])+","+str(x1)+","+str(y1)+","+str(x2)+","+str(y1)+","+str(x2)+","+str(y2)+","+str(x1)+","+str(y2))
+        obj_points[0 + 4 * i] = [x1, y1, 0.0]
+        obj_points[1 + 4 * i] = [x2, y1, 0.0]
+        obj_points[2 + 4 * i] = [x2, y2, 0.0]
+        obj_points[3 + 4 * i] = [x1, y2, 0.0]
+        print(str(id)+","+str(x1)+","+str(y1)+","+str(x2)+","+str(y2))
 
     # Make transform matrices
     ret, rvec, tvec = cv2.solvePnP(obj_points, img_points, camera_matrix, dist_coeffs)
@@ -247,6 +279,10 @@ def main():
 
     print("Finished writing data to calibration file")
     pass
+
+def get_position_with_id(positions_data, id):
+    found_positions = [item for item in positions_data if int(item["id"]) == id]
+    return found_positions[0] if found_positions else None
 
 def get_cell_offsets_with_original_detections(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, camera_to_origin, center_x_offset, center_y_offset, x_scale_factor, y_scale_factor):
     #These will store the scaled points with fudge factors that move the detected center point of each
@@ -371,7 +407,7 @@ def get_args():
         "--rows",
         metavar="<number of rows in map>",
         type=int,
-        required=True,
+        required=False,
         default=3,
         help="number of rows of april tags in your april tag map",
     )
@@ -381,7 +417,7 @@ def get_args():
         "--columns",
         metavar="<number of columns in map>",
         type=int,
-        required=True,
+        required=False,
         default=8,
         help="number of columns of april tags in your april tag map",
     )

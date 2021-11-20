@@ -12,7 +12,7 @@ DEVICE_ID = 0  # The device the camera is, usually 0. TODO make this adjustable
 
 # Arguments
 # These are effectively constant after the argument parser has ran.
-TAG_SIZE = 6.5  # The length of one side of an apriltag, in inches
+TAG_SIZE = 6.5 # The length of one side of an apriltag, in inches
 MULT_FACTOR = 5  # The scale factor of the output coordinates
 SEND_DATA = True  # Sends data to URL if True. Set to False for debug
 
@@ -33,7 +33,7 @@ def main():
 
     # Get matrices from calibration file
     print("Parsing calibration file " + calib_file_name + "...")
-    calib_file, calib_data = util.read_calib_json(calib_file_name)
+    calib_file, calib_data = util.read_json(calib_file_name)
     transform_matrix = util.get_numpy_matrix(calib_data, "transform_matrix")
     camera_matrix = util.get_numpy_matrix(calib_data, "camera_matrix")
     dist_coeffs = util.get_numpy_matrix(calib_data, "dist_coeffs")
@@ -113,8 +113,8 @@ def main():
             x = x_scale_factor * (x + overall_center_x_offset) + center_cell_offset["x_offset"]
             y = y_scale_factor * (y + overall_center_y_offset) + center_cell_offset["y_offset"]
             (ctr_x, ctr_y) = d.center
-            cv2.putText(dst, "id:"+str(d.tag_id),(int(ctr_x), int(ctr_y+60 )), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 255, 255),2)
-            cv2.putText(dst, "angle:"+str(round(angle,3)),(int(ctr_x), int(ctr_y+(40 if i %2 == 0 else -40))), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 255, 255),2)
+            cv2.putText(dst, "id:"+str(d.tag_id),(int(ctr_x), int(ctr_y + 60)), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 0, 255),2)
+            # cv2.putText(dst, "angle:"+str(round(angle,3)),(int(ctr_x), int(ctr_y+(40 if i %2 == 0 else -40))), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 255, 255),2)
             cv2.putText(dst, str((round(x,3),round(y,3))),(int(ctr_x), int(ctr_y+(20 if i %2 == 0 else -20))), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 0, 255),2)
             cv2.circle(dst, (int(ctr_x), int(ctr_y)), 3, (255, 0, 0), 3)
             
