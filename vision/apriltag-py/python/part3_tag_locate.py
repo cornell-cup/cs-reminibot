@@ -81,12 +81,11 @@ def main():
 
         # take a picture and get detections
         frame = util.get_image(camera)
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
         # Un-distorting an image worsened distortion effects
         # Uncomment this if needed
-        # dst = undistort_image(frame, camera_matrix, dist_coeffs)
-        # gray = cvtColor(dst, COLOR_BGR2GRAY)
+        dst = util.undistort_image(frame, camera_matrix, dist_coeffs)
+        gray = cv2.cvtColor(dst, cv2.COLOR_BGR2GRAY)
         detections = []
         try:
             detections, det_image = detector.detect(gray, return_image=True)
@@ -114,8 +113,10 @@ def main():
             x = x_scale_factor * (x + overall_center_x_offset) + center_cell_offset["x_offset"]
             y = y_scale_factor * (y + overall_center_y_offset) + center_cell_offset["y_offset"]
             (ctr_x, ctr_y) = d.center
-            cv2.putText(frame, str((round(x,3),round(y,3))),(int(ctr_x), int(ctr_y+(20 if i %2 == 0 else -20))), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 0, 255),2)
-            cv2.circle(frame, (int(ctr_x), int(ctr_y)), 3, (255, 0, 0), 3)
+            cv2.putText(dst, "id:"+str(d.tag_id),(int(ctr_x), int(ctr_y+60 )), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 255, 255),2)
+            cv2.putText(dst, "angle:"+str(round(angle,3)),(int(ctr_x), int(ctr_y+(40 if i %2 == 0 else -40))), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 255, 255),2)
+            cv2.putText(dst, str((round(x,3),round(y,3))),(int(ctr_x), int(ctr_y+(20 if i %2 == 0 else -20))), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 0, 255),2)
+            cv2.circle(dst, (int(ctr_x), int(ctr_y)), 3, (255, 0, 0), 3)
             
             # print(tag_xyz)
             # print("{} :: {} :: {} {} {} {}".format(DEVICE_ID, d.tag_id, x, y, z, angle))
@@ -141,7 +142,7 @@ def main():
                             num_frames / (time.time() - past_time)
                         )
                     )
-        cv2.imshow("Origin tag", frame)
+        cv2.imshow("Tag Locations", dst)
         if cv2.waitKey(1) & 0xFF == ord(" "):
             break
         else:

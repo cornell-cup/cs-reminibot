@@ -79,9 +79,9 @@ def main():
         # For weird reasons, anti-distortion measures WORSENED the problem,
         # so they have been removed. If you need to put them back,
         # this is the place for it.
-
+        dst = util.undistort_image(frame, camera_matrix, dist_coeffs)
         # Convert undistorted image to grayscale
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        gray = cv2.cvtColor(dst, cv2.COLOR_BGR2GRAY)
 
         # Use the detector and compute useful values from it
         detections, det_image = detector.detect(gray, return_image=True)
@@ -105,7 +105,7 @@ def main():
             overall_y_center += ctr_y
 
             # Draw onto the frame
-            cv2.circle(frame, (int(ctr_x), int(ctr_y)), 5, (0, 0, 255), 3)
+            cv2.circle(dst, (int(ctr_x), int(ctr_y)), 5, (0, 0, 255), 3)
             # pose, e0, e1 = detector.detection_pose(d,
             #                                       options.camera_params,
             #                                       options.tag_size)
@@ -122,10 +122,10 @@ def main():
         # if len(detections) == 4:
         #     cv2.circle(frame, (int(x_offset / 4), int(y_offset / 4)), 5, (255, 0, 0), 3)
         # Draw origin of more than 4 tags 
-        cv2.circle(frame, (int(overall_x_center), int(overall_y_center)), 5, (255, 0, 0), 3)
+        cv2.circle(dst, (int(overall_x_center), int(overall_y_center)), 5, (255, 0, 0), 3)
         
         
-        cv2.imshow("Calibration board", frame)
+        cv2.imshow("Calibration board", dst)
         if cv2.waitKey(1) & 0xFF == ord(" "):
             break
     print("passed")
@@ -200,7 +200,8 @@ def main():
     while True:
         # Locate tag for use as origin
         frame = util.get_image(camera)
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        dst = util.undistort_image(frame, camera_matrix, dist_coeffs)
+        gray = cv2.cvtColor(dst, cv2.COLOR_BGR2GRAY)
         detections, det_image = detector.detect(gray, return_image=True)
 
         if len(detections) == 0:
@@ -221,11 +222,7 @@ def main():
 
         detected_xs, detected_ys, x_offsets, y_offsets = get_cell_offsets_with_original_detections(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, camera_to_origin, center_x_offset, center_y_offset, x_scale_factor, y_scale_factor)
 
-        # Write offsets old
-        # calib_data["cell_center_offsets"] = {str(detections[detection_index].tag_id) : {
-        #     "x": x_offsets[detection_index],
-        #     "y": y_offsets[detection_index]
-        # } for detection_index in range(len(detections)) if True} 
+
 
         # Write offsets new
         calib_data["cell_center_offsets"] = [{
@@ -236,9 +233,9 @@ def main():
         } for detection_index in range(len(detections)) if True] 
           
         
-        cv2.circle(frame, (int(overall_x_center), int(overall_y_center)), 5, (255, 0, 0), 3)
+        cv2.circle(dst, (int(overall_x_center), int(overall_y_center)), 5, (255, 0, 0), 3)
 
-        cv2.imshow("Origin tag", frame)
+        cv2.imshow("Origin tag", dst)
         if cv2.waitKey(1) & 0xFF == ord(" "):
             break
         else:
