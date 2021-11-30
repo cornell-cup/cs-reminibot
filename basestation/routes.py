@@ -205,3 +205,33 @@ def speech_recognition():
     else:
         message = base_station.get_speech_recognition_status()
         return json.dumps(message), status.HTTP_200_OK
+
+@app.route('/chatbot-context', methods=['POST','GET'])
+def chatbot_context():
+    if request.method == 'POST':
+        data = request.get_json()
+        # bot_name = data['bot_name']
+        # if not bot_name:
+        #     error_json = {"error_msg": NO_BOT_ERROR_MSG}
+        #     return json.dumps(error_json), status.HTTP_400_BAD_REQUEST
+        command = data['command']
+        if command == 'update':
+            context = data['context']
+            base_station.update_chatbot_context(context)
+            return json.dumps(True), status.HTTP_200_OK
+        elif command == 'clear':
+            base_station.chatbot_clear_context()
+            return json.dumps(True), status.HTTP_200_OK
+        
+
+@app.route('/chatbot-ask', methods=['POST','GET'])
+def chatbot_ask():
+    if request.method == 'POST':
+        data = request.get_json()
+        # bot_name = data['bot_name']
+        # if not bot_name:
+        #     error_json = {"error_msg": NO_BOT_ERROR_MSG}
+        #     return json.dumps(error_json), status.HTTP_400_BAD_REQUEST
+        question = data['question']
+        answer = base_station.chatbot_ask_question(question)
+        return json.dumps(answer), status.HTTP_200_OK

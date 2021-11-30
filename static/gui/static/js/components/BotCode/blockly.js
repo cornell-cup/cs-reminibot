@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import { Button, LabeledTextBox } from '../utils/Util.js';
 import CodeMirror from 'react-codemirror';
+import Chatbot from '../Chatbot/chatbot.js';
 require('codemirror/mode/python/python');
 
 
@@ -823,6 +824,7 @@ export default class MinibotBlockly extends React.Component {
                             stopBlockly={this.stopBlockly}
                         />
                     </div>
+                    <Chatbot />
                 </div>
             </div>
         );

@@ -4,6 +4,7 @@ import AddBot from './SetupBot/AddBot.js';
 import MovementControls from './MovementControl/MovementControl.js';
 import GridView from './gridview.js';
 
+
 function BotControl({ selectedBotName, setSelectedBotName, selectedBotStyle, setSelectedBotStyle }) {
   return (
     <div className="row">

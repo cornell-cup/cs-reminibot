@@ -3,7 +3,7 @@ Base Station for the MiniBot.
 """
 
 from basestation.bot import Bot
-from basestation.user_database import Program, User
+from basestation.user_database import Program, User, Chatbot as Chatbot
 from basestation import db
 from basestation.util.stoppable_thread import StoppableThread, ThreadSafeVariable
 
@@ -18,6 +18,7 @@ import time
 import threading
 import pyaudio
 import speech_recognition as sr
+from .ChatbotWrapper import ChatbotWrapper
 
 MAX_VISION_LOG_LENGTH = 1000
 
@@ -49,6 +50,7 @@ class BaseStation:
     def __init__(self, app_debug=False):
         self.active_bots = {}
         self.vision_log = []
+        self.chatbot = ChatbotWrapper()
 
         self.blockly_function_map = {
             "move_forward": "fwd",         "move_backward": "back",
@@ -309,6 +311,61 @@ class BaseStation:
         db.session.commit()
         return True
 
+    def update_chatbot_context(self, context: str):
+        """ Update user's context to the Chatbot object
+        """
+        self.chatbot.update_context(context)
+
+    def get_chatbot_obj_context(self):
+        return self.chatbot.get_all_context()
+
+    def update_chatbot_context_db(self, user_id, context):
+        """ Update user's context if user exists upon exiting the session
+        (closing the GUI tab)
+        """
+        if user_id != "":
+            user = ChatbotT.query.filter_by(id=user_id).first()
+
+            # user is not logged in
+            if user is None:
+                # make new record in chatbot table
+                new_context = ChatbotT(
+                    user_id=user_id,
+                    context=context
+                )
+                db.session.add(new_context)
+            else:
+                # do this if user exists in chatbot database already
+                user.context += ". " + context
+
+            db.session.commit()
+        return
+
+    def chatbot_get_context(self, user_id):
+        """Gets the stored context for the chatbot based on user_id.
+         If user_id is nonexistent or empty, returns an empty
+         json object. Otherwise, returns a json object with the context and its
+         corresponding user_id """
+
+        if user_id != "":
+            user = ChatbotT.query.filter_by(id=user_id).first()
+
+            if user is None:
+                return {'context': '', 'user_id': ''}
+            else:
+                print("user's context: " + user.context)
+                self.chatbot.context_stack = [user.context]
+                data = {'context': user.context, 'user_id': user_id}
+                return data
+        else:
+            return {'context': '', 'user_id': ''}
+
+    def chatbot_clear_context(self):
+        self.chatbot.reset_context()
+
+    def chatbot_ask_question(self, question):
+        return self.chatbot.compute_answer(question)
+
     # ==================== SPEECH RECOGNITION ====================
     def get_speech_recognition_status(self) -> str:
         """Retrieves the speech recognition status string"""
@@ -396,6 +453,40 @@ class BaseStation:
                     thread_safe_message_queue.push("Timed out!")
                 except sr.UnknownValueError:
                     thread_safe_message_queue.push("Words not recognized!")
+
+    # ==================== CHATBOT ====================
+    def chatbot_listening_context(
+        self,
+        thread_safe_condition: ThreadSafeVariable,
+        thread_safe_message_queue: ThreadSafeVariable
+    ) -> None:
+        # bot_name: str
+        recognizer = sr.Recognizer()
+        heard_context = []
+        self.chatbot_temp_context = ""
+        while thread_safe_condition.get_val():
+            try:
+                print("chatbot listening")
+                with sr.Microphone() as microphone:
+                    recognizer = sr.Recognizer()
+                    audio = recognizer.listen(microphone)
+                    words = recognizer.recognize_google(audio)
+                    heard_context.append(words)
+                    print("heard context")
+                    print(heard_context)
+            except sr.WaitTimeoutError:
+                thread_safe_message_queue.push("Timed out!")
+            except sr.UnknownValueError:
+                thread_safe_message_queue.push("Words not recognized!")
+
+        temp = ' '.join(heard_context)
+        self.chatbot_temp_context = temp if temp != "" else "Nothing was said!"
+        print("temp context is " + self.chatbot_temp_context)
+        # self.chatbot.update_context(' '.join(heard_context))
+        self.chatbot.update_context(self.chatbot_temp_context)
+
+    def chatbot_compute_answer(self, question): 
+        return self.chatbot.compute_answer(question)
 
     # ==================== GETTERS and SETTERS ====================
     @property

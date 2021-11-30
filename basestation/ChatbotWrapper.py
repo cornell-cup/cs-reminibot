@@ -1,3 +1,8 @@
+import requests
+import time
+from requests.structures import CaseInsensitiveDict
+import json
+
 default_context = "Hello, I am minibot. My creators are from Cornell but I \
 legally can't say that because they signed a waiver. Oh well, let's just say \
 I was created at Harvard. I have two wheels that are connected to motors with \
@@ -8,7 +13,10 @@ Make sure to SMASH the like button and hit \
 subscribe and turn on the notification bell.  \
 See you guys in the next episode. Join my Twitch, Patreon, and Instagram."
 
-class Chatbot:
+SUCCESS = 200
+FAILURE = 400
+
+class ChatbotWrapper:
     
     def __init__(self, context=default_context):
         self.context_stack = [context]  # context
@@ -17,40 +25,25 @@ class Chatbot:
         if context != "":
             self.context_stack.append(context)
        
-    def get_context(self):
+    def get_latest_context(self):
         return self.context_stack[-1]
 
     def get_all_context(self):
-        self.context_stack = ['. '.join(self.context_stack)]
-        return self.context_stack[-1]
+        return self.context_stack
   
     def reset_context(self):
         self.context_stack = [default_context]
 
-    def revert_context(self):
-        self.context_stack.pop()
+    def undo_context(self):
+        if len(self.context_stack) > 1:
+          self.context_stack.pop()
+          return SUCCESS
+        else:
+          return FAILURE
 
-    
     def compute_answer(self, input_question):
-        # print('. '.join(self.context_stack))
-        # context = '. '.join(self.context_stack)
-
-        start = time.time()
-        self.context_stack = ['. '.join(self.context_stack)]
-        answer_dict = nlp(question=input_question,
-                          context= self.context_stack[-1])
-        # print("Question:" + input_question)
-
-
-        if answer_dict['score'] < .05:
-            # print("Answer: I don't have an answer to your question.")
-            return "I don't have an answer to your question."
-
-        # if answer_dict['answer'] == 'You can follow lines and detect objects':
-        #     return "I" + answer_dict['answer'][3:]
-        # print("Answer: " + answer_dict['answer'])
-        # print(answer_dict['score'])
-        end = time.time()
-        print(end - start)
-        return answer_dict['answer']
-
+        # self.context_stack = ['. '.join(self.context_stack)]
+        url = "http://3.133.110.167/qa"
+        data = {"question": input_question, "context":'. '.join(self.context_stack) }
+        resp = requests.get(url, json=data)
+        return resp.text
