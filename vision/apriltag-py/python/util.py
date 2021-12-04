@@ -282,3 +282,86 @@ def get_tag_angle(corners):
 def distance(x1, y1, x2, y2):
     return math.sqrt((x2-x1)**2 + (y2-y1)**2)
 
+def draw_pose(overlay, camera_params, tag_size, pose, z_sign=1):
+    opoints = np.array([
+        -2, -2, 0,
+        2, -2, 0,
+        2, 2, 0,
+        2, -2, -4 * z_sign,
+    ]).reshape(-1, 1, 3) * 0.5 * tag_size
+
+    fx, fy, cx, cy = camera_params
+
+    K = np.array([fx, 0, cx, 0, fy, cy, 0, 0, 1]).reshape(3, 3)
+
+    rvec, _ = cv2.Rodrigues(pose[:3, :3])
+    tvec = pose[:3, 3]
+
+    dcoeffs = np.zeros(5)
+
+    ipoints, _ = cv2.projectPoints(opoints, rvec, tvec, K, dcoeffs)
+
+    ipoints = np.round(ipoints).astype(int)
+
+    ipoints = [tuple(pt) for pt in ipoints.reshape(-1, 2)]
+
+    cv2.line(overlay, ipoints[0], ipoints[1], (0,0,255), 2)
+    cv2.line(overlay, ipoints[1], ipoints[2], (0,255,0), 2)
+    cv2.line(overlay, ipoints[1], ipoints[3], (255,0,0), 2)
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    cv2.putText(overlay, 'X', ipoints[0], font, 0.5, (0,0,255), 2, cv2.LINE_AA)
+    cv2.putText(overlay, 'Y', ipoints[2], font, 0.5, (0,255,0), 2, cv2.LINE_AA)
+    cv2.putText(overlay, 'Z', ipoints[3], font, 0.5, (255,0,0), 2, cv2.LINE_AA)
+
+def draw_cube(overlay, camera_params, tag_size, pose, z_sign=1):
+
+    opoints = np.array([
+        -tag_size, -tag_size, 0,
+        tag_size, -tag_size, 0,
+        tag_size, tag_size, 0,
+        -tag_size, tag_size, 0,
+        -tag_size, -tag_size, tag_size * z_sign,
+        tag_size, -tag_size, tag_size * z_sign,
+        tag_size, tag_size, tag_size * z_sign,
+        -tag_size, tag_size, tag_size * z_sign,
+    ]).reshape(-1, 1, 3) * 0.5 * tag_size
+
+    edges = np.array([
+        0, 1,
+        1, 2,
+        2, 3,
+        3, 0,
+        0, 4,
+        1, 5,
+        2, 6,
+        3, 7,
+        4, 5,
+        5, 6,
+        6, 7,
+        7, 4
+    ]).reshape(-1, 2)
+
+    fx, fy, cx, cy = camera_params
+
+    K = np.array([fx, 0, cx, 0, fy, cy, 0, 0, 1]).reshape(3, 3)
+
+    rvec, _ = cv2.Rodrigues(pose[:3, :3])
+    tvec = pose[:3, 3]
+
+    dcoeffs = np.zeros(5)
+
+    ipoints, _ = cv2.projectPoints(opoints, rvec, tvec, K, dcoeffs)
+
+    ipoints = np.round(ipoints).astype(int)
+
+    ipoints = [tuple(pt) for pt in ipoints.reshape(-1, 2)]
+
+    for i, j in edges:
+        cv2.line(overlay, ipoints[i], ipoints[j], (0, 255, 0), 1, 16)
+
+def camera_matrix_to_camera_params(camera_matrix):
+    fx = camera_matrix[0][0]
+    fy = camera_matrix[1][1]
+    cx = camera_matrix[0][2]
+    cy = camera_matrix[1][2]
+    return (fx, fy, cx, cy)

@@ -87,12 +87,12 @@ def main():
         # For weird reasons, anti-distortion measures WORSENED the problem,
         # so they have been removed. If you need to put them back,
         # this is the place for it.
-        dst = util.undistort_image(frame, camera_matrix, dist_coeffs)
+        undst = util.undistort_image(frame, camera_matrix, dist_coeffs)
         # Convert undistorted image to grayscale
-        gray = cv2.cvtColor(dst, cv2.COLOR_BGR2GRAY)
+        gray = cv2.cvtColor(undst, cv2.COLOR_BGR2GRAY)
 
         # Use the detector and compute useful values from it
-        detections, det_image = detector.detect(gray, return_image=True)
+        detections = get_filtered_detections(positions_file_name, positions_data, detector, gray)
 
         x_offset = 0
         y_offset = 0
@@ -112,15 +112,9 @@ def main():
             overall_y_center += ctr_y
 
             # Draw onto the frame
-            cv2.circle(dst, (int(ctr_x), int(ctr_y)), 5, (0, 0, 255), 3)
-            # pose, e0, e1 = detector.detection_pose(d,
-            #                                       options.camera_params,
-            #                                       options.tag_size)
-
-            #     _draw_pose(overlay,
-            #                options.camera_params,
-            #                options.tag_size,
-            #                pose)
+            cv2.circle(undst, (int(ctr_x), int(ctr_y)), 5, (0, 0, 255), 3)
+            pose, e0, e1 = detector.detection_pose(d, util.camera_matrix_to_camera_params(camera_matrix), BOARD_TAG_SIZE)
+            util.draw_cube(undst,util.camera_matrix_to_camera_params(camera_matrix),BOARD_TAG_SIZE, pose)
 
 
         overall_x_center /= 1 if len(detections) == 0 else len(detections)
@@ -129,10 +123,10 @@ def main():
         # if len(detections) == 4:
         #     cv2.circle(frame, (int(x_offset / 4), int(y_offset / 4)), 5, (255, 0, 0), 3)
         # Draw origin of more than 4 tags 
-        cv2.circle(dst, (int(overall_x_center), int(overall_y_center)), 5, (255, 0, 0), 3)
+        cv2.circle(undst, (int(overall_x_center), int(overall_y_center)), 5, (255, 0, 0), 3)
         
         
-        cv2.imshow("Calibration board", dst)
+        cv2.imshow("Calibration board", undst)
         if cv2.waitKey(1) & 0xFF == ord(" "):
             break
     print("passed")
@@ -144,12 +138,7 @@ def main():
     # transcribed from the C++ system.
     object_center_points = []
     middle_column, middle_row = get_middle_column_and_row(COLUMNS, ROWS)
-    if positions_file_name == None:
-        filtered_detections = []
-        for detection in detections:
-            if get_position_with_id(positions_data, detection.tag_id) != None:
-                filtered_detections.append(detection)
-        detections = filtered_detections
+    
 
 
     #detections = detections if positions_file_name == None else [detection for detection in detections if get_position_with_id(positions_data, detection.tag_id) != None]
@@ -188,8 +177,11 @@ def main():
         print(str(id)+","+str(x1)+","+str(y1)+","+str(x2)+","+str(y2))
 
     # Make transform matrices
-    ret, rvec, tvec = cv2.solvePnP(obj_points, img_points, camera_matrix, dist_coeffs)
+    pose = cv2.solvePnP(obj_points, img_points, camera_matrix, dist_coeffs)
+    ret, rvec, tvec = pose
     dst, jac = cv2.Rodrigues(rvec)
+
+
 
     # Make origin to camera matrix
     """
@@ -232,9 +224,9 @@ def main():
     while True:
         # Locate tag for use as origin
         frame = util.get_image(camera)
-        dst = util.undistort_image(frame, camera_matrix, dist_coeffs)
-        gray = cv2.cvtColor(dst, cv2.COLOR_BGR2GRAY)
-        detections, det_image = detector.detect(gray, return_image=True)
+        undst = util.undistort_image(frame, camera_matrix, dist_coeffs)
+        gray = cv2.cvtColor(undst, cv2.COLOR_BGR2GRAY)
+        detections = get_filtered_detections(positions_file_name, positions_data, detector, gray)
 
         if len(detections) == 0:
             continue
@@ -265,9 +257,9 @@ def main():
         } for detection_index in range(len(detections)) if True] 
           
         
-        cv2.circle(dst, (int(overall_x_center), int(overall_y_center)), 5, (255, 0, 0), 3)
+        cv2.circle(undst, (int(overall_x_center), int(overall_y_center)), 5, (255, 0, 0), 3)
 
-        cv2.imshow("Origin tag", dst)
+        cv2.imshow("Origin tag", undst)
         if cv2.waitKey(1) & 0xFF == ord(" "):
             break
         else:
@@ -279,6 +271,21 @@ def main():
 
     print("Finished writing data to calibration file")
     pass
+
+def get_filtered_detections(positions_file_name, positions_data, detector, gray):
+    detections, det_image = detector.detect(gray, return_image=True)
+
+    if positions_file_name != None:
+        detections = filter_detections_from_file(positions_data, detections)
+    return detections
+
+def filter_detections_from_file(positions_data, detections):
+    filtered_detections = []
+    for detection in detections:
+        if get_position_with_id(positions_data, detection.tag_id) != None:
+            filtered_detections.append(detection)
+    detections = filtered_detections
+    return detections
 
 def get_position_with_id(positions_data, id):
     found_positions = [item for item in positions_data if int(item["id"]) == id]
@@ -327,6 +334,8 @@ def get_world_scale_factors(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detectio
     return x_scale_factor,y_scale_factor
 
 def get_world_center_offsets(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, camera_to_origin):
+    actual_x_coords = []
+    actual_y_coords = []
     detected_x_coords = []
     detected_y_coords = []
     max_id = -1
@@ -336,7 +345,8 @@ def get_world_center_offsets(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detecti
             )
         (actual_x, actual_y) = object_center_points[detection_index]
         max_id = int(detections[detection_index].tag_id) if int(detections[detection_index].tag_id) > max_id else max_id
-            
+        actual_x_coords.append(actual_x)
+        actual_y_coords.append(actual_y)    
         detected_x_coords.append(detected_x)
         detected_y_coords.append(detected_y)
 
@@ -345,8 +355,8 @@ def get_world_center_offsets(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detecti
         # as the origin of our coordinate plane.
         # Center_y_offset is the same thing. Both of these values are negative so we can add it to other coordinates,
         # which generally come with very large values.      
-    center_x_offset = -sum(detected_x_coords)/len(detected_x_coords)
-    center_y_offset = -sum(detected_y_coords)/len(detected_y_coords)
+    center_x_offset = -(sum(detected_x_coords)-sum(actual_x_coords))/len(detected_x_coords)
+    center_y_offset = -(sum(detected_y_coords)-sum(actual_y_coords))/len(detected_y_coords)
     return center_x_offset,center_y_offset
 
 def get_middle_column_and_row(COLUMNS, ROWS):
