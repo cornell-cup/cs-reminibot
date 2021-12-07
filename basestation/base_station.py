@@ -76,7 +76,7 @@ class BaseStation:
         # empty string means 0.0.0.0, which is all IP addresses on the local
         # machine, because some machines can have multiple Network Interface
         # Cards, and therefore will have multiple ip_addresses
-        server_address = ("0.0.0.0", 9434)
+        server_address = ("0.0.0.0", 5001)
 
         # only bind in debug mode if you are the debug server, if you are the
         # monitoring program which restarts the debug server, do not bind,
@@ -150,7 +150,8 @@ class BaseStation:
             if data_lst[0] == request_password:
                 # Tell the minibot that you are the base station
                 self.sock.sendto(response.encode(), address)
-                self.add_bot(ip_address=address[0], port=data_lst[1])
+                # self.add_bot(ip_address=address[0], port=data_lst[1])
+                self.add_bot(ip_address=address[0], port=10000)
 
     def add_bot(self, port: int, ip_address: str, bot_name: str = None):
         """ Adds a bot to the list of active bots """
@@ -167,8 +168,8 @@ class BaseStation:
         for bot_name in self.get_bot_names():
             status = self.get_bot_status(bot_name)
             # if the bot is inactive, remove it from the active bots list
-            if status == "INACTIVE":
-                self.remove_bot(bot_name)
+            # if status == "INACTIVE":
+            #     self.remove_bot(bot_name) #add back in when working with current minibot code
         return self.get_bot_names()
 
     def get_bot_status(self, bot_name: str) -> str:
