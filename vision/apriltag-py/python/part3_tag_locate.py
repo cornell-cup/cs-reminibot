@@ -123,26 +123,28 @@ def main():
             # print("{} :: {} :: {} {} {} {}".format(DEVICE_ID, d.tag_id, x, y, z, angle))
             print("{},{},{},{},{}".format(d.tag_id, x, y, z, angle))
 
-            # Send the data to the URL specified.
-            # This is usually a URL to the base station.
-            if SEND_DATA:
-                payload = {"id": d.tag_id, "x": x, "y": y, "orientation": angle}
-                r = requests.post(url, json=payload)
-                status_code = r.status_code
-                if status_code / 100 != 2:
-                    # Status codes not starting in '2' are usually error codes.
-                    print(
-                        "WARNING: Basestation returned status code {}".format(
-                            status_code
-                        )
+        # Send the data to the URL specified.
+        # This is usually a URL to the base station.
+        if SEND_DATA:
+            payload = {"id": d.tag_id, "x": x, "y": y, "orientation": angle}
+            r = requests.post(url, json=payload)
+            status_code = r.status_code
+            if status_code / 100 != 2:
+                # Status codes not starting in '2' are usually error codes.
+                print(
+                    "WARNING: Basestation returned status code {}".format(
+                        status_code
                     )
-                else:
-                    num_frames += 1
-                    print(
-                        "Vision FPS (Vision System outflow): {}".format(
-                            num_frames / (time.time() - past_time)
-                        )
+                )
+            else:
+                print(r)
+                print("total seconds:",r.elapsed.total_seconds())
+                num_frames += 1
+                print(
+                    "Vision FPS (Vision System outflow): {}".format(
+                        num_frames / (time.time() - past_time)
                     )
+                )
         cv2.imshow("Tag Locations", undst)
         if cv2.waitKey(1) & 0xFF == ord(" "):
             break

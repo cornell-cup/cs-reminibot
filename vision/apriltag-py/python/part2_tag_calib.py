@@ -170,10 +170,10 @@ def main():
             x2 = center_x + BOARD_TAG_SIZE/2
             y2 = center_y + BOARD_TAG_SIZE/2
         object_center_points.append(((x1+x2)/2, (y1+y2)/2))
-        obj_points[0 + 4 * i] = [x1, y1, 0.0]
-        obj_points[1 + 4 * i] = [x2, y1, 0.0]
-        obj_points[2 + 4 * i] = [x2, y2, 0.0]
-        obj_points[3 + 4 * i] = [x1, y2, 0.0]
+        obj_points[0 + 4 * i] = [x1, y1, 0]
+        obj_points[1 + 4 * i] = [x2, y1, 0]
+        obj_points[2 + 4 * i] = [x2, y2, 0]
+        obj_points[3 + 4 * i] = [x1, y2, 0]
         print(str(id)+","+str(x1)+","+str(y1)+","+str(x2)+","+str(y2))
 
     # Make transform matrices
