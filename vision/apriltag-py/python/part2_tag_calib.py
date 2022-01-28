@@ -450,7 +450,7 @@ def get_args():
         type=str,
         required=False,
         default=None,
-        help="CSV file containg positions \
+        help="JSON file containg positions \
                             of the april tags for calibration",
     )
 
