@@ -248,7 +248,7 @@ def main():
             "y": y_scale_factor
         }
 
-        detected_xs, detected_ys, x_offsets, y_offsets, angle_offsets = get_cell_offsets_with_original_detections(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, camera_to_origin, center_x_offset, center_y_offset, x_scale_factor, y_scale_factor)
+        detected_xs, detected_ys, x_offsets, y_offsets, angle_offsets = get_cell_offsets_with_original_detections(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, object_angles, camera_to_origin, center_x_offset, center_y_offset, x_scale_factor, y_scale_factor)
 
 
 
