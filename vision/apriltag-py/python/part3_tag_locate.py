@@ -41,6 +41,7 @@ def main():
     y_scale_factor = calib_data["scale_factors"]["y"]
     overall_center_x_offset = calib_data["overall_center_offset"]["x"]
     overall_center_y_offset = calib_data["overall_center_offset"]["y"]
+    overall_angle_offset = calib_data["overall_center_offset"]["angle"]
     center_cell_offsets = calib_data["cell_center_offsets"]
     calib_file.close()
 
@@ -112,6 +113,7 @@ def main():
             y_without_ff = y_scale_factor * (y + overall_center_y_offset)
             x = x_scale_factor * (x + overall_center_x_offset) + center_cell_offset["x_offset"]
             y = y_scale_factor * (y + overall_center_y_offset) + center_cell_offset["y_offset"]
+            angle = (angle + overall_angle_offset) + center_cell_offset["angle"]
             (ctr_x, ctr_y) = d.center
             # cv2.putText(undst, "id:"+str(d.tag_id),(int(ctr_x) , int(ctr_y + 60)), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 0, 255),2)
             # cv2.putText(dst, "angle:"+str(round(angle,3)),(int(ctr_x), int(ctr_y+(40 if i %2 == 0 else -40))), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 255, 255),2)

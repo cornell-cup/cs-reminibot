@@ -137,6 +137,7 @@ def main():
     # This was from a tutorial somehwhere and was directly
     # transcribed from the C++ system.
     object_center_points = []
+    object_angles = []
     middle_column, middle_row = get_middle_column_and_row(COLUMNS, ROWS)
     
 
@@ -164,12 +165,14 @@ def main():
             print(f"position: {position}")
             center_x = position["x"]
             center_y = position["y"]
+            angle = position["angle"]
             
             x1 = center_x - BOARD_TAG_SIZE/2
             y1 = center_y - BOARD_TAG_SIZE/2
             x2 = center_x + BOARD_TAG_SIZE/2
             y2 = center_y + BOARD_TAG_SIZE/2
         object_center_points.append(((x1+x2)/2, (y1+y2)/2))
+        object_angles.append(angle)
         obj_points[0 + 4 * i] = [x1, y1, 0]
         obj_points[1 + 4 * i] = [x2, y1, 0]
         obj_points[2 + 4 * i] = [x2, y2, 0]
@@ -231,10 +234,11 @@ def main():
         if len(detections) == 0:
             continue
         
-        center_x_offset, center_y_offset = get_world_center_offsets(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, camera_to_origin)
+        center_x_offset, center_y_offset, angle_offset = get_world_center_offsets(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, object_angles, camera_to_origin)
         calib_data["overall_center_offset"] = {
             "x": center_x_offset,
-            "y": center_y_offset
+            "y": center_y_offset,
+            "angle": angle_offset
         }
 
         
@@ -244,7 +248,7 @@ def main():
             "y": y_scale_factor
         }
 
-        detected_xs, detected_ys, x_offsets, y_offsets = get_cell_offsets_with_original_detections(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, camera_to_origin, center_x_offset, center_y_offset, x_scale_factor, y_scale_factor)
+        detected_xs, detected_ys, x_offsets, y_offsets, angle_offsets = get_cell_offsets_with_original_detections(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, camera_to_origin, center_x_offset, center_y_offset, x_scale_factor, y_scale_factor)
 
 
 
@@ -253,7 +257,8 @@ def main():
             "reference_point_x": detected_xs[detection_index],
             "reference_point_y": detected_ys[detection_index],
             "x_offset": x_offsets[detection_index],
-            "y_offset": y_offsets[detection_index]
+            "y_offset": y_offsets[detection_index],
+            "angle_offset": angle_offsets[detection_index]
         } for detection_index in range(len(detections)) if True] 
           
         
@@ -291,11 +296,12 @@ def get_position_with_id(positions_data, id):
     found_positions = [item for item in positions_data if int(item["id"]) == id]
     return found_positions[0] if found_positions else None
 
-def get_cell_offsets_with_original_detections(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, camera_to_origin, center_x_offset, center_y_offset, x_scale_factor, y_scale_factor):
+def get_cell_offsets_with_original_detections(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, object_angles, camera_to_origin, center_x_offset, center_y_offset, x_scale_factor, y_scale_factor):
     #These will store the scaled points with fudge factors that move the detected center point of each
     #april tag closer to the ideal center point. 
     x_offsets = []
     y_offsets = []
+    angle_offsets = []
     detected_xs = []
     detected_ys = []
     for detection_index in range(len(detections)):
@@ -304,13 +310,15 @@ def get_cell_offsets_with_original_detections(BOARD_TAG_SIZE, camera_matrix, dis
             )
             
         (actual_x, actual_y) = object_center_points[detection_index]
+        actual_angle = object_angles[detection_index]
         center_offset_detected_x = detected_x+center_x_offset
         center_offset_detected_y = detected_y+center_y_offset
         x_offsets.append(actual_x - x_scale_factor*center_offset_detected_x)
         y_offsets.append(actual_y - y_scale_factor*center_offset_detected_y)
+        angle_offsets.append(actual_angle - detected_angle)
         detected_xs.append(detected_x)
         detected_ys.append(detected_y)
-    return detected_xs, detected_ys, x_offsets, y_offsets
+    return detected_xs, detected_ys, x_offsets, y_offsets, angle_offsets
 
 def get_world_scale_factors(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, camera_to_origin, center_x_offset, center_y_offset):
     #Store the scale factor for every set of points (x,y) in these lists
@@ -333,11 +341,12 @@ def get_world_scale_factors(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detectio
     y_scale_factor = sum(y_scale_factors)/len(y_scale_factors)
     return x_scale_factor,y_scale_factor
 
-def get_world_center_offsets(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, camera_to_origin):
+def get_world_center_offsets(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, object_angles, camera_to_origin):
     actual_x_coords = []
     actual_y_coords = []
     detected_x_coords = []
     detected_y_coords = []
+    detected_angles = []
     max_id = -1
     for detection_index in range(len(detections)):
         (detected_x, detected_y, detected_z, detected_angle) = util.compute_tag_undistorted_pose(
@@ -349,15 +358,17 @@ def get_world_center_offsets(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detecti
         actual_y_coords.append(actual_y)    
         detected_x_coords.append(detected_x)
         detected_y_coords.append(detected_y)
+        detected_angles.append(detected_angle)
 
         # Center_x_offset is the actual coordinate the of center of all the detected x values, and it will be used
         # to offset all the other points. We do this because we are treating the center of all detected x values
         # as the origin of our coordinate plane.
         # Center_y_offset is the same thing. Both of these values are negative so we can add it to other coordinates,
         # which generally come with very large values.      
-    center_x_offset = -(sum(detected_x_coords)-sum(actual_x_coords))/len(detected_x_coords)
-    center_y_offset = -(sum(detected_y_coords)-sum(actual_y_coords))/len(detected_y_coords)
-    return center_x_offset,center_y_offset
+    center_x_offset = (sum(actual_x_coords)-sum(detected_x_coords))/len(detected_x_coords)
+    center_y_offset = (sum(actual_y_coords)-sum(detected_y_coords))/len(detected_y_coords)
+    angle_offset = (sum(object_angles)-sum(detected_angles))/len(detected_angles)
+    return center_x_offset,center_y_offset,angle_offset
 
 def get_middle_column_and_row(COLUMNS, ROWS):
     middle_column = (COLUMNS - 1)//2

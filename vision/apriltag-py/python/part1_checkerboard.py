@@ -102,8 +102,9 @@ def get_checkerboard_interactive(camera, cols, rows):
         if found_checkerboard:
             cv2.drawChessboardCorners(image, (cols, rows), corners, True)
         cv2.imshow("Checkerboard Calibration", image)
-        if cv2.waitKey(1) & 0xFF == ord("q"):
+        if cv2.waitKey(1) & 0xFF == ord("q") and found_checkerboard:
             break
+        
     return image, gray_image, corners
 
 
