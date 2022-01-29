@@ -1,14 +1,14 @@
-from blockly_python_process import BlocklyPythonProcess
-from bs_repr import BS_Repr
-from collections import deque
-from select import select
-from socket import socket, timeout, AF_INET, SOCK_STREAM, SOCK_DGRAM
-from socket import SOL_SOCKET, SO_REUSEADDR, SO_BROADCAST
-from threading import Thread
-from typing import List, Tuple
-import sys
-import time
-import argparse
+from blockly_python_process import BlocklyPythonProcess 
+from bs_repr import BS_Repr 
+from collections import deque 
+from select import select 
+from socket import socket, timeout, AF_INET, SOCK_STREAM, SOCK_DGRAM 
+from socket import SOL_SOCKET, SO_REUSEADDR, SO_BROADCAST 
+from threading import Thread 
+from typing import List, Tuple 
+import sys 
+import time 
+import argparse 
 import signal
 
 # NOTE: Please add "flush=True" to all print statements so that our test
@@ -27,7 +27,7 @@ class Minibot:
     # 255.255.255.255 to indicate that we are broadcasting to all addresses
     # on port 9434.  The Basestation has been hard-coded to listen on port 9434
     # for incoming Minibot broadcasts
-    BROADCAST_ADDRESS = ('255.255.255.255', 9434)
+    BROADCAST_ADDRESS = ('255.255.255.255', 5001)
     MINIBOT_MESSAGE = "i_am_a_minibot"
     BASESTATION_MESSAGE = "i_am_the_basestation"
     # 1024 bytes
@@ -134,7 +134,7 @@ class Minibot:
         """
         print("Broadcasting message to basestation.", flush=True)
         # try connecting to the basestation every 2 sec until connection is made
-        self.broadcast_sock.settimeout(2.0)
+        self.broadcast_sock.settimeout(0.2)
         data = ""
         # broadcast message to basestation
         msg_byte_str = "{} {}".format(
@@ -146,6 +146,8 @@ class Minibot:
             data = self.broadcast_sock.recv(4096)
         except timeout:
             print("Timed out", flush=True)
+        except OSError:
+            print("Try again", flush=True)
 
         # TODO this security policy is stupid.  We should be doing
         # authentication after we create the TCP connection and also we should
