@@ -4,8 +4,8 @@
 #include "box.h"
 #include "g2d.h"
 #include "apriltag_quad_contour.h"
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/ihighgui.hpp>
+#include <opencv2/imgproc.hpp>
 #include <iostream>
 #include <float.h>
 #include <stdio.h>

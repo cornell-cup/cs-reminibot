@@ -33,8 +33,8 @@ either expressed or implied, of the FreeBSD Project.
 #include "apriltag_family.h"
 #include "getopt.h"
 
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui.hpp>
+#include <opencv2/imgproc.hpp>
 
 
 // Invoke:

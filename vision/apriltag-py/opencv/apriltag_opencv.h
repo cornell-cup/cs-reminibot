@@ -4,7 +4,7 @@
 #include "apriltag.h"
 #include "contour.h"
 
-#include <opencv2/core/core.hpp>
+#include <opencv2/core.hpp>
 
 #include "image_u32.h"
 
