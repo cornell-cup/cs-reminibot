@@ -248,7 +248,7 @@ def main():
             "y": y_scale_factor
         }
 
-        detected_xs, detected_ys, x_offsets, y_offsets, angle_offsets = get_cell_offsets_with_original_detections(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, object_angles, camera_to_origin, center_x_offset, center_y_offset, x_scale_factor, y_scale_factor)
+        detected_xs, detected_ys, x_offsets, y_offsets, angle_offsets = get_cell_offsets_with_original_detections(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, object_angles, camera_to_origin, center_x_offset, center_y_offset, angle_offset, x_scale_factor, y_scale_factor)
 
 
 
@@ -296,7 +296,7 @@ def get_position_with_id(positions_data, id):
     found_positions = [item for item in positions_data if int(item["id"]) == id]
     return found_positions[0] if found_positions else None
 
-def get_cell_offsets_with_original_detections(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, object_angles, camera_to_origin, center_x_offset, center_y_offset, x_scale_factor, y_scale_factor):
+def get_cell_offsets_with_original_detections(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, object_angles, camera_to_origin, center_x_offset, center_y_offset, angle_offset, x_scale_factor, y_scale_factor):
     #These will store the scaled points with fudge factors that move the detected center point of each
     #april tag closer to the ideal center point. 
     x_offsets = []
@@ -315,7 +315,7 @@ def get_cell_offsets_with_original_detections(BOARD_TAG_SIZE, camera_matrix, dis
         center_offset_detected_y = detected_y+center_y_offset
         x_offsets.append(actual_x - x_scale_factor*center_offset_detected_x)
         y_offsets.append(actual_y - y_scale_factor*center_offset_detected_y)
-        angle_offsets.append(actual_angle - detected_angle)
+        angle_offsets.append((actual_angle - (detected_angle+angle_offset))%360)
         detected_xs.append(detected_x)
         detected_ys.append(detected_y)
     return detected_xs, detected_ys, x_offsets, y_offsets, angle_offsets
@@ -367,7 +367,7 @@ def get_world_center_offsets(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detecti
         # which generally come with very large values.      
     center_x_offset = (sum(actual_x_coords)-sum(detected_x_coords))/len(detected_x_coords)
     center_y_offset = (sum(actual_y_coords)-sum(detected_y_coords))/len(detected_y_coords)
-    angle_offset = (sum(object_angles)-sum(detected_angles))/len(detected_angles)
+    angle_offset = (sum(object_angles)-sum(detected_angles))/len(detected_angles)%360
     return center_x_offset,center_y_offset,angle_offset
 
 def get_middle_column_and_row(COLUMNS, ROWS):
