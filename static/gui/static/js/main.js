@@ -4,34 +4,35 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faCogs, faCode, faBullseye } from '@fortawesome/free-solid-svg-icons';
-library.add(faCogs, faCode, faBullseye);
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCogs, faCode } from '@fortawesome/free-solid-svg-icons';
+library.add(faCogs, faCode);
 
-import BotControl from './components/BotControl/BotControl.js';
-
-// import GridView from './components/BotControl/gridview.js';
-import AddBot from './components/BotControl/SetupBot/AddBot.js';
-import MovementControls from './components/BotControl/MovementControl/MovementControl.js';
-
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link
+} from "react-router-dom";
 
 // import Signup from './components/signup.js';
 // import { BrowserRouter as Router, Link} from 'react-router-dom';
 import Blockly from './components/BotCode/blockly.js';
-import Dashboard from './components/Analytics/dashboard.js';
+import AddBot from './components/BotControl/SetupBot/AddBot.js';
+import MovementControls from './components/BotControl/MovementControl/MovementControl.js';
+// import Dashboard from './components/dashboard.js';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import LoginModal from './components/Login/LoginModal.js';
+import RegisterModal from './components/Login/RegisterModal.js';
 
 import Navbar from './components/Navbar.js';
+import BotControl from './components/BotControl/BotControl.js';
 import { CookiesProvider } from 'react-cookie';
-
 
 
 /**
  * Top Level component for the GUI, includes two tabs
  */
-const BLOCKLY_GENERATED = -1 //Code is completely blockly generated, no user changes have been made
-const BLOCKLY_OVERWRITE_PERM = 0
-const NO_BLOCKLY_OVERWRITE_PERM = 1
-
 class Platform extends React.Component {
   constructor(props) {
     super(props);
@@ -56,6 +57,7 @@ class Platform extends React.Component {
       pythonCodeState: -1,
       selectedBotName: '',
       selectedBotStyle: this.hiddenStyle,
+      email: "",
     };
 
     this.setBlockly = this.setBlockly.bind(this);
@@ -63,6 +65,7 @@ class Platform extends React.Component {
     this.redefineCustomBlockList = this.redefineCustomBlockList.bind(this);
     this.setSelectedBotName = this.setSelectedBotName.bind(this);
     this.setSelectedBotStyle = this.setSelectedBotStyle.bind(this);
+    this.onEmailChange = this.onEmailChange.bind(this);
 
   }
 
@@ -99,62 +102,72 @@ class Platform extends React.Component {
     }
   }
 
+  onEmailChange(email) {
+    console.log("email", email);
+    this.setState({ email: email });
+
+  }
   render() {
     return (
       <div id="platform">
-        {/* <Tabs> */}
-        {/* keeping this here so the tab mechanism is known */}
-        {/* <TabList>
-            <Tab>Setup/Control</Tab>
-            <Tab>Coding</Tab> */}
-        {/* <Tab>Analytics</Tab> */}
-        {/* </TabList> */}
         <div className="tab-content">
-          {/* // Set tabindex to -1 so that this div is in focus to caputure 
-            // the keyboard event handler for arrow key movement */}
-          <div id="setup_control_tab" tabIndex="-1" className="tab-pane active" role="tabpanel">
-            <BotControl
-              selectedBotName={this.state.selectedBotName}
-              setSelectedBotName={this.setSelectedBotName}
-              selectedBotStyle={this.state.selectedBotStyle}
-              setSelectedBotStyle={this.setSelectedBotStyle}
-            />
-          </div>
+          <Switch>
 
-          <div id="coding-tab" className="tab-pane" role="tabpanel">
-            <Blockly
-              blocklyXml={this.state.blocklyXml}
-              setBlockly={this.setBlockly}
-              pythonCode={this.state.pythonCode}
-              pythonCodeState={this.state.pythonCodeState}
-              setPythonCode={this.setPythonCode}
-              selectedBotName={this.state.selectedBotName}
-              customBlockList={this.state.customBlockList}
-              redefineCustomBlockList={this.redefineCustomBlockList}
-            />
-          </div>
-          {/* hiding this page for now */}
-          <div id="analytics-tab" className="tab-pane" role="tabpanel">
+            {/* // Set tabindex to -1 so that this div is in focus to caputure 
+            // the keyboard event handler for arrow key movement */}
+            <Route path="/start">
+              <div id="setup_control_tab" tabIndex="-1" className="tab-pane active" role="tabpanel">
+                <BotControl
+                  selectedBotName={this.state.selectedBotName}
+                  setSelectedBotName={this.setSelectedBotName}
+                  selectedBotStyle={this.state.selectedBotStyle}
+                  setSelectedBotStyle={this.setSelectedBotStyle}
+                />
+              </div>
+            </Route>
+
+            {/* </TabPanel> */}
+            {/* <TabPanel> */}
+            <Route path="/coding">
+              <div id="coding-tab">
+
+                <Blockly
+                  onEmailChange={this.onEmailChange}
+                  blocklyXml={this.state.blocklyXml}
+                  setBlockly={this.setBlockly}
+                  pythonCode={this.state.pythonCode}
+                  pythonCodeState={this.state.pythonCodeState}
+                  setPythonCode={this.setPythonCode}
+                  selectedBotName={this.state.selectedBotName}
+                  customBlockList={this.state.customBlockList}
+                  redefineCustomBlockList={this.redefineCustomBlockList}
+                />
+              </div>
+            </Route>
+            {/* hiding this page for now */}
+            {/* <div className="tab-pane" role="tabpanel"> 
             <Dashboard>
 
             </Dashboard>
-          </div>
-          {/* </TabPanel> */}
+            </div> */}
+          </Switch>
         </div>
-        {/* </Tabs> */}
       </div>
     );
   }
 }
 
+
 class ClientGUI extends React.Component {
   render() {
     return (
       <div className="main-body">
-        <Navbar />
-        <div className="container">
-          <Platform />
-        </div>
+        <Router>
+          <Navbar />
+          <div className="container">
+            <Platform />
+          </div>
+        </Router>
       </div>
     );
   }
