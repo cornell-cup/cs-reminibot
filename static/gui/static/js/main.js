@@ -28,6 +28,7 @@ import RegisterModal from './components/Login/RegisterModal.js';
 import Navbar from './components/Navbar.js';
 import BotControl from './components/BotControl/BotControl.js';
 import { CookiesProvider } from 'react-cookie';
+import Dashboard from './components/Analytics/dashboard.js';
 
 
 /**
@@ -144,12 +145,10 @@ class Platform extends React.Component {
                 />
               </div>
             </Route>
-            {/* hiding this page for now */}
-            {/* <div className="tab-pane" role="tabpanel"> 
-            <Dashboard>
 
-            </Dashboard>
-            </div> */}
+            <Route path="/analytics">
+              <Dashboard />
+            </Route>
           </Switch>
         </div>
       </div>

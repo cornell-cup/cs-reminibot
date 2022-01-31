@@ -745,26 +745,6 @@ export default class MinibotBlockly extends React.Component {
     render() {
         return (
             <div className="">
-                <div className="row">
-                    <div id="loginandregister" className="horizontalDiv" style={{ marginLeft: "40px" }}>
-                        {!this.state.isLoggedIn ? <Button id="register" name="Register" onClick={this.register} /> : null}
-                        {!this.state.isLoggedIn ? <Button id="login" name="Login" onClick={this.login} /> : null}
-                        {this.state.isLoggedIn ? <label className="white-label"> Logged in as: {this.state.loginEmail} &nbsp; </label> : null}
-                        {this.state.isLoggedIn ? <Button id="logout" name="Logout" onClick={this.logout} /> : null}
-                        <UserAccountModal
-                            modalType="register"
-                            handleEvent={this.handleRegister}
-                            successLabel={this.state.registerSuccessLabel}
-                            errorLabel={this.state.registerErrorLabel}
-                        />
-                        <UserAccountModal
-                            modalType="login"
-                            handleEvent={this.handleLogin}
-                            successLabel={this.state.loginSuccessLabel}
-                            errorLabel={this.state.loginErrorLabel}
-                        />
-                    </div>
-                </div>
                 <div className="container-coding">
                     <div className="row">
                         <div className="col">
