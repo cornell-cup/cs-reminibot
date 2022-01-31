@@ -110,8 +110,8 @@ class Minibot:
             self.handle_writable_socks(write_ready_socks)
             self.handle_readable_socks(read_ready_socks)
             # if basestation exists but is disconnected, stop minibot
-            # if self.bs_repr and not self.bs_repr.is_connected():
-            #     self.basestation_disconnected(self.bs_repr.conn_sock)
+            if self.bs_repr and not self.bs_repr.is_connected():
+                self.basestation_disconnected(self.bs_repr.conn_sock)
 
     def create_listener_sock(self):
         """ Creates a socket that listens for TCP connections from the 

@@ -5,37 +5,13 @@ import CodeMirror from 'react-codemirror';
 require('codemirror/mode/python/python');
 
 
-function UserAccountModal(props) {
-    const s = props.modalType;
-    const modalId = s + "Modal2";
-    const formId = s + "Form";
-    const closeId = s + "Close";
-    // Make first letter of s uppercase
-    const sUpperCased = s.charAt(0).toUpperCase() + s.slice(1)
-    const title = sUpperCased + " Window";
-    return (
-        <div id={modalId} className="modal2">
-            <span id={closeId} className="close">&times;</span>
-            <p>{title}</p>
-            <form id={formId}>
-                <input type="text" placeholder="Email" name="email" ></input>
-                <input type="password" placeholder="Password" name="password" ></input>
-                <input className="button-login" type="button" value={sUpperCased} onClick={props.handleEvent}></input>
-                <label style={{ color: 'green' }}> {props.successLabel} </label>
-                <br />
-                <label style={{ color: 'red' }}> {props.errorLabel} </label>
-            </form>
-        </div>
-    )
-}
-
 class PythonEditor extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             filename: "FileName.py",
             functionName: "default_function",
-            codingStart: -1
+            codingStart: -1,
         }
 
         this.downloadPython = this.downloadPython.bind(this);
@@ -134,6 +110,8 @@ class PythonEditor extends React.Component {
             this.setState({ codingStart: -1 })
         }
 
+        console.log(this.props.loginEmail);
+
         axios({
             method: 'POST',
             url: '/script',
@@ -142,7 +120,8 @@ class PythonEditor extends React.Component {
             },
             data: JSON.stringify({
                 bot_name: this.props.selectedBotName,
-                script_code: this.props.pythonCode
+                script_code: this.props.pythonCode,
+                login_email: this.props.loginEmail
             }),
         }).then(function (response) {
             console.log('sent script');
@@ -310,7 +289,7 @@ export default class MinibotBlockly extends React.Component {
             blocklyFilename: 'FileName.xml',
             pyblock: "",
             showPopup: false,
-            loginEmail: "",
+            loginEmail: props.loginEmail,
             loginErrorLabel: "",
             loginSuccessLabel: "",
             registerErrorLabel: "",
@@ -596,13 +575,11 @@ export default class MinibotBlockly extends React.Component {
             },
             data: JSON.stringify({
                 bot_name: _this.props.selectedBotName,
-                script_code: _this.props.pythonCode
+                script_code: _this.props.pythonCode,
+                login_email: this.props.loginEmail
             }),
         }).catch(function (error) {
-            if (error.response.data.error_msg.length > 0)
-                window.alert(error.response.data.error_msg);
-            else
-                console.log(error);
+            console.log(error);
         });
     }
 
@@ -801,6 +778,7 @@ export default class MinibotBlockly extends React.Component {
                             pythonCodeState={this.props.pythonCodeState}
                             setPythonCode={this.props.setPythonCode}
                             stopBlockly={this.stopBlockly}
+                            loginEmail={this.props.loginEmail}
                         />
                     </div>
                 </div>

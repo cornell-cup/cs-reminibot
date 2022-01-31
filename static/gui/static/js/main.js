@@ -27,33 +27,33 @@ import History from './components/Analytics/submissionHistory.js';
 /**
  * Top Level component for the GUI, includes two tabs
  */
-const Platform = withCookies((props) =>  {
+const Platform = withCookies((props) => {
 
 
-    const hiddenStyle = {
-      visibility: 'hidden',
-    };
-    const visibleStyle = {
-      visibility: 'visible',
-    };
+  const hiddenStyle = {
+    visibility: 'hidden',
+  };
+  const visibleStyle = {
+    visibility: 'visible',
+  };
 
-    const [customBlockList, redefineCustomBlockList] = useState([]);
-    const [blocklyXml, setBlocklyXml] = useState(null);
-    const [pythonCode, setPythonCode] = useState("");
-    // pythonCodeState == -1:  Code is completely blockly generated, no user
-    //    changes have been made
-    // pythonCodeState == 0:  User has made changes to the Python code, but 
-    //    the user has not yet disallowed Blockly from overwiting these changes
-    // pythonCodeState == 1:  User has made changes to the Python code
-    //    and has disallowed Blockly from overwriting these changes.
-    const [pythonCodeState, setPythonCodeState] = useState(-1);
-    const [selectedBotName, setSelectedBotName] = useState('');
-    const [selectedBotStyle, setSelectedBotStyleState] = useState(hiddenStyle);
-    const [loginEmail, setLoginEmail] = useState(props.cookies.get('current_user_email') || "");
-    
-    useEffect(() => {
-      setLoginEmail(props.cookies.get('current_user_email') || "");
-    }, [document.cookie]);
+  const [customBlockList, redefineCustomBlockList] = useState([]);
+  const [blocklyXml, setBlocklyXml] = useState(null);
+  const [pythonCode, setPythonCode] = useState("");
+  // pythonCodeState == -1:  Code is completely blockly generated, no user
+  //    changes have been made
+  // pythonCodeState == 0:  User has made changes to the Python code, but 
+  //    the user has not yet disallowed Blockly from overwiting these changes
+  // pythonCodeState == 1:  User has made changes to the Python code
+  //    and has disallowed Blockly from overwriting these changes.
+  const [pythonCodeState, setPythonCodeState] = useState(-1);
+  const [selectedBotName, setSelectedBotName] = useState('');
+  const [selectedBotStyle, setSelectedBotStyleState] = useState(hiddenStyle);
+  const [loginEmail, setLoginEmail] = useState(props.cookies.get('current_user_email') || "");
+
+  useEffect(() => {
+    setLoginEmail(props.cookies.get('current_user_email') || "");
+  }, [document.cookie]);
 
 
 
@@ -69,57 +69,58 @@ const Platform = withCookies((props) =>  {
 
 
 
-    return (
-      <div id="platform">
-        <div className="tab-content">
-          <Switch>
+  return (
+    <div id="platform">
+      <div className="tab-content">
+        <Switch>
 
-            {/* // Set tabindex to -1 so that this div is in focus to caputure 
+          {/* // Set tabindex to -1 so that this div is in focus to caputure 
             // the keyboard event handler for arrow key movement */}
-            <Route path="/start">
-              <div id="setup_control_tab" tabIndex="-1" className="tab-pane active" role="tabpanel">
-                <BotControl
-                  selectedBotName={selectedBotName}
-                  setSelectedBotName={setSelectedBotName}
-                  selectedBotStyle={selectedBotStyle}
-                  setSelectedBotStyle={setSelectedBotStyle}
-                />
-              </div>
-            </Route>
-
-            {/* </TabPanel> */}
-            {/* <TabPanel> */}
-            <Route path="/coding">
-              <div id="coding-tab">
-
-                <Blockly
-                  blocklyXml={blocklyXml}
-                  setBlockly={setBlocklyXml}
-                  pythonCode={pythonCode}
-                  pythonCodeState={pythonCodeState}
-                  setPythonCode={setPythonCode}
-                  selectedBotName={selectedBotName}
-                  customBlockList={customBlockList}
-                  redefineCustomBlockList={redefineCustomBlockList}
-                />
-              </div>
-            </Route>
-
-            <Route path="/analytics">
-              <Dashboard
-                loginEmail={loginEmail}
+          <Route path="/start">
+            <div id="setup_control_tab" tabIndex="-1" className="tab-pane active" role="tabpanel">
+              <BotControl
+                selectedBotName={selectedBotName}
+                setSelectedBotName={setSelectedBotName}
+                selectedBotStyle={selectedBotStyle}
+                setSelectedBotStyle={setSelectedBotStyle}
               />
-            </Route>
+            </div>
+          </Route>
 
-            <Route path="/history">
-              <History
+          {/* </TabPanel> */}
+          {/* <TabPanel> */}
+          <Route path="/coding">
+            <div id="coding-tab">
+
+              <Blockly
                 loginEmail={loginEmail}
+                blocklyXml={blocklyXml}
+                setBlockly={setBlocklyXml}
+                pythonCode={pythonCode}
+                pythonCodeState={pythonCodeState}
+                setPythonCode={setPythonCode}
+                selectedBotName={selectedBotName}
+                customBlockList={customBlockList}
+                redefineCustomBlockList={redefineCustomBlockList}
               />
-            </Route>
-          </Switch>
-        </div>
+            </div>
+          </Route>
+
+          <Route path="/analytics">
+            <Dashboard
+              loginEmail={loginEmail}
+            />
+          </Route>
+
+          <Route path="/history">
+            <History
+              loginEmail={loginEmail}
+            />
+          </Route>
+        </Switch>
       </div>
-    );
+    </div>
+  );
 
 })
 

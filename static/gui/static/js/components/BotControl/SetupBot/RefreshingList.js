@@ -1,11 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import InformationBoxModal from '../../utils/InformationBoxModal.js';
-import { INFOBOXID, INFOBOXTYPE, INFO_ICON } from '../../utils/Constants.js';
-
-export default class BotSearch extends React.Component {
+export default class RefreshingList extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -62,41 +58,25 @@ export default class BotSearch extends React.Component {
 
   render() {
     const _this = this;
+    if (_this.state.availableBots.length === 0) {
+      _this.state.currentBot = "";
+      return <select className="available-bots" onClick={this.discoverBots}>
+        <option>Click to search for available bots</option>
+      </select>
+    }
     if (_this.state.currentBot === "") {
       _this.state.currentBot = _this.state.availableBots[0]
     }
-    return (
-      <div>
-        <div className="row">
-          <div className="col d-flex">
-            <h3 className="small-title">
-              Setup the Bot
-              <span style={{ leftMargin: "0.5em" }}> </span>
-              <input className="info-box" type="image"
-                data-toggle="modal"
-                data-target={"#" + INFOBOXID.SETUP}
-                src={INFO_ICON}
-                width="18" height="18" />
-            </h3>
-            <button className="btn btn-secondary ml-auto" onClick={this.discoverBots()}>Search for bots</button>
-          </div>
-        </div>
-        <div className="form-group row">
-          <label className="col-sm-4 col-form-label">Select Bot:</label>
-          <div className="col-sm-8">
-            <select className="available-bots custom-select custom-select-sm" onChange={(e) => this.updateCurrentBot(e)}>
-              {
-                _this.state.availableBots.length === 0 ?
-                  <option defaultValue>-------Available Bots--------</option>
-                  :
-                  _this.state.availableBots.map((name, idx) => <option key={idx}> {name} </option>)
-              }
-            </select>
-          </div>
-        </div>
-        <InformationBoxModal type={INFOBOXTYPE.SETUP} />
-      </div>
-    )
-  }
 
+    return (
+      <select
+        className="available-bots"
+        onChange={(e) => this.updateCurrentBot(e)}
+        onClick={this.discoverBots}
+      >
+        {_this.state.availableBots.map(
+          (name, idx) => <option key={idx}> {name} </option>)}
+      </select>
+    );
+  }
 }
