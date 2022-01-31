@@ -71,6 +71,9 @@ const Navbar = (props) => {
         {isLoggedIn &&
           <Link id="analytics-link" to="/analytics" className={`nav-link ${activeIndex === 2 ? "active" : ""}`} onClick={(e) => { setActiveIndex(2) }}><FontAwesomeIcon icon={Icons.faChartBar} /> Analytics</Link>
         }
+        {isLoggedIn &&
+          <Link id="history-link" to="/history" className={`nav-link ${activeIndex === 3 ? "active" : ""}`} onClick={(e) => { setActiveIndex(3) }}><FontAwesomeIcon icon={Icons.faChartBar} /> History</Link>
+        }
         {isLoggedIn ? <a className="nav-link" onClick={handleLogout}><FontAwesomeIcon icon={Icons.faSignOutAlt} /> Logout</a> : <a className="nav-link" data-toggle="modal" data-target="#loginModal"><FontAwesomeIcon icon={Icons.faSignInAlt} /> Login</a>}
         {!isLoggedIn && <a className="nav-link" data-toggle="modal" data-target="#registerModal"><FontAwesomeIcon icon={Icons.faUserPlus} /> Signup</a>}
       </div>

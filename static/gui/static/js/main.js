@@ -4,7 +4,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCogs, faCode } from '@fortawesome/free-solid-svg-icons';
 library.add(faCogs, faCode);
 
@@ -12,23 +11,16 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Link
 } from "react-router-dom";
 
 // import Signup from './components/signup.js';
 // import { BrowserRouter as Router, Link} from 'react-router-dom';
 import Blockly from './components/BotCode/blockly.js';
-import AddBot from './components/BotControl/SetupBot/AddBot.js';
-import MovementControls from './components/BotControl/MovementControl/MovementControl.js';
-// import Dashboard from './components/dashboard.js';
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
-import LoginModal from './components/Login/LoginModal.js';
-import RegisterModal from './components/Login/RegisterModal.js';
-
 import Navbar from './components/Navbar.js';
 import BotControl from './components/BotControl/BotControl.js';
 import { CookiesProvider } from 'react-cookie';
 import Dashboard from './components/Analytics/dashboard.js';
+import History from './components/Analytics/submissionHistory.js';
 
 
 /**
@@ -58,7 +50,7 @@ class Platform extends React.Component {
       pythonCodeState: -1,
       selectedBotName: '',
       selectedBotStyle: this.hiddenStyle,
-      email: "",
+      loginEmail: "",
     };
 
     this.setBlockly = this.setBlockly.bind(this);
@@ -105,7 +97,7 @@ class Platform extends React.Component {
 
   onEmailChange(email) {
     console.log("email", email);
-    this.setState({ email: email });
+    this.setState({ loginEmail: email });
 
   }
   render() {
@@ -133,7 +125,6 @@ class Platform extends React.Component {
               <div id="coding-tab">
 
                 <Blockly
-                  onEmailChange={this.onEmailChange}
                   blocklyXml={this.state.blocklyXml}
                   setBlockly={this.setBlockly}
                   pythonCode={this.state.pythonCode}
@@ -147,7 +138,15 @@ class Platform extends React.Component {
             </Route>
 
             <Route path="/analytics">
-              <Dashboard />
+              <Dashboard
+                loginEmail={this.state.email}
+              />
+            </Route>
+
+            <Route path="/history">
+              <History
+                loginEmail={this.state.email}
+              />
             </Route>
           </Switch>
         </div>
@@ -162,7 +161,8 @@ class ClientGUI extends React.Component {
     return (
       <div className="main-body">
         <Router>
-          <Navbar />
+          <Navbar
+          />
           <div className="container">
             <Platform />
           </div>
