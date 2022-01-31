@@ -1,6 +1,6 @@
 /* ES6 */
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -19,6 +19,7 @@ import Blockly from './components/BotCode/blockly.js';
 import Navbar from './components/Navbar.js';
 import BotControl from './components/BotControl/BotControl.js';
 import { CookiesProvider } from 'react-cookie';
+import { withCookies, Cookies } from 'react-cookie';
 import Dashboard from './components/Analytics/dashboard.js';
 import History from './components/Analytics/submissionHistory.js';
 
@@ -26,81 +27,48 @@ import History from './components/Analytics/submissionHistory.js';
 /**
  * Top Level component for the GUI, includes two tabs
  */
-class Platform extends React.Component {
-  constructor(props) {
-    super(props);
+const Platform = withCookies((props) =>  {
 
-    this.hiddenStyle = {
+
+    const hiddenStyle = {
       visibility: 'hidden',
     };
-    this.visibleStyle = {
+    const visibleStyle = {
       visibility: 'visible',
     };
 
-    this.state = {
-      customBlockList: [],
-      blocklyXml: null,
-      pythonCode: "",
-      // pythonCodeState == -1:  Code is completely blockly generated, no user
-      //    changes have been made
-      // pythonCodeState == 0:  User has made changes to the Python code, but 
-      //    the user has not yet disallowed Blockly from overwiting these changes
-      // pythonCodeState == 1:  User has made changes to the Python code
-      //    and has disallowed Blockly from overwriting these changes.
-      pythonCodeState: -1,
-      selectedBotName: '',
-      selectedBotStyle: this.hiddenStyle,
-      loginEmail: "",
-    };
+    const [customBlockList, redefineCustomBlockList] = useState([]);
+    const [blocklyXml, setBlocklyXml] = useState(null);
+    const [pythonCode, setPythonCode] = useState("");
+    // pythonCodeState == -1:  Code is completely blockly generated, no user
+    //    changes have been made
+    // pythonCodeState == 0:  User has made changes to the Python code, but 
+    //    the user has not yet disallowed Blockly from overwiting these changes
+    // pythonCodeState == 1:  User has made changes to the Python code
+    //    and has disallowed Blockly from overwriting these changes.
+    const [pythonCodeState, setPythonCodeState] = useState(-1);
+    const [selectedBotName, setSelectedBotName] = useState('');
+    const [selectedBotStyle, setSelectedBotStyleState] = useState(hiddenStyle);
+    const [loginEmail, setLoginEmail] = useState(props.cookies.get('current_user_email') || "");
+    
+    useEffect(() => {
+      setLoginEmail(props.cookies.get('current_user_email') || "");
+    }, [document.cookie]);
 
-    this.setBlockly = this.setBlockly.bind(this);
-    this.setPythonCode = this.setPythonCode.bind(this)
-    this.redefineCustomBlockList = this.redefineCustomBlockList.bind(this);
-    this.setSelectedBotName = this.setSelectedBotName.bind(this);
-    this.setSelectedBotStyle = this.setSelectedBotStyle.bind(this);
-    this.onEmailChange = this.onEmailChange.bind(this);
 
+
+
+
+
+
+
+
+  function setSelectedBotStyle(style) {
+    setSelectedBotStyleState(style === "hidden" ? hiddenStyle : visibleStyle);
   }
 
-  setBlockly(xmltext) {
-    this.setState({ blocklyXml: xmltext });
-  }
 
-  /**
-   * Sets the Python code and code state.  See the comment in the constructor
-   * to understand the different values the code state can take.  
-   */
-  setPythonCode(code, state) {
-    this.setState({
-      pythonCode: code,
-      pythonCodeState: state,
-    });
-  }
 
-  redefineCustomBlockList(newCustomBlockList) {
-    this.setState({ customBlockList: newCustomBlockList });
-  }
-
-  setSelectedBotName(text) {
-    this.setState({ selectedBotName: text });
-  }
-
-  setSelectedBotStyle(style) {
-    const _this = this;
-    if (style === "hidden") {
-      _this.setState({ selectedBotStyle: this.hiddenStyle });
-    }
-    else {
-      _this.setState({ selectedBotStyle: this.visibleStyle });
-    }
-  }
-
-  onEmailChange(email) {
-    console.log("email", email);
-    this.setState({ loginEmail: email });
-
-  }
-  render() {
     return (
       <div id="platform">
         <div className="tab-content">
@@ -111,10 +79,10 @@ class Platform extends React.Component {
             <Route path="/start">
               <div id="setup_control_tab" tabIndex="-1" className="tab-pane active" role="tabpanel">
                 <BotControl
-                  selectedBotName={this.state.selectedBotName}
-                  setSelectedBotName={this.setSelectedBotName}
-                  selectedBotStyle={this.state.selectedBotStyle}
-                  setSelectedBotStyle={this.setSelectedBotStyle}
+                  selectedBotName={selectedBotName}
+                  setSelectedBotName={setSelectedBotName}
+                  selectedBotStyle={selectedBotStyle}
+                  setSelectedBotStyle={setSelectedBotStyle}
                 />
               </div>
             </Route>
@@ -125,35 +93,35 @@ class Platform extends React.Component {
               <div id="coding-tab">
 
                 <Blockly
-                  blocklyXml={this.state.blocklyXml}
-                  setBlockly={this.setBlockly}
-                  pythonCode={this.state.pythonCode}
-                  pythonCodeState={this.state.pythonCodeState}
-                  setPythonCode={this.setPythonCode}
-                  selectedBotName={this.state.selectedBotName}
-                  customBlockList={this.state.customBlockList}
-                  redefineCustomBlockList={this.redefineCustomBlockList}
+                  blocklyXml={blocklyXml}
+                  setBlockly={setBlocklyXml}
+                  pythonCode={pythonCode}
+                  pythonCodeState={pythonCodeState}
+                  setPythonCode={setPythonCode}
+                  selectedBotName={selectedBotName}
+                  customBlockList={customBlockList}
+                  redefineCustomBlockList={redefineCustomBlockList}
                 />
               </div>
             </Route>
 
             <Route path="/analytics">
               <Dashboard
-                loginEmail={this.state.email}
+                loginEmail={loginEmail}
               />
             </Route>
 
             <Route path="/history">
               <History
-                loginEmail={this.state.email}
+                loginEmail={loginEmail}
               />
             </Route>
           </Switch>
         </div>
       </div>
     );
-  }
-}
+
+})
 
 
 class ClientGUI extends React.Component {

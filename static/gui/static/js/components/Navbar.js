@@ -17,7 +17,7 @@ import {
  */
 const Navbar = (props) => {
   const [loginEmail, setLoginEmail] = useState(props.cookies.get('current_user_email') || "");
-  const [isLoggedIn, setIsLoggedIn] = useState(props.cookies.get(isLoggedIn !== ""));
+  const [isLoggedIn, setIsLoggedIn] = useState(loginEmail !== "");
   const [isSideNavOpen, setIsSideNavOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -33,8 +33,8 @@ const Navbar = (props) => {
   function handleLogout(e) {
     console.log("logout")
     if (activeIndex === 2) {
-      document.querySelector("#analytics-tab").classList.remove("active");
-      document.querySelector("#setup_control_tab").classList.add("active");
+      document.querySelector("#analytics-link").classList.remove("active");
+      document.querySelector("#setup-control-link").classList.add("active");
       setActiveIndex(0);
     }
     const current_user_email = props.cookies.remove('current_user_email');
