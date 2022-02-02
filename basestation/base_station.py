@@ -375,6 +375,7 @@ class BaseStation:
             while thread_safe_condition.get_val():
                 thread_safe_message_queue.push("Say something!")
                 try:
+                    recognizer.adjust_for_ambient_noise(microphone)
                     # listen for 5 seconds
                     audio = recognizer.listen(microphone, RECORDING_TIME_LIMIT)
                     thread_safe_message_queue.push(
