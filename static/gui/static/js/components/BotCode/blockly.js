@@ -179,7 +179,7 @@ class PythonEditor extends React.Component {
             mode: 'python'
         };
         return (
-            <div id="Python" className="col">
+            <div id="Python" className="col" style={{ paddingLeft: "40px", marginLeft: "10px" }}>
                 <div className="row">
                     <div className="col text-center">
                         <p className="small-title"> Python </p>
@@ -190,8 +190,8 @@ class PythonEditor extends React.Component {
                         style={{
                             "minWidth": '480px',
                             "minHeight": '400px',
-                            "marginRight": "5px",
-                            "padding": "20px",
+                            "maxWidth": '950px',
+                            "padding": '10px',
                         }}
                     >
                         <CodeMirror
@@ -297,10 +297,6 @@ export default class MinibotBlockly extends React.Component {
             functionName: "default_function",
             codingStart: -1,
             isLoggedIn: false,
-            loginErrorLabel: "",
-            loginSuccessLabel: "",
-            registerErrorLabel: "",
-            registerSuccessLabel: "",
             emptyFunctionName: "Create Custom Block",
             workspace: null,
         };
@@ -732,12 +728,12 @@ export default class MinibotBlockly extends React.Component {
                             </div>
                             <div className="row">
                                 <div className="col">
-                                    <div id="blocklyDiv" style={{ height: "488px", width: "540px", padding: "10px" }}></div>
+                                    <div id="blocklyDiv" style={{ height: "488px", width: "975px", padding: "40px" }}></div>
                                 </div>
                             </div>
                             <div className="row">
                                 <div className="col horizontalDiv">
-                                    <form style={{ color: "white", paddingLeft: "20px" }}>
+                                    <form style={{ color: "white", paddingLeft: "40px" }}>
                                         <input
                                             type="file"
                                             id="blockUpload"
@@ -750,7 +746,7 @@ export default class MinibotBlockly extends React.Component {
                             </div>
                             <div className="row">
                                 <div className="col horizontalDiv">
-                                    <div className="element-wrapper" style={{ paddingLeft: "20px" }}><input
+                                    <div className="element-wrapper" style={{ paddingLeft: "40px" }}><input
                                         type="text"
                                         name="blockly_filename"
                                         placeholder="FileName.xml"
@@ -761,7 +757,7 @@ export default class MinibotBlockly extends React.Component {
                             </div>
                             <div className="row">
                                 <div className="col horizontalDiv">
-                                    <div className="element-wrapper" style={{ paddingLeft: "20px" }}>
+                                    <div className="element-wrapper" style={{ paddingLeft: "40px" }}>
                                         <Button id="blocklyRun" name="Run" onClick={this.runBlockly} />
                                         <Button id="blocklyStop" name="Stop" onClick={this.stopBlockly} />
                                     </div>

@@ -1,10 +1,8 @@
 import React from 'react';
 import axios from 'axios';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 library.add(faInfoCircle);
-import { Button } from '../../utils/Util.js';
 import InformationBoxModal from '../../utils/InformationBoxModal.js';
 import RefreshingList from './RefreshingList.js';
 import PortsList from './PortsList.js';
@@ -261,7 +259,6 @@ export default class AddBot extends React.Component {
                     <div className="row">
                         <div className="col horizontalDivCenter">
                             <div className="element-wrapper">
-                                <label className="white-label"> Available Bots: &nbsp; </label>
                                 <RefreshingList ref={this.refreshingBotListRef} />
                             </div>
                             <button className="btn btn-secondary" onClick={this.addBotListener}>Add Bot</button>
@@ -281,6 +278,10 @@ export default class AddBot extends React.Component {
                         </div>
                     </div>
                 </div>
+                <InformationBoxModal type={INFOBOXTYPE.SETUP} />
+                <br />
+                <br />
+                <br />
                 <div className="container">
                     <div className="row">
                         <div className="col horizontalDivCenter">
@@ -318,14 +319,10 @@ export default class AddBot extends React.Component {
                             </h3>
                             <br />
                             <PortsList motorPorts={this.motorPorts} />
-                            {/* <div className="element-wrapper in-front-of-other-elems">
-                                <PortsList motorPorts={this.motorPorts} />
-                            </div> */}
                         </div>
                     </div>
                     <InformationBoxModal type={INFOBOXTYPE.PORT} />
                 </div>
-
                 <br />
             </div >
         );

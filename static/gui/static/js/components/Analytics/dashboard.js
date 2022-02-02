@@ -1,10 +1,5 @@
 import React, { Component } from 'react';
-import axios from 'axios';
-import { render } from 'react-dom';
-import BarChartComponent from './barchart';
 import LineChartComponent from './linechart';
-import PieChartComponent from './piechart';
-import { BarChart } from 'recharts';
 import MonthtlyResultBarChart from './monthlyResultsBarChart'
 import MonthlyErrorPieChart from './monthlyErrorPieChart'
 import MiscData from './miscData'
@@ -13,8 +8,6 @@ export default class Dashboard extends React.Component {
     constructor() {
         super();
     }
-
-
 
     render() {
         return (
@@ -33,7 +26,6 @@ export default class Dashboard extends React.Component {
                             <div className="card-body">
                                 <div className="chart-area">
                                     <canvas id="myAreaChart"></canvas>
-                                    {/* <PieChartComponent></PieChartComponent> */}
                                     <MonthlyErrorPieChart loginEmail={this.props.loginEmail} />
                                 </div>
                             </div>
@@ -51,7 +43,6 @@ export default class Dashboard extends React.Component {
                             <div className="card-body">
                                 <div className="chart-area">
                                     <canvas id="myAreaChart"></canvas>
-                                    {/* <BarChartComponent></BarChartComponent> */}
                                     <MonthtlyResultBarChart loginEmail={this.props.loginEmail} />
                                 </div>
                             </div>

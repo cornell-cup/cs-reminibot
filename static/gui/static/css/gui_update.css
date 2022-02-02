@@ -431,8 +431,12 @@ table {
 }
 
 #botName {
-  color: orange;
+  color: #ff8484;
   font-weight: bold;
+}
+
+.available-bots{
+  padding: 5px;
 }
 
 .control-option {

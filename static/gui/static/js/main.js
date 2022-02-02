@@ -55,14 +55,6 @@ const Platform = withCookies((props) => {
     setLoginEmail(props.cookies.get('current_user_email') || "");
   }, [document.cookie]);
 
-
-
-
-
-
-
-
-
   function setSelectedBotStyle(style) {
     setSelectedBotStyleState(style === "hidden" ? hiddenStyle : visibleStyle);
   }
@@ -87,8 +79,6 @@ const Platform = withCookies((props) => {
             </div>
           </Route>
 
-          {/* </TabPanel> */}
-          {/* <TabPanel> */}
           <Route path="/coding">
             <div id="coding-tab">
 
