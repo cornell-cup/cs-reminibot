@@ -22,6 +22,7 @@ export default class AddBot extends React.Component {
             availableBots: [], // bots connected to Base Station but not GUI
             botList: [],
             power: 50,
+            showPorts: false,
         };
 
         // Needed to use a ref for react
@@ -31,12 +32,13 @@ export default class AddBot extends React.Component {
         this.buttonMapListener = this.buttonMapListener.bind(this);
         this.handleArrowKeyDown = this.handleArrowKeyDown.bind(this);
         this.motorPorts = this.motorPorts.bind(this);
+        this.portConfigBttnOnClick = this.portConfigBttnOnClick.bind(this);
     }
 
     portConfigBttnOnClick() {
         let bttn = document.getElementById("portConfigBttn");
         this.setState({ showPorts: !this.state.showPorts });
-        console.log(this.state.showPorts);
+
         if (this.state.showPorts) {
             bttn.src = CARROT_COLLAPSED;
         } else {
