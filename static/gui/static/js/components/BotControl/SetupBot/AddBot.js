@@ -253,8 +253,15 @@ export default class AddBot extends React.Component {
                     <div className="row">
                         <div className="col text-center">
                             <br />
-                            <p className="small-title"> Minibot Setup </p>
+                            <p className="small-title"> Minibot Setup
+                                <span style={{ leftMargin: "0.5em" }}> </span>
+                                <input className="info-box" type="image"
+                                    data-toggle="modal"
+                                    data-target={"#" + INFOBOXID.SETUP}
+                                    src={INFO_ICON}
+                                    width="18" height="18" /></p>
                         </div>
+
                     </div>
                     <div className="row">
                         <div className="col horizontalDivCenter">
