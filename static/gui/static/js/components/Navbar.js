@@ -69,7 +69,7 @@ const Navbar = (props) => {
         <Link id="setup-control-link" to="/start" className={`nav-link ${activeIndex === 0 ? "active" : ""}`} onClick={(e) => { setActiveIndex(0) }}><FontAwesomeIcon icon="cogs" /> Setup/Movement</Link>
         <Link id="coding-link" to="/coding" className={`nav-link ${activeIndex === 1 ? "active" : ""}`} onClick={(e) => { setActiveIndex(1) }}><FontAwesomeIcon icon="code" /> Coding</Link>
         {isLoggedIn &&
-          <Link id="analytics-link" to="/analytics" className={`nav-link ${activeIndex === 2 ? "active" : ""}`} onClick={(e) => { setActiveIndex(2) }}><FontAwesomeIcon icon={Icons.faChartBar} /> Analytics</Link>
+          <Link id="analytics-link" to="/user-analytics" className={`nav-link ${activeIndex === 2 ? "active" : ""}`} onClick={(e) => { setActiveIndex(2) }}><FontAwesomeIcon icon={Icons.faChartBar} /> Analytics</Link>
         }
         {isLoggedIn &&
           <Link id="history-link" to="/history" className={`nav-link ${activeIndex === 3 ? "active" : ""}`} onClick={(e) => { setActiveIndex(3) }}><FontAwesomeIcon icon={Icons.faChartBar} /> History</Link>

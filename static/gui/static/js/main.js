@@ -68,7 +68,7 @@ const Platform = withCookies((props) => {
 
           {/* // Set tabindex to -1 so that this div is in focus to caputure 
             // the keyboard event handler for arrow key movement */}
-          <Route path="/start">
+          <Route exact path="/start">
             <div id="setup_control_tab" tabIndex="-1" className="tab-pane active" role="tabpanel">
               <BotControl
                 selectedBotName={selectedBotName}
@@ -79,7 +79,7 @@ const Platform = withCookies((props) => {
             </div>
           </Route>
 
-          <Route path="/coding">
+          <Route exact path="/coding">
             <div id="coding-tab">
 
               <Blockly
@@ -96,7 +96,7 @@ const Platform = withCookies((props) => {
             </div>
           </Route>
 
-          <Route path="/analytics">
+          <Route path="/user-analytics">
             <Dashboard
               loginEmail={loginEmail}
             />

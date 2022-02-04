@@ -281,3 +281,19 @@ def analytics():
 
     else:
         return json.dumps("Failed, not logged in"), 400
+
+
+# To stop refreshing pages from 404 requests, temp solution to render page on refresh
+@app.route('/coding', methods=['GET'])
+def coding():
+    return render_template('index.html')
+
+
+@app.route('/user-analytics', methods=['GET'])
+def user_analytics():
+    return render_template('index.html')
+
+
+@app.route('/history', methods=['GET'])
+def history():
+    return render_template('index.html')
