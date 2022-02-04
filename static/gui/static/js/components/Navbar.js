@@ -8,8 +8,11 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Link
+  Link,
+  useLocation
 } from "react-router-dom";
+
+const authorizationRestrictedRoutes = ['/analytics','/history'];
 
 /**
  * New component for the Navbar on top
@@ -32,12 +35,7 @@ const Navbar = (props) => {
 
   function handleLogout(e) {
     console.log("logout")
-    if (activeIndex === 2) {
-      document.querySelector("#analytics-link").classList.remove("active");
-      document.querySelector("#setup-control-link").classList.add("active");
-      setActiveIndex(0);
-    }
-    const current_user_email = props.cookies.remove('current_user_email');
+    props.cookies.remove('current_user_email');
     setIsLoggedIn(false);
     setLoginEmail("");
   }
@@ -61,6 +59,10 @@ const Navbar = (props) => {
       openNav();
     }
   }
+
+  const location = useLocation();
+  const pathname = location.pathname;
+
   return (
     <div>
       <div id="mySidenav" class="sidenav">
@@ -74,7 +76,7 @@ const Navbar = (props) => {
         {isLoggedIn &&
           <Link id="history-link" to="/history" className={`nav-link ${activeIndex === 3 ? "active" : ""}`} onClick={(e) => { setActiveIndex(3) }}><FontAwesomeIcon icon={Icons.faChartBar} /> History</Link>
         }
-        {isLoggedIn ? <a className="nav-link" onClick={handleLogout}><FontAwesomeIcon icon={Icons.faSignOutAlt} /> Logout</a> : <a className="nav-link" data-toggle="modal" data-target="#loginModal"><FontAwesomeIcon icon={Icons.faSignInAlt} /> Login</a>}
+        {isLoggedIn ? ( authorizationRestrictedRoutes.includes(pathname) ? <Link className="nav-link" to="/start" onClick={() => {handleLogout(); setActiveIndex(0)}}><FontAwesomeIcon icon={Icons.faSignOutAlt} /> Logout</Link> : <a className="nav-link" onClick={handleLogout}><FontAwesomeIcon icon={Icons.faSignOutAlt} /> Logout</a> ): <a className="nav-link" data-toggle="modal" data-target="#loginModal"><FontAwesomeIcon icon={Icons.faSignInAlt} /> Login</a>}
         {!isLoggedIn && <a className="nav-link" data-toggle="modal" data-target="#registerModal"><FontAwesomeIcon icon={Icons.faUserPlus} /> Signup</a>}
       </div>
 
