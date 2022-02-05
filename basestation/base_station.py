@@ -3,7 +3,7 @@ Base Station for the MiniBot.
 """
 
 from basestation.bot import Bot
-from basestation.user_database import Program, User
+from basestation.user_database import Submission, User
 from basestation import db
 from basestation.util.stoppable_thread import StoppableThread, ThreadSafeVariable
 
@@ -76,15 +76,17 @@ class BaseStation:
         # empty string means 0.0.0.0, which is all IP addresses on the local
         # machine, because some machines can have multiple Network Interface
         # Cards, and therefore will have multiple ip_addresses
-        server_address = ("0.0.0.0", 9434)
+        server_address = ("0.0.0.0", 5001)
 
         # only bind in debug mode if you are the debug server, if you are the
         # monitoring program which restarts the debug server, do not bind,
         # otherwise the debug server won't be able to bind
-        if app_debug and os.environ["WERKZEUG_RUN_MAIN"] == "true":
-            self.sock.bind(server_address)
-        else:
-            self.sock.bind(server_address)
+        # if app_debug and os.environ["WERKZEUG_RUN_MAIN"] == "true":
+        #     self.sock.bind(server_address)
+        # else:
+        
+        # since we are running in debug mode, always bind
+        self.sock.bind(server_address)
 
         self._login_email = None
         self.speech_recog_thread = None
@@ -225,7 +227,10 @@ class BaseStation:
         for line in program_lines:
             match = regex.match(line)
             if match:
-                func = self.blockly_function_map[match.group(2)]
+                if match.group(2) in self.blockly_function_map:
+                    func = self.blockly_function_map[match.group(2)]
+                else:
+                    func = match.group(2)
                 args = match.group(3)
                 whitespace = match.group(1)
                 if not whitespace:
@@ -238,7 +243,6 @@ class BaseStation:
                 parsed_program.append(parsed_line)
             else:
                 parsed_program.append(line + '\n')  # "normal" Python
-
         parsed_program_string = "".join(parsed_program)
 
         # Now actually send to the bot
@@ -264,6 +268,8 @@ class BaseStation:
     # ==================== DATABASE ====================
     def login(self, email: str, password: str) -> Tuple[int, Optional[str]]:
         """Logs in the user if the email and password are valid"""
+        print("email:" + email)
+        print("password" + password)
         if not email:
             return -1, None
         if not password:
@@ -371,6 +377,7 @@ class BaseStation:
             while thread_safe_condition.get_val():
                 thread_safe_message_queue.push("Say something!")
                 try:
+                    recognizer.adjust_for_ambient_noise(microphone)
                     # listen for 5 seconds
                     audio = recognizer.listen(microphone, RECORDING_TIME_LIMIT)
                     thread_safe_message_queue.push(
@@ -405,3 +412,32 @@ class BaseStation:
     def login_email(self, email: str):
         """Sets the login email property"""
         self._login_email = email
+
+    # data analytics
+
+    def get_user(self, email: str) -> User:
+        user = User.query.filter_by(email=email).first()
+        return user
+
+    def save_submission(self, code: str, email: str) -> Submission:
+        submission = Submission(
+            code=code,
+            time=time.strftime("%Y/%b/%d %H:%M:%S", time.localtime()),
+            duration=-1,
+            user_id=self.get_user(email).id
+        )
+        db.session.add(submission)
+        db.session.commit()
+        return submission
+
+    def update_result(self, result: str, submission_id: int):
+        if submission_id is None:
+            return
+        submission = Submission.query.filter_by(id=submission_id).first()
+        submission.result = result
+        db.session.commit()
+
+    def get_all_submissions(self, user: User) -> []:
+        submissions = []
+        submissions = Submission.query.filter_by(user_id=User.id)
+        return submissions

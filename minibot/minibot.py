@@ -11,9 +11,10 @@ import time
 import argparse
 import signal
 
-# NOTE: Please add "flush=True" to all print statements so that our test 
-# harness (test_minibot.py) can pipe the stdout output, and use it 
+# NOTE: Please add "flush=True" to all print statements so that our test
+# harness (test_minibot.py) can pipe the stdout output, and use it
 # determine the correctness of the tests
+
 
 class Minibot:
     """ Represents a minibot.  Handles all communication with the basestation
@@ -26,7 +27,7 @@ class Minibot:
     # 255.255.255.255 to indicate that we are broadcasting to all addresses
     # on port 9434.  The Basestation has been hard-coded to listen on port 9434
     # for incoming Minibot broadcasts
-    BROADCAST_ADDRESS = ('255.255.255.255', 9434)
+    BROADCAST_ADDRESS = ('255.255.255.255', 5001)
     MINIBOT_MESSAGE = "i_am_a_minibot"
     BASESTATION_MESSAGE = "i_am_the_basestation"
     # 1024 bytes
@@ -133,7 +134,7 @@ class Minibot:
         """
         print("Broadcasting message to basestation.", flush=True)
         # try connecting to the basestation every 2 sec until connection is made
-        self.broadcast_sock.settimeout(2.0)
+        self.broadcast_sock.settimeout(0.2)
         data = ""
         # broadcast message to basestation
         msg_byte_str = f"{Minibot.MINIBOT_MESSAGE} {self.port_number}".encode()
@@ -174,7 +175,7 @@ class Minibot:
             if sock is self.listener_sock:
                 connection, base_station_addr = sock.accept()
                 print(
-                    f"Connected to base station with address {base_station_addr}", 
+                    f"Connected to base station with address {base_station_addr}",
                     flush=True
                 )
                 # set to non-blocking reads (when we call connection.recv,
@@ -324,7 +325,7 @@ class Minibot:
                 "right": ece.right,
             }
             if value in cmds_functions_map:
-                # TODO use the appropriate power arg instead of 50 when 
+                # TODO use the appropriate power arg instead of 50 when
                 # that's implemented
                 Thread(target=cmds_functions_map[value], args=[50]).start()
             else:

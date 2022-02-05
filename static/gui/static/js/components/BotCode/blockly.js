@@ -1,33 +1,9 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { Button, LabeledTextBox } from './Util.js';
+import { Button, LabeledTextBox } from '../utils/Util.js';
 import CodeMirror from 'react-codemirror';
 require('codemirror/mode/python/python');
 
-
-function UserAccountModal(props) {
-    const s = props.modalType;
-    const modalId = s + "Modal";
-    const formId = s + "Form";
-    const closeId = s + "Close";
-    // Make first letter of s uppercase
-    const sUpperCased = s.charAt(0).toUpperCase() + s.slice(1)
-    const title = sUpperCased + " Window";
-    return (
-        <div id={modalId} className="modal">
-            <span id={closeId} className="close">&times;</span>
-            <p>{title}</p>
-            <form id={formId}>
-                <input type="text" placeholder="Email" name="email" ></input>
-                <input type="password" placeholder="Password" name="password" ></input>
-                <input className="button-login" type="button" value={sUpperCased} onClick={props.handleEvent}></input>
-                <label style={{ color: 'green' }}> {props.successLabel} </label>
-                <br />
-                <label style={{ color: 'red' }}> {props.errorLabel} </label>
-            </form>
-        </div>
-    )
-}
 
 class PythonEditor extends React.Component {
     constructor(props) {
@@ -35,7 +11,7 @@ class PythonEditor extends React.Component {
         this.state = {
             filename: "FileName.py",
             functionName: "default_function",
-            codingStart: -1
+            codingStart: -1,
         }
 
         this.downloadPython = this.downloadPython.bind(this);
@@ -65,7 +41,7 @@ class PythonEditor extends React.Component {
         else
             // update the code state to indicate user updates have been made 
             // to the Python code, 
-            codeState = (this.props.pythonCodeState === -1) ? 
+            codeState = (this.props.pythonCodeState === -1) ?
                 0 : this.props.pythonCodeState;
         this.props.setPythonCode(code, codeState);
         if (this.state.codingStart == -1) {
@@ -114,8 +90,8 @@ class PythonEditor extends React.Component {
         if (filename.substring(filename.length - 3) != ".py") {
             filename += ".py";
         }
-        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + 
-                encodeURIComponent(this.props.pythonCode));
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' +
+            encodeURIComponent(this.props.pythonCode));
         element.setAttribute('download', filename);
         element.style.display = 'none';
         document.body.appendChild(element);
@@ -134,6 +110,8 @@ class PythonEditor extends React.Component {
             this.setState({ codingStart: -1 })
         }
 
+        console.log(this.props.loginEmail);
+
         axios({
             method: 'POST',
             url: '/script',
@@ -142,7 +120,8 @@ class PythonEditor extends React.Component {
             },
             data: JSON.stringify({
                 bot_name: this.props.selectedBotName,
-                script_code: this.props.pythonCode
+                script_code: this.props.pythonCode,
+                login_email: this.props.loginEmail
             }),
         }).then(function (response) {
             console.log('sent script');
@@ -200,7 +179,7 @@ class PythonEditor extends React.Component {
             mode: 'python'
         };
         return (
-            <div id="Python" className="col">
+            <div id="Python" className="col" style={{ paddingLeft: "40px", marginLeft: "10px" }}>
                 <div className="row">
                     <div className="col text-center">
                         <p className="small-title"> Python </p>
@@ -211,8 +190,8 @@ class PythonEditor extends React.Component {
                         style={{
                             "minWidth": '480px',
                             "minHeight": '400px',
-                            "marginRight": "5px",
-                            "padding": "20px",
+                            "maxWidth": '950px',
+                            "padding": '10px',
                         }}
                     >
                         <CodeMirror
@@ -310,7 +289,7 @@ export default class MinibotBlockly extends React.Component {
             blocklyFilename: 'FileName.xml',
             pyblock: "",
             showPopup: false,
-            loginEmail: "",
+            loginEmail: props.loginEmail,
             loginErrorLabel: "",
             loginSuccessLabel: "",
             registerErrorLabel: "",
@@ -318,10 +297,6 @@ export default class MinibotBlockly extends React.Component {
             functionName: "default_function",
             codingStart: -1,
             isLoggedIn: false,
-            loginErrorLabel: "",
-            loginSuccessLabel: "",
-            registerErrorLabel: "",
-            registerSuccessLabel: "",
             emptyFunctionName: "Create Custom Block",
             workspace: null,
         };
@@ -557,8 +532,8 @@ export default class MinibotBlockly extends React.Component {
 
         // Only update the pythonCodeState if there are no user changes, or
         // if the user has said Blockly can overwrite the user changes
-        let code = (pythonCodeState < 0) ? 
-            window.Blockly.Python.workspaceToCode(this.workspace) : 
+        let code = (pythonCodeState < 0) ?
+            window.Blockly.Python.workspaceToCode(this.workspace) :
             this.props.pythonCode;
 
         this.props.setPythonCode(code, pythonCodeState);
@@ -596,13 +571,11 @@ export default class MinibotBlockly extends React.Component {
             },
             data: JSON.stringify({
                 bot_name: _this.props.selectedBotName,
-                script_code: _this.props.pythonCode
+                script_code: _this.props.pythonCode,
+                login_email: this.props.loginEmail
             }),
         }).catch(function (error) {
-            if (error.response.data.error_msg.length > 0)
-                window.alert(error.response.data.error_msg);
-            else
-                console.log(error);
+            console.log(error);
         });
     }
 
@@ -628,7 +601,7 @@ export default class MinibotBlockly extends React.Component {
     }
 
     login(event) {
-        const modal = document.getElementById("loginModal")
+        const modal = document.getElementById("loginModal2")
         const closeBtn = document.getElementById("loginClose")
         modal.style.display = "block";
         closeBtn.addEventListener("click", () => {
@@ -656,7 +629,7 @@ export default class MinibotBlockly extends React.Component {
     }
 
     register(event) {
-        const registerModal = document.getElementById("registerModal")
+        const registerModal = document.getElementById("registerModal2")
         const closeBtn = document.getElementById("registerClose")
         registerModal.style.display = "block";
         closeBtn.addEventListener("click", () => {
@@ -744,31 +717,8 @@ export default class MinibotBlockly extends React.Component {
 
     render() {
         return (
-            <div className="container-fluid">
-                <div className="row">
-                    <div id="login and register" className="horizontalDiv" style={{ marginLeft: "40px" }}>
-                        {!this.state.isLoggedIn ? <Button id="register" name="Register" onClick={this.register} /> : null}
-                        {!this.state.isLoggedIn ? <Button id="login" name="Login" onClick={this.login} /> : null}
-                        {this.state.isLoggedIn ? <label className="white-label"> Logged in as: {this.state.loginEmail} &nbsp; </label> : null}
-                        {this.state.isLoggedIn ? <Button id="logout" name="Logout" onClick={this.logout}/> : null}
-                        <UserAccountModal
-                            modalType="register"
-                            handleEvent={this.handleRegister}
-                            successLabel={this.state.registerSuccessLabel}
-                            errorLabel={this.state.registerErrorLabel}
-                        />
-
-                        <UserAccountModal
-                            modalType="login"
-                            handleEvent={this.handleLogin}
-                            successLabel={this.state.loginSuccessLabel}
-                            errorLabel={this.state.loginErrorLabel}
-                        />
-                    </div>
-                </div>
-                <br />
+            <div className="">
                 <div className="container-coding">
-                    <br />
                     <div className="row">
                         <div className="col">
                             <div className="row">
@@ -778,12 +728,12 @@ export default class MinibotBlockly extends React.Component {
                             </div>
                             <div className="row">
                                 <div className="col">
-                                    <div id="blocklyDiv" style={{ height: "520px", width: "575px", padding: "10px" }}></div>
+                                    <div id="blocklyDiv" style={{ height: "488px", width: "975px", padding: "40px" }}></div>
                                 </div>
                             </div>
                             <div className="row">
                                 <div className="col horizontalDiv">
-                                    <form style={{ color: "white", paddingLeft: "20px"}}>
+                                    <form style={{ color: "white", paddingLeft: "40px" }}>
                                         <input
                                             type="file"
                                             id="blockUpload"
@@ -796,7 +746,7 @@ export default class MinibotBlockly extends React.Component {
                             </div>
                             <div className="row">
                                 <div className="col horizontalDiv">
-                                    <div className="element-wrapper" style={{ paddingLeft: "20px" }}><input
+                                    <div className="element-wrapper" style={{ paddingLeft: "40px" }}><input
                                         type="text"
                                         name="blockly_filename"
                                         placeholder="FileName.xml"
@@ -807,7 +757,7 @@ export default class MinibotBlockly extends React.Component {
                             </div>
                             <div className="row">
                                 <div className="col horizontalDiv">
-                                    <div className="element-wrapper" style={{ paddingLeft: "20px" }}>
+                                    <div className="element-wrapper" style={{ paddingLeft: "40px" }}>
                                         <Button id="blocklyRun" name="Run" onClick={this.runBlockly} />
                                         <Button id="blocklyStop" name="Stop" onClick={this.stopBlockly} />
                                     </div>
@@ -824,15 +774,10 @@ export default class MinibotBlockly extends React.Component {
                             pythonCodeState={this.props.pythonCodeState}
                             setPythonCode={this.props.setPythonCode}
                             stopBlockly={this.stopBlockly}
+                            loginEmail={this.props.loginEmail}
                         />
-                        <br />
-                        <br />
                     </div>
-                    <br />
-                    <br />
                 </div>
-                <br />
-                <br />
             </div>
         );
     }
