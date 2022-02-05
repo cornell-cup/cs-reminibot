@@ -12,7 +12,8 @@ import {
   useLocation
 } from "react-router-dom";
 
-const authorizationRestrictedRoutes = ['/analytics','/history'];
+const allRoutes = ['/start','/coding','/user-analytics','/history']
+const authorizationRestrictedRoutes = ['/user-analytics','/history'];
 
 /**
  * New component for the Navbar on top
@@ -31,6 +32,11 @@ const Navbar = (props) => {
     setLoginEmail(current_user_email);
 
   }, [document.cookie]);
+
+  useEffect(() => {
+    setActiveIndex(allRoutes.indexOf(location.pathname))
+
+  }, []);
 
 
   function handleLogout(e) {

@@ -50,7 +50,7 @@ const Platform = withCookies((props) => {
   const [selectedBotName, setSelectedBotName] = useState('');
   const [selectedBotStyle, setSelectedBotStyleState] = useState(hiddenStyle);
   const [loginEmail, setLoginEmail] = useState(props.cookies.get('current_user_email') || "");
-
+  
   useEffect(() => {
     setLoginEmail(props.cookies.get('current_user_email') || "");
   }, [document.cookie]);
@@ -115,8 +115,18 @@ const Platform = withCookies((props) => {
 })
 
 
-class ClientGUI extends React.Component {
-  render() {
+const ClientGUI = () => {
+  useEffect(() => {
+    window.addEventListener("beforeunload", alertUser);
+    return () => {
+      window.removeEventListener("beforeunload", alertUser);
+    };
+  }, []);
+  const alertUser = (e) => {
+      e.preventDefault();
+      e.returnValue = "";
+  };
+
     return (
       <div className="main-body">
         <Router>
@@ -128,7 +138,6 @@ class ClientGUI extends React.Component {
         </Router>
       </div>
     );
-  }
 }
 
 // insert something here about localStorage function for first time tutorial
