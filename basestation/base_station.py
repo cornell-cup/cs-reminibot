@@ -81,10 +81,12 @@ class BaseStation:
         # only bind in debug mode if you are the debug server, if you are the
         # monitoring program which restarts the debug server, do not bind,
         # otherwise the debug server won't be able to bind
-        if app_debug and os.environ["WERKZEUG_RUN_MAIN"] == "true":
-            self.sock.bind(server_address)
-        else:
-            self.sock.bind(server_address)
+        # if app_debug and os.environ["WERKZEUG_RUN_MAIN"] == "true":
+        #     self.sock.bind(server_address)
+        # else:
+        
+        # since we are running in debug mode, always bind
+        self.sock.bind(server_address)
 
         self._login_email = None
         self.speech_recog_thread = None
@@ -431,8 +433,6 @@ class BaseStation:
     def update_result(self, result: str, submission_id: int):
         if submission_id is None:
             return
-        print("UPDATE RESULT!!!")
-        print(result)
         submission = Submission.query.filter_by(id=submission_id).first()
         submission.result = result
         db.session.commit()
