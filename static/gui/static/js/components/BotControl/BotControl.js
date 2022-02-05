@@ -5,10 +5,11 @@ import MovementControls from './MovementControl/MovementControl.js';
 import GridView from './gridview.js';
 
 
+
+
 function BotControl({ selectedBotName, setSelectedBotName, selectedBotStyle, setSelectedBotStyle }) {
   return (
     <div className="row">
-
       <div className="col-md">
         <AddBot
           selectedBotName={selectedBotName}
@@ -34,6 +35,7 @@ function BotControl({ selectedBotName, setSelectedBotName, selectedBotStyle, set
           <GridView />
         </div>
       </div>
+
     </div>
 
   )

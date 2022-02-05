@@ -23,7 +23,7 @@ import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import Navbar from './components/Navbar.js';
 import { CookiesProvider } from 'react-cookie';
 
-
+import Chatbot from './components/Chatbot/chatbot2.js';
 
 /**
  * Top Level component for the GUI, includes two tabs
@@ -142,6 +142,7 @@ class Platform extends React.Component {
           {/* </TabPanel> */}
         </div>
         {/* </Tabs> */}
+
       </div>
     );
   }
@@ -155,6 +156,8 @@ class ClientGUI extends React.Component {
         <div className="container">
           <Platform />
         </div>
+
+        <Chatbot />
       </div>
     );
   }
