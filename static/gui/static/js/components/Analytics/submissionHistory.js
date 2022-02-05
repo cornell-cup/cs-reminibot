@@ -88,7 +88,9 @@ export default class History extends React.Component {
 		var stateVis = this.state.visibility;
 
 		var visStyle = {
-			visibility: stateVis
+			visibility: stateVis,
+			position: "relative",
+			zIndex: 0,
 		}
 
 		let options = {
