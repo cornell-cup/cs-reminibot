@@ -27,12 +27,18 @@ function Chatbot2({ }) {
 
   const openChatbox = (e) => {
     e.preventDefault();
-    const open_n = !open;
-    setOpen(open_n);
-    if (open_n) {
+    if (!open) {
+      setOpen(true);
       setExpand("expand");
-      setEnter("enter")
+      setEnter("enter");
     }
+  }
+
+  const closeChatbox = (e) => {
+    e.preventDefault();
+    setOpen(false);
+    setExpand("");
+    setEnter("");
   }
 
   const sendMessage = (e) => {
@@ -50,11 +56,19 @@ function Chatbot2({ }) {
       <div class={"chat " + enter}> {/* add 'enter' to class for the rest to display */}
         <div class="header">
           <span class="title">
-            what's on your mind?
+            Chatbot uwu
           </span>
-          <button>
+
+          <div style={{ width: "10px", height: "10px", }}>
+            <input type="image"
+              src={X_BTN}
+              style={{ width: "100%", height: "100%", objectFit: "contain", }}
+              onClick={(e) => closeChatbox(e)} />
+          </div>
+          {/* <button style={{ width: "20px", height: "20px", }}>
             <span class="close_btn" />
-          </button>
+           
+          */}
 
         </div>
         <ul class="messages">

@@ -5,16 +5,17 @@
 
 
 .close_btn {
-  background: url('../img/close_btn.png');
-  height: 20px;
-  width: 20px;
+  background-image: url('../img/close_btn.png');
+  width:20px;
+  height:20x;
+
   display: block;
   /* Other styles here */
 }
-/* body {
+body {
   background: skyblue;
   font: 12px/16px "Noto Sans", sans-serif;
-} */
+}
 
 .floating-chat {
   cursor: pointer;
