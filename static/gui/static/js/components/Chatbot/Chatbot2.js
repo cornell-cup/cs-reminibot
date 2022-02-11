@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
+import { X_BTN, INFO_ICON } from "../utils/Constants.js";
+
 let id = 2;
 
 const initialList = [
@@ -23,7 +25,7 @@ function Chatbot2({ }) {
     setInputText(input);
   }
 
-  const toggleChatbox = (e) => {
+  const openChatbox = (e) => {
     e.preventDefault();
     const open_n = !open;
     setOpen(open_n);
@@ -43,7 +45,7 @@ function Chatbot2({ }) {
 
 
   return (
-    <div class={"floating-chat enter " + expand} onClick={(e) => toggleChatbox(e)}> {/* add 'expand' to class for this to turn into a chat */}
+    <div class={"floating-chat enter " + expand} onClick={(e) => openChatbox(e)}> {/* add 'expand' to class for this to turn into a chat */}
       <i class="fa fa-comments" aria-hidden={true}></i>
       <div class={"chat " + enter}> {/* add 'enter' to class for the rest to display */}
         <div class="header">
@@ -51,7 +53,7 @@ function Chatbot2({ }) {
             what's on your mind?
           </span>
           <button>
-            <i class="fa fa-times" aria-hidden={true}></i>
+            <span class="close_btn" />
           </button>
 
         </div>

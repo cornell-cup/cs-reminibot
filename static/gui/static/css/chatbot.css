@@ -3,6 +3,14 @@
   box-sizing: border-box;
 }
 
+
+.close_btn {
+  background: url('../img/close_btn.png');
+  height: 20px;
+  width: 20px;
+  display: block;
+  /* Other styles here */
+}
 /* body {
   background: skyblue;
   font: 12px/16px "Noto Sans", sans-serif;
@@ -154,7 +162,7 @@
 }
 .floating-chat .chat .messages li.self:before {
   right: -45px;
-  background-image: url(https://github.com/Thatkookooguy.png);
+  background-image: url(../img/disgusting_cat.png);
 }
 .floating-chat .chat .messages li.self:after {
   border-right: 10px solid transparent;
