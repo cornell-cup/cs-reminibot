@@ -1,6 +1,12 @@
 import React from 'react';
 import axios from 'axios';
-import { Button } from './Util.js'
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
+import InformationBoxModal from '../utils/InformationBoxModal.js';
+import { INFOBOXTYPE, INFOBOXID, INFO_ICON } from '../utils/Constants.js';
+library.add(faInfoCircle);
+import { Button } from '../utils/Util.js'
 
 /**
  * Component for the grid view of the simulated bots.
@@ -11,7 +17,7 @@ export default class GridView extends React.Component {
 
         this.state = {
             width: 520,
-            height: 520,
+            height: 500,
             xcor: 0,
             ycor: 0,
             count: 0,
@@ -45,8 +51,8 @@ export default class GridView extends React.Component {
             .ticks(10)
             .tickSize(this.state.width);
 
-        this.svg.attr("width", this.state.width + 60)
-            .attr("height", this.state.height + 60)
+        this.svg.attr("width", this.state.width + 30)
+            .attr("height", this.state.height + 20)
             .append("g").attr("transform", "translate(" + 80 + "," + 20 + ")");
 
         this.svg.append("rect")
@@ -196,19 +202,26 @@ export default class GridView extends React.Component {
 
     render() {
         return (
-            <div className="container">
-                <div id="component_view" className="box">
-                    <p className="small-title">Vision &nbsp; &nbsp; </p>
-                    <Button
-                        id="grid_recenter"
-                        onClick={this.displayRobot}
+            <div className="control-option">
+                {/* <div id="component_view" className="box"> */}
+                <div className="mb-3 d-flex">
+                    <h3 className="small-title">
+                        Vision
+                        <span style={{ leftMargin: "0.5em" }}> </span>
+                        <input className="info-box" type="image"
+                            data-toggle="modal"
+                            data-target={"#" + INFOBOXID.VISION}
+                            src={INFO_ICON}
+                            width="18" height="18" />
+                    </h3>
+                    <button onClick={this.displayRobot}
                         name={"Display Bot"}
-                    />
-                    <br />
-                    <br />
-                    <div id="view"></div>
-                </div >
-            </div >
+                        className="btn btn-secondary ml-auto">Display Bot</button>
+                </div>
+                <div id="view" className="mx-auto"></div>
+                {/* </div > */}
+                <InformationBoxModal type={INFOBOXTYPE.VISION} />
+            </div>
         );
     }
 }

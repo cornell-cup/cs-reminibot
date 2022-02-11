@@ -1,14 +1,14 @@
-from blockly_python_process import BlocklyPythonProcess 
-from bs_repr import BS_Repr 
-from collections import deque 
-from select import select 
-from socket import socket, timeout, AF_INET, SOCK_STREAM, SOCK_DGRAM 
-from socket import SOL_SOCKET, SO_REUSEADDR, SO_BROADCAST 
-from threading import Thread 
-from typing import List, Tuple 
-import sys 
-import time 
-import argparse 
+from blockly_python_process import BlocklyPythonProcess
+from bs_repr import BS_Repr
+from collections import deque
+from select import select
+from socket import socket, timeout, AF_INET, SOCK_STREAM, SOCK_DGRAM
+from socket import SOL_SOCKET, SO_REUSEADDR, SO_BROADCAST
+from threading import Thread
+from typing import List, Tuple
+import sys
+import time
+import argparse
 import signal
 
 # NOTE: Please add "flush=True" to all print statements so that our test
