@@ -140,6 +140,7 @@ export default class GridView extends React.Component {
             .then(function (response) {
                 // console.log(response.data);
                 pos.push(response.data);
+                console.log("vision data: "+JSON.stringify(response.data))
                 if (pos[0]['x'] === '') {
                     _this.deleteBot();
                 }
