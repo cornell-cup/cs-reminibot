@@ -316,14 +316,14 @@ def draw_pose(overlay, camera_params, tag_size, pose, z_sign=1):
 def draw_cube(overlay, camera_params, tag_size, pose, z_sign=1):
 
     opoints = np.array([
-        -tag_size, -tag_size, 0,
-        tag_size, -tag_size, 0,
-        tag_size, tag_size, 0,
-        -tag_size, tag_size, 0,
-        -tag_size, -tag_size, tag_size * z_sign,
-        tag_size, -tag_size, tag_size * z_sign,
-        tag_size, tag_size, tag_size * z_sign,
-        -tag_size, tag_size, tag_size * z_sign,
+        -1, -1, 0,
+        1, -1, 0,
+        1, 1, 0,
+        -1, 1, 0,
+        -1, -1, 1 * z_sign,
+        1, -1, 1 * z_sign,
+        1, 1, 1 * z_sign,
+        -1, 1, 1 * z_sign,
     ]).reshape(-1, 1, 3) * 0.5 * tag_size
 
     edges = np.array([
