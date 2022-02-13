@@ -313,10 +313,10 @@ def get_cell_offsets_with_original_detections(BOARD_TAG_SIZE, camera_matrix, dis
         actual_angle = object_angles[detection_index]
         center_offset_detected_x = detected_x+center_x_offset
         center_offset_detected_y = detected_y+center_y_offset
-        offset_detected_angle = (detected_angle+angle_offset)%360
+        offset_detected_angle = (detected_angle+angle_offset)
         x_offsets.append(actual_x - x_scale_factor*center_offset_detected_x)
         y_offsets.append(actual_y - y_scale_factor*center_offset_detected_y)
-        angle_offsets.append((actual_angle - offset_detected_angle)%360)
+        angle_offsets.append((actual_angle - offset_detected_angle))
         detected_xs.append(detected_x)
         detected_ys.append(detected_y)
     return detected_xs, detected_ys, x_offsets, y_offsets, angle_offsets
@@ -368,7 +368,7 @@ def get_world_center_offsets(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detecti
         # which generally come with very large values.      
     center_x_offset = (sum(actual_x_coords)-sum(detected_x_coords))/len(detected_x_coords)
     center_y_offset = (sum(actual_y_coords)-sum(detected_y_coords))/len(detected_y_coords)
-    angle_offset = (sum(object_angles)-sum(detected_angles))/len(detected_angles)%360
+    angle_offset = (sum(object_angles)-sum(detected_angles))/len(detected_angles)
     return center_x_offset,center_y_offset,angle_offset
 
 def get_middle_column_and_row(COLUMNS, ROWS):
