@@ -113,14 +113,14 @@ def main():
             y_without_ff = y_scale_factor * (y + overall_center_y_offset)
             x = x_scale_factor * (x + overall_center_x_offset) + center_cell_offset["x_offset"]
             y = y_scale_factor * (y + overall_center_y_offset) + center_cell_offset["y_offset"]
-            angle = ((angle + overall_angle_offset)+center_cell_offset["angle_offset"])%360
+            angle = ((angle + overall_angle_offset))%360
             (ctr_x, ctr_y) = d.center
             # cv2.putText(undst, "id:"+str(d.tag_id),(int(ctr_x) , int(ctr_y + 60)), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 0, 255),2)
             # cv2.putText(dst, "angle:"+str(round(angle,3)),(int(ctr_x), int(ctr_y+(40 if i %2 == 0 else -40))), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 255, 255),2)
-            cv2.putText(undst, str((round(x,3),round(y,3))),(int(ctr_x), int(ctr_y)), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 0, 255),2)
-            cv2.circle(undst, (int(ctr_x), int(ctr_y)), 3, (255, 0, 0), 3)
-            pose, e0, e1 = detector.detection_pose(d, util.camera_matrix_to_camera_params(camera_matrix), TAG_SIZE)
-            util.draw_cube(undst,util.camera_matrix_to_camera_params(camera_matrix), TAG_SIZE, pose)
+            cv2.putText(undst, str(round(angle,3)),(int(ctr_x), int(ctr_y)), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 0, 255),2)
+            # cv2.circle(undst, (int(ctr_x), int(ctr_y)), 3, (255, 0, 0), 3)
+            # pose, e0, e1 = detector.detection_pose(d, util.camera_matrix_to_camera_params(camera_matrix), TAG_SIZE)
+            # util.draw_cube(undst,util.camera_matrix_to_camera_params(camera_matrix), TAG_SIZE, pose)
             # print(tag_xyz)
             # print("{} :: {} :: {} {} {} {}".format(DEVICE_ID, d.tag_id, x, y, z, angle))
             print("{},{},{},{},{}".format(d.tag_id, x, y, z, angle))

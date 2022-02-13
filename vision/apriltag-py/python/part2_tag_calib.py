@@ -154,9 +154,14 @@ def main():
         img_points[2 + 4 * i] = d.corners[2]
         img_points[3 + 4 * i] = d.corners[3]
         # print("corner: ",d.corners[0])
-        x1, x2, y1, y2 = 0,0,0,0
         if positions_file_name == None:
             x1, x2, y1, y2 = get_corner_coordinate_components(COLUMNS, ROWS, BOARD_TAG_SIZE, horizontal_distance_between_april_tags, vertical_distance_between_april_tags, id, middle_column, middle_row)
+            # DEPRECATED: old code doesn't account for rotation
+            object_center_points.append(((x1+x2)/2, (y1+y2)/2))
+            obj_points[0 + 4 * i] = [x1, y1, 0]
+            obj_points[1 + 4 * i] = [x2, y1, 0]
+            obj_points[2 + 4 * i] = [x2, y2, 0]
+            obj_points[3 + 4 * i] = [x1, y2, 0]
         else:
             position = get_position_with_id(positions_data, id)
             if position == None:
@@ -165,19 +170,20 @@ def main():
             print(f"position: {position}")
             center_x = position["x"]
             center_y = position["y"]
+            object_center_points.append((center_x, center_y))
             angle = position["angle"]
+            object_angles.append(angle)
             
-            x1 = center_x - BOARD_TAG_SIZE/2
-            y1 = center_y - BOARD_TAG_SIZE/2
-            x2 = center_x + BOARD_TAG_SIZE/2
-            y2 = center_y + BOARD_TAG_SIZE/2
-        object_center_points.append(((x1+x2)/2, (y1+y2)/2))
-        object_angles.append(angle)
-        obj_points[0 + 4 * i] = [x1, y1, 0]
-        obj_points[1 + 4 * i] = [x2, y1, 0]
-        obj_points[2 + 4 * i] = [x2, y2, 0]
-        obj_points[3 + 4 * i] = [x1, y2, 0]
-        print(str(id)+","+str(x1)+","+str(y1)+","+str(x2)+","+str(y2))
+            unrotated_corner_vectors = [np.array([[-BOARD_TAG_SIZE/2],[-BOARD_TAG_SIZE/2]]), np.array([[BOARD_TAG_SIZE/2],[-BOARD_TAG_SIZE/2]]), np.array([[BOARD_TAG_SIZE/2],[BOARD_TAG_SIZE/2]]), np.array([[-BOARD_TAG_SIZE/2],[BOARD_TAG_SIZE/2]])]
+            angle_in_radians = math.pi*angle/180
+            rotation_matrix = np.array([[math.cos(angle_in_radians), -math.sin(angle_in_radians)],[math.sin(angle_in_radians),math.cos(angle_in_radians)]])
+            for index, unrotated_corner_vector  in enumerate(unrotated_corner_vectors):
+                rotated_corner_vector = np.matmul(rotation_matrix,unrotated_corner_vector)
+                obj_points[index + 4 * i] = [center_x+rotated_corner_vector[0][0], center_y+rotated_corner_vector[1][0], 0]
+                print("obj_points",obj_points)
+        
+
+        # print(str(id)+","+str(x1)+","+str(y1)+","+str(x2)+","+str(y2))
 
     # Make transform matrices
     pose = cv2.solvePnP(obj_points, img_points, camera_matrix, dist_coeffs)
@@ -277,6 +283,7 @@ def main():
     print("Finished writing data to calibration file")
     pass
 
+
 def get_filtered_detections(positions_file_name, positions_data, detector, gray):
     detections, det_image = detector.detect(gray, return_image=True)
 
@@ -316,7 +323,7 @@ def get_cell_offsets_with_original_detections(BOARD_TAG_SIZE, camera_matrix, dis
         offset_detected_angle = (detected_angle+angle_offset)
         x_offsets.append(actual_x - x_scale_factor*center_offset_detected_x)
         y_offsets.append(actual_y - y_scale_factor*center_offset_detected_y)
-        angle_offsets.append((actual_angle - offset_detected_angle))
+        angle_offsets.append((actual_angle - offset_detected_angle) if abs(actual_angle - offset_detected_angle) <= 180 else (actual_angle - offset_detected_angle)%math.copysign(180,offset_detected_angle - actual_angle))
         detected_xs.append(detected_x)
         detected_ys.append(detected_y)
     return detected_xs, detected_ys, x_offsets, y_offsets, angle_offsets
@@ -348,18 +355,22 @@ def get_world_center_offsets(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detecti
     detected_x_coords = []
     detected_y_coords = []
     detected_angles = []
+    angle_differences = []
     max_id = -1
     for detection_index in range(len(detections)):
         (detected_x, detected_y, detected_z, detected_angle) = util.compute_tag_undistorted_pose(
                 camera_matrix, dist_coeffs, camera_to_origin, detections[detection_index], BOARD_TAG_SIZE
             )
         (actual_x, actual_y) = object_center_points[detection_index]
+        actual_angle = object_angles[detection_index]
         max_id = int(detections[detection_index].tag_id) if int(detections[detection_index].tag_id) > max_id else max_id
         actual_x_coords.append(actual_x)
         actual_y_coords.append(actual_y)    
         detected_x_coords.append(detected_x)
         detected_y_coords.append(detected_y)
         detected_angles.append(detected_angle)
+        #print("angle diff",str(detections[detection_index].tag_id)+":",str((actual_angle-detected_angle) if abs(actual_angle-detected_angle) <= 180 else (actual_angle-detected_angle)%math.copysign(180,detected_angle-actual_angle)))
+        angle_differences.append((actual_angle-detected_angle) if abs(actual_angle-detected_angle) <= 180 else (actual_angle-detected_angle)%math.copysign(180,detected_angle-actual_angle) )
 
         # Center_x_offset is the actual coordinate the of center of all the detected x values, and it will be used
         # to offset all the other points. We do this because we are treating the center of all detected x values
@@ -368,7 +379,7 @@ def get_world_center_offsets(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detecti
         # which generally come with very large values.      
     center_x_offset = (sum(actual_x_coords)-sum(detected_x_coords))/len(detected_x_coords)
     center_y_offset = (sum(actual_y_coords)-sum(detected_y_coords))/len(detected_y_coords)
-    angle_offset = (sum(object_angles)-sum(detected_angles))/len(detected_angles)
+    angle_offset = (sum(angle_differences)/len(detected_angles))
     return center_x_offset,center_y_offset,angle_offset
 
 def get_middle_column_and_row(COLUMNS, ROWS):
