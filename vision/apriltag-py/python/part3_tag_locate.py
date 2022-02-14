@@ -33,6 +33,10 @@ def main():
 
     # Get matrices from calibration file
     print("Parsing calibration file " + calib_file_name + "...")
+    predictors = util.get_predictors_with_calibration_file(calib_file_name)
+    predict_x_offset = predictors["x_offsets_predictor"].predict
+    predict_y_offset = predictors["y_offsets_predictor"].predict
+    predict_angle_offset = predictors["angle_offsets_predictor"].predict
     calib_file, calib_data = util.read_json(calib_file_name)
     transform_matrix = util.get_numpy_matrix(calib_data, "transform_matrix")
     camera_matrix = util.get_numpy_matrix(calib_data, "camera_matrix")
@@ -101,7 +105,7 @@ def main():
             # TODO draw tag - might be better to generalize, because
             # locate_cameras does this too.
 
-            (x, y, z, angle) = util.compute_tag_undistorted_pose(
+            (detected_x, detected_y, detected_z, detected_angle) = util.compute_tag_undistorted_pose(
                 camera_matrix, dist_coeffs, transform_matrix, d, TAG_SIZE
             )
 
@@ -109,9 +113,11 @@ def main():
             # prints Device ID :: tag id :: x y z angle
             # TODO debug offset method - is better, but not perfect.
             center_cell_offset = get_closest_reference_point_offset(x,y,center_cell_offsets)
-            x = x_scale_factor * (x + overall_center_x_offset) + center_cell_offset["x_offset"]
-            y = y_scale_factor * (y + overall_center_y_offset) + center_cell_offset["y_offset"]
-            angle = ((angle + overall_angle_offset) + center_cell_offset["angle_offset"])%360
+
+            x = x_scale_factor * (detected_x + overall_center_x_offset) + predict_x_offset((detected_x,detected_y))
+            y = y_scale_factor * (detected_y + overall_center_y_offset) + predict_y_offset((detected_x,detected_y))
+            z = detected_z
+            angle = ((detected_angle + overall_angle_offset))%360
             (ctr_x, ctr_y) = d.center
             # cv2.putText(undst, "id:"+str(d.tag_id),(int(ctr_x) , int(ctr_y + 60)), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 0, 255),2)
             # cv2.putText(dst, "angle:"+str(round(angle,3)),(int(ctr_x), int(ctr_y+(40 if i %2 == 0 else -40))), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 255, 255),2)

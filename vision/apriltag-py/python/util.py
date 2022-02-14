@@ -3,6 +3,8 @@ import cv2
 import numpy as np
 import json
 import math
+from predictor import Predictor
+from sklearn.neural_network import MLPRegressor
 
 """
 Utility module for common actions in this module and in OpenCV.
@@ -232,16 +234,16 @@ def undistort_image(frame, camera_matrix, dist_coeffs):
     dst = dst[y:y+h, x:x+w]
     return dst
 
-def read_json(filename):
-    calib_file = None
+def read_json(calibration_file_name):
+    calibration_file = None
     try:
-        calib_file = open(filename)
+        with open(calibration_file_name) as calibration_file:
+            assert calibration_file
+            return calibration_file, json.load(calibration_file)
     except FileNotFoundError:
-        print("Could not find file: " + filename)
+        print("Could not find file: " + calibration_file_name)
         exit(0)
-    assert calib_file
-
-    return calib_file, json.load(calib_file)
+    
 
 def get_camera(idx):
     camera = cv2.VideoCapture(idx)
@@ -365,3 +367,41 @@ def camera_matrix_to_camera_params(camera_matrix):
     cx = camera_matrix[0][2]
     cy = camera_matrix[1][2]
     return (fx, fy, cx, cy)
+
+def get_inputs_and_outputs_for_models(calibration_file_name):
+    calibration_file, calibration_data = read_json(calibration_file_name)
+    center_cell_offsets = calibration_data["cell_center_offsets"]
+    inputs = []
+    x_offsets = []
+    y_offsets = []
+    angle_offsets = []
+    for entry in center_cell_offsets:
+        inputs.append((entry["reference_point_x"],entry["reference_point_y"]))
+        x_offsets.append(entry["x_offsets"])
+        y_offsets.append(entry["y_offsets"])
+        angle_offsets.append(entry["angle_offsets"])
+    return {"inputs": np.array(inputs), "x_offsets": np.array(x_offsets), "y_offsets": np.array(y_offsets), "angle_offsets": np.array(angle_offsets)}
+    
+
+def get_models_with_calibration_file(calibration_file_name):
+    inputs_and_outputs = get_inputs_and_outputs_for_models(calibration_file_name)
+    return {
+        "x_offsets_model": get_model_with_data(inputs_and_outputs["inputs"],inputs_and_outputs["x_offsets"]),
+        "y_offsets_model": get_model_with_data(inputs_and_outputs["inputs"],inputs_and_outputs["y_offsets"]),
+        "angle_offsets_model": get_model_with_data(inputs_and_outputs["inputs"],inputs_and_outputs["angle_offsets"])
+    }
+
+def get_model_with_data(inputs,outputs):
+    return MLPRegressor(random_state=1, max_iter=500).fit(np.array(inputs), np.array(outputs))
+
+
+
+
+
+def get_predictors_with_calibration_file(calibration_file_name):
+    models = get_models_with_calibration_file(calibration_file_name)
+    return {
+        "x_offsets_predictor": Predictor(models["x_offsets_model"]),
+        "y_offsets_predictor": Predictor(models["y_offsets_model"]),
+        "angle_offsets_predictor": Predictor(models["angle_offsets_model"])
+    }
