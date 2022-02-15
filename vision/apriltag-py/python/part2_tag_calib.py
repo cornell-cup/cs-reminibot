@@ -320,7 +320,7 @@ def get_cell_offsets_with_original_detections(BOARD_TAG_SIZE, camera_matrix, dis
         actual_angle = object_angles[detection_index]
         center_offset_detected_x = detected_x+center_x_offset
         center_offset_detected_y = detected_y+center_y_offset
-        offset_detected_angle = (detected_angle+angle_offset)
+        offset_detected_angle = (detected_angle+angle_offset)%360
         x_offsets.append(actual_x - x_scale_factor*center_offset_detected_x)
         y_offsets.append(actual_y - y_scale_factor*center_offset_detected_y)
         angle_offsets.append((actual_angle - offset_detected_angle) if abs(actual_angle - offset_detected_angle) <= 180 else (actual_angle - offset_detected_angle)%math.copysign(180,offset_detected_angle - actual_angle))
