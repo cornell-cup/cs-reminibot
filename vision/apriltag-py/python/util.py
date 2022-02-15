@@ -377,9 +377,9 @@ def get_inputs_and_outputs_for_models(calibration_file_name):
     angle_offsets = []
     for entry in center_cell_offsets:
         inputs.append((entry["reference_point_x"],entry["reference_point_y"]))
-        x_offsets.append(entry["x_offsets"])
-        y_offsets.append(entry["y_offsets"])
-        angle_offsets.append(entry["angle_offsets"])
+        x_offsets.append(entry["x_offset"])
+        y_offsets.append(entry["y_offset"])
+        angle_offsets.append(entry["angle_offset"])
     return {"inputs": np.array(inputs), "x_offsets": np.array(x_offsets), "y_offsets": np.array(y_offsets), "angle_offsets": np.array(angle_offsets)}
     
 
