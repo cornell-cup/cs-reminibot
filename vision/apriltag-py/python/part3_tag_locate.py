@@ -112,7 +112,7 @@ def main():
             # Scale the coordinates, and print for debugging
             # prints Device ID :: tag id :: x y z angle
             # TODO debug offset method - is better, but not perfect.
-            center_cell_offset = get_closest_reference_point_offset(x,y,center_cell_offsets)
+            center_cell_offset = get_closest_reference_point_offset(detected_x,detected_y,center_cell_offsets)
 
             x = x_scale_factor * (detected_x + overall_center_x_offset) + predict_x_offset((detected_x,detected_y))
             y = y_scale_factor * (detected_y + overall_center_y_offset) + predict_y_offset((detected_x,detected_y))

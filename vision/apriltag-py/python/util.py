@@ -377,9 +377,9 @@ def get_inputs_and_outputs_for_models(calibration_file_name):
     angle_offsets = []
     for entry in center_cell_offsets:
         inputs.append((entry["reference_point_x"],entry["reference_point_y"]))
-        x_offsets.append(entry["x_offsets"])
-        y_offsets.append(entry["y_offsets"])
-        angle_offsets.append(entry["angle_offsets"])
+        x_offsets.append(entry["x_offset"])
+        y_offsets.append(entry["y_offset"])
+        angle_offsets.append(entry["angle_offset"])
     return {"inputs": np.array(inputs), "x_offsets": np.array(x_offsets), "y_offsets": np.array(y_offsets), "angle_offsets": np.array(angle_offsets)}
     
 
@@ -392,7 +392,7 @@ def get_models_with_calibration_file(calibration_file_name):
     }
 
 def get_model_with_data(inputs,outputs):
-    return MLPRegressor(random_state=1, max_iter=500).fit(np.array(inputs), np.array(outputs))
+    return MLPRegressor(random_state=1,learning_rate_init=0.0001, hidden_layer_sizes=(10000, ), max_iter=1000000).fit(np.array(inputs), np.array(outputs))
 
 
 
