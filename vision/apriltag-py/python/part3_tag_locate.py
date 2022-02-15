@@ -109,8 +109,6 @@ def main():
             # prints Device ID :: tag id :: x y z angle
             # TODO debug offset method - is better, but not perfect.
             center_cell_offset = get_closest_reference_point_offset(x,y,center_cell_offsets)
-            x_without_ff = x_scale_factor * (x + overall_center_x_offset)
-            y_without_ff = y_scale_factor * (y + overall_center_y_offset)
             x = x_scale_factor * (x + overall_center_x_offset) + center_cell_offset["x_offset"]
             y = y_scale_factor * (y + overall_center_y_offset) + center_cell_offset["y_offset"]
             angle = ((angle + overall_angle_offset) + center_cell_offset["angle_offset"])%360
