@@ -3,6 +3,7 @@ import spidev
 import time
 import threading
 from statistics import median
+import os
 
 spi = spidev.SpiDev()
 STOP_CMD = "S"
@@ -54,17 +55,17 @@ class TransmitLock():
                 # thread that was waiting first, do not let it enter this code block
                 if self.timestamp == timestamp or self.timestamp == 0:
                     self.is_transmitting = 1
-                    # reset the timestamp field, because the current thread 
+                    # reset the timestamp field, because the current thread
                     # managed to acquire the lock
-                    self.timestamp = 0 
+                    self.timestamp = 0
                     return True
             # if some other thread is transmitting (self.is_transmitting != 0)
             # and no other thread has told the thread to stop transmitting
             # (self.is_transmitting != -1), then that means the current thread
             # is the first thread that will be waiting for the lock.  Hence,
             # the current thread tells the thread that is trasmitting to stop
-            # trasmitting (by setting self.is_transmitting = -1).  The current 
-            # thread also records its timestamp to indicate that its the next 
+            # trasmitting (by setting self.is_transmitting = -1).  The current
+            # thread also records its timestamp to indicate that its the next
             # thread that will get to acquire the lock
             elif self.is_transmitting == 1:
                 self.is_transmitting = -1
@@ -72,9 +73,9 @@ class TransmitLock():
             # otherwise if self.is_transmitting == -1, don't do anything
             # just return False, this is because some other thread has already
             # told the currently transmitting thread to stop transmitting,
-            # and that other thread has already saved its timestamp in 
+            # and that other thread has already saved its timestamp in
             # self.timestamp so the other thread will acquire the lock before
-            # you can. 
+            # you can.
         return False
 
 
@@ -90,6 +91,7 @@ def setSlave(pi_bus):
     spi.mode = 0
     spi.max_speed_hz = 115200
 
+
 def transmit_once(cmd):
     """ Sends each character in the cmd to the Arduino
 
@@ -102,9 +104,10 @@ def transmit_once(cmd):
         print(char)
         spi.writebytes([ord(char)])
 
+
 def transmit_continuously(cmd):
     """ Transmits the cmd continuously to the Arduino 
-    
+
     Arguments: 
         cmd: (str) The command to be sent to the Arduino
     """
@@ -112,14 +115,16 @@ def transmit_continuously(cmd):
         transmit_once(cmd)
     spi.writebytes([ord(STOP_CMD)])
 
+
 def send_integer_once(num):
     """ Sends a numerical value to the Arduino
-    
+
     Arguments:
         num: (int) The integer to be sent to the Arduino
     """
     print(num)
     spi.xfer([num])
+
 
 def read_once():
     """ Reads from the Arduino multiple times and then returns the
@@ -157,6 +162,7 @@ def acquire_lock():
     setSlave(1)
     transmit_once(START_TRASMISSION_CMD)
 
+
 def release_lock():
     """ Releases the lock that was used to send data over SPI to
     the Arduino.  It also sends the ending character
@@ -166,7 +172,7 @@ def release_lock():
     transmit_once(END_TRASMISSION_CMD)
     spi.close()
     tlock.end_transmit()
-    
+
 
 def fwd(power):
     """ Move minibot forwards, (currently power field is not in use) """
@@ -215,10 +221,22 @@ def read_ultrasonic():
     return return_val
 
 
+def read_ir():
+    acquire_lock()
+    return_val = read_once()
+
+    # log the results
+    file = open("/home/pi/Documents/log.csv", "a")
+    file.write(return_val + "\n")
+
+    release_lock()
+    return return_val
+
+
 def move_servo(angle):
     """ Tell the Arduino to move its servo motor to a specific angle """
     acquire_lock()
-    # "ss" tells the Arduino that the next byte sent will correspond to 
+    # "ss" tells the Arduino that the next byte sent will correspond to
     # the servo_motor's angle
     transmit_once("ss")
     print("Servo should move to {} angle".format(angle))
@@ -232,16 +250,18 @@ def line_follow():
     transmit_continuously('T')
     release_lock()
 
+
 def object_detection():
     """ Tell minibot to detect objects using RFID """
     acquire_lock()
     transmit_continuously('O')
     release_lock()
 
+
 def set_ports(ports):
     """ Tell minibot which motors and sensor correspond to
     which ports.
-    
+
     Arguments:
         ports: ([str, int]) List where the first element is a port name
             and the second element is the corresponding port number
@@ -251,13 +271,13 @@ def set_ports(ports):
     port_name = ports[0]
     port_number = str(ports[1])
     ports_dict = {
-        "LMOTOR" : "LM",
-        "RMOTOR" : "RM",
-        "MOTOR3" : "M",
-        "LINE" : "L",
-        "INFRARED" : "I",
-        "RFID" : "R",
-        "ULTRASONIC" : "U"
+        "LMOTOR": "LM",
+        "RMOTOR": "RM",
+        "MOTOR3": "M",
+        "LINE": "L",
+        "INFRARED": "I",
+        "RFID": "R",
+        "ULTRASONIC": "U"
     }
     arr = list(port_number) + list(ports_dict[port_name])
     transmit_once(arr)

@@ -25,11 +25,11 @@ MAX_VISION_LOG_LENGTH = 1000
 def make_thread_safe(func):
     """ Decorator which wraps the specified function with a lock.  This makes
     sure that there aren't concurrent calls to the basestation functions.  The
-    reason we need this is because both SpeechRecognition and the regular 
+    reason we need this is because both SpeechRecognition and the regular
     movement buttons call basestation functions to make the Minibot move.  The
-    SpeechRecognition function runs in its own background thread.  We 
+    SpeechRecognition function runs in its own background thread.  We
     do not want the SpeechRecognition function calling the basestation functions
-    while the movement button requests are calling them.  Hence we protect 
+    while the movement button requests are calling them.  Hence we protect
     the necessary basestation functions with a lock that is owned by the basestation
     Arguments:
          func: The function that will become thread safe
@@ -115,7 +115,7 @@ class BaseStation:
         return list(self.active_bots.keys())
 
     def listen_for_minibot_broadcast(self):
-        """ Listens for the Minibot to broadcast a message to figure out the 
+        """ Listens for the Minibot to broadcast a message to figure out the
         Minibot's ip address. Code taken from link below:
             https://github.com/jholtmann/ip_discovery
         """
@@ -160,7 +160,7 @@ class BaseStation:
         self.active_bots[bot_name] = Bot(bot_name, ip_address, port)
 
     def get_active_bots(self):
-        """ Get the names of all the Minibots that are currently connected to 
+        """ Get the names of all the Minibots that are currently connected to
         Basestation
         """
         for bot_name in self.get_bot_names():
@@ -171,7 +171,7 @@ class BaseStation:
         return self.get_bot_names()
 
     def get_bot_status(self, bot_name: str) -> str:
-        """ Gets whether the Minibot is currently connected or has been 
+        """ Gets whether the Minibot is currently connected or has been
         disconnected.
         1. Send Minibot BOTSTATUS
         2. read from Minibot whatever Minibot has sent us.
@@ -282,7 +282,7 @@ class BaseStation:
         return 1, user.custom_function
 
     def register(self, email: str, password: str) -> int:
-        """Registers a new user if the email and password are not null and 
+        """Registers a new user if the email and password are not null and
         there is no account associated wth the email yet"""
         if not email:
             return -1
@@ -299,7 +299,7 @@ class BaseStation:
         return 1
 
     def update_custom_function(self, custom_function: str) -> bool:
-        """Adds custom function(s) for the logged in user if there is a user 
+        """Adds custom function(s) for the logged in user if there is a user
         logged in
         """
         if not self.login_email:
@@ -344,19 +344,19 @@ class BaseStation:
         thread_safe_message_queue: ThreadSafeVariable,
         bot_name: str
     ) -> None:
-        """ Listens to the user and converts the user's speech to text. 
+        """ Listens to the user and converts the user's speech to text.
         Arguments:
-            thread_safe_condition: This variable is used by the parent function 
+            thread_safe_condition: This variable is used by the parent function
                 to stop this speech recognition thread.  As long as this variable
-                is True, the speech recognition service runs.  When it becomes 
+                is True, the speech recognition service runs.  When it becomes
                 False, the service exits its loop.
-            thread_safe_message_queue:  The queue of messages to be displayed 
-                on the GUI. Needs to be thread safe because messages are pushed 
+            thread_safe_message_queue:  The queue of messages to be displayed
+                on the GUI. Needs to be thread safe because messages are pushed
                 on to the queue by this thread, and the parent function / thread
-                pops messages from this queue. The parent function relays these 
+                pops messages from this queue. The parent function relays these
                 messages to the front-end as the response of a post request.
             session_id:  Unique identifier for the user's current session.
-            bot_id:  Unique identifier for the Minibot we are connected to 
+            bot_id:  Unique identifier for the Minibot we are connected to
                 currently.
         """
         RECORDING_TIME_LIMIT = 5
@@ -438,3 +438,9 @@ class BaseStation:
         submissions = []
         submissions = Submission.query.filter_by(user_id=User.id)
         return submissions
+
+    @make_thread_safe
+    def start_ir(self, bot_name: str):
+        """ Starts IR sensor """
+        bot = self.get_bot(bot_name)
+        bot.sendKV("IR", "")

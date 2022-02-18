@@ -338,6 +338,8 @@ class Minibot:
                 if self.blockly_python_proc.is_running():
                     self.blockly_python_proc.kill_proc()
                 Thread(target=ece.stop).start()
+        elif key == "IR":
+            Thread(target=ece.read_ir).start()
 
     def sendKV(self, sock: socket, key: str, value: str):
         """ Sends a key-value pair to the specified socket. The key value

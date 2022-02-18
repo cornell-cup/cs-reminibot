@@ -5,7 +5,7 @@
 int bufSize = 4;
 char buf[4];
 
-int IRreciever = 9;
+int IRreciever = 6;
 
 void setup() {
     Serial.begin(115200);
@@ -13,19 +13,21 @@ void setup() {
 
     // set up pin
     pinMode(IRreciever, INPUT);
+
+    SPI.attachInterrupt();
 }
+
+// SPI interrupt routine
+ISR(SPI_STC_vect) {
+    byte c = SPDR;
+    SPDR = c + 10;
+}  // end of interrupt service routine (ISR) for SPI
+
 void loop() {
     // put your main code here, to run repeatedly;
-    delay(1000);
+    delay(100);
 
     int statusSensor = digitalRead(IRreciever);
-
-    if (statusSensor == 1) {
-        SPDR = cm;
-        Serial.println("0");
-    }
-    if (statusSensor == 0) {
-        SPDR = cm;
-        Serial.println("1");
-    }
+    SPDR = statusSensor;
+    Serial.println(statusSensor);
 }
