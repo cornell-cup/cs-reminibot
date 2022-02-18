@@ -226,8 +226,10 @@ def read_ir():
     return_val = read_once()
 
     # log the results
-    file = open("/home/pi/Documents/log.csv", "a")
+    file = open("/home/pi/Documents/log.txt", "a")
+    file.write("hi\n")
     file.write(return_val + "\n")
+    file.flush()
 
     release_lock()
     return return_val
