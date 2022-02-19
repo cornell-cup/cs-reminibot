@@ -109,17 +109,15 @@ class BaseStation:
 
     # ==================== VISION ====================
 
+
+
     def update_vision_log(self, value):
         """ Updates vision log. Size of log based on MAX_VISION_LOG_LENGTH """
-        locations = {'id': value['id'], 'x': value['x'],
-                     'y': value['y'], 'orientation': value['orientation']}
-        self.vision_log.append(locations)
-        if len(self.vision_log) > MAX_VISION_LOG_LENGTH:
-            self.vision_log.pop(0)
+        self.vision_log = value
 
     def get_vision_data(self):
         """ Returns most recent vision data """
-        return self.vision_log[-1] if self.vision_log else None
+        return self.vision_log[:] if self.vision_log else None
 
     def vision_monitior(self):
         """

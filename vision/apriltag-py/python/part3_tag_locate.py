@@ -101,6 +101,8 @@ def main():
 
         print("Found " + str(len(detections)) + " apriltags")
 
+        data_for_BS = []
+
         for i, d in enumerate(detections):
             # TODO draw tag - might be better to generalize, because
             # locate_cameras does this too.
@@ -128,11 +130,12 @@ def main():
             # print(tag_xyz)
             # print("{} :: {} :: {} {} {} {}".format(DEVICE_ID, d.tag_id, x, y, z, angle))
             print("{},{},{},{},{}".format(d.tag_id, x, y, z, angle))
+            data_for_BS.append({"id": d.tag_id, "x": x, "y": y, "orientation": angle})
 
         # Send the data to the URL specified.
         # This is usually a URL to the base station.
         if SEND_DATA:
-            payload = {"id": d.tag_id, "x": x, "y": y, "orientation": angle}
+            payload = data_for_BS
             r = requests.post(url, json=payload)
             status_code = r.status_code
             if status_code / 100 != 2:

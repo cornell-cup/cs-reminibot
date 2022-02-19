@@ -92,10 +92,9 @@ export default class GridView extends React.Component {
         this.svg.call(zoom);
     }
 
+
+
     drawBot(x, y, c, o) {
-        // remove old circle/logo
-        this.svg.selectAll("circle").remove();
-        this.svg.selectAll("image").remove();
         console.log("drawBot");
         // draws circle at the x,y coordinate of the april tage with given color
         var circle = this.svg.append("circle")
@@ -106,7 +105,7 @@ export default class GridView extends React.Component {
         console.log("Drew Circle");
         // draws cornell cup logo on top of circle
         var image = this.svg.append('image')
-            .attr('href', './static/gui/static/img/bot-dot.png')
+            .attr('href', './static/img/bot-dot.png')
             .attr('x', this.state.width / 2 - 10 + x)
             .attr("y", this.state.height / 2 - 10 - y)
             .attr('width', 20)
@@ -139,23 +138,27 @@ export default class GridView extends React.Component {
         axios.get('/vision')
             .then(function (response) {
                 // console.log(response.data);
-                pos.push(response.data);
-                console.log("vision data: "+JSON.stringify(response.data))
-                if (pos[0]['x'] === '') {
-                    _this.deleteBot();
+                _this.deleteBot();
+                pos = response.data;
+                
+                for(let i = 0; i < pos.length; i++){
+                    if (pos[i]['x'] === '') {
+                        _this.deleteBot();
+                    }
+                    else {
+                        _this.state.xcor = parseInt(pos[i]['x']);
+                        _this.state.ycor = parseInt(pos[i]['y']);
+                        _this.drawBot(_this.state.xcor, _this.state.ycor, 'red', parseInt(pos[i]['orientation']));
+                        // each drawing is one frame added to the FPS
+                        _this.setState({
+                            point_count: _this.state.point_count + 1
+                        });
+                        _this.setState({
+                            fps: _this.state.point_count * 1000 / (new Date().getTime() - _this.state.time)
+                        });
+                    }
                 }
-                else {
-                    _this.state.xcor = parseInt(pos[0]['x']);
-                    _this.state.ycor = parseInt(pos[0]['y']);
-                    _this.drawBot(_this.state.xcor, _this.state.ycor, 'red', parseInt(pos[0]['orientation']));
-                    // each drawing is one frame added to the FPS
-                    _this.setState({
-                        point_count: _this.state.point_count + 1
-                    });
-                    _this.setState({
-                        fps: _this.state.point_count * 1000 / (new Date().getTime() - _this.state.time)
-                    });
-                }
+                
             })
             .catch(function (error) {
                 // console.log(error);
