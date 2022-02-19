@@ -206,7 +206,8 @@ def speech_recognition():
         message = base_station.get_speech_recognition_status()
         return json.dumps(message), status.HTTP_200_OK
 
-@app.route('/chatbot-context', methods=['POST','GET'])
+
+@app.route('/chatbot-context', methods=['POST', 'GET'])
 def chatbot_context():
     if request.method == 'POST':
         data = request.get_json()
@@ -222,9 +223,21 @@ def chatbot_context():
         elif command == 'clear':
             base_station.chatbot_clear_context()
             return json.dumps(True), status.HTTP_200_OK
-        
+        elif command == 'get-all-local-context':
+            base_station.get_chatbot_obj_context()
+            return status.HTTP_200_OK
+        elif command == 'get-all-db-context':
+            # TODO properly deal with guest users?
+            user = base_station.login_email
+            if user != "":
+                answer = base_station.chatbot_get_context(
+                    base_station.login_email)
+                return json.dumps(answer), status.HTTP_200_OK
+            else:
+                return json.dumps({'error': 'Not logged in'}), status.HTTP_401_UNAUTHORIZED
 
-@app.route('/chatbot-ask', methods=['POST','GET'])
+
+@app.route('/chatbot-ask', methods=['POST', 'GET'])
 def chatbot_ask():
     if request.method == 'POST':
         data = request.get_json()

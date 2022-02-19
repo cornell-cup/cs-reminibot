@@ -316,6 +316,13 @@ class BaseStation:
         """
         self.chatbot.update_context(context)
 
+    def update_chatbot_all_context(self, context: str):
+        """ Replaces all context in the Chatbot object
+        with the input context 
+        """
+        self.chatbot.reset_context()
+        self.chatbot.update_context(context)
+
     def get_chatbot_obj_context(self):
         return self.chatbot.get_all_context()
 
@@ -485,7 +492,7 @@ class BaseStation:
         # self.chatbot.update_context(' '.join(heard_context))
         self.chatbot.update_context(self.chatbot_temp_context)
 
-    def chatbot_compute_answer(self, question): 
+    def chatbot_compute_answer(self, question):
         return self.chatbot.compute_answer(question)
 
     # ==================== GETTERS and SETTERS ====================
