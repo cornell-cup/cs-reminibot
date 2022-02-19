@@ -139,7 +139,8 @@ def read_once():
 
     # log the results
     date = datetime.now()
-    file = open("/home/pi/Documents/log" + date + ".txt", "w")
+    file = open("/home/pi/Documents/log" +
+                datetime.datetime.now() + ".txt", "w")
 
     file.write("Reading from Arduino\n")
     values = []
@@ -230,16 +231,6 @@ def read_ultrasonic():
 def read_ir():
     acquire_lock()
     return_val = read_once()
-<<<<<<< HEAD
-
-    # log the results
-    file = open("/home/pi/Documents/log.txt", "a")
-    file.write("hi\n")
-    file.write(return_val + "\n")
-    file.flush()
-
-=======
->>>>>>> 2db8b174eefa049bbad8d3eea702e96f329a5fbf
     release_lock()
     return return_val
 
