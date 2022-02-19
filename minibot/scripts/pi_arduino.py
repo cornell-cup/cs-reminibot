@@ -4,6 +4,7 @@ import time
 import threading
 from statistics import median
 import os
+from datetime import datetime
 
 spi = spidev.SpiDev()
 STOP_CMD = "S"
@@ -135,16 +136,21 @@ def read_once():
         "num_reads" times.  
     """
     num_reads = 5
-    print("Reading from Arduino")
+
+    # log the results
+    date = datetime.now()
+    file = open("/home/pi/Documents/log" + date + ".txt", "w")
+
+    file.write("Reading from Arduino\n")
     values = []
     for _ in range(num_reads):
         values += spi.readbytes(1)
         # Need a short delay between each read from the Arduino
         # Without the delay, the Arduino will return 0
         time.sleep(0.02)
-    print("Original values: {}".format(values))
+    file.write("Original values: {}".format(values) + "\n")
     val = median(values)
-    print("Median value read is {}".format(val))
+    file.write("Median value read is {}".format(val) + "\n")
     return val
 
 
@@ -224,6 +230,7 @@ def read_ultrasonic():
 def read_ir():
     acquire_lock()
     return_val = read_once()
+<<<<<<< HEAD
 
     # log the results
     file = open("/home/pi/Documents/log.txt", "a")
@@ -231,6 +238,8 @@ def read_ir():
     file.write(return_val + "\n")
     file.flush()
 
+=======
+>>>>>>> 2db8b174eefa049bbad8d3eea702e96f329a5fbf
     release_lock()
     return return_val
 
