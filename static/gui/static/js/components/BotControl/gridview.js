@@ -146,6 +146,7 @@ export default class GridView extends React.Component {
                         _this.deleteBot();
                     }
                     else {
+                        console.log("angle "+pos[i]['orientation']);
                         _this.state.xcor = parseInt(pos[i]['x']);
                         _this.state.ycor = parseInt(pos[i]['y']);
                         _this.drawBot(_this.state.xcor, _this.state.ycor, 'red', parseInt(pos[i]['orientation']));
