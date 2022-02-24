@@ -29,7 +29,7 @@ class Minibot:
     # 255.255.255.255 to indicate that we are broadcasting to all addresses
     # on port 9434.  The Basestation has been hard-coded to listen on port 9434
     # for incoming Minibot broadcasts
-    BROADCAST_ADDRESS = ('255.255.255.255', 9434)
+    BROADCAST_ADDRESS = ('255.255.255.255', 5001)
     MINIBOT_MESSAGE = "i_am_a_minibot"
     BASESTATION_MESSAGE = "i_am_the_basestation"
     # 1024 bytes
