@@ -201,17 +201,36 @@ export default class AddBot extends React.Component {
 
     }
 
+    // lineFollowOnClick() {
+    //     const _this = this;
+    //     axios({
+    //         method: 'POST',
+    //         url: '/mode', //url to backend endpoint
+    //         headers: {
+    //             'Content-Type': 'application/json'
+    //         },
+    //         data: JSON.stringify({
+    //             bot_name: _this.props.selectedBotName,
+    //             mode: "line_follow",
+    //         })
+    //     }).catch(function (error) {
+    //         if (error.response.data.error_msg.length > 0)
+    //             window.alert(error.response.data.error_msg);
+    //         else
+    //             console.log(error);
+    //     });
+    // }
+
     lineFollowOnClick() {
         const _this = this;
         axios({
             method: 'POST',
-            url: '/mode', //url to backend endpoint
+            url: '/ir', //url to backend endpoint
             headers: {
                 'Content-Type': 'application/json'
             },
             data: JSON.stringify({
                 bot_name: _this.props.selectedBotName,
-                mode: "line_follow",
             })
         }).catch(function (error) {
             if (error.response.data.error_msg.length > 0)

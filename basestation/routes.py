@@ -49,11 +49,24 @@ def wheels():
     if not bot_name:
         error_json = {"error_msg": NO_BOT_ERROR_MSG}
         return json.dumps(error_json), status.HTTP_400_BAD_REQUEST
-    # direction = data['direction']
-    # power = data['power']
-    # base_station.move_bot_wheels(bot_name, direction, power)
-    base_station.start_ir(bot_name)
+    direction = data['direction']
+    power = data['power']
+    base_station.move_bot_wheels(bot_name, direction, power)
     return json.dumps(True), status.HTTP_200_OK
+
+
+@app.route('/ir', methods=['POST'])
+def ir():
+    data = request.get_json()
+    bot_name = data['bot_name']
+    if not bot_name:
+        error_json = {"error_msg": NO_BOT_ERROR_MSG}
+        return json.dumps(error_json), status.HTTP_400_BAD_REQUEST
+    if request.method == 'POST':
+        base_station.start_ir(bot_name)
+        return json.dumps(True), status.HTTP_200_OK
+    else:
+        return json.dumps(True), status.HTTP_200_OK
 
 
 @app.route('/script', methods=['POST'])
