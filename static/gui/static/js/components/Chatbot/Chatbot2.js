@@ -117,14 +117,19 @@ function Chatbot2({ }) {
     e.preventDefault();
     console.log("toggle mic");
     setMic(!mic);
+    if (mic == false) recognition.stop();
   }
 
   const handleListen = () => {
     if (mic) {
+      console.log("start listening");
       recognition.start()
       recognition.onend = () => recognition.start()
     } else {
       recognition.stop()
+      recognition.onend = () => {
+        console.log("Stopped listening per click")
+      }
     }
     let finalTranscript = ''
     recognition.onresult = event => {
