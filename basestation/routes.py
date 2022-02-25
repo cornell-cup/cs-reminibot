@@ -234,4 +234,26 @@ def chatbot_ask():
         #     return json.dumps(error_json), status.HTTP_400_BAD_REQUEST
         question = data['question']
         answer = base_station.chatbot_ask_question(question)
+        print(f'answer: {answer}')
         return json.dumps(answer), status.HTTP_200_OK
+
+
+@app.route('/chatbot_microphone', methods=['POST','GET'])
+def chatbot_microphone():
+    if request.method == 'POST':
+        base_station.chatbot_listening_toggle()
+    else:
+        message = base_station.get_chatbot_listening_context_status()
+        return json.dumps(message), status.HTTP_200_OK
+
+
+# ==================== FRONT END SPEECH RECOGNITION ==========================
+
+# @app.route('/send_context', methods = ['POST','GET'])
+# def chatbot_send_context:
+#     if request.method == 'POST':
+#         # send the context to the database
+#         context = data['context']
+#         # TODO get user context
+#         update_chatbot_context_db(self, user_id, context) # TODO check if this function works???
+        
