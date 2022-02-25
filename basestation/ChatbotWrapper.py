@@ -44,6 +44,7 @@ class ChatbotWrapper:
     def compute_answer(self, input_question):
         # self.context_stack = ['. '.join(self.context_stack)]
         url = "http://3.133.110.167/qa"
+        # TODO set this using startup parameters
         data = {"question": input_question, "context":'. '.join(self.context_stack) }
         resp = requests.get(url, json=data)
         return resp.text
