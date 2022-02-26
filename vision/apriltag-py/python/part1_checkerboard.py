@@ -1,3 +1,4 @@
+from fileinput import filename
 import cv2
 import util
 import numpy as np
@@ -72,8 +73,10 @@ def main():
     }
 
     if args["output"]:
+        filename = args["output"].strip()
+        filename = filename if filename[-5:].lower() == ".json" else filename + ".json"
         print("Writing calibration file")
-        with open(args["output"] + ".json", "w+") as calib_file:
+        with open(filename, "w+") as calib_file:
             json.dump(calib_data, calib_file)
     else:
         print(json.dumps(calib_data))
@@ -83,7 +86,7 @@ def main():
 
 def get_checkerboard_interactive(camera, cols, rows):
     """
-    Draws chessboard corners live. Returns when "q" is pressed.
+    Draws chessboard corners live. Returns when space (" ") is pressed.
 
     Returns:
     image of the checkerboard,
@@ -102,7 +105,7 @@ def get_checkerboard_interactive(camera, cols, rows):
         if found_checkerboard:
             cv2.drawChessboardCorners(image, (cols, rows), corners, True)
         cv2.imshow("Checkerboard Calibration", image)
-        if cv2.waitKey(1) & 0xFF == ord("q") and found_checkerboard:
+        if cv2.waitKey(1) & 0xFF == ord(" ") and found_checkerboard:
             break
         
     return image, gray_image, corners
@@ -113,7 +116,7 @@ def get_image_on_keypress(camera):
     while True:
         image = util.get_image(camera)
         cv2.imshow("Raw Image", image)
-        if cv2.waitKey(1) & 0xFF == ord("q"):
+        if cv2.waitKey(1) & 0xFF == ord(" "):
             break
     return image
 

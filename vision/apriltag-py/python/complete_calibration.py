@@ -1,7 +1,7 @@
 from subprocess import call
 checkerboard_rows = "6"
 checkerboard_columns = "9"
-calibration_file_name = "calibration"
+calibration_file_name = "calibration_test"
 calibration_file = calibration_file_name+".json"
 position_file = "corner_positions.json"
 board_tag_size = "1.1811"
