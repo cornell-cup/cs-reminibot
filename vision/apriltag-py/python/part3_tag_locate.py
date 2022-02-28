@@ -30,8 +30,8 @@ def main():
     calib_file = open(calib_file_name)
 
     camera = util.get_camera(DEVICE_ID)
-    FRAME_WIDTH  = camera.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH)   # float `width`
-    FRAME_HEIGHT = camera.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT)  # float `height`
+    FRAME_WIDTH  = camera.get(cv2.CAP_PROP_FRAME_WIDTH )   # float `width`
+    FRAME_HEIGHT = camera.get(cv2.CAP_PROP_FRAME_HEIGHT)  # float `height`
 
     # Get matrices from calibration file
     print("Parsing calibration file " + calib_file_name + "...")
