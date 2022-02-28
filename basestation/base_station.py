@@ -136,6 +136,7 @@ class BaseStation:
         return estimated_positions
         
     def get_estimated_position(self, apriltag_position_data):
+        """ Returns the estimated position of an apriltag detected by all cameras based on apriltage position data """
         x = 0
         y = 0
         orientation = 0

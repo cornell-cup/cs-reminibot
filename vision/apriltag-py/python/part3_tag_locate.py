@@ -118,8 +118,8 @@ def main():
             angle = ((detected_angle + overall_angle_offset))%360
             (ctr_x, ctr_y) = d.center
             
-            # displaying angles
-            cv2.putText(undst, str(round(angle,3)),(int(ctr_x), int(ctr_y)), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 0, 255),2)
+            # displaying tag id
+            cv2.putText(undst, str(d.tag_id),(int(ctr_x), int(ctr_y)), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 0, 255),2)
 
             # pose, e0, e1 = detector.detection_pose(d, util.camera_matrix_to_camera_params(camera_matrix), TAG_SIZE)
             # util.draw_pose(undst,util.camera_matrix_to_camera_params(camera_matrix), TAG_SIZE, pose)

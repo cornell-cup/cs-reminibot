@@ -21,29 +21,12 @@ def main():
     # ORIGIN_TAG_SIZE = args["origin"]
     calib_file_name = args["calibration_file"]
     positions_file_name = args["positions_file"]
-    COLUMNS = args["columns"]
-    ROWS = args["rows"]
-    NUM_DETECTIONS = COLUMNS * ROWS
-    map_width = args["map_width"]
-    map_height = args["map_height"]
-    horizontal_distance_between_april_tags = (map_width - COLUMNS*BOARD_TAG_SIZE)/(1 if COLUMNS <= 1 else (COLUMNS - 1))
-    vertical_distance_between_april_tags = (map_height - ROWS*BOARD_TAG_SIZE)/(1 if ROWS <= 1 else (ROWS - 1))
-
-    #position file information takes precedence over rows and columns arguments
-    positions_file, positions_data = None, None
-    if positions_file_name != None:
-        positions_file, positions_data = util.read_json(positions_file_name)
-        NUM_DETECTIONS = len(positions_data)
+    positions_file, positions_data = util.read_json(positions_file_name)
+    NUM_DETECTIONS = len(positions_data)
 
     
 
-    #FOR TESTING REMOVE LATER
-    # middle_column, middle_row = get_middle_column_and_row(COLUMNS, ROWS)
-    # print("id,x1,x2,y1,y2")
-    # for id in range(NUM_DETECTIONS):
-    #     x1,x2,y1,y2 = get_corner_coordinate_components(COLUMNS, ROWS, BOARD_TAG_SIZE, horizontal_distance_between_april_tags, vertical_distance_between_april_tags, id, middle_column, middle_row)
-    #     print(str(id)+","+str(x1)+","+str(x2)+","+str(y1)+","+str(y2))
-    #FOR TESTING REMOVE LATER
+
     
     # offsets to reposition where (0,0) is
     x_offset = 0
@@ -71,13 +54,13 @@ def main():
     detections = []
 
     print(
-        "The program will now attempt to detect the 4 tags on the axis calibration board"
+        "The program will now attempt to detect the tags on the calibration board"
     )
     print(
-        "The four tags should have a red circle on their centers if detected properly."
+        "The tags should have a red circle on their centers if detected properly."
     )
     print(
-        "There will also be a blue circle in the middle of the 4 tags if 4 are detected."
+        "There will also be a blue circle in the middle of the tags if they are detected."
     )
     print("Align the blue dot with the middle of the screen.")
     print("Then, press SPACE.")
@@ -93,6 +76,14 @@ def main():
 
         # Use the detector and compute useful values from it
         detections = get_filtered_detections(positions_file_name, positions_data, detector, gray)
+
+        img_points = np.ndarray((4 * len(detections), 2))
+        obj_points = np.ndarray((4 * len(detections), 3))
+
+        if len(detections) > NUM_DETECTIONS:
+            print("WARNING: Too many calibration apriltags detected based on position file:",positions_file_name)
+        elif len(detections) < NUM_DETECTIONS:
+            print("WARNING: Not enough calibration apriltags detected based on position file:",positions_file_name)
 
         x_offset = 0
         y_offset = 0
@@ -119,10 +110,7 @@ def main():
 
         overall_x_center /= 1 if len(detections) == 0 else len(detections)
         overall_y_center /= 1 if len(detections) == 0 else len(detections)
-        # Draw origin
-        # if len(detections) == 4:
-        #     cv2.circle(frame, (int(x_offset / 4), int(y_offset / 4)), 5, (255, 0, 0), 3)
-        # Draw origin of more than 4 tags 
+        
         cv2.circle(undst, (int(overall_x_center), int(overall_y_center)), 5, (255, 0, 0), 3)
         
         
@@ -138,11 +126,6 @@ def main():
     # transcribed from the C++ system.
     object_center_points = []
     object_angles = []
-    middle_column, middle_row = get_middle_column_and_row(COLUMNS, ROWS)
-    
-
-
-    #detections = detections if positions_file_name == None else [detection for detection in detections if get_position_with_id(positions_data, detection.tag_id) != None]
     for i, d in enumerate(detections):
         if i >= NUM_DETECTIONS:
             print(f"Waring:\nToo many tags detected. tags with id: {id} will be ignored")
@@ -153,34 +136,25 @@ def main():
         img_points[1 + 4 * i] = d.corners[1]
         img_points[2 + 4 * i] = d.corners[2]
         img_points[3 + 4 * i] = d.corners[3]
-        # print("corner: ",d.corners[0])
-        if positions_file_name == None:
-            x1, x2, y1, y2 = get_corner_coordinate_components(COLUMNS, ROWS, BOARD_TAG_SIZE, horizontal_distance_between_april_tags, vertical_distance_between_april_tags, id, middle_column, middle_row)
-            # DEPRECATED: old code doesn't account for rotation
-            object_center_points.append(((x1+x2)/2, (y1+y2)/2))
-            obj_points[0 + 4 * i] = [x1, y1, 0]
-            obj_points[1 + 4 * i] = [x2, y1, 0]
-            obj_points[2 + 4 * i] = [x2, y2, 0]
-            obj_points[3 + 4 * i] = [x1, y2, 0]
-        else:
-            position = get_position_with_id(positions_data, id)
-            if position == None:
-                print(f"Waring:\nid: {id} not found in {positions_file_name}")
-                continue
-            print(f"position: {position}")
-            center_x = position["x"]
-            center_y = position["y"]
-            object_center_points.append((center_x, center_y))
-            angle = position["angle"]
-            object_angles.append(angle)
-            
-            unrotated_corner_vectors = [np.array([[-BOARD_TAG_SIZE/2],[-BOARD_TAG_SIZE/2]]), np.array([[BOARD_TAG_SIZE/2],[-BOARD_TAG_SIZE/2]]), np.array([[BOARD_TAG_SIZE/2],[BOARD_TAG_SIZE/2]]), np.array([[-BOARD_TAG_SIZE/2],[BOARD_TAG_SIZE/2]])]
-            angle_in_radians = math.pi*angle/180
-            rotation_matrix = np.array([[math.cos(angle_in_radians), -math.sin(angle_in_radians)],[math.sin(angle_in_radians),math.cos(angle_in_radians)]])
-            for index, unrotated_corner_vector  in enumerate(unrotated_corner_vectors):
-                rotated_corner_vector = np.matmul(rotation_matrix,unrotated_corner_vector)
-                obj_points[index + 4 * i] = [center_x+rotated_corner_vector[0][0], center_y+rotated_corner_vector[1][0], 0]
-                print("obj_points",obj_points)
+        
+        position = get_position_with_id(positions_data, id)
+        if position == None:
+            print(f"Waring:\nid: {id} not found in {positions_file_name}")
+            continue
+        print(f"position: {position}")
+        center_x = position["x"]
+        center_y = position["y"]
+        object_center_points.append((center_x, center_y))
+        angle = position["angle"]
+        object_angles.append(angle)
+        
+        unrotated_corner_vectors = [np.array([[-BOARD_TAG_SIZE/2],[-BOARD_TAG_SIZE/2]]), np.array([[BOARD_TAG_SIZE/2],[-BOARD_TAG_SIZE/2]]), np.array([[BOARD_TAG_SIZE/2],[BOARD_TAG_SIZE/2]]), np.array([[-BOARD_TAG_SIZE/2],[BOARD_TAG_SIZE/2]])]
+        angle_in_radians = math.pi*angle/180
+        rotation_matrix = np.array([[math.cos(angle_in_radians), -math.sin(angle_in_radians)],[math.sin(angle_in_radians),math.cos(angle_in_radians)]])
+        for index, unrotated_corner_vector  in enumerate(unrotated_corner_vectors):
+            rotated_corner_vector = np.matmul(rotation_matrix,unrotated_corner_vector)
+            obj_points[index + 4 * i] = [center_x+rotated_corner_vector[0][0], center_y+rotated_corner_vector[1][0], 0]
+            print("obj_points",obj_points)
         
 
     # Make transform matrices
@@ -294,9 +268,11 @@ def get_filtered_detections(positions_file_name, positions_data, detector, gray)
 def filter_detections_from_file(positions_data, detections):
     """ filters detection list to return a list of only the apriltag detections that correspond with the position file """
     filtered_detections = []
+    detected_ids = []
     for detection in detections:
-        if get_position_with_id(positions_data, detection.tag_id) != None:
+        if get_position_with_id(positions_data, detection.tag_id) != None and not (detection.tag_id in detected_ids):
             filtered_detections.append(detection)
+            detected_ids.append(detection.tag_id)
     detections = filtered_detections
     return detections
 
@@ -367,14 +343,13 @@ def get_world_center_offsets(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detecti
     detected_y_coords = []
     detected_angles = []
     angle_differences = []
-    max_id = -1
+
     for detection_index in range(len(detections)):
         (detected_x, detected_y, detected_z, detected_angle) = util.compute_tag_undistorted_pose(
                 camera_matrix, dist_coeffs, camera_to_origin, detections[detection_index], BOARD_TAG_SIZE
             )
         (actual_x, actual_y) = object_center_points[detection_index]
         actual_angle = object_angles[detection_index]
-        max_id = int(detections[detection_index].tag_id) if int(detections[detection_index].tag_id) > max_id else max_id
         actual_x_coords.append(actual_x)
         actual_y_coords.append(actual_y)    
         detected_x_coords.append(detected_x)
@@ -386,34 +361,6 @@ def get_world_center_offsets(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detecti
     center_y_offset = (sum(actual_y_coords)-sum(detected_y_coords))/len(detected_y_coords)
     angle_offset = (sum(angle_differences)/len(detected_angles))
     return center_x_offset,center_y_offset,angle_offset
-
-def get_middle_column_and_row(COLUMNS, ROWS):
-    """ DEPRECATED: returns the middle column and row of the old quick calibration board """
-    middle_column = (COLUMNS - 1)//2
-    middle_row = (ROWS - 1)//2
-    return middle_column, middle_row
-
-def get_corner_coordinate_components(COLUMNS, ROWS, BOARD_TAG_SIZE, horizontal_distance_between_april_tags, vertical_distance_between_april_tags, id, middle_column, middle_row):
-    """ DEPRECATED: returns the corner world points of the old quick calibration board """
-    x1,x2,y1,y2 = 0, 0, 0, 0
-    column = id % COLUMNS
-    row = id // COLUMNS
-
-    #calculating x components of corners
-    horizontal_distance_between_april_tags_from_center = (column - middle_column)
-    BOARD_TAGs_from_center = horizontal_distance_between_april_tags_from_center+.5
-    even_column_offset = -(horizontal_distance_between_april_tags+BOARD_TAG_SIZE)/2 * (1-COLUMNS%2)
-    x2 = horizontal_distance_between_april_tags * horizontal_distance_between_april_tags_from_center + (BOARD_TAGs_from_center)*BOARD_TAG_SIZE + even_column_offset
-    x1 = x2 - BOARD_TAG_SIZE
-
-    #calculating y components of corners
-    vertical_distance_between_april_tags_from_center = (middle_row - row)
-    BOARD_TAGs_from_center = vertical_distance_between_april_tags_from_center+.5
-    even_row_offset = (vertical_distance_between_april_tags+BOARD_TAG_SIZE)/2 * (1-ROWS%2)
-    y2 = vertical_distance_between_april_tags * vertical_distance_between_april_tags_from_center + (BOARD_TAGs_from_center)*BOARD_TAG_SIZE + even_row_offset
-    y1 = y2 - BOARD_TAG_SIZE
-
-    return x1,x2,y1,y2
 
 def get_args():
     """
@@ -442,79 +389,17 @@ def get_args():
     )
 
     parser.add_argument(
-        "-r",
-        "--rows",
-        metavar="<number of rows in map>",
-        type=int,
-        required=False,
-        default=3,
-        help="number of rows of april tags in your april tag map",
-    )
-
-    parser.add_argument(
-        "-c",
-        "--columns",
-        metavar="<number of columns in map>",
-        type=int,
-        required=False,
-        default=8,
-        help="number of columns of april tags in your april tag map",
-    )
-
-    # parser.add_argument(
-    #     "-o",
-    #     "--origin",
-    #     metavar="<origin tag size>",
-    #     type=float,
-    #     required=False,
-    #     default=6.5,
-    #     help="size of one side of the tag to calibrate \
-    #                         the origin, in inches",
-    # )
-
-    parser.add_argument(
         "-pf",
         "--positions_file",
         metavar="<tag positions file name>",
         type=str,
-        required=False,
+        required=True,
         default=None,
         help="JSON file containg positions \
                             of the april tags for calibration",
     )
 
-    parser.add_argument(
-        "-mw",
-        "--map_width",
-        metavar="<width of map>",
-        type=float,
-        required=False,
-        default=2,
-        help="horizontal distance between the left edge of one of the leftmost april \
-            tag and the right edge of one of the rightmost april tag in inches. \
-            NOTE: For and accurate calibration: \
-            Measure from the edge of the april tags pattern itself, not the ege of the paper. \
-            The tags must be in evenly spaced rows in columns. \
-            The tag ids increase by 1 as they go from left to right and downwards \
-            The map_height argument (--map_height <height of map>) must be specified",
-    )
-
-    parser.add_argument(
-        "-mh",
-        "--map_height",
-        metavar="<vertical distance of the \
-            outer edges of the april tag map in inches>",
-        type=float,
-        required=False,
-        default=4.5,
-        help="vertical distance between the top edge of one of the topmost april \
-            tag and the bottom edge of one of the bottommost april tag in inches. \
-            NOTE: For and accurate calibration: \
-            Measure from the edge of the april tags pattern itself, not the ege of the paper. \
-            The tags must be in evenly spaced rows in columns. \
-            The tag ids increase by 1 as they go from left to right and downwards \
-            The map_width argument (--map_width <width of map>) must be specified",
-    )
+    
 
     options = parser.parse_args()
     args = vars(options)  # get dict of args parsed
