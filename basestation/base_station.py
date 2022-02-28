@@ -6,6 +6,7 @@ from basestation.bot import Bot
 from basestation.user_database import Submission, User
 from basestation import db
 from basestation.util.stoppable_thread import StoppableThread, ThreadSafeVariable
+from basestation.util.helper_functions import distance
 
 from random import choice
 from string import digits, ascii_lowercase, ascii_uppercase
@@ -48,7 +49,7 @@ def make_thread_safe(func):
 class BaseStation:
     def __init__(self, app_debug=False):
         self.active_bots = {}
-        self.vision_log = []
+        self.vision_log = {}
 
         self.blockly_function_map = {
             "move_forward": "fwd",         "move_backward": "back",
@@ -79,13 +80,7 @@ class BaseStation:
         server_address = ("0.0.0.0", 5001)
         
 
-        self.vision_monitior_thread = threading.Thread(
-            target=self.vision_monitior, daemon=True
-        )
-
         
-        # checks if vision can see april tag by checking lenth of vision_log
-        self.vision_monitior_thread.start()
         # self.connections = BaseConnection()
 
         # only bind in debug mode if you are the debug server, if you are the
@@ -113,25 +108,51 @@ class BaseStation:
 
     def update_vision_log(self, value):
         """ Updates vision log. Size of log based on MAX_VISION_LOG_LENGTH """
-        self.vision_log = value
+        self.vision_log[value["DEVICE_ID"]] = {"DEVICE_CENTER_X": value["DEVICE_CENTER_X"], "DEVICE_CENTER_Y": value["DEVICE_CENTER_Y"], "position_data" : value["position_data"]}
 
     def get_vision_data(self):
         """ Returns most recent vision data """
-        return self.vision_log[:] if self.vision_log else None
+        return self.vision_log if self.vision_log else None
 
-    def vision_monitior(self):
-        """
-        Checks if the len of the vision log is growing.
-        If not growing return empty string for x coordinate.
-        """
-        locations = {'id': '', 'x': '',
-                     'y': '', 'orientation': ''}
-        while True:
-            if self.vision_log:
-                count = len(self.vision_log)
-                time.sleep(1)
-                if len(self.vision_log) == count and self.vision_log[-1]['x'] != '':
-                    self.vision_log.append(locations)
+    def get_estimated_positions(self):
+        """ Returns the estimated positions of all apriltags detected by all cameras based on vision log data """
+        apriltag_positions = {}
+        for device_id, device_data in self.vision_log.items():
+            for position_entry in device_data["position_data"]:
+                if not (position_entry["id"] in apriltag_positions):
+                    apriltag_positions[position_entry["id"]] = []
+                apriltag_positions[position_entry["id"]].append(
+                    {
+                        "distance_from_camera_center": distance(device_data["DEVICE_CENTER_X"], device_data["DEVICE_CENTER_Y"], position_entry["image_x"], position_entry["image_y"]),
+                        "x": position_entry["x"], 
+                        "y": position_entry["y"], 
+                        "orientation": position_entry["orientation"]
+                    }
+                )
+        estimated_positions = []
+        for apriltag_id, apriltag_position_data in apriltag_positions.items():
+            estimated_x, estimated_y, estimated_orientation = self.get_estimated_position(apriltag_position_data)
+            estimated_positions.append({"id": apriltag_id, "x": estimated_x, "y": estimated_y, "orientation": estimated_orientation})
+        return estimated_positions
+        
+    def get_estimated_position(self, apriltag_position_data):
+        x = 0
+        y = 0
+        orientation = 0
+        weighted_divisor = 0
+        for position_entry in apriltag_position_data:
+            distance = round(position_entry["distance_from_camera_center"],3) if round(position_entry["distance_from_camera_center"],3) > 0 else .0001
+            weight = 1/distance
+            x += weight * position_entry["x"]
+            y += weight * position_entry["y"]
+            orientation += weight * position_entry["orientation"]
+            weighted_divisor += weight
+        x /= weighted_divisor
+        y /= weighted_divisor
+        orientation /= weighted_divisor
+        return x, y, orientation
+
+ 
 
     def get_vision_log(self):
         """

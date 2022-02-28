@@ -112,7 +112,7 @@ def vision():
         base_station.update_vision_log(info)
         return json.dumps(True), status.HTTP_200_OK
     else:
-        return json.dumps(base_station.get_vision_data()), status.HTTP_200_OK
+        return json.dumps(base_station.get_estimated_positions()), status.HTTP_200_OK
 
 
 @app.route('/result', methods=['POST'])

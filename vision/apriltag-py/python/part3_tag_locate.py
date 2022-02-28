@@ -9,11 +9,11 @@ import util
 
 # Constants
 DEVICE_ID = 0  # The device the camera is, usually 0. TODO make this adjustable
-
+FRAME_WIDTH = 1280
+FRAME_HEIGHT = 720
 # Arguments
 # These are effectively constant after the argument parser has ran.
 TAG_SIZE = 6.5 # The length of one side of an apriltag, in inches
-MULT_FACTOR = 5  # The scale factor of the output coordinates
 SEND_DATA = True  # Sends data to URL if True. Set to False for debug
 
 
@@ -30,6 +30,8 @@ def main():
     calib_file = open(calib_file_name)
 
     camera = util.get_camera(DEVICE_ID)
+    FRAME_WIDTH  = camera.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH)   # float `width`
+    FRAME_HEIGHT = camera.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT)  # float `height`
 
     # Get matrices from calibration file
     print("Parsing calibration file " + calib_file_name + "...")
@@ -49,17 +51,12 @@ def main():
     center_cell_offsets = calib_data["cell_center_offsets"]
     calib_file.close()
 
-    # calib_file, camera_matrix, dist_coeffs = get_matrices_from_file(
-    #     calib_file_name)
-    # transform_matrix = get_transform_matrix(calib_file)
-    # x_offset, y_offset = get_offsets_from_file(calib_file)
-    # calib_file.close()
 
     assert camera_matrix.shape == (3, 3)
     assert dist_coeffs.shape == (1, 5)
     assert transform_matrix.shape == (4, 4)
 
-    # print("TRANSFORM MATRIX:\n {}\n".format(transform_matrix))
+
     print("Calibration file parsed successfully.")
     print("Initializing apriltag detector...")
 
@@ -87,8 +84,6 @@ def main():
         # take a picture and get detections
         frame = util.get_image(camera)
 
-        # Un-distorting an image worsened distortion effects
-        # Uncomment this if needed
         undst = util.undistort_image(frame, camera_matrix, dist_coeffs)
         gray = cv2.cvtColor(undst, cv2.COLOR_BGR2GRAY)
         detections = []
@@ -101,7 +96,8 @@ def main():
 
         print("Found " + str(len(detections)) + " apriltags")
 
-        data_for_BS = []
+        
+        data_for_BS = {"DEVICE_ID": DEVICE_ID, "DEVICE_CENTER_X": FRAME_WIDTH/2, "DEVICE_CENTER_Y": FRAME_HEIGHT/2, "position_data" : []}
 
         for i, d in enumerate(detections):
             # TODO draw tag - might be better to generalize, because
@@ -121,16 +117,17 @@ def main():
             z = detected_z
             angle = ((detected_angle + overall_angle_offset))%360
             (ctr_x, ctr_y) = d.center
-            # cv2.putText(undst, "id:"+str(d.tag_id),(int(ctr_x) , int(ctr_y + 60)), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 0, 255),2)
-            # cv2.putText(dst, "angle:"+str(round(angle,3)),(int(ctr_x), int(ctr_y+(40 if i %2 == 0 else -40))), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 255, 255),2)
+            
+            # displaying angles
             cv2.putText(undst, str(round(angle,3)),(int(ctr_x), int(ctr_y)), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 0, 255),2)
-            # cv2.circle(undst, (int(ctr_x), int(ctr_y)), 3, (255, 0, 0), 3)
+
             # pose, e0, e1 = detector.detection_pose(d, util.camera_matrix_to_camera_params(camera_matrix), TAG_SIZE)
-            # util.draw_cube(undst,util.camera_matrix_to_camera_params(camera_matrix), TAG_SIZE, pose)
-            # print(tag_xyz)
-            # print("{} :: {} :: {} {} {} {}".format(DEVICE_ID, d.tag_id, x, y, z, angle))
-            print("{},{},{},{},{}".format(d.tag_id, x, y, z, angle))
-            data_for_BS.append({"id": d.tag_id, "x": x, "y": y, "orientation": angle})
+            # util.draw_pose(undst,util.camera_matrix_to_camera_params(camera_matrix), TAG_SIZE, pose)
+           
+            
+            # prints DEVICE_ID tag id x y z angle
+            print("{}, {},{},{},{},{}".format(DEVICE_ID, d.tag_id, x, y, z, angle))
+            data_for_BS["position_data"].append({"id": d.tag_id, "image_x": ctr_x, "image_y": ctr_y,"x": x, "y": y, "orientation": angle})
 
         # Send the data to the URL specified.
         # This is usually a URL to the base station.
@@ -221,7 +218,9 @@ def get_args():
 
     return args
     
+
 def get_closest_reference_point_offset(x, y, center_cell_offsets):
+    """ gets the reference point and its corresponding offsets that are closest to the detected point """
     return min(center_cell_offsets, key=lambda item: util.distance(x, y, item["reference_point_x"],item["reference_point_y"]))
 
 if __name__ == "__main__":

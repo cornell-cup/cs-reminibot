@@ -286,10 +286,10 @@ def distance(x1, y1, x2, y2):
 
 def draw_pose(overlay, camera_params, tag_size, pose, z_sign=1):
     opoints = np.array([
-        -2, -2, 0,
-        2, -2, 0,
-        2, 2, 0,
-        2, -2, -4 * z_sign,
+        -1, -1, 0,
+        1, -1, 0,
+        1, 1, 0,
+        1, -1, -1 * z_sign,
     ]).reshape(-1, 1, 3) * 0.5 * tag_size
 
     fx, fy, cx, cy = camera_params
