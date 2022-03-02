@@ -91,8 +91,10 @@ def main():
             detections, det_image = detector.detect(gray, return_image=True)
         except Exception:
             pass
-        if len(detections) == 0:
-            continue  # Try again if we don't get anything
+
+        # removed so system sends updates when all apriltags have moved out of frame
+        # if len(detections) == 0:
+        #     continue  # Try again if we don't get anything
 
         print("Found " + str(len(detections)) + " apriltags")
 
