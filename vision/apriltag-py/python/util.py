@@ -4,7 +4,7 @@ import numpy as np
 import json
 import math
 from predictor import Predictor
-from sklearn.neural_network import MLPRegressor
+from sklearn.linear_model import LinearRegression
 
 """
 Utility module for common actions in this module and in OpenCV.
@@ -372,27 +372,33 @@ def get_inputs_and_outputs_for_models(calibration_file_name):
     calibration_file, calibration_data = read_json(calibration_file_name)
     center_cell_offsets = calibration_data["cell_center_offsets"]
     inputs = []
+    x_inputs = []
+    y_inputs = []
     x_offsets = []
     y_offsets = []
     angle_offsets = []
     for entry in center_cell_offsets:
+        x_inputs.append(tuple([entry["reference_point_x"]]))
+        y_inputs.append(tuple([entry["reference_point_y"]]))
         inputs.append((entry["reference_point_x"],entry["reference_point_y"]))
         x_offsets.append(entry["x_offset"])
         y_offsets.append(entry["y_offset"])
         angle_offsets.append(entry["angle_offset"])
-    return {"inputs": np.array(inputs), "x_offsets": np.array(x_offsets), "y_offsets": np.array(y_offsets), "angle_offsets": np.array(angle_offsets)}
+    return {"inputs": np.array(inputs), "x_inputs": np.array(x_inputs), "y_inputs": np.array(y_inputs), "x_offsets": np.array(x_offsets), "y_offsets": np.array(y_offsets), "angle_offsets": np.array(angle_offsets)}
     
 
 def get_models_with_calibration_file(calibration_file_name):
     inputs_and_outputs = get_inputs_and_outputs_for_models(calibration_file_name)
     return {
+        "x_offsets_model_x_input_only": get_model_with_data(inputs_and_outputs["x_inputs"],inputs_and_outputs["x_offsets"]),
         "x_offsets_model": get_model_with_data(inputs_and_outputs["inputs"],inputs_and_outputs["x_offsets"]),
+        "y_offsets_model_y_input_only": get_model_with_data(inputs_and_outputs["y_inputs"],inputs_and_outputs["y_offsets"]),
         "y_offsets_model": get_model_with_data(inputs_and_outputs["inputs"],inputs_and_outputs["y_offsets"]),
         "angle_offsets_model": get_model_with_data(inputs_and_outputs["inputs"],inputs_and_outputs["angle_offsets"])
     }
 
 def get_model_with_data(inputs,outputs):
-    return MLPRegressor(random_state=1,learning_rate_init=0.001, hidden_layer_sizes=(1000, ), max_iter=10000).fit(np.array(inputs), np.array(outputs))
+    return LinearRegression().fit(np.array(inputs), np.array(outputs))
 
 
 
@@ -401,7 +407,9 @@ def get_model_with_data(inputs,outputs):
 def get_predictors_with_calibration_file(calibration_file_name):
     models = get_models_with_calibration_file(calibration_file_name)
     return {
+        "x_offsets_predictor_x_input_only": Predictor(models["x_offsets_model_x_input_only"]),
         "x_offsets_predictor": Predictor(models["x_offsets_model"]),
+        "y_offsets_predictor_y_input_only": Predictor(models["y_offsets_model_y_input_only"]),
         "y_offsets_predictor": Predictor(models["y_offsets_model"]),
         "angle_offsets_predictor": Predictor(models["angle_offsets_model"])
     }

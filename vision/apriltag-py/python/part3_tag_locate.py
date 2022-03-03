@@ -38,6 +38,8 @@ def main():
     predictors = util.get_predictors_with_calibration_file(calib_file_name)
     predict_x_offset = predictors["x_offsets_predictor"].predict
     predict_y_offset = predictors["y_offsets_predictor"].predict
+    predict_x_offset_x_input_only = predictors["x_offsets_predictor_x_input_only"].predict
+    predict_y_offset_y_input_only = predictors["y_offsets_predictor_y_input_only"].predict
     predict_angle_offset = predictors["angle_offsets_predictor"].predict
     calib_file, calib_data = util.read_json(calib_file_name)
     transform_matrix = util.get_numpy_matrix(calib_data, "transform_matrix")
@@ -114,10 +116,14 @@ def main():
             # TODO debug offset method - is better, but not perfect.
             center_cell_offset = get_closest_reference_point_offset(detected_x,detected_y,center_cell_offsets)
 
+            # 2 input linear regression is slightly better than 1 input linear regression
+            # x = x_scale_factor * (detected_x + overall_center_x_offset) + predict_x_offset_x_input_only(tuple([detected_x]))
+            # y = y_scale_factor * (detected_y + overall_center_y_offset) + predict_y_offset_y_input_only(tuple([detected_y]))
+
             x = x_scale_factor * (detected_x + overall_center_x_offset) + predict_x_offset((detected_x,detected_y))
             y = y_scale_factor * (detected_y + overall_center_y_offset) + predict_y_offset((detected_x,detected_y))
             z = detected_z
-            angle = ((detected_angle + overall_angle_offset))%360
+            angle = ((detected_angle + overall_angle_offset)%360+ predict_angle_offset((detected_x,detected_y)))%360
             (ctr_x, ctr_y) = d.center
             
             # displaying tag id
