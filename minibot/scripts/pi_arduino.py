@@ -138,8 +138,7 @@ def read_once():
     num_reads = 5
 
     # log the results
-    file = open("/home/pi/Documents/log" +
-                datetime.datetime.now() + ".txt", "w")
+    file = open("/home/pi/Documents/log120931.txt", "w")
 
     file.write("Reading from Arduino\n")
     values = []
