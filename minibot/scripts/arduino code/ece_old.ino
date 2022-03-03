@@ -29,7 +29,7 @@ int Lmotor = 8;
 int LmotorPWM = 5;
 
 // IR
-int IRPin = 6;
+int IRPin = 4;
 
 int send_data[6];
 
@@ -40,6 +40,7 @@ Adafruit_PN532 nfc(PN532_IRQ, PN532_RESET);
 int bufSize = 4;
 char buf[4];
 volatile byte pos = 0;
+int valid;
 
 void setup() {
     Serial.begin(115200);
@@ -47,7 +48,7 @@ void setup() {
     SPCR |= bit(SPE);  // turn on SPI in slave mode
     //  pinMode(trigPin, OUTPUT);
     //  pinMode(echoPin, INPUT);
-    pinMode(LED, OUTPUT);
+    //    pinMode(LED, OUTPUT);
     // turn on the interrupt
     SPI.attachInterrupt();
 
@@ -125,69 +126,71 @@ ISR(SPI_STC_vect) {
         }
     }
 }
+
 void read_IR() {
-    val = digitalRead(IRPin);
+    int val = digitalRead(IRPin);
     SPDR = val;
     Serial.println(val);
 }
 
-boolean stop_motor = false;
-boolean right = false;
-boolean left = false;
-boolean driveForward = false;
+// boolean stop_motor = false;
+// boolean right = false;
+// boolean left = false;
+// boolean driveForward = false;
 
 void check_buffer() {
-    if (buf[0] == 's') {
-        stop_motor = true;
-        left = false;
-        right = false;
-        driveForward = false;
-    } else if (buf[0] == 'l') {
-        stop_motor = false;
-        left = true;
-        right = false;
-        driveForward = false;
-    } else if (buf[0] == 'r') {
-        stop_motor = false;
-        left = false;
-        right = true;
-        driveForward = false;
-    } else if (buf[0] == 'f') {
-        stop_motor = false;
-        left = false;
-        right = false;
-        driveForward = true;
-    }
+    Serial.println(buf[0]);
+
+    //        stop_motor = true;
+    //        left = false;
+    //        right = false;
+    //        driveForward = false;
+    //    } else if (buf[0] == 'l') {
+    //        stop_motor = false;
+    //        left = true;
+    //        right = false;
+    //        driveForward = false;
+    //    } else if (buf[0] == 'r') {
+    //        stop_motor = false;
+    //        left = false;
+    //        right = true;
+    //        driveForward = false;
+    //    } else if (buf[0] == 'f') {
+    //        stop_motor = false;
+    //        left = false;
+    //        right = false;
+    //        driveForward = true;
+    //    }
 }
 
 void motor_control() {
-    check_buffer();
-    while (stop_motor == true && left == false && right == false &&
-           driveForward == false) {
-        stopMotors();
-    }
-
-    // turn left
-    while (stop_motor == false && left == true && right == false &&
-           driveForward == false) {
-        left();
-        delay(200);
-        drive_forward();
-    }
-
-    // turn righ
-    while (stop_motor == false && left == false && right == true &&
-           driveForward == false) {
-        right();
-        delay(200);
-        drive_forward();
-    }
-
-    // go straight
-    while (stop_motor == false && left == false && right == false &&
-           driveForward == true) {
-        drive_forward();
-    }
+    //    check_buffer();
+    //    while (stop_motor == true && left == false && right == false &&
+    //           driveForward == false) {
+    //        stopMotors();
+    //    }
+    //
+    //    // turn left
+    //    while (stop_motor == false && left == true && right == false &&
+    //           driveForward == false) {
+    //        left();
+    //        delay(200);
+    //        drive_forward();
+    //    }
+    //
+    //    // turn righ
+    //    while (stop_motor == false && left == false && right == true &&
+    //           driveForward == false) {
+    //        right();
+    //        delay(200);
+    //        drive_forward();
+    //    }
+    //
+    //    // go straight
+    //    while (stop_motor == false && left == false && right == false &&
+    //           driveForward == true) {
+    //        drive_forward();
+    //    }
 }
 
 void loop() {
@@ -210,15 +213,16 @@ void loop() {
     //     motor_control();
     // }
 
-	delay(1000);
-    read_IR();
+    delay(1000);
+    // read_IR();
+    check_buffer();
 
     // clear the buffer when a command is executed
 
-    if (process_it) {
-        pos = 0;
-        process_it = false;
-    }
+    //    if (!valid) {
+    //        pos = 0;
+    //        valid = false;
+    //    }
 }
 
 void left() {
@@ -243,6 +247,6 @@ void drive_forward() {
 }
 
 void stopMotors() {
-    digitalWrite(motorpin2, LOW);  // stop
-    digitalWrite(motorpin1, LOW);
+    //    digitalWrite(motorpin2, LOW);  // stop
+    //    digitalWrite(motorpin1, LOW);
 }

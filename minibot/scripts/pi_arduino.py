@@ -214,9 +214,10 @@ def stop():
     case there is some data loss over SPI
     """
     acquire_lock()
-    num_stops = 10
-    for _ in range(num_stops):
-        transmit_once(STOP_CMD)
+    # num_stops = 10
+    # for _ in range(num_stops):
+    #     transmit_once(STOP_CMD)
+    transmit_continuously('s')
     release_lock()
 
 
