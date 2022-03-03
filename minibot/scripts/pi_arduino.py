@@ -151,6 +151,8 @@ def read_once():
     file.write("Original values: {}".format(values) + "\n")
     val = median(values)
     file.write("Median value read is {}".format(val) + "\n")
+
+    file.close()
     return val
 
 
