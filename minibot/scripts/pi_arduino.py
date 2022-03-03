@@ -166,7 +166,7 @@ def acquire_lock():
         time.sleep(0.01)
     # Send the starting character to tell the Arduino
     # that we will be starting to transmit commands to it
-    setSlave(1)
+    setSlave(0)
     transmit_once(START_TRASMISSION_CMD)
 
 
