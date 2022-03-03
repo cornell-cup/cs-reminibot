@@ -233,8 +233,8 @@ def read_ultrasonic():
 def read_ir():
     acquire_lock()
     transmit_once('T')
-    return_val = read_once()
     release_lock()
+    return_val = read_once()
     return return_val
 
 
