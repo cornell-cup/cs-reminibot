@@ -214,8 +214,8 @@ void loop() {
     // }
 
     delay(1000);
-    // read_IR();
-    check_buffer();
+    read_IR();
+    // check_buffer();
 
     // clear the buffer when a command is executed
 

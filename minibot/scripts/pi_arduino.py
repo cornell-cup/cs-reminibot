@@ -138,7 +138,6 @@ def read_once():
     num_reads = 5
 
     # log the results
-    date = datetime.now()
     file = open("/home/pi/Documents/log" +
                 datetime.datetime.now() + ".txt", "w")
 
@@ -166,6 +165,8 @@ def acquire_lock():
         time.sleep(0.01)
     # Send the starting character to tell the Arduino
     # that we will be starting to transmit commands to it
+
+    # set slave 1 doesnt work
     setSlave(0)
     transmit_once(START_TRASMISSION_CMD)
 
@@ -231,7 +232,7 @@ def read_ultrasonic():
 
 def read_ir():
     acquire_lock()
-    transmit_continuously('T')
+    transmit_once('T')
     return_val = read_once()
     release_lock()
     return return_val
