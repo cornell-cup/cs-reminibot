@@ -164,6 +164,7 @@ body {
 .floating-chat .chat .messages li.self:before {
   right: -45px;
   background-image: url(../img/disgusting_cat.png);
+  content: "Me";
 }
 .floating-chat .chat .messages li.self:after {
   border-right: 10px solid transparent;
@@ -213,6 +214,15 @@ body {
 .floating-chat .chat .footer .text-box::-webkit-scrollbar-thumb {
   border-radius: 5px;
   background-color: rgba(25, 147, 147, 0.2);
+}
+
+#sendMessage:hover {
+  background-color: rgb(68, 89, 249);
+  color: white;
+}
+
+#msgTime {
+  font-style: italic;
 }
 
 @keyframes show-chat-even {

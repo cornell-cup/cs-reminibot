@@ -12,12 +12,32 @@ const initialList = [
     message: "Hello, I am Chatbot. How are you today?",
   }
 ];
+
 function Chatbot2({ }) {
   const [open, setOpen] = useState(false);
   const [expand, setExpand] = useState("");
   const [enter, setEnter] = useState("");
   const [inputText, setInputText] = useState("");
   const [messages, setMessages] = useState(initialList);
+  // const messagesRef = useRef(null);
+
+  // const scrollToBottom = () => {
+  //   messagesRef.current.scrollIntoView({
+  //     behavior: "smooth",
+  //     block: "start",
+  //   });
+  //   console.log("ran");
+  // };
+
+  // useEffect(() => {
+  //   console.log("ran");
+  //   scrollToBottom();
+  // }, [messages]);
+
+  // useEffect(() => {
+  //   console.log("ran");
+  //   scrollToBottom();
+  // });
 
   const changeInputText = (event) => {
     event.preventDefault();
@@ -44,11 +64,14 @@ function Chatbot2({ }) {
   const sendMessage = (e) => {
     e.preventDefault();
     id++;
-    const newList = messages.concat({ id: id, who: "self", message: inputText });
+    var time = new Date().toLocaleString('en-GB');
+    time = time.substring(time.indexOf(',') + 2);
+    console.log(time);
+    const newList = messages.concat({ id: id, who: "self", message: inputText, timeStamp: time});
     setInputText("");
     setMessages(newList);
+    scrollToBottom();
   }
-
 
   return (
     <div class={"floating-chat enter " + expand} onClick={(e) => openChatbox(e)}> {/* add 'expand' to class for this to turn into a chat */}
@@ -69,18 +92,28 @@ function Chatbot2({ }) {
             <span class="close_btn" />
            
           */}
+        </div>
 
-        </div>
-        <ul class="messages">
+       
+        <div class="messages"> 
           {messages.map((item) => (
-            <li class={item.who} key={item.id}>{item.message}</li>
+            <li class={item.who} key={item.id} time={item.timeStamp}>{item.message}<br /><br /><div id="msgTime">{item.timeStamp}</div></li>
           ))}
-        </ul>
-        <div class="footer">
-          <input class="text-box" id="textbox" onChange={changeInputText} value={inputText}></input>
-          <button id="sendMessage" onClick={(e) => sendMessage(e)}>send</button>
+          {/* <div ref={messagesRef}></div>  */}
         </div>
-      </div>
+  
+
+        <div class="footer">
+          <input class="text-box" id="textbox" onChange={changeInputText} value={inputText}
+            onKeyPress={event => {
+              if (event.key === 'Enter') {
+                sendMessage(event);
+              }}}>
+          </input>
+          <button id="sendMessage" onClick={(e) => sendMessage(e)} style={{ backgroundColor: "white", color: "rgb(68, 89, 249)"}}>Send</button>
+        </div>
+       
+      </div> 
     </div>
   );
 }
