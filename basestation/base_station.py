@@ -90,6 +90,7 @@ class BaseStation:
 
         self._login_email = None
         self.speech_recog_thread = None
+        self.chatbot_listening_thread = None
         self.lock = threading.Lock()
 
     # ==================== VISION ====================
@@ -316,6 +317,13 @@ class BaseStation:
         """
         self.chatbot.update_context(context)
 
+    def update_chatbot_all_context(self, context: str):
+        """ Replaces all context in the Chatbot object
+        with the input context 
+        """
+        self.chatbot.reset_context()
+        self.chatbot.update_context(context)
+
     def get_chatbot_obj_context(self):
         return self.chatbot.get_all_context()
 
@@ -455,6 +463,22 @@ class BaseStation:
                     thread_safe_message_queue.push("Words not recognized!")
 
     # ==================== CHATBOT ====================
+    def chatbot_listening_toggle(bot_name):
+        # start the chatbot_listening_context thread
+        if True: # TODO add condition to start the listening
+            # create a new thread that listens and converts speech
+            # to text in the background.  Cannot run this non-terminating
+            # function  in the current thread because the current post request
+            # will not terminate and our server will not handle any more
+            # requests.
+            self.chatbot_listening_thread = StoppableThread(
+                self.chatbot_listening_context, bot_name
+            )
+            self.chatbot_listening_thread.start()
+        # stop listening
+        elif False: # TODO add condition to stop the thread
+            if self.chatbot_listening_thread:
+                self.chatbot_listening_thread.stop()
     def chatbot_listening_context(
         self,
         thread_safe_condition: ThreadSafeVariable,
@@ -478,6 +502,7 @@ class BaseStation:
                 thread_safe_message_queue.push("Timed out!")
             except sr.UnknownValueError:
                 thread_safe_message_queue.push("Words not recognized!")
+                # send the request
 
         temp = ' '.join(heard_context)
         self.chatbot_temp_context = temp if temp != "" else "Nothing was said!"
@@ -485,7 +510,7 @@ class BaseStation:
         # self.chatbot.update_context(' '.join(heard_context))
         self.chatbot.update_context(self.chatbot_temp_context)
 
-    def chatbot_compute_answer(self, question): 
+    def chatbot_compute_answer(self, question):
         return self.chatbot.compute_answer(question)
 
     # ==================== GETTERS and SETTERS ====================
