@@ -1,5 +1,4 @@
 import cv2
-import apriltag
 import argparse
 import sys
 import numpy as np
@@ -7,18 +6,15 @@ import time
 import util
 import json
 import math
+from detector import Detector
 
-# PAPER_WIDTH = 8.5
-# PAPER_HEIGHT = 11
-# BOARD_TAG_SIZE = 6.5  # The length of a side of a tag on the axis board, in inches
-# ORIGIN_TAG_SIZE = 6.5  # The length of a side of a tag used to calibrate the origin
+
 
 
 
 def main():
     args = get_args()
     BOARD_TAG_SIZE = args["board"]
-    # ORIGIN_TAG_SIZE = args["origin"]
     calib_file_name = args["calibration_file"]
     positions_file_name = args["positions_file"]
     positions_file, positions_data = util.read_json(positions_file_name)
@@ -45,8 +41,11 @@ def main():
     print("DIST COEFFS: {}".format(dist_coeffs))
     print()
 
+    
+
     # Initialize the detector
-    detector = apriltag.Detector(searchpath=apriltag._get_demo_searchpath())
+    detector = Detector()
+
     frame = []
     gray = []
     img_points = np.ndarray((4 * NUM_DETECTIONS, 2))
@@ -104,9 +103,8 @@ def main():
 
             # Draw onto the frame
             cv2.circle(undst, (int(ctr_x), int(ctr_y)), 5, (0, 0, 255), 3)
-            pose, e0, e1 = detector.detection_pose(d, util.camera_matrix_to_camera_params(camera_matrix), BOARD_TAG_SIZE)
-            util.draw_cube(undst,util.camera_matrix_to_camera_params(camera_matrix),BOARD_TAG_SIZE, pose)
 
+            
 
         overall_x_center /= 1 if len(detections) == 0 else len(detections)
         overall_y_center /= 1 if len(detections) == 0 else len(detections)

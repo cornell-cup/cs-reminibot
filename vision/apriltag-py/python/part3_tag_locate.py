@@ -1,11 +1,11 @@
 import cv2
-import apriltag
 import argparse
 import numpy as np
 import sys
 import time
 import requests
 import util
+from detector import Detector
 
 # Constants
 DEVICE_ID = 0  # The device the camera is, usually 0. TODO make this adjustable
@@ -63,7 +63,7 @@ def main():
     print("Initializing apriltag detector...")
 
     # make the detector
-    detector = apriltag.Detector(searchpath=apriltag._get_demo_searchpath())
+    detector = Detector()
     frame = []
     gray = []
 
@@ -129,8 +129,7 @@ def main():
             # displaying tag id
             cv2.putText(undst, str(d.tag_id),(int(ctr_x), int(ctr_y)), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 0, 255),2)
 
-            # pose, e0, e1 = detector.detection_pose(d, util.camera_matrix_to_camera_params(camera_matrix), TAG_SIZE)
-            # util.draw_pose(undst,util.camera_matrix_to_camera_params(camera_matrix), TAG_SIZE, pose)
+
            
             
             # prints DEVICE_ID tag id x y z angle

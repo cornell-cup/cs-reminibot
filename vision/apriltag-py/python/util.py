@@ -263,10 +263,10 @@ def get_numpy_matrix(src, name):
 def angle(corners):
     x1 = corners[0][0]
     y1 = corners[0][1]
-    x2 = corners[1][0]
-    y2 = corners[1][1]
+    x4 = corners[3][0]
+    y4 = corners[3][1]
     
-    return math.degrees(math.atan2(y2 - y1, x2 - x1))
+    return math.degrees(math.atan2(y4 - y1, x4 - x1))
 
 def distance(x1, y1, x2, y2):
     return math.sqrt((x2-x1)**2 + (y2-y1)**2)
