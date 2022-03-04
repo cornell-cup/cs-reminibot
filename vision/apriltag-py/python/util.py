@@ -260,26 +260,13 @@ def get_numpy_matrix(src, name):
     """
     return np.asarray(src[name])
 
-def get_tag_angle(corners):
-    """
-    Get the angle of a tag relative to the x-axis.
-    Args:
-      corners (numpy.ndarray list): 
-          The four tag corners. The top left corner is at index 0,
-          and the subsequent corners are labeled clockwise. This is
-          the format in which the detector returns corners.
-
-    """
-    tr = corners[1] # top right
-    br = corners[2] # bottom right
-    X, Y = 0,1 # constants for better naming
-
-    # Use the angle between two vectors formula
-    side_length = np.sqrt((tr[X]-br[X])**2 + (tr[Y] - br[Y])**2)
-    if tr[Y] > br[Y]:
-        # compensate for arrcos always computing the shorter angle
-        return (2*np.pi) - np.arccos( (tr[X] - br[X]) / side_length)
-    return np.arccos( (tr[X] - br[X]) / side_length)
+def angle(corners):
+    x1 = corners[0][0]
+    y1 = corners[0][1]
+    x2 = corners[1][0]
+    y2 = corners[1][1]
+    
+    return math.degrees(math.atan2(y2 - y1, x2 - x1))
 
 def distance(x1, y1, x2, y2):
     return math.sqrt((x2-x1)**2 + (y2-y1)**2)
