@@ -70,7 +70,7 @@ def main():
     print("Detector initialized")
     print("")
     print("The program will begin sending data in 3 seconds.")
-    print("Press CTRL+C to stop this program.")
+    print("Click in the video window and press space to stop this program.")
     time.sleep(3)
     print("Starting detection")
 
