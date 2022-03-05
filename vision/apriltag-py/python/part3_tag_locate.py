@@ -123,7 +123,7 @@ def main():
             x = x_scale_factor * (detected_x + overall_center_x_offset) + predict_x_offset((detected_x,detected_y))
             y = y_scale_factor * (detected_y + overall_center_y_offset) + predict_y_offset((detected_x,detected_y))
             z = detected_z
-            angle = ((detected_angle + overall_angle_offset)%360+ predict_angle_offset((detected_x,detected_y)))%360
+            angle = ((detected_angle + overall_angle_offset))%360
             (ctr_x, ctr_y) = d.center
             
             # displaying tag id
