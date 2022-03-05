@@ -1,3 +1,3 @@
 FLASK_APP=minibot_server.py
-FLASK_RUN_PORT=6256
+FLASK_RUN_PORT=5660
 FLASK_ENV=development
