@@ -92,6 +92,13 @@ class BaseStation:
         self.speech_recog_thread = None
         self.chatbot_listening_thread = None
         self.lock = threading.Lock()
+        self.commands = {
+            "forward": "Minibot moves forward",
+            "backward": "Minibot moves backwards",
+            "left": "Minibot moves left",
+            "right": "Minibot moves right",
+            "stop": "Minibot stops",
+        }
 
     # ==================== VISION ====================
 
@@ -425,13 +432,7 @@ class BaseStation:
         """
         RECORDING_TIME_LIMIT = 5
         # dictionary of commmands
-        commands = {
-            "forward": "Minibot moves forward",
-            "backward": "Minibot moves backwards",
-            "left": "Minibot moves left",
-            "right": "Minibot moves right",
-            "stop": "Minibot stops",
-        }
+        
         # open the Microphone as variable microphone
         with sr.Microphone() as microphone:
             recognizer = sr.Recognizer()
@@ -452,8 +453,8 @@ class BaseStation:
                     thread_safe_message_queue.push(f"You said: {words}")
 
                     # check if the command is valid
-                    if words in commands:
-                        thread_safe_message_queue.push(commands[words])
+                    if words in self.commands:
+                        thread_safe_message_queue.push(self.commands[words])
                         self.move_bot_wheels(bot_name, words, 100)
                     else:
                         thread_safe_message_queue.push("Invalid command!")
@@ -461,6 +462,15 @@ class BaseStation:
                     thread_safe_message_queue.push("Timed out!")
                 except sr.UnknownValueError:
                     thread_safe_message_queue.push("Words not recognized!")
+
+    # ==================== NEW SPEECH RECOGNITION ============================
+    def send_command(bot_name, command):
+        if command in self.commands:
+            self.move_bot_wheels(bot_name, command, 100)
+            return self.commands[command] + " command sent"
+        else:
+            return "invalid command"
+
 
     # ==================== CHATBOT ====================
     def chatbot_listening_toggle(bot_name):

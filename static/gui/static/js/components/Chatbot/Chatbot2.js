@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 import { X_BTN, MIC_BTN } from "../utils/Constants.js";
+import SpeechRecognitionComp from "../utils/SpeechRecognitionComp.js";
 
-const SpeechRecognition = SpeechRecognition || webkitSpeechRecognition
-const recognition = new SpeechRecognition()
+// const SpeechRecognition = SpeechRecognition || webkitSpeechRecognition
+// const recognition = new SpeechRecognition()
 
-recognition.continous = true
-recognition.interimResults = true
-recognition.lang = 'en-US'
+// recognition.continous = true
+// recognition.interimResults = true
+// recognition.lang = 'en-US'
 
 //Chat messages
 let id = 2;
@@ -26,6 +27,7 @@ function Chatbot2({ }) {
   const [enter, setEnter] = useState("");
   const [inputText, setInputText] = useState("");
   const [messages, setMessages] = useState(initialList);
+  const [mic, setMic] = useState(false);
   // const messagesRef = useRef(null);
 
   // const scrollToBottom = () => {
@@ -45,7 +47,7 @@ function Chatbot2({ }) {
   //   console.log("ran");
   //   scrollToBottom();
   // });
-  const [mic, setMic] = useState(false);
+
 
   const changeInputText = (event) => {
     event.preventDefault();
@@ -75,11 +77,11 @@ function Chatbot2({ }) {
     var time = new Date().toLocaleString('en-GB');
     time = time.substring(time.indexOf(',') + 2);
     console.log(time);
-    const newList = messages.concat({ id: id, who: "self", message: inputText, timeStamp: time});
+    const newList = messages.concat({ id: id, who: "self", message: inputText, timeStamp: time });
     setInputText("");
     setMessages(newList);
     scrollToBottom();
-  
+
     axios({
       method: 'POST',
       url: '/chatbot-context',
@@ -135,43 +137,12 @@ function Chatbot2({ }) {
     })
   }
 
+
   const toggleMic = (e) => {
     e.preventDefault();
     console.log("toggle mic");
     setMic(!mic);
-    if (mic == false) recognition.stop();
   }
-
-  const handleListen = () => {
-    if (mic) {
-      console.log("start listening");
-      recognition.start()
-      recognition.onend = () => recognition.start()
-    } else {
-      recognition.stop()
-      recognition.onend = () => {
-        console.log("Stopped listening per click")
-      }
-    }
-    let finalTranscript = ''
-    recognition.onresult = event => {
-      let interimTranscript = ''
-
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcript = event.results[i][0].transcript;
-        if (event.results[i].isFinal) finalTranscript += transcript + ' ';
-        else interimTranscript += transcript;
-      }
-      // document.getElementById('interim').innerHTML = interimTranscript
-      setInputText(interimTranscript);
-      setInputText(finalTranscript);
-    }
-  }
-
-  useEffect(() => {
-    handleListen();
-    console.log("mic", mic);
-  }, [mic]);
 
   return (
     <div class={"floating-chat enter " + expand} onClick={(e) => openChatbox(e)}> {/* add 'expand' to class for this to turn into a chat */}
@@ -207,11 +178,12 @@ function Chatbot2({ }) {
                 toggleMic(e);
               }} />
           </div>
+          <SpeechRecognitionComp setText={setInputText} mic={mic} />
           <button onClick={(e) => sendContext(e)}>Context</button>
           <button onClick={(e) => sendQuestion(e)}>?</button>
         </div>
-       
-      </div> 
+
+      </div>
     </div>
   );
 }

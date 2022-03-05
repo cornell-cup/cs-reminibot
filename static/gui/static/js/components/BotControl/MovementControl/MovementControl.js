@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle, faMicrophone, faCaretDown, faCaretLeft, faCaretRight, faCaretUp, faStop } from '@fortawesome/free-solid-svg-icons';
 library.add(faInfoCircle, faMicrophone, faCaretDown, faCaretLeft, faCaretRight, faCaretUp, faStop);
 import SpeechRecognition from './SpeechRecognition.js';
+import BotVoiceControl from './BotVoiceControl.js';
 
 export default class MovementControls extends React.Component {
 
@@ -98,7 +99,8 @@ export default class MovementControls extends React.Component {
                             step="5" onChange={evt => this.updatePowerValue(evt)} />
                     </div>
                     <div className="col-md align-self-center">
-                        <SpeechRecognition selectedBotName={this.props.selectedBotName} />
+                        {/* <SpeechRecognition selectedBotName={this.props.selectedBotName} /> */}
+                        <BotVoiceControl selectedBotName={this.props.selectedBotName} />
                     </div>
                 </div>
             </div>
