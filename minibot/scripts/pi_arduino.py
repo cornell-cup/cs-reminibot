@@ -138,17 +138,20 @@ def read_once():
     num_reads = 5
 
     # log the results
-    file = open("/home/pi/Documents/log120931.txt", "w")
-
-    file.write("Reading from Arduino\n")
-    file.close()
 
     values = []
     for _ in range(num_reads):
+        now = datetime.now()
+        file = open("/home/pi/Documents/" + now.strftime("%H:%M:%S") + ".txt", "w")
+
+        file.write("Reading from Arduino\n")
         values += spi.readbytes(1)
+        file.write(values)
+        file.close()
         # Need a short delay between each read from the Arduino
         # Without the delay, the Arduino will return 0
         time.sleep(0.02)
+
     file.write("Original values: {}".format(values) + "\n")
     val = median(values)
     file.write("Median value read is {}".format(val) + "\n")
