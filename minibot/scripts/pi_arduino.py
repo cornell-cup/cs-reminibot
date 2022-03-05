@@ -146,7 +146,7 @@ def read_once():
 
         file.write("Reading from Arduino\n")
         values += spi.readbytes(1)
-        file.write(str(values[0]))
+        file.write(' '.join(str(val) for val in values))
         file.close()
         # Need a short delay between each read from the Arduino
         # Without the delay, the Arduino will return 0
