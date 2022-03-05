@@ -27,7 +27,7 @@ class Detector:
           # reversing corners since that's the order they were in for the older library
           corners_list = corners[i].tolist()
           corners_list.reverse()
-          data.append(Detection(ids[i],centers[i],corners_list,util.angle(corners_list)))
+          data.append(Detection(ids[i],centers[i],corners_list,util.compute_angle(corners_list)))
 
       data.sort(key=lambda entry : entry.tag_id )
       if return_image:

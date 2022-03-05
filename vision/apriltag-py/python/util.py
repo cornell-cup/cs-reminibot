@@ -193,12 +193,7 @@ def compute_tag_undistorted_pose(camera_matrix, dist_coeffs, transform_matrix, d
     tag_xyz = np.around(tag_xyz, decimals=3)
 
     # Compute orientation (also called heading), in degrees
-    sin = tag_to_origin[0, 1]
-    cos = tag_to_origin[0, 0]
-    angle = np.arccos(cos)
-    if sin < 0:
-        angle = 2 * np.pi - angle
-    angle = angle * 180.0 / np.pi
+    angle = compute_angle(d.corners)
     return tag_xyz[0][0], tag_xyz[1][0], tag_xyz[2][0], angle
 
 
@@ -260,13 +255,13 @@ def get_numpy_matrix(src, name):
     """
     return np.asarray(src[name])
 
-def angle(corners):
+def compute_angle(corners):
     x1 = corners[0][0]
     y1 = corners[0][1]
     x4 = corners[3][0]
     y4 = corners[3][1]
     
-    return math.degrees(math.atan2(y4 - y1, x4 - x1))
+    return (math.degrees(math.atan2(y4 - y1, x4 - x1))%360)
 
 def distance(x1, y1, x2, y2):
     return math.sqrt((x2-x1)**2 + (y2-y1)**2)
