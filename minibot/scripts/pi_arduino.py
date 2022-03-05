@@ -141,6 +141,8 @@ def read_once():
     file = open("/home/pi/Documents/log120931.txt", "w")
 
     file.write("Reading from Arduino\n")
+    file.close()
+
     values = []
     for _ in range(num_reads):
         values += spi.readbytes(1)
@@ -151,7 +153,6 @@ def read_once():
     val = median(values)
     file.write("Median value read is {}".format(val) + "\n")
 
-    file.close()
     return val
 
 
