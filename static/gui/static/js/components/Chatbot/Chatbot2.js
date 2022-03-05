@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 import { X_BTN, MIC_BTN } from "../utils/Constants.js";
 
-//speech recognition
 const SpeechRecognition = SpeechRecognition || webkitSpeechRecognition
 const recognition = new SpeechRecognition()
 
@@ -111,7 +110,6 @@ function Chatbot2({ }) {
         console.log("Chatbot", error);
     })
   }
-
 
   const toggleMic = (e) => {
     e.preventDefault();
