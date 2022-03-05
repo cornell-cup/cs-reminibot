@@ -127,7 +127,7 @@ def main():
             (ctr_x, ctr_y) = d.center
             
             # displaying tag id
-            cv2.putText(undst, str(d.tag_id),(int(ctr_x), int(ctr_y)), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 0, 255),2)
+            cv2.putText(undst, str(round(angle,2)),(int(ctr_x), int(ctr_y)), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 0, 255),2)
 
 
            
