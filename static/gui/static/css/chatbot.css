@@ -214,6 +214,16 @@ body {
   border-radius: 5px;
   background-color: rgba(25, 147, 147, 0.2);
 }
+
+#sendMessage:hover {
+  background-color: rgb(68, 89, 249);
+  color: white;
+}
+
+#msgTime {
+  font-style: italic;
+}
+
 @keyframes show-chat-even {
   0% {
     margin-left: -480px;

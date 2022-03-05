@@ -26,6 +26,25 @@ function Chatbot2({ }) {
   const [enter, setEnter] = useState("");
   const [inputText, setInputText] = useState("");
   const [messages, setMessages] = useState(initialList);
+  // const messagesRef = useRef(null);
+
+  // const scrollToBottom = () => {
+  //   messagesRef.current.scrollIntoView({
+  //     behavior: "smooth",
+  //     block: "start",
+  //   });
+  //   console.log("ran");
+  // };
+
+  // useEffect(() => {
+  //   console.log("ran");
+  //   scrollToBottom();
+  // }, [messages]);
+
+  // useEffect(() => {
+  //   console.log("ran");
+  //   scrollToBottom();
+  // });
   const [mic, setMic] = useState(false);
 
   const changeInputText = (event) => {
@@ -53,9 +72,14 @@ function Chatbot2({ }) {
   const sendContext = (e) => {
     e.preventDefault();
     id++;
-    const newList = messages.concat({ id: id, who: "self", message: inputText });
+    var time = new Date().toLocaleString('en-GB');
+    time = time.substring(time.indexOf(',') + 2);
+    console.log(time);
+    const newList = messages.concat({ id: id, who: "self", message: inputText, timeStamp: time});
     setInputText("");
     setMessages(newList);
+    scrollToBottom();
+  
     axios({
       method: 'POST',
       url: '/chatbot-context',
@@ -166,7 +190,7 @@ function Chatbot2({ }) {
         </div>
         <ul class="messages">
           {messages.map((item) => (
-            <li class={item.who} key={item.id}>{item.message}</li>
+            <li class={item.who} key={item.id} time={item.timeStamp}>{item.message}<br /><br /><div id="msgTime">{item.timeStamp}</div></li>
           ))}
         </ul>
         <div class="footer">
@@ -186,7 +210,8 @@ function Chatbot2({ }) {
           <button onClick={(e) => sendContext(e)}>Context</button>
           <button onClick={(e) => sendQuestion(e)}>?</button>
         </div>
-      </div>
+       
+      </div> 
     </div>
   );
 }
