@@ -144,7 +144,7 @@ def main():
         center_y = position["y"]
         object_center_points.append((center_x, center_y))
         angle = position["angle"]
-        object_angles.append(angle)
+        object_angles.append(angle%360)
         
         unrotated_corner_vectors = [np.array([[-BOARD_TAG_SIZE/2],[-BOARD_TAG_SIZE/2]]), np.array([[BOARD_TAG_SIZE/2],[-BOARD_TAG_SIZE/2]]), np.array([[BOARD_TAG_SIZE/2],[BOARD_TAG_SIZE/2]]), np.array([[-BOARD_TAG_SIZE/2],[BOARD_TAG_SIZE/2]])]
         angle_in_radians = math.pi*angle/180
@@ -353,8 +353,8 @@ def get_world_center_offsets(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detecti
         detected_x_coords.append(detected_x)
         detected_y_coords.append(detected_y)
         detected_angles.append(detected_angle)
-        angle_differences.append((actual_angle-detected_angle) if abs(actual_angle-detected_angle) <= 180 else (actual_angle-detected_angle)%math.copysign(180,detected_angle-actual_angle) )
-   
+        angle_difference = (actual_angle-detected_angle) %360
+        angle_differences.append(angle_difference )
     center_x_offset = (sum(actual_x_coords)-sum(detected_x_coords))/len(detected_x_coords)
     center_y_offset = (sum(actual_y_coords)-sum(detected_y_coords))/len(detected_y_coords)
     angle_offset = (sum(angle_differences)/len(detected_angles))

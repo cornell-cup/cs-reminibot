@@ -261,7 +261,7 @@ def compute_angle(corners):
     x4 = corners[3][0]
     y4 = corners[3][1]
     
-    return (math.degrees(math.atan2(y4 - y1, x4 - x1))%360)
+    return (math.degrees(math.atan2(y1-y4, x4 - x1))%360)
 
 def distance(x1, y1, x2, y2):
     return math.sqrt((x2-x1)**2 + (y2-y1)**2)
