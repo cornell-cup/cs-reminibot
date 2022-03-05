@@ -131,10 +131,10 @@ def main():
 
 
            
-            print("raw angle: {}, angle:{}, corners: {}".format(detected_angle, angle, d.corners))
+
             # prints DEVICE_ID tag id x y z angle
-            # print("{}, {},{},{},{},{}".format(DEVICE_ID, d.tag_id, x, y, z, angle))
-            # data_for_BS["position_data"].append({"id": d.tag_id, "image_x": ctr_x, "image_y": ctr_y,"x": x, "y": y, "orientation": angle})
+            print("{}, {},{},{},{},{}".format(DEVICE_ID, d.tag_id, x, y, z, angle))
+            data_for_BS["position_data"].append({"id": d.tag_id, "image_x": ctr_x, "image_y": ctr_y,"x": x, "y": y, "orientation": angle})
 
         # Send the data to the URL specified.
         # This is usually a URL to the base station.
