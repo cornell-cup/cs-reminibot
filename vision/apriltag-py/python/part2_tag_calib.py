@@ -188,65 +188,41 @@ def main():
     with open(calib_file_name, "w") as calib_file:
         json.dump(calib_data, calib_file)
 
-    # Compute offsets via new calibration process
-    print("Axis calibration was successful!")
-    print(
-        "We will now center the camera. Place any apriltag where you would \
-        like (0,0) to be."
-    )
-    print(
-        "A blue dot will appear in the center of the tag you placed to help \
-        show where (0,0) will be set to."
-    )
-    print("When you have your tag in the right place, press SPACE.")
-
-    while True:
-        # Locate tag for use as origin
-        frame = util.get_image(camera)
-        undst = util.undistort_image(frame, camera_matrix, dist_coeffs)
-        gray = cv2.cvtColor(undst, cv2.COLOR_BGR2GRAY)
-        detections = get_filtered_detections(positions_file_name, positions_data, detector, gray)
-
-        if len(detections) == 0:
-            continue
-        
-        detected_xs, detected_ys = get_detected_xs_ys(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, object_angles, camera_to_origin)
-
-        center_x_offset, center_y_offset, angle_offset = get_world_center_offsets(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, object_angles, camera_to_origin)
-        calib_data["overall_center_offset"] = {
-            "x": center_x_offset,
-            "y": center_y_offset,
-            "angle": angle_offset
-        }
 
         
-        x_scale_factor, y_scale_factor = get_world_scale_factors(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, camera_to_origin, center_x_offset, center_y_offset)
-        calib_data["scale_factors"] = {
-            "x": x_scale_factor,
-            "y": y_scale_factor
-        }
+    detected_xs, detected_ys = get_detected_xs_ys(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, object_angles, camera_to_origin)
 
-        x_offsets, y_offsets, angle_offsets = get_cell_offsets(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, object_angles, camera_to_origin, center_x_offset, center_y_offset, angle_offset, x_scale_factor, y_scale_factor)
+    center_x_offset, center_y_offset, angle_offset = get_world_center_offsets(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, object_angles, camera_to_origin)
+    calib_data["overall_center_offset"] = {
+        "x": center_x_offset,
+        "y": center_y_offset,
+        "angle": angle_offset
+    }
+
+    
+    x_scale_factor, y_scale_factor = get_world_scale_factors(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, camera_to_origin, center_x_offset, center_y_offset)
+    calib_data["scale_factors"] = {
+        "x": x_scale_factor,
+        "y": y_scale_factor
+    }
+
+    x_offsets, y_offsets, angle_offsets = get_cell_offsets(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, object_angles, camera_to_origin, center_x_offset, center_y_offset, angle_offset, x_scale_factor, y_scale_factor)
 
 
 
-        # Write offsets new
-        calib_data["cell_center_offsets"] = [{
-            "reference_point_x": detected_xs[detection_index],
-            "reference_point_y": detected_ys[detection_index],
-            "x_offset": x_offsets[detection_index],
-            "y_offset": y_offsets[detection_index],
-            "angle_offset": angle_offsets[detection_index]
-        } for detection_index in range(len(detections)) if True] 
-          
+    # Write offsets new
+    calib_data["cell_center_offsets"] = [{
+        "reference_point_x": detected_xs[detection_index],
+        "reference_point_y": detected_ys[detection_index],
+        "x_offset": x_offsets[detection_index],
+        "y_offset": y_offsets[detection_index],
+        "angle_offset": angle_offsets[detection_index]
+    } for detection_index in range(len(detections)) if True] 
         
-        cv2.circle(undst, (int(overall_x_center), int(overall_y_center)), 5, (255, 0, 0), 3)
+    
+    cv2.circle(undst, (int(overall_x_center), int(overall_y_center)), 5, (255, 0, 0), 3)
 
-        cv2.imshow("Origin tag", undst)
-        if cv2.waitKey(1) & 0xFF == ord(" "):
-            break
-        else:
-            continue
+    
 
     
     with open(calib_file_name, "w") as calib_file:
@@ -309,7 +285,7 @@ def get_cell_offsets(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, obj
         offset_detected_angle = (detected_angle+angle_offset)%360
         x_offsets.append(actual_x - x_scale_factor*center_offset_detected_x)
         y_offsets.append(actual_y - y_scale_factor*center_offset_detected_y)
-        angle_offsets.append((actual_angle - offset_detected_angle) if abs(actual_angle - offset_detected_angle) <= 180 else (actual_angle - offset_detected_angle)%math.copysign(180,offset_detected_angle - actual_angle))
+        angle_offsets.append((actual_angle - offset_detected_angle)%360)
     return x_offsets, y_offsets, angle_offsets
 
 def get_world_scale_factors(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, camera_to_origin, center_x_offset, center_y_offset):
