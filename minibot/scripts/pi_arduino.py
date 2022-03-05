@@ -142,7 +142,8 @@ def read_once():
     values = []
     for _ in range(num_reads):
         now = datetime.now()
-        file = open("/home/pi/Documents/" + now.strftime("%H:%M:%S") + ".txt", "w")
+        file = open("/home/pi/Documents/" +
+                    now.strftime('%H:%M:%S.%f') + ".txt", "w")
 
         file.write("Reading from Arduino\n")
         values += spi.readbytes(1)
