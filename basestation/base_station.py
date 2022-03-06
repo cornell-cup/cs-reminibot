@@ -21,6 +21,7 @@ import pyaudio
 import speech_recognition as sr
 
 MAX_VISION_LOG_LENGTH = 1000
+VISION_DATA_HOLD_THRESHOLD = 1
 
 
 def make_thread_safe(func):
@@ -80,7 +81,13 @@ class BaseStation:
         server_address = ("0.0.0.0", 5001)
         
 
+        self.vision_monitior_thread = threading.Thread(
+            target=self.vision_monitior, daemon=True
+        )
+
         
+        # checks if vision can see april tag by checking lenth of vision_log
+        self.vision_monitior_thread.start()
         # self.connections = BaseConnection()
 
         # only bind in debug mode if you are the debug server, if you are the
@@ -108,7 +115,7 @@ class BaseStation:
 
     def update_vision_log(self, value):
         """ Updates vision log. Size of log based on MAX_VISION_LOG_LENGTH """
-        self.vision_log[value["DEVICE_ID"]] = {"DEVICE_CENTER_X": value["DEVICE_CENTER_X"], "DEVICE_CENTER_Y": value["DEVICE_CENTER_Y"], "position_data" : value["position_data"]}
+        self.vision_log[value["DEVICE_ID"]] = {"DEVICE_CENTER_X": value["DEVICE_CENTER_X"], "DEVICE_CENTER_Y": value["DEVICE_CENTER_Y"], "TIMESTAMP": value["TIMESTAMP"], "position_data" : value["position_data"]}
 
     def get_vision_data(self):
         """ Returns most recent vision data """
@@ -124,6 +131,7 @@ class BaseStation:
                 apriltag_positions[position_entry["id"]].append(
                     {
                         "distance_from_camera_center": distance(device_data["DEVICE_CENTER_X"], device_data["DEVICE_CENTER_Y"], position_entry["image_x"], position_entry["image_y"]),
+                        "is_physical": position_entry["is_physical"], 
                         "x": position_entry["x"], 
                         "y": position_entry["y"], 
                         "orientation": position_entry["orientation"]
@@ -132,7 +140,7 @@ class BaseStation:
         estimated_positions = []
         for apriltag_id, apriltag_position_data in apriltag_positions.items():
             estimated_x, estimated_y, estimated_orientation = self.get_estimated_position(apriltag_position_data)
-            estimated_positions.append({"id": apriltag_id, "x": estimated_x, "y": estimated_y, "orientation": estimated_orientation})
+            estimated_positions.append({"id": apriltag_id, "is_physical": apriltag_position_data[0]["is_physical"], "x": estimated_x, "y": estimated_y, "orientation": estimated_orientation})
         return estimated_positions
         
     def get_estimated_position(self, apriltag_position_data):
@@ -160,6 +168,19 @@ class BaseStation:
         Returns entire vision log.
         """
         return self.vision_log
+
+    def vision_monitior(self):
+        """
+        Checks if the len of the vision log is growing.
+        If not growing return empty string for x coordinate.
+        """
+
+        while True:
+            if self.vision_log:
+                for device_id, device_data in self.vision_log.items():
+                    if time.time() - device_data["TIMESTAMP"] > VISION_DATA_HOLD_THRESHOLD:
+                        del self.vision_log[device_id]
+
 
     # ==================== BOTS ====================
 

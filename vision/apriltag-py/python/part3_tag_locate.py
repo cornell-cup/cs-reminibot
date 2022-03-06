@@ -4,6 +4,7 @@ import numpy as np
 import sys
 import time
 import requests
+from sqlalchemy import true
 import util
 from detector import Detector
 from platform import node as platform_node
@@ -134,7 +135,7 @@ def main():
 
             # prints DEVICE_ID tag id x y z angle
             print("{}, {},{},{},{},{}".format(BASE_STATION_DEVICE_ID, d.tag_id, x, y, z, angle))
-            data_for_BS["position_data"].append({"id": d.tag_id, "image_x": ctr_x, "image_y": ctr_y,"x": x, "y": y, "orientation": angle})
+            data_for_BS["position_data"].append({"id": d.tag_id, "is_physical": True, "image_x": ctr_x, "image_y": ctr_y,"x": x, "y": y, "orientation": angle})
 
         data_for_BS["TIMESTAMP"] = time.time()
         # Send the data to the URL specified.

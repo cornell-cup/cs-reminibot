@@ -57,17 +57,14 @@ export default class GridView extends React.Component {
   renderXAxis() {
     let ticks = [];
     const xStart = -this.state.world_width / 2;
-    const numXAxisTicks = 
-    this.state.world_width  / distanceBetweenTicks + 1;
+    const numXAxisTicks = this.state.world_width / distanceBetweenTicks + 1;
     const xStep = distanceBetweenTicks;
     for (let i = 0; i < numXAxisTicks; i++) {
       ticks.push(
         <g
           class="tick"
           opacity="1"
-          transform={`translate(${
-          scaleFactor * distanceBetweenTicks * i
-          },0)`}
+          transform={`translate(${scaleFactor * distanceBetweenTicks * i},0)`}
         >
           <line
             stroke="currentColor"
@@ -99,18 +96,15 @@ export default class GridView extends React.Component {
 
   renderYAxis() {
     let ticks = [];
-    const yStart = this.state.world_height / 2 ;
-    const numYAxisTicks =
-    this.state.world_height / distanceBetweenTicks + 1;
+    const yStart = this.state.world_height / 2;
+    const numYAxisTicks = this.state.world_height / distanceBetweenTicks + 1;
     const yStep = distanceBetweenTicks;
     for (let i = 0; i < numYAxisTicks; i++) {
       ticks.push(
         <g
           class="tick"
           opacity="1"
-          transform={`translate(0,${
-            scaleFactor * distanceBetweenTicks * i
-          })`}
+          transform={`translate(0,${scaleFactor * distanceBetweenTicks * i})`}
         >
           <line
             stroke="currentColor"
@@ -119,7 +113,7 @@ export default class GridView extends React.Component {
           ></line>
           <text
             fill="white"
-            x={scaleFactor * this.state.world_width  + textOffset}
+            x={scaleFactor * this.state.world_width + textOffset}
             dx="0.71em"
           >
             {`${yStart - yStep * i}`}
@@ -143,11 +137,9 @@ export default class GridView extends React.Component {
   renderGrid() {
     return (
       <React.Fragment>
-        
         <rect
           width={scaleFactor * this.state.world_width}
           height={scaleFactor * this.state.world_height}
-
           fill="white"
         ></rect>
 
@@ -160,24 +152,14 @@ export default class GridView extends React.Component {
 
   renderBots() {
     let bots = [];
-    console.log("made it to render bots");
-    console.log(JSON.stringify(this.state.detections));
     for (const detection of this.state.detections) {
       const x_pos = parseInt(detection["x"]);
       const y_pos = parseInt(detection["y"]);
-      const x =
-        scaleFactor * (this.state.world_width / 2 + x_pos);
-      const y =
-        scaleFactor * (this.state.world_height / 2 - y_pos);
-      console.log("x: " + x + ", y: " + y);
+      const x = scaleFactor * (this.state.world_width / 2 + x_pos);
+      const y = scaleFactor * (this.state.world_height / 2 - y_pos);
       const orientation_pos = parseInt(detection["orientation"]);
       bots.push(
-        <circle
-          cx={x}
-          cy={y}
-          r={botRadius }
-          fill={botColor}
-        ></circle>,
+        <circle cx={x} cy={y} r={botRadius} fill={botColor}></circle>,
         <image
           x={x - botRadius}
           y={y - botRadius}
@@ -198,13 +180,13 @@ export default class GridView extends React.Component {
         width={this.state.view_width}
         height={this.state.view_height}
         fill="white"
-        viewBox={`0 0 ${scaleFactor * this.state.world_width + 2*widthPadding} ${
-          scaleFactor * this.state.world_height + 2*heightPadding
-        }`}
+        viewBox={`0 0 ${
+          scaleFactor * this.state.world_width + 2 * widthPadding
+        } ${scaleFactor * this.state.world_height + 2 * heightPadding}`}
       >
         <g transform={`translate(${widthPadding},${heightPadding})`}>
-        {this.renderGrid()}
-        {this.renderBots()}
+          {this.renderGrid()}
+          {this.renderBots()}
         </g>
       </svg>
     );
@@ -222,7 +204,6 @@ export default class GridView extends React.Component {
       .get("/vision")
       .then(
         function (response) {
-          // console.log(response.data);
           this.setState({ detections: response.data });
         }.bind(this)
       )
@@ -337,107 +318,3 @@ export default class GridView extends React.Component {
     );
   }
 }
-
-/*
-
-<svg width="550" height="520">
-   <g transform="translate(80,20)"></g>
-   <rect width="520" height="500" style="fill: white;"></rect>
-   <g class="x-axis" fill="none" font-size="10" font-family="sans-serif" text-anchor="middle">
-      <path class="domain" stroke="currentColor" d="M0.5,500V0.5H520.5V500"></path>
-      <g class="tick" opacity="1" transform="translate(10.5,0)">
-         <line stroke="currentColor" y2="500"></line>
-         <text fill="currentColor" y="503" dy="0.71em">-250</text>
-      </g>
-      <g class="tick" opacity="1" transform="translate(60.5,0)">
-         <line stroke="currentColor" y2="500"></line>
-         <text fill="currentColor" y="503" dy="0.71em">-200</text>
-      </g>
-      <g class="tick" opacity="1" transform="translate(110.5,0)">
-         <line stroke="currentColor" y2="500"></line>
-         <text fill="currentColor" y="503" dy="0.71em">-150</text>
-      </g>
-      <g class="tick" opacity="1" transform="translate(160.5,0)">
-         <line stroke="currentColor" y2="500"></line>
-         <text fill="currentColor" y="503" dy="0.71em">-100</text>
-      </g>
-      <g class="tick" opacity="1" transform="translate(210.5,0)">
-         <line stroke="currentColor" y2="500"></line>
-         <text fill="currentColor" y="503" dy="0.71em">-50</text>
-      </g>
-      <g class="tick" opacity="1" transform="translate(260.5,0)">
-         <line stroke="currentColor" y2="500"></line>
-         <text fill="currentColor" y="503" dy="0.71em">0</text>
-      </g>
-      <g class="tick" opacity="1" transform="translate(310.5,0)">
-         <line stroke="currentColor" y2="500"></line>
-         <text fill="currentColor" y="503" dy="0.71em">50</text>
-      </g>
-      <g class="tick" opacity="1" transform="translate(360.5,0)">
-         <line stroke="currentColor" y2="500"></line>
-         <text fill="currentColor" y="503" dy="0.71em">100</text>
-      </g>
-      <g class="tick" opacity="1" transform="translate(410.5,0)">
-         <line stroke="currentColor" y2="500"></line>
-         <text fill="currentColor" y="503" dy="0.71em">150</text>
-      </g>
-      <g class="tick" opacity="1" transform="translate(460.5,0)">
-         <line stroke="currentColor" y2="500"></line>
-         <text fill="currentColor" y="503" dy="0.71em">200</text>
-      </g>
-      <g class="tick" opacity="1" transform="translate(510.5,0)">
-         <line stroke="currentColor" y2="500"></line>
-         <text fill="currentColor" y="503" dy="0.71em">250</text>
-      </g>
-   </g>
-   <g class="y-axis" fill="none" font-size="10" font-family="sans-serif" text-anchor="start">
-      <path class="domain" stroke="currentColor" d="M520,500.5H0.5V0.5H520"></path>
-      <g class="tick" opacity="1" transform="translate(0,500.5)">
-         <line stroke="currentColor" x2="520"></line>
-         <text fill="currentColor" x="523" dy="0.32em">-250</text>
-      </g>
-      <g class="tick" opacity="1" transform="translate(0,450.5)">
-         <line stroke="currentColor" x2="520"></line>
-         <text fill="currentColor" x="523" dy="0.32em">-200</text>
-      </g>
-      <g class="tick" opacity="1" transform="translate(0,400.5)">
-         <line stroke="currentColor" x2="520"></line>
-         <text fill="currentColor" x="523" dy="0.32em">-150</text>
-      </g>
-      <g class="tick" opacity="1" transform="translate(0,350.5)">
-         <line stroke="currentColor" x2="520"></line>
-         <text fill="currentColor" x="523" dy="0.32em">-100</text>
-      </g>
-      <g class="tick" opacity="1" transform="translate(0,300.5)">
-         <line stroke="currentColor" x2="520"></line>
-         <text fill="currentColor" x="523" dy="0.32em">-50</text>
-      </g>
-      <g class="tick" opacity="1" transform="translate(0,250.5)">
-         <line stroke="currentColor" x2="520"></line>
-         <text fill="currentColor" x="523" dy="0.32em">0</text>
-      </g>
-      <g class="tick" opacity="1" transform="translate(0,200.5)">
-         <line stroke="currentColor" x2="520"></line>
-         <text fill="currentColor" x="523" dy="0.32em">50</text>
-      </g>
-      <g class="tick" opacity="1" transform="translate(0,150.50000000000003)">
-         <line stroke="currentColor" x2="520"></line>
-         <text fill="currentColor" x="523" dy="0.32em">100</text>
-      </g>
-      <g class="tick" opacity="1" transform="translate(0,100.49999999999997)">
-         <line stroke="currentColor" x2="520"></line>
-         <text fill="currentColor" x="523" dy="0.32em">150</text>
-      </g>
-      <g class="tick" opacity="1" transform="translate(0,50.499999999999986)">
-         <line stroke="currentColor" x2="520"></line>
-         <text fill="currentColor" x="523" dy="0.32em">200</text>
-      </g>
-      <g class="tick" opacity="1" transform="translate(0,0.5)">
-         <line stroke="currentColor" x2="520"></line>
-         <text fill="currentColor" x="523" dy="0.32em">250</text>
-      </g>
-   </g>
-   <g class="view"></g>
-</svg>
-
-*/
