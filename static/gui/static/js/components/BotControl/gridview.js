@@ -9,15 +9,14 @@ library.add(faInfoCircle);
 import { Button } from "../utils/Util.js";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
-const scaleFactor = 10;
-const numXAxisTicks = 11;
-const numYAxisTicks = 11;
-const widthPadding = 10;
-const heightPadding = 10;
-const textOffset = 3;
-const botRadius = 10;
+const scaleFactor = 20;
+const distanceBetweenTicks = 10;
+
+const widthPadding = 200;
+const heightPadding = 50;
+const textOffset = 20;
+const botRadius = 50;
 const botColor = "red";
-const inchToPixelScaleFactor = 10;
 /**
  * Component for the grid view of the simulated bots.
  */
@@ -26,8 +25,10 @@ export default class GridView extends React.Component {
     super(props);
 
     this.state = {
-      width: 520,
-      height: 520,
+      view_width: 520,
+      view_height: 520,
+      world_width: 300,
+      world_height: 300,
       xcor: 0,
       ycor: 0,
       count: 0,
@@ -55,27 +56,27 @@ export default class GridView extends React.Component {
 
   renderXAxis() {
     let ticks = [];
-    const xStart = -(this.state.width - 2 * widthPadding) / (2 * scaleFactor);
-    const distanceBetweenTicks =
-      (this.state.width - 2 * widthPadding) / (numXAxisTicks - 1);
-    const xStep = distanceBetweenTicks / inchToPixelScaleFactor;
+    const xStart = -this.state.world_width / 2;
+    const numXAxisTicks = 
+    this.state.world_width  / distanceBetweenTicks + 1;
+    const xStep = distanceBetweenTicks;
     for (let i = 0; i < numXAxisTicks; i++) {
       ticks.push(
         <g
           class="tick"
           opacity="1"
           transform={`translate(${
-            scaleFactor * (widthPadding + distanceBetweenTicks * i)
+          scaleFactor * distanceBetweenTicks * i
           },0)`}
         >
           <line
             stroke="currentColor"
-            y2={scaleFactor * this.state.height}
+            y2={scaleFactor * this.state.world_height}
             strokeWidth="5"
           ></line>
           <text
             fill="white"
-            y={scaleFactor * (this.state.height + textOffset)}
+            y={scaleFactor * this.state.world_height + textOffset}
             dy="0.71em"
           >
             {`${xStart + xStep * i}`}
@@ -87,7 +88,7 @@ export default class GridView extends React.Component {
       <g
         class="x-axis"
         fill="none"
-        font-size={`${10 * scaleFactor}`}
+        font-size="40"
         font-family="sans-serif"
         text-anchor="middle"
       >
@@ -98,27 +99,27 @@ export default class GridView extends React.Component {
 
   renderYAxis() {
     let ticks = [];
-    const yStart = (this.state.height - 2 * heightPadding) / (2 * scaleFactor);
-    const distanceBetweenTicks =
-      (this.state.height - 2 * heightPadding) / (numYAxisTicks - 1);
-    const yStep = distanceBetweenTicks / inchToPixelScaleFactor;
+    const yStart = this.state.world_height / 2 ;
+    const numYAxisTicks =
+    this.state.world_height / distanceBetweenTicks + 1;
+    const yStep = distanceBetweenTicks;
     for (let i = 0; i < numYAxisTicks; i++) {
       ticks.push(
         <g
           class="tick"
           opacity="1"
           transform={`translate(0,${
-            scaleFactor * (widthPadding + distanceBetweenTicks * i)
+            scaleFactor * distanceBetweenTicks * i
           })`}
         >
           <line
             stroke="currentColor"
-            x2={scaleFactor * this.state.width}
+            x2={scaleFactor * this.state.world_width}
             strokeWidth="5"
           ></line>
           <text
             fill="white"
-            x={scaleFactor * (this.state.width + textOffset)}
+            x={scaleFactor * this.state.world_width  + textOffset}
             dx="0.71em"
           >
             {`${yStart - yStep * i}`}
@@ -130,7 +131,7 @@ export default class GridView extends React.Component {
       <g
         class="y-axis"
         fill="none"
-        font-size={`${10 * scaleFactor}`}
+        font-size="40"
         font-family="sans-serif"
         text-anchor="start"
       >
@@ -142,18 +143,17 @@ export default class GridView extends React.Component {
   renderGrid() {
     return (
       <React.Fragment>
-        <g transform="translate(80,40)"></g>
+        
         <rect
-          width={scaleFactor * this.state.width}
-          height={scaleFactor * this.state.height}
+          width={scaleFactor * this.state.world_width}
+          height={scaleFactor * this.state.world_height}
+
           fill="white"
         ></rect>
 
         {this.renderXAxis()}
 
         {this.renderYAxis()}
-
-        <g class="view"></g>
       </React.Fragment>
     );
   }
@@ -166,23 +166,23 @@ export default class GridView extends React.Component {
       const x_pos = parseInt(detection["x"]);
       const y_pos = parseInt(detection["y"]);
       const x =
-        scaleFactor * (this.state.width / 2 + inchToPixelScaleFactor * x_pos);
+        scaleFactor * (this.state.world_width / 2 + x_pos);
       const y =
-        scaleFactor * (this.state.height / 2 - inchToPixelScaleFactor * y_pos);
+        scaleFactor * (this.state.world_height / 2 - y_pos);
       console.log("x: " + x + ", y: " + y);
       const orientation_pos = parseInt(detection["orientation"]);
       bots.push(
         <circle
           cx={x}
           cy={y}
-          r={botRadius * scaleFactor}
+          r={botRadius }
           fill={botColor}
         ></circle>,
         <image
-          x={x - botRadius * scaleFactor}
-          y={y - botRadius * scaleFactor}
-          width={2 * botRadius * scaleFactor}
-          height={2 * botRadius * scaleFactor}
+          x={x - botRadius}
+          y={y - botRadius}
+          width={2 * botRadius}
+          height={2 * botRadius}
           fill={botColor}
           href="./static/img/bot-dot.png"
           transform={`rotate(${orientation_pos}, ${x}, ${y})`}
@@ -195,15 +195,17 @@ export default class GridView extends React.Component {
   renderSVG() {
     return (
       <svg
-        width={this.state.width + 30}
-        height={this.state.height + 30}
+        width={this.state.view_width}
+        height={this.state.view_height}
         fill="white"
-        viewBox={`0 0 ${scaleFactor * this.state.width + 500} ${
-          scaleFactor * this.state.height + 100
+        viewBox={`0 0 ${scaleFactor * this.state.world_width + 2*widthPadding} ${
+          scaleFactor * this.state.world_height + 2*heightPadding
         }`}
       >
+        <g transform={`translate(${widthPadding},${heightPadding})`}>
         {this.renderGrid()}
         {this.renderBots()}
+        </g>
       </svg>
     );
   }
