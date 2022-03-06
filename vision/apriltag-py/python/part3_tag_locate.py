@@ -6,6 +6,10 @@ import time
 import requests
 import util
 from detector import Detector
+from platform import node as platform_node
+from random import randint
+from os import environ
+
 
 # Constants
 DEVICE_ID = 0  # The device the camera is, usually 0. TODO make this adjustable
@@ -16,6 +20,8 @@ FRAME_HEIGHT = 720
 TAG_SIZE = 6.5 # The length of one side of an apriltag, in inches
 SEND_DATA = True  # Sends data to URL if True. Set to False for debug
 
+
+BASE_STATION_DEVICE_ID = hash(platform_node()+str(randint(0,1000000))+environ["USER"]+str(randint(0,1000000))+str(DEVICE_ID)+str(time.time()))
 
 def main():
     # DEBUGGING AND TIMING VARIABLES
@@ -94,14 +100,11 @@ def main():
         except Exception:
             pass
 
-        # removed so system sends updates when all apriltags have moved out of frame
-        # if len(detections) == 0:
-        #     continue  # Try again if we don't get anything
 
         print("Found " + str(len(detections)) + " apriltags")
 
         
-        data_for_BS = {"DEVICE_ID": DEVICE_ID, "DEVICE_CENTER_X": FRAME_WIDTH/2, "DEVICE_CENTER_Y": FRAME_HEIGHT/2, "position_data" : []}
+        data_for_BS = {"DEVICE_ID": BASE_STATION_DEVICE_ID, "TIMESTAMP": time.time(), "DEVICE_CENTER_X": FRAME_WIDTH/2, "DEVICE_CENTER_Y": FRAME_HEIGHT/2, "position_data" : []}
 
         for i, d in enumerate(detections):
             # TODO draw tag - might be better to generalize, because
@@ -116,10 +119,6 @@ def main():
             # TODO debug offset method - is better, but not perfect.
             center_cell_offset = get_closest_reference_point_offset(detected_x,detected_y,center_cell_offsets)
 
-            # 2 input linear regression is slightly better than 1 input linear regression
-            # x = x_scale_factor * (detected_x + overall_center_x_offset) + predict_x_offset_x_input_only(tuple([detected_x]))
-            # y = y_scale_factor * (detected_y + overall_center_y_offset) + predict_y_offset_y_input_only(tuple([detected_y]))
-
             x = x_scale_factor * (detected_x + overall_center_x_offset) + predict_x_offset((detected_x,detected_y))
             y = y_scale_factor * (detected_y + overall_center_y_offset) + predict_y_offset((detected_x,detected_y))
             z = detected_z
@@ -129,13 +128,15 @@ def main():
             # displaying tag id
             cv2.putText(undst, str(round(angle,2)),(int(ctr_x), int(ctr_y)), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 0, 255),2)
 
-
+            
+            
            
 
             # prints DEVICE_ID tag id x y z angle
-            print("{}, {},{},{},{},{}".format(DEVICE_ID, d.tag_id, x, y, z, angle))
+            print("{}, {},{},{},{},{}".format(BASE_STATION_DEVICE_ID, d.tag_id, x, y, z, angle))
             data_for_BS["position_data"].append({"id": d.tag_id, "image_x": ctr_x, "image_y": ctr_y,"x": x, "y": y, "orientation": angle})
 
+        data_for_BS["TIMESTAMP"] = time.time()
         # Send the data to the URL specified.
         # This is usually a URL to the base station.
         if SEND_DATA:
