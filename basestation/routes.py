@@ -114,6 +114,17 @@ def vision():
     else:
         return json.dumps(base_station.get_estimated_positions()), status.HTTP_200_OK
 
+@app.route('/object-mapping', methods=['POST', 'GET'])
+def vision():
+    """Updates vision object mapping"""
+    # TODO add FPS tracking on server side
+    if request.method == 'POST':
+        info = request.get_json()
+        base_station.update_vision_object_map(info)
+        return json.dumps(True), status.HTTP_200_OK
+    else:
+        return json.dumps(base_station.get_vision_object_map()), status.HTTP_200_OK
+
 
 @app.route('/result', methods=['POST'])
 def error_message_update():

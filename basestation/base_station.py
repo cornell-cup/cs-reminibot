@@ -19,6 +19,7 @@ import time
 import threading
 import pyaudio
 import speech_recognition as sr
+from copy import deepcopy
 
 MAX_VISION_LOG_LENGTH = 1000
 VISION_DATA_HOLD_THRESHOLD = 1
@@ -50,7 +51,9 @@ def make_thread_safe(func):
 class BaseStation:
     def __init__(self, app_debug=False):
         self.active_bots = {}
-        self.vision_log = {}
+        self.vision_log = []
+        self.vision_snapshot = {}
+        self.vision_object_map = {}
 
         self.blockly_function_map = {
             "move_forward": "fwd",         "move_backward": "back",
@@ -113,25 +116,68 @@ class BaseStation:
 
 
 
-    def update_vision_log(self, value):
-        """ Updates vision log. Size of log based on MAX_VISION_LOG_LENGTH """
-        self.vision_log[value["DEVICE_ID"]] = {"DEVICE_CENTER_X": value["DEVICE_CENTER_X"], "DEVICE_CENTER_Y": value["DEVICE_CENTER_Y"], "TIMESTAMP": value["TIMESTAMP"], "position_data" : value["position_data"]}
+    def update_vision_snapshot(self, value):
+        """ Adds value to vision snapshot based on device id"""
+        self.vision_snapshot[value["DEVICE_ID"]] = {"DEVICE_CENTER_X": value["DEVICE_CENTER_X"], "DEVICE_CENTER_Y": value["DEVICE_CENTER_Y"], "TIMESTAMP": value["TIMESTAMP"], "position_data" : value["position_data"]}
 
+    def update_vision_object_map(self, update):
+        """ Updates vision object mapping. """
+        if "mappings" in update and "add" in update and type(update["mappings"]) is list and len(update["mappings"]) > 0:
+            if update["add"]:
+                self.add_multiple_to_vision_object_map(update["mappings"])
+            else:
+                self.remove_multiple_from_vision_object_map(update["mappings"])
+        elif "mapping" in update and "add" in update:
+            if update["add"]:
+                self.add_to_vision_object_map(update["mapping"])
+            else:
+                self.remove_from_vision_object_map(update["mapping"])
+        else:
+            print("The vision object map was not given a valid update")
+            
+
+    def add_to_vision_object_map(self, object_mapping):
+        """ Adds single mapping from the vision object map based on mapping's id """
+        if "id" in object_mapping and "name" in object_mapping and "type" in object_mapping:
+            self.vision_object_map[object_mapping["id"]] = {"name": object_mapping["name"], "type": object_mapping["type"]}
+        else:
+            print("The vision object map was not given a valid update")
+
+    def add_multiple_to_vision_object_map(self, object_mappings):
+        """ Adds multiple mappings from the vision object map based on mappings' ids """
+        for value in object_mappings:
+            self.add_to_vision_object_map(value)
+    
+    def remove_from_vision_object_map(self, object_mapping):
+        """ Removes single mapping from the vision object map based on mapping's id """
+        if "id" in object_mapping:
+            self.vision_object_map.pop(object_mapping["id"], None)
+        else:
+            print("The vision object map was not given a valid update")
+
+    def remove_multiple_from_vision_object_map(self, object_mappings):
+        """ Removes multiple mappings from the vision object map based on mappings' ids """
+        for value in object_mappings:
+            self.remove_from_vision_object_map(value)
+        
     def get_vision_data(self):
         """ Returns most recent vision data """
-        return self.vision_log if self.vision_log else None
+        return self.vision_snapshot if self.vision_snapshot else None
+
+    def get_vision_object_map(self):
+        """ Returns the mapping of vision objects to their corresponding ids """
+        return self.vision_object_map if self.vision_object_map else []
 
     def get_estimated_positions(self):
         """ Returns the estimated positions of all apriltags detected by all cameras based on vision log data """
         apriltag_positions = {}
-        for device_id, device_data in self.vision_log.items():
+        for device_id, device_data in self.vision_snapshot.items():
             for position_entry in device_data["position_data"]:
                 if not (position_entry["id"] in apriltag_positions):
                     apriltag_positions[position_entry["id"]] = []
                 apriltag_positions[position_entry["id"]].append(
                     {
                         "distance_from_camera_center": distance(device_data["DEVICE_CENTER_X"], device_data["DEVICE_CENTER_Y"], position_entry["image_x"], position_entry["image_y"]),
-                        "is_physical": position_entry["is_physical"], 
                         "x": position_entry["x"], 
                         "y": position_entry["y"], 
                         "orientation": position_entry["orientation"]
@@ -140,7 +186,16 @@ class BaseStation:
         estimated_positions = []
         for apriltag_id, apriltag_position_data in apriltag_positions.items():
             estimated_x, estimated_y, estimated_orientation = self.get_estimated_position(apriltag_position_data)
-            estimated_positions.append({"id": apriltag_id, "is_physical": apriltag_position_data[0]["is_physical"], "x": estimated_x, "y": estimated_y, "orientation": estimated_orientation})
+            estimated_positions.append(
+                {
+                    "id": apriltag_id, 
+                    "name": self.vision_object_map[position_entry["id"]]["name"] if position_entry["id"] in self.vision_object_map else "No Name",
+                    "type": self.vision_object_map[position_entry["id"]]["type"] if position_entry["id"] in self.vision_object_map else "No Type",
+                    "x": estimated_x, 
+                    "y": estimated_y, 
+                    "orientation": estimated_orientation
+                }
+            )
         return estimated_positions
         
     def get_estimated_position(self, apriltag_position_data):
@@ -171,15 +226,18 @@ class BaseStation:
 
     def vision_monitior(self):
         """
-        Checks if the len of the vision log is growing.
-        If not growing return empty string for x coordinate.
+        Removes stale data from vision snapshot
+        Updates the vision log with current vision snapshot. 
+        Size of log based on MAX_VISION_LOG_LENGTH
         """
-
         while True:
-            if self.vision_log:
-                for device_id, device_data in self.vision_log.items():
+            if self.vision_snapshot:
+                for device_id, device_data in self.vision_snapshot.items():
                     if time.time() - device_data["TIMESTAMP"] > VISION_DATA_HOLD_THRESHOLD:
-                        del self.vision_log[device_id]
+                        self.vision_snapshot.pop(device_id, None)
+                self.vision_log.append(deepcopy(self.vision_snapshot))
+                while len(self.vision_log) > MAX_VISION_LOG_LENGTH:
+                    self.vision_log.pop(0)
 
 
     # ==================== BOTS ====================
