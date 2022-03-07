@@ -17,6 +17,8 @@ const heightPadding = 50;
 const textOffset = 20;
 const botRadius = 50;
 const botColor = "red";
+const unknownRadius = 50;
+const unknownColor = "black";
 
 /**
  * Component for the grid view of the simulated bots.
@@ -52,6 +54,7 @@ export default class GridView extends React.Component {
     this.renderYAxis = this.renderYAxis.bind(this);
     this.renderObjects = this.renderObjects.bind(this);
     this.renderBot = this.renderBot.bind(this);
+    this.renderUnknown = this.renderUnknown.bind(this);
 
     this.getArgs = this.getArgs.bind(this);
   }
@@ -159,10 +162,10 @@ export default class GridView extends React.Component {
         detection["type"] ? String(detection["type"].toLowerCase().trim()) : ""
       ) {
         case "minibot":
-          const botJSXArray = this.renderBot(detection);
-          bots.push(botJSXArray);
+          bots.push(this.renderBot(detection));
           break;
         default:
+          bots.push(this.renderUnknown(detection));
           break;
       }
     }
@@ -188,6 +191,30 @@ export default class GridView extends React.Component {
           height={2 * botRadius}
           fill={botColor}
           href="./static/img/bot-dot.png"
+          transform={`rotate(${orientation_pos}, ${x}, ${y})`}
+        ></image>
+      </g>
+    );
+  }
+  renderUnknown(detection) {
+    const x_pos = parseInt(detection["x"]);
+    const y_pos = parseInt(detection["y"]);
+    const x = scaleFactor * (this.state.world_width / 2 + x_pos);
+    const y = scaleFactor * (this.state.world_height / 2 - y_pos);
+    const orientation_pos = parseInt(detection["orientation"]);
+    return (
+      <g>
+        <title>{`${detection["name"] ? detection["name"] : ""}: (${Math.round(
+          x_pos
+        )},${Math.round(y_pos)}) ${Math.round(orientation_pos)}°`}</title>
+        <circle cx={x} cy={y} r={unknownRadius} fill={unknownColor}></circle>,
+        <image
+          x={x - unknownRadius}
+          y={y - unknownRadius}
+          width={2 * unknownRadius}
+          height={2 * unknownRadius}
+          fill={unknownColor}
+          href="./static/img/unknown-dot.png"
           transform={`rotate(${orientation_pos}, ${x}, ${y})`}
         ></image>
       </g>
@@ -220,6 +247,19 @@ export default class GridView extends React.Component {
   getVisionData() {
     // allows you to call global attributes in axios
     // example of adding object mapping to base station
+
+    axios
+      .get("/vision")
+      .then(
+        function (response) {
+          // console.log(response.data);
+          this.setState({ detections: response.data ? response.data : [] });
+        }.bind(this)
+      )
+      .catch(function (error) {
+        // console.log(error);
+      });
+
     axios
       .post("/object-mapping", {
         add: true,
@@ -248,7 +288,7 @@ export default class GridView extends React.Component {
       .catch(function (error) {
         // console.log(error);
       });
-
+    // example of adding virtual object to base station
     axios
       .post("/virtual-objects", {
         add: true,
@@ -267,18 +307,6 @@ export default class GridView extends React.Component {
         ],
       })
       .then(function (response) {}.bind(this))
-      .catch(function (error) {
-        // console.log(error);
-      });
-
-    axios
-      .get("/vision")
-      .then(
-        function (response) {
-          // console.log(response.data);
-          this.setState({ detections: response.data ? response.data : [] });
-        }.bind(this)
-      )
       .catch(function (error) {
         // console.log(error);
       });

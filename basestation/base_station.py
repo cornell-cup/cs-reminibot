@@ -335,10 +335,7 @@ class BaseStation:
                 self.vision_log.append({"TIMESTAMP": time.time(), "POSITION_DATA": self.get_estimated_positions()})
                 while len(self.vision_log) > MAX_VISION_LOG_LENGTH:
                     self.vision_log.pop(0)
-                print(self.vision_log)
-                for i in range(30):
-                    print("")
-                time.sleep(1/VISION_UPDATE_FREQUENCY)
+                time.sleep(1/VISION_UPDATE_FREQUENCY) 
 
 
     # ==================== BOTS ====================
