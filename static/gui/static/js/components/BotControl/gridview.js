@@ -17,6 +17,7 @@ const heightPadding = 50;
 const textOffset = 20;
 const botRadius = 50;
 const botColor = "red";
+
 /**
  * Component for the grid view of the simulated bots.
  */
@@ -49,7 +50,8 @@ export default class GridView extends React.Component {
     this.renderGrid = this.renderGrid.bind(this);
     this.renderXAxis = this.renderXAxis.bind(this);
     this.renderYAxis = this.renderYAxis.bind(this);
-    this.renderBots = this.renderBots.bind(this);
+    this.renderObjects = this.renderObjects.bind(this);
+    this.renderBot = this.renderBot.bind(this);
 
     this.getArgs = this.getArgs.bind(this);
   }
@@ -150,28 +152,40 @@ export default class GridView extends React.Component {
     );
   }
 
-  renderBots() {
+  renderObjects() {
     let bots = [];
     for (const detection of this.state.detections) {
-      const x_pos = parseInt(detection["x"]);
-      const y_pos = parseInt(detection["y"]);
-      const x = scaleFactor * (this.state.world_width / 2 + x_pos);
-      const y = scaleFactor * (this.state.world_height / 2 - y_pos);
-      const orientation_pos = parseInt(detection["orientation"]);
-      bots.push(
-        <circle cx={x} cy={y} r={botRadius} fill={botColor}></circle>,
-        <image
-          x={x - botRadius}
-          y={y - botRadius}
-          width={2 * botRadius}
-          height={2 * botRadius}
-          fill={botColor}
-          href="./static/img/bot-dot.png"
-          transform={`rotate(${orientation_pos}, ${x}, ${y})`}
-        ></image>
-      );
+      console.log(String(detection["type"].toLowerCase().trim()));
+      switch (String(detection["type"].toLowerCase().trim())) {
+        case "minibot":
+          const botJSXArray = this.renderBot(detection);
+          bots.push(botJSXArray[0], botJSXArray[1]);
+          break;
+        default:
+          break;
+      }
     }
     return <React.Fragment>{bots}</React.Fragment>;
+  }
+
+  renderBot(detection) {
+    const x_pos = parseInt(detection["x"]);
+    const y_pos = parseInt(detection["y"]);
+    const x = scaleFactor * (this.state.world_width / 2 + x_pos);
+    const y = scaleFactor * (this.state.world_height / 2 - y_pos);
+    const orientation_pos = parseInt(detection["orientation"]);
+    return [
+      <circle cx={x} cy={y} r={botRadius} fill={botColor}></circle>,
+      <image
+        x={x - botRadius}
+        y={y - botRadius}
+        width={2 * botRadius}
+        height={2 * botRadius}
+        fill={botColor}
+        href="./static/img/bot-dot.png"
+        transform={`rotate(${orientation_pos}, ${x}, ${y})`}
+      ></image>,
+    ];
   }
 
   renderSVG() {
@@ -186,7 +200,7 @@ export default class GridView extends React.Component {
       >
         <g transform={`translate(${widthPadding},${heightPadding})`}>
           {this.renderGrid()}
-          {this.renderBots()}
+          {this.renderObjects()}
         </g>
       </svg>
     );
@@ -199,11 +213,63 @@ export default class GridView extends React.Component {
 
   getVisionData() {
     // allows you to call global attributes in axios
+    // example of adding object mapping to base station
+    axios
+      .post("/object-mapping", {
+        add: true,
+        mappings: [
+          {
+            id: "6",
+            name: "minibot6",
+            type: "minibot",
+            length: 5,
+            width: 10,
+            height: 7,
+            shape: "cube",
+            color: "red",
+          },
+          // {
+          //   id: "test id",
+          //   name: "test name",
+          //   type: "test type",
+          //   radius: 7,
+          //   shape: "sphere",
+          //   color: "blue",
+          // },
+        ],
+      })
+      .then(function (response) {}.bind(this))
+      .catch(function (error) {
+        // console.log(error);
+      });
+
+    axios
+      .post("/virtual-objects", {
+        add: true,
+        virtual_objects: [
+          {
+            id: "test id",
+            x: 4,
+            y: 9,
+            orientation: 92,
+            name: "test name",
+            type: "test type",
+            radius: 7,
+            shape: "sphere",
+            color: "blue",
+          },
+        ],
+      })
+      .then(function (response) {}.bind(this))
+      .catch(function (error) {
+        // console.log(error);
+      });
 
     axios
       .get("/vision")
       .then(
         function (response) {
+          // console.log(response.data);
           this.setState({ detections: response.data });
         }.bind(this)
       )

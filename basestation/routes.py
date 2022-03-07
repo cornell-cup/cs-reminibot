@@ -117,13 +117,22 @@ def vision():
 @app.route('/object-mapping', methods=['POST', 'GET'])
 def object_mapping():
     """Updates vision object mapping"""
-    # TODO add FPS tracking on server side
     if request.method == 'POST':
         info = request.get_json()
         base_station.update_vision_object_map(info)
         return json.dumps(True), status.HTTP_200_OK
     else:
         return json.dumps(base_station.get_vision_object_map()), status.HTTP_200_OK
+
+@app.route('/virtual-objects', methods=['POST', 'GET'])
+def virtual_objects():
+    """Updates vision virtual objects"""
+    if request.method == 'POST':
+        info = request.get_json()
+        base_station.update_virtual_objects(info)
+        return json.dumps(True), status.HTTP_200_OK
+    else:
+        return json.dumps(base_station.get_virtual_objects()), status.HTTP_200_OK
 
 
 @app.route('/result', methods=['POST'])

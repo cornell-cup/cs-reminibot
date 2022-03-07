@@ -52,6 +52,7 @@ class BaseStation:
     def __init__(self, app_debug=False):
         self.active_bots = {}
         self.vision_log = []
+        self.virtual_objects = {}
         self.vision_snapshot = {}
         self.vision_object_map = {}
 
@@ -114,6 +115,57 @@ class BaseStation:
 
     # ==================== VISION ====================
 
+    def update_virtual_objects(self, update):
+        """ Updates vision virtual objects list. """
+        if "virtual_objects" in update and "add" in update and type(update["virtual_objects"]) is list and len(update["virtual_objects"]) > 0:
+            if update["add"]:
+                self.add_multiple_to_virtual_objects(update["virtual_objects"])
+            else:
+                self.remove_multiple_from_virtual_objects(update["virtual_objects"])
+        elif "virtual_object" in update and "add" in update:
+            if update["add"]:
+                self.add_to_virtual_objects(update["virtual_object"])
+            else:
+                self.remove_from_virtual_objects(update["virtual_object"])
+        else:
+            print("The vision virtual object list was not given a valid update")
+            
+
+    def add_to_virtual_objects(self, virtual_object):
+        """ Adds single virtual object to virtual objects list """
+        if "id" in virtual_object and "name" in virtual_object and "type" in virtual_object and "x" in virtual_object and "y" in virtual_object and "orientation" in virtual_object:
+            self.virtual_objects[virtual_object["id"]] = {
+                "name": virtual_object["name"], 
+                "type": virtual_object["type"],   
+                "x": virtual_object["x"],  
+                "y": virtual_object["y"],  
+                "orientation": virtual_object["orientation"],                        
+                "length": virtual_object["length"] if "length" in virtual_object else None, 
+                "width": virtual_object["width"] if "width" in virtual_object else None, 
+                "radius": virtual_object["radius"] if "radius" in virtual_object else None, 
+                "height": virtual_object["height"] if "height" in virtual_object else None, 
+                "shape": virtual_object["shape"] if "shape" in virtual_object else None, 
+                "color": virtual_object["color"] if "color" in virtual_object else None 
+            }
+        else:
+            print("The vision virtual object list was not given a valid update")
+
+    def add_multiple_to_virtual_objects(self, virtual_objects):
+        """ Adds multiple virtual objects to virtual objects list """
+        for value in virtual_objects:
+            self.add_to_virtual_objects(value)
+    
+    def remove_from_virtual_objects(self, virtual_object):
+        """ Removes single virtual object from virtual objects list """
+        if "id" in virtual_object:
+            self.virtual_objects.pop(virtual_object["id"], None)
+        else:
+            print("The vision virtual object list was not given a valid update")
+
+    def remove_multiple_from_virtual_objects(self, virtual_objects):
+        """ Removes multiple virtual objects from virtual objects list """
+        for value in virtual_objects:
+            self.remove_from_virtual_objects(value)
 
 
     def update_vision_snapshot(self, value):
@@ -139,7 +191,16 @@ class BaseStation:
     def add_to_vision_object_map(self, object_mapping):
         """ Adds single mapping from the vision object map based on mapping's id """
         if "id" in object_mapping and "name" in object_mapping and "type" in object_mapping:
-            self.vision_object_map[object_mapping["id"]] = {"name": object_mapping["name"], "type": object_mapping["type"]}
+            self.vision_object_map[object_mapping["id"]] = {
+                "name": object_mapping["name"], 
+                "type": object_mapping["type"],                         
+                "length": object_mapping["length"] if "length" in object_mapping else None, 
+                "width": object_mapping["width"] if "width" in object_mapping else None, 
+                "radius": object_mapping["radius"] if "radius" in object_mapping else None, 
+                "height": object_mapping["height"] if "height" in object_mapping else None, 
+                "shape": object_mapping["shape"] if "shape" in object_mapping else None, 
+                "color": object_mapping["color"] if "color" in object_mapping else None 
+            }
         else:
             print("The vision object map was not given a valid update")
 
@@ -166,16 +227,20 @@ class BaseStation:
 
     def get_vision_object_map(self):
         """ Returns the mapping of vision objects to their corresponding ids """
-        return self.vision_object_map if self.vision_object_map else []
+        return self.vision_object_map if self.vision_object_map else {}
+
+    def get_virtual_objects(self):
+        """ Returns the dictionary of virtual objects """
+        return self.virtual_objects if self.virtual_objects else {}
 
     def get_estimated_positions(self):
         """ Returns the estimated positions of all apriltags detected by all cameras based on vision snapshot data """
-        apriltag_positions = {}
+        object_positions = {}
         for device_id, device_data in self.vision_snapshot.items():
             for position_entry in device_data["position_data"]:
-                if not (position_entry["id"] in apriltag_positions):
-                    apriltag_positions[position_entry["id"]] = []
-                apriltag_positions[position_entry["id"]].append(
+                if not (position_entry["id"] in object_positions):
+                    object_positions[position_entry["id"]] = []
+                object_positions[position_entry["id"]].append(
                     {
                         "distance_from_camera_center": distance(device_data["DEVICE_CENTER_X"], device_data["DEVICE_CENTER_Y"], position_entry["image_x"], position_entry["image_y"]),
                         "x": position_entry["x"], 
@@ -184,21 +249,48 @@ class BaseStation:
                     }
                 )
         estimated_positions = []
-        for apriltag_id, apriltag_position_data in apriltag_positions.items():
-            estimated_x, estimated_y, estimated_orientation = self.get_estimated_position(apriltag_position_data)
+        for object_id, object_position_data in object_positions.items():
+            estimated_x, estimated_y, estimated_orientation = self.get_estimated_position_data(object_position_data)
+            estimated_position = self.format_estimated_position(object_id, estimated_x, estimated_y, estimated_orientation)
             estimated_positions.append(
-                {
-                    "id": apriltag_id, 
-                    "name": self.vision_object_map[position_entry["id"]]["name"] if position_entry["id"] in self.vision_object_map else "No Name",
-                    "type": self.vision_object_map[position_entry["id"]]["type"] if position_entry["id"] in self.vision_object_map else "No Type",
+                estimated_position
+            )
+        for virtual_object_id, virtual_object_position_data in self.virtual_objects.items():
+            name = virtual_object_position_data["name"] if "name" in virtual_object_position_data else None
+            type = virtual_object_position_data["type"] if "type" in virtual_object_position_data else None
+            length = virtual_object_position_data["length"] if "length" in virtual_object_position_data else None
+            width = virtual_object_position_data["width"] if "width" in virtual_object_position_data else None
+            radius = virtual_object_position_data["radius"] if "radius" in virtual_object_position_data else None
+            height = virtual_object_position_data["height"] if "height" in virtual_object_position_data else None
+            shape = virtual_object_position_data["shape"] if "shape" in virtual_object_position_data else None
+            color = virtual_object_position_data["color"] if "color" in virtual_object_position_data else None
+            estimated_position = self.format_estimated_position(virtual_object_id, virtual_object_position_data["x"], virtual_object_position_data["y"], virtual_object_position_data["orientation"], name, type, length, width, radius, height, shape, color)
+            estimated_positions.append(
+                estimated_position
+            )
+        return estimated_positions
+
+    def format_estimated_position(self, object_id, estimated_x, estimated_y, estimated_orientation, name = None, type = None, length = None, width = None, radius = None, height = None, shape = None, color = None):
+        estimated_position = {
+                    "id": object_id, 
+                    "name": name if name != None else (self.vision_object_map[object_id]["name"] if object_id in self.vision_object_map else None),
+                    "type": type if type != None else (self.vision_object_map[object_id]["type"] if object_id in self.vision_object_map else None),
+                    "length": length if length != None else (self.vision_object_map[object_id]["length"] if object_id in self.vision_object_map else None),
+                    "width": width if width != None else (self.vision_object_map[object_id]["width"] if object_id in self.vision_object_map else None), 
+                    "radius": radius if radius != None else (self.vision_object_map[object_id]["radius"] if object_id in self.vision_object_map else None), 
+                    "height": height if height != None else (self.vision_object_map[object_id]["height"] if object_id in self.vision_object_map else None), 
+                    "shape": shape if shape != None else (self.vision_object_map[object_id]["shape"] if object_id in self.vision_object_map else None), 
+                    "color": color if color != None else (self.vision_object_map[object_id]["color"] if object_id in self.vision_object_map else None), 
                     "x": estimated_x, 
                     "y": estimated_y, 
                     "orientation": estimated_orientation
                 }
-            )
-        return estimated_positions
-        
-    def get_estimated_position(self, apriltag_position_data):
+        for key in list(estimated_position.keys()):
+            if estimated_position[key] == None:
+                estimated_position.pop(key, None) 
+        return estimated_position
+
+    def get_estimated_position_data(self, apriltag_position_data):
         """ Returns the estimated position of an apriltag detected by all cameras based on apriltage position data """
         x = 0
         y = 0
@@ -578,3 +670,5 @@ class BaseStation:
         submissions = []
         submissions = Submission.query.filter_by(user_id=User.id)
         return submissions
+
+    

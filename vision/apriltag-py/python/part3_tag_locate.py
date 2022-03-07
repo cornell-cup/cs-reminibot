@@ -105,7 +105,7 @@ def main():
         print("Found " + str(len(detections)) + " apriltags")
 
         
-        data_for_BS = {"DEVICE_ID": BASE_STATION_DEVICE_ID, "TIMESTAMP": time.time(), "DEVICE_CENTER_X": FRAME_WIDTH/2, "DEVICE_CENTER_Y": FRAME_HEIGHT/2, "position_data" : []}
+        data_for_BS = {"DEVICE_ID": str(BASE_STATION_DEVICE_ID), "TIMESTAMP": time.time(), "DEVICE_CENTER_X": FRAME_WIDTH/2, "DEVICE_CENTER_Y": FRAME_HEIGHT/2, "position_data" : []}
 
         for i, d in enumerate(detections):
             # TODO draw tag - might be better to generalize, because
@@ -135,7 +135,7 @@ def main():
 
             # prints DEVICE_ID tag id x y z angle
             print("{}, {},{},{},{},{}".format(BASE_STATION_DEVICE_ID, d.tag_id, x, y, z, angle))
-            data_for_BS["position_data"].append({"id": d.tag_id, "image_x": ctr_x, "image_y": ctr_y,"x": x, "y": y, "orientation": angle})
+            data_for_BS["position_data"].append({"id": str(d.tag_id), "image_x": ctr_x, "image_y": ctr_y,"x": x, "y": y, "orientation": angle})
 
         data_for_BS["TIMESTAMP"] = time.time()
         # Send the data to the URL specified.
