@@ -22,7 +22,7 @@ import speech_recognition as sr
 from copy import deepcopy
 
 MAX_VISION_LOG_LENGTH = 1000
-VISION_UPDATE_FREQUENCY = 1
+VISION_UPDATE_FREQUENCY = 30
 VISION_DATA_HOLD_THRESHOLD = 1
 
 
@@ -228,7 +228,7 @@ class BaseStation:
     
     def get_vision_data(self):
         """ Returns most recent vision data """
-        return self.vision_log[-1] if self.vision_log and len(self.vision_log) > 0 else None
+        return self.vision_log[-1]["POSITION_DATA"] if self.vision_log and len(self.vision_log) > 0 else None
 
     def get_vision_object_map(self):
         """ Returns the mapping of vision objects to their corresponding ids """
@@ -332,12 +332,9 @@ class BaseStation:
                 for device_id, device_data in self.vision_snapshot.items():
                     if time.time() - device_data["TIMESTAMP"] > VISION_DATA_HOLD_THRESHOLD:
                         self.vision_snapshot.pop(device_id, None)
-                self.vision_log.append(self.get_estimated_positions())
+                self.vision_log.append({"TIMESTAMP": time.time(), "POSITION_DATA": self.get_estimated_positions()})
                 while len(self.vision_log) > MAX_VISION_LOG_LENGTH:
                     self.vision_log.pop(0)
-                print(self.vision_log)
-                for i in range(30):
-                    print("")
                 time.sleep(1/VISION_UPDATE_FREQUENCY)
 
 
