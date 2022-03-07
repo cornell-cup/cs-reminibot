@@ -155,8 +155,9 @@ export default class GridView extends React.Component {
   renderObjects() {
     let bots = [];
     for (const detection of this.state.detections) {
-      console.log(String(detection["type"].toLowerCase().trim()));
-      switch (String(detection["type"].toLowerCase().trim())) {
+      switch (
+        detection["type"] ? String(detection["type"].toLowerCase().trim()) : ""
+      ) {
         case "minibot":
           const botJSXArray = this.renderBot(detection);
           bots.push(botJSXArray);
@@ -275,7 +276,7 @@ export default class GridView extends React.Component {
       .then(
         function (response) {
           // console.log(response.data);
-          this.setState({ detections: response.data });
+          this.setState({ detections: response.data ? response.data : [] });
         }.bind(this)
       )
       .catch(function (error) {
