@@ -169,7 +169,7 @@ class BaseStation:
         return self.vision_object_map if self.vision_object_map else []
 
     def get_estimated_positions(self):
-        """ Returns the estimated positions of all apriltags detected by all cameras based on vision log data """
+        """ Returns the estimated positions of all apriltags detected by all cameras based on vision snapshot data """
         apriltag_positions = {}
         for device_id, device_data in self.vision_snapshot.items():
             for position_entry in device_data["position_data"]:
@@ -227,7 +227,7 @@ class BaseStation:
     def vision_monitior(self):
         """
         Removes stale data from vision snapshot
-        Updates the vision log with current vision snapshot. 
+        Updates the vision log with current positions from vision snapshot. 
         Size of log based on MAX_VISION_LOG_LENGTH
         """
         while True:
@@ -235,9 +235,12 @@ class BaseStation:
                 for device_id, device_data in self.vision_snapshot.items():
                     if time.time() - device_data["TIMESTAMP"] > VISION_DATA_HOLD_THRESHOLD:
                         self.vision_snapshot.pop(device_id, None)
-                self.vision_log.append(deepcopy(self.vision_snapshot))
+                self.vision_log.append(self.get_estimated_positions())
                 while len(self.vision_log) > MAX_VISION_LOG_LENGTH:
                     self.vision_log.pop(0)
+                print(self.vision_log)
+                for i in range(30):
+                    print("")
 
 
     # ==================== BOTS ====================
