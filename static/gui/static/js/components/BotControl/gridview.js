@@ -159,7 +159,7 @@ export default class GridView extends React.Component {
       switch (String(detection["type"].toLowerCase().trim())) {
         case "minibot":
           const botJSXArray = this.renderBot(detection);
-          bots.push(botJSXArray[0], botJSXArray[1]);
+          bots.push(botJSXArray);
           break;
         default:
           break;
@@ -174,18 +174,23 @@ export default class GridView extends React.Component {
     const x = scaleFactor * (this.state.world_width / 2 + x_pos);
     const y = scaleFactor * (this.state.world_height / 2 - y_pos);
     const orientation_pos = parseInt(detection["orientation"]);
-    return [
-      <circle cx={x} cy={y} r={botRadius} fill={botColor}></circle>,
-      <image
-        x={x - botRadius}
-        y={y - botRadius}
-        width={2 * botRadius}
-        height={2 * botRadius}
-        fill={botColor}
-        href="./static/img/bot-dot.png"
-        transform={`rotate(${orientation_pos}, ${x}, ${y})`}
-      ></image>,
-    ];
+    return (
+      <g>
+        <title>{`${detection["name"] ? detection["name"] : ""}: (${Math.round(
+          x_pos
+        )},${Math.round(y_pos)}) ${Math.round(orientation_pos)}°`}</title>
+        <circle cx={x} cy={y} r={botRadius} fill={botColor}></circle>,
+        <image
+          x={x - botRadius}
+          y={y - botRadius}
+          width={2 * botRadius}
+          height={2 * botRadius}
+          fill={botColor}
+          href="./static/img/bot-dot.png"
+          transform={`rotate(${orientation_pos}, ${x}, ${y})`}
+        ></image>
+      </g>
+    );
   }
 
   renderSVG() {
