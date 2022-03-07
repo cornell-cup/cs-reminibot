@@ -5,6 +5,7 @@ from select import select
 from socket import socket, timeout, AF_INET, SOCK_STREAM, SOCK_DGRAM
 from socket import SOL_SOCKET, SO_REUSEADDR, SO_BROADCAST
 from threading import Thread
+from multiprocessing import Process, Queue
 from typing import List, Tuple
 import sys
 import time
@@ -339,7 +340,14 @@ class Minibot:
                     self.blockly_python_proc.kill_proc()
                 Thread(target=ece.stop).start()
         elif key == "IR":
-            Thread(target=ece.read_ir).start()
+            # shared queue
+            qq = Queue()
+
+            proc = Process(target=ece.read_ir, args=((qq),))
+            proc.daemon = True
+            proc.start()
+
+            self.sendKV(sock, key, qq.get(block=True, timeout=timeout))
 
     def sendKV(self, sock: socket, key: str, value: str):
         """ Sends a key-value pair to the specified socket. The key value

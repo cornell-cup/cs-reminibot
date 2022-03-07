@@ -232,12 +232,17 @@ export default class AddBot extends React.Component {
             data: JSON.stringify({
                 bot_name: _this.props.selectedBotName,
             })
-        }).catch(function (error) {
-            if (error.response.data.error_msg.length > 0)
-                window.alert(error.response.data.error_msg);
-            else
-                console.log(error);
-        });
+        }).then(function (response) {
+            if (response.data) {
+                console.log(response.data);
+            }
+        })
+            .catch(function (error) {
+                if (error.response.data.error_msg.length > 0)
+                    window.alert(error.response.data.error_msg);
+                else
+                    console.log(error);
+            });
     }
 
     objectDetectionOnClick() {
@@ -253,13 +258,14 @@ export default class AddBot extends React.Component {
                 bot_name: _this.props.selectedBotName,
                 mode: "object_detection",
             })
-        }).catch(function (error) {
-            if (error.response.data.error_msg.length > 0)
-                window.alert(error.response.data.error_msg);
-            else
-                console.log(error);
-            //handle errors
-        });
+        })
+            .catch(function (error) {
+                if (error.response.data.error_msg.length > 0)
+                    window.alert(error.response.data.error_msg);
+                else
+                    console.log(error);
+                //handle errors
+            });
     }
 
 

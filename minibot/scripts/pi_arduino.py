@@ -135,8 +135,9 @@ def read_once():
     Returns: (int) The median value of reading from the Arduino
         "num_reads" times.  
     """
-    num_reads = 5
+    # num_reads = 5
 
+    num_reads = 1
     # log the results
 
     values = []
@@ -146,18 +147,16 @@ def read_once():
                     now.strftime('%H:%M:%S.%f') + ".txt", "w")
 
         file.write("Reading from Arduino\n")
-        values += spi.readbytes(1)
+        values = spi.readbytes(1)
         file.write(' '.join(str(val) for val in values))
         file.close()
         # Need a short delay between each read from the Arduino
         # Without the delay, the Arduino will return 0
         time.sleep(0.02)
 
-    file.write("Original values: {}".format(values) + "\n")
-    val = median(values)
-    file.write("Median value read is {}".format(val) + "\n")
+    # val = median(values)
 
-    return val
+    return values[0]
 
 
 def acquire_lock():
@@ -236,12 +235,12 @@ def read_ultrasonic():
     return return_val
 
 
-def read_ir():
+def read_ir(queue):
     acquire_lock()
     transmit_once('T')
     release_lock()
     return_val = read_once()
-    return return_val
+    queue.put(return_val)
 
 
 def move_servo(angle):

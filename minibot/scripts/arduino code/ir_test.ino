@@ -15,8 +15,8 @@ QTRSensors qtr;
 // If using the breakout or shield with I2C, define just the pins connected
 // to the IRQ and reset lines.  Use the values below (2, 3) for the shield!
 // RFID module
-#define PN532_IRQ (2)   // pin 3 of the RJ12 17 (2)
-#define PN532_RESET (3) // pin 4 of the RJ12 9  (3)
+#define PN532_IRQ (2)    // pin 3 of the RJ12 17 (2)
+#define PN532_RESET (3)  // pin 4 of the RJ12 9  (3)
 
 // IR
 int IRPin = 4;
@@ -33,81 +33,72 @@ volatile byte pos = 0;
 
 boolean valid;
 
-void setup()
-{
+void setup() {
     Serial.begin(115200);
     pinMode(SCK, INPUT);
     pinMode(MISO, OUTPUT);
     pinMode(MOSI, INPUT);
-    SPCR |= bit(SPE); // turn on SPI in slave mode
+    SPCR |= bit(SPE);  // turn on SPI in slave mode
     // turn on the interrupt
     SPI.attachInterrupt();
 
     pos = 0;
     pinMode(IRPin, INPUT);
 }
+int val;
 
 // SPI ISR (Interrupt Service Routine)
 
-ISR(SPI_STC_vect)
-{
-    byte c = SPDR; // get byte from the SPI data register
+ISR(SPI_STC_vect) {
+    byte c = SPDR;  // get byte from the SPI data register
     // detect the beginning of the buffer, do not put it in the buffer
-    if (c == '\n')
-    {
+    if (c == '\n') {
         valid = true;
     }
     // detect the end character
-    else if (c == '\r')
-    {
+    else if (c == '\r') {
         valid = false;
         pos = 0;
     }
     // put data into the buffer
-    if ((valid == true) && (c != '\n') && (c != '\r'))
-    {
-        if (pos < bufSize)
-        { /// sizeof buffer
+    if ((valid == true) && (c != '\n') && (c != '\r')) {
+        if (pos < bufSize) {  /// sizeof buffer
             buf[pos] = c;
             pos++;
         }
     }
+
+    if (c == 'T') {
+        read_IR();
+        SPDR = val;
+    }
 }
 
-int val;
-void read_IR()
-{
+void read_IR() {
     val = digitalRead(IRPin);
-    SPDR = val;
-    Serial.println(val);
+    // Serial.println("val" + String(val));
+    // Serial.println("SPDR" + String(SPDR));
+    // Serial.println("SPDR_value" + String(spdr_value));
 }
 
 boolean read_ir = false;
-void check_buffer()
-{
-    if (buf[0] == 'T')
-    {
+void check_buffer() {
+    if (buf[0] == 'T') {
         read_ir = true;
-    }
-    else
-    {
+    } else {
         read_ir = false;
     }
 }
 
-void loop()
-{
-
+void loop() {
     delay(100);
     check_buffer();
-    if (read_ir == true)
-    {
+    if (read_ir == true) {
         read_IR();
     }
 
     // clear the buffer when a command is executed
-    if (valid)
-    {
+    if (valid) {
         pos = 0;
         valid = false;
     }
