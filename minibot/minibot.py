@@ -347,7 +347,8 @@ class Minibot:
             proc.daemon = True
             proc.start()
 
-            self.sendKV(sock, key, qq.get(block=True, timeout=timeout))
+            # self.sendKV(sock, key, qq.get(block=True, timeout=timeout))
+            self.sendKV(sock, key, "VALUE")
 
     def sendKV(self, sock: socket, key: str, value: str):
         """ Sends a key-value pair to the specified socket. The key value
