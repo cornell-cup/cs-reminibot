@@ -22,6 +22,7 @@ import speech_recognition as sr
 from copy import deepcopy
 
 MAX_VISION_LOG_LENGTH = 1000
+VISION_UPDATE_FREQUENCY = 1
 VISION_DATA_HOLD_THRESHOLD = 1
 
 
@@ -221,9 +222,13 @@ class BaseStation:
         for value in object_mappings:
             self.remove_from_vision_object_map(value)
         
-    def get_vision_data(self):
+    def get_raw_vision_data(self):
         """ Returns most recent vision data """
         return self.vision_snapshot if self.vision_snapshot else None
+    
+    def get_vision_data(self):
+        """ Returns most recent vision data """
+        return self.vision_log[-1] if self.vision_log and len(self.vision_log) > 0 else None
 
     def get_vision_object_map(self):
         """ Returns the mapping of vision objects to their corresponding ids """
@@ -333,6 +338,7 @@ class BaseStation:
                 print(self.vision_log)
                 for i in range(30):
                     print("")
+                time.sleep(1/VISION_UPDATE_FREQUENCY)
 
 
     # ==================== BOTS ====================
