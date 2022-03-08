@@ -329,8 +329,8 @@ class BaseStation:
         """
         while True:
             if self.vision_snapshot:
-                for device_id, device_data in self.vision_snapshot.items():
-                    if time.time() - device_data["TIMESTAMP"] > VISION_DATA_HOLD_THRESHOLD:
+                for device_id in list(self.vision_snapshot.keys()):
+                    if time.time() - self.vision_snapshot[device_id]["TIMESTAMP"] > VISION_DATA_HOLD_THRESHOLD:
                         self.vision_snapshot.pop(device_id, None)
                 self.vision_log.append({"TIMESTAMP": time.time(), "POSITION_DATA": self.get_estimated_positions()})
                 while len(self.vision_log) > MAX_VISION_LOG_LENGTH:

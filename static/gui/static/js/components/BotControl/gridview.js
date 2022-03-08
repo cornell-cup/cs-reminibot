@@ -9,7 +9,7 @@ library.add(faInfoCircle);
 import { Button } from "../utils/Util.js";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
-const scaleFactor = 20;
+const scaleFactor = 40;
 const distanceBetweenTicks = 10;
 
 const widthPadding = 200;
@@ -216,6 +216,9 @@ export default class GridView extends React.Component {
     const x = scaleFactor * (this.state.world_width / 2 + x_pos);
     const y = scaleFactor * (this.state.world_height / 2 - y_pos);
     const orientation_pos = parseFloat(detection["orientation"]);
+    const width = detection["width"] ? detection["width"] : unknownMeasure;
+    const height = detection["length"] ? detection["length"] : unknownMeasure;
+    const radius = detection["radius"] ? detection["radius"] : unknownMeasure;
     switch (
       detection["shape"] ? String(detection["shape"].toLowerCase().trim()) : ""
     ) {
@@ -224,18 +227,15 @@ export default class GridView extends React.Component {
       case "rectangular-prism":
       case "square":
       case "rectangle":
-        const width = detection["width"] ? detection["width"] : unknownMeasure;
-        const height = detection["length"]
-          ? detection["length"]
-          : unknownMeasure;
         return (
           <React.Fragment>
             <rect
-              cx={x}
-              cy={y}
+              x={x - (scaleFactor * width) / 2}
+              y={y - (scaleFactor * height) / 2}
               transform={`rotate(${orientation_pos}, ${x}, ${y})`}
-              width={width}
-              height={height}
+              width={scaleFactor * width}
+              height={scaleFactor * height}
+              fill={detection["color"]}
             ></rect>
             {this.renderShape(
               {
@@ -254,15 +254,12 @@ export default class GridView extends React.Component {
       case "sphere":
       case "cylinder":
       case "circle":
-        const radius = detection["radius"]
-          ? detection["radius"]
-          : unknownMeasure;
         return (
           <React.Fragment>
             <circle
               cx={x}
               cy={y}
-              r={radius}
+              r={scaleFactor * radius}
               fill={detection["color"] ? detection["color"] : unknownMeasure}
               transform={`rotate(${orientation_pos}, ${x}, ${y})`}
             ></circle>
@@ -283,11 +280,14 @@ export default class GridView extends React.Component {
       case "image":
         return (
           <image
-            cx={x}
-            cy={y}
-            width={detection["width"] ? detection["width"] : unknownMeasure}
-            height={detection["length"] ? detection["length"] : unknownMeasure}
-            fill={detection["color"] ? detection["color"] : unknownMeasure}
+            x={x - (scaleFactor * width) / 2}
+            y={y - (scaleFactor * height) / 2}
+            width={scaleFactor * width}
+            height={scaleFactor * height}
+            fill={
+              scaleFactor *
+              (detection["color"] ? detection["color"] : unknownMeasure)
+            }
             href={image_path}
             transform={`rotate(${orientation_pos}, ${x}, ${y})`}
           ></image>
