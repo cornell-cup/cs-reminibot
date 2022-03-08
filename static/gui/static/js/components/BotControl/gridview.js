@@ -15,9 +15,9 @@ const distanceBetweenTicks = 10;
 const widthPadding = 200;
 const heightPadding = 50;
 const textOffset = 20;
-const botRadius = 50;
+const botRadius = 2.5;
 const botColor = "red";
-const unknownRadius = 50;
+const unknownMeasure = 2.5;
 const unknownColor = "black";
 
 /**
@@ -173,52 +173,136 @@ export default class GridView extends React.Component {
   }
 
   renderBot(detection) {
-    const x_pos = parseInt(detection["x"]);
-    const y_pos = parseInt(detection["y"]);
+    return this.renderShapeGroup(detection, "./static/img/bot-dot.png");
+  }
+
+  renderUnknown(detection) {
+    const x_pos = parseFloat(detection["x"]);
+    const y_pos = parseFloat(detection["y"]);
+    const orientation_pos = parseFloat(detection["orientation"]);
+    return this.renderShapeGroup(
+      {
+        shape: "circle",
+        x: x_pos,
+        y: y_pos,
+        orientation: orientation_pos,
+        width: 2 * unknownMeasure,
+        height: 2 * unknownMeasure,
+        color: unknownColor,
+      },
+      "./static/img/unknown-dot.png"
+    );
+  }
+
+  renderShapeGroup(detection, image_path) {
+    const x_pos = parseFloat(detection["x"]);
+    const y_pos = parseFloat(detection["y"]);
     const x = scaleFactor * (this.state.world_width / 2 + x_pos);
     const y = scaleFactor * (this.state.world_height / 2 - y_pos);
-    const orientation_pos = parseInt(detection["orientation"]);
+    const orientation_pos = parseFloat(detection["orientation"]);
     return (
       <g>
         <title>{`${detection["name"] ? detection["name"] : ""}: (${Math.round(
           x_pos
         )},${Math.round(y_pos)}) ${Math.round(orientation_pos)}°`}</title>
-        <circle cx={x} cy={y} r={botRadius} fill={botColor}></circle>,
-        <image
-          x={x - botRadius}
-          y={y - botRadius}
-          width={2 * botRadius}
-          height={2 * botRadius}
-          fill={botColor}
-          href="./static/img/bot-dot.png"
-          transform={`rotate(${orientation_pos}, ${x}, ${y})`}
-        ></image>
+        {this.renderShape(detection, image_path)}
       </g>
     );
   }
-  renderUnknown(detection) {
-    const x_pos = parseInt(detection["x"]);
-    const y_pos = parseInt(detection["y"]);
+
+  renderShape(detection, image_path = "./static/img/unknown-dot.png") {
+    const x_pos = parseFloat(detection["x"]);
+    const y_pos = parseFloat(detection["y"]);
     const x = scaleFactor * (this.state.world_width / 2 + x_pos);
     const y = scaleFactor * (this.state.world_height / 2 - y_pos);
-    const orientation_pos = parseInt(detection["orientation"]);
-    return (
-      <g>
-        <title>{`${detection["name"] ? detection["name"] : ""}: (${Math.round(
-          x_pos
-        )},${Math.round(y_pos)}) ${Math.round(orientation_pos)}°`}</title>
-        <circle cx={x} cy={y} r={unknownRadius} fill={unknownColor}></circle>,
-        <image
-          x={x - unknownRadius}
-          y={y - unknownRadius}
-          width={2 * unknownRadius}
-          height={2 * unknownRadius}
-          fill={unknownColor}
-          href="./static/img/unknown-dot.png"
-          transform={`rotate(${orientation_pos}, ${x}, ${y})`}
-        ></image>
-      </g>
-    );
+    const orientation_pos = parseFloat(detection["orientation"]);
+    switch (
+      detection["shape"] ? String(detection["shape"].toLowerCase().trim()) : ""
+    ) {
+      case "cube":
+      case "rectangular-prism":
+      case "rectangular-prism":
+      case "square":
+      case "rectangle":
+        const width = detection["width"] ? detection["width"] : unknownMeasure;
+        const height = detection["length"]
+          ? detection["length"]
+          : unknownMeasure;
+        return (
+          <React.Fragment>
+            <rect
+              cx={x}
+              cy={y}
+              transform={`rotate(${orientation_pos}, ${x}, ${y})`}
+              width={width}
+              height={height}
+            ></rect>
+            {this.renderShape(
+              {
+                x: x_pos,
+                y: y_pos,
+                orientation: orientation_pos,
+                width: width,
+                length: height,
+                color: detection["color"],
+                shape: "image",
+              },
+              image_path
+            )}
+          </React.Fragment>
+        );
+      case "sphere":
+      case "cylinder":
+      case "circle":
+        const radius = detection["radius"]
+          ? detection["radius"]
+          : unknownMeasure;
+        return (
+          <React.Fragment>
+            <circle
+              cx={x}
+              cy={y}
+              r={radius}
+              fill={detection["color"] ? detection["color"] : unknownMeasure}
+              transform={`rotate(${orientation_pos}, ${x}, ${y})`}
+            ></circle>
+            {this.renderShape(
+              {
+                x: x_pos,
+                y: y_pos,
+                orientation: orientation_pos,
+                width: 2 * radius,
+                length: 2 * radius,
+                color: detection["color"],
+                shape: "image",
+              },
+              image_path
+            )}
+          </React.Fragment>
+        );
+      case "image":
+        return (
+          <image
+            cx={x}
+            cy={y}
+            width={detection["width"] ? detection["width"] : unknownMeasure}
+            height={detection["length"] ? detection["length"] : unknownMeasure}
+            fill={detection["color"] ? detection["color"] : unknownMeasure}
+            href={image_path}
+            transform={`rotate(${orientation_pos}, ${x}, ${y})`}
+          ></image>
+        );
+      default:
+        return (
+          <circle
+            cx={x}
+            cy={y}
+            r={detection["radius"] ? detection["radius"] : unknownMeasure}
+            fill={detection["color"] ? detection["color"] : unknownMeasure}
+            transform={`rotate(${orientation_pos}, ${x}, ${y})`}
+          ></circle>
+        );
+    }
   }
 
   renderSVG() {
