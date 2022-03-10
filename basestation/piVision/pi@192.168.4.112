@@ -29,7 +29,7 @@ def main():
     # vs = VideoStream(usePiCamera=True, resolution=(
     #     240, 135), framerate=25).start()
     vs = VideoStream(usePiCamera=True, resolution=(
-        240, 135), framerate=25).start()
+        240, 135), framerate=25)
     #vs = VideoStream(src=0).start()
     time.sleep(2.0)
 

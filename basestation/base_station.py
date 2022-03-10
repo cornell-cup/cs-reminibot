@@ -82,10 +82,10 @@ class BaseStation:
         # only bind in debug mode if you are the debug server, if you are the
         # monitoring program which restarts the debug server, do not bind,
         # otherwise the debug server won't be able to bind
-        if app_debug and os.environ["WERKZEUG_RUN_MAIN"] == "true":
-            self.sock.bind(server_address)
-        else:
-            self.sock.bind(server_address)
+        # if app_debug and os.environ["WERKZEUG_RUN_MAIN"] == "true":
+        #     self.sock.bind(server_address)
+        # else:
+        self.sock.bind(server_address)
 
         self._login_email = None
         self.speech_recog_thread = None
@@ -213,7 +213,8 @@ class BaseStation:
 
         if mode == "object_detection":
             self.bot_vision_server = subprocess.Popen(
-                ['python', './basestation/piVision/server.py'])
+                ['python', './basestation/piVision/server.py', '-p MobileNetSSD_deploy.prototxt', 
+                '-m', 'MobileNetSSD_deploy.caffemodel', '-mW', '2', '-mH', '2'])
         else:
             if self.bot_vision_server:
                 self.bot_vision_server.kill()
