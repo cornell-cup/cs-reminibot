@@ -137,7 +137,7 @@ def read_once():
     """
     # num_reads = 5
 
-    num_reads = 1
+    num_reads = 5
     # log the results
 
     values = []
