@@ -328,14 +328,13 @@ class BaseStation:
         Size of log based on MAX_VISION_LOG_LENGTH
         """
         while True:
-            if self.vision_snapshot:
-                for device_id in list(self.vision_snapshot.keys()):
-                    if time.time() - self.vision_snapshot[device_id]["TIMESTAMP"] > VISION_DATA_HOLD_THRESHOLD:
-                        self.vision_snapshot.pop(device_id, None)
-                self.vision_log.append({"TIMESTAMP": time.time(), "POSITION_DATA": self.get_estimated_positions()})
-                while len(self.vision_log) > MAX_VISION_LOG_LENGTH:
-                    self.vision_log.pop(0)
-                time.sleep(1/VISION_UPDATE_FREQUENCY) 
+            for device_id in list(self.vision_snapshot.keys()):
+                if time.time() - self.vision_snapshot[device_id]["TIMESTAMP"] > VISION_DATA_HOLD_THRESHOLD:
+                    self.vision_snapshot.pop(device_id, None)
+            self.vision_log.append({"TIMESTAMP": time.time(), "POSITION_DATA": self.get_estimated_positions()})
+            while len(self.vision_log) > MAX_VISION_LOG_LENGTH:
+                self.vision_log.pop(0)
+            time.sleep(1/VISION_UPDATE_FREQUENCY) 
 
 
     # ==================== BOTS ====================
