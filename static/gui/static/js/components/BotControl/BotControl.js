@@ -1,13 +1,18 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from "react";
 
-import AddBot from './SetupBot/AddBot.js';
-import MovementControls from './MovementControl/MovementControl.js';
-import GridView from './gridview.js';
+import AddBot from "./SetupBot/AddBot.js";
+import MovementControls from "./MovementControl/MovementControl.js";
+import GridView from "./gridview.js";
+import VisionUserInterface from "./VisionUserInterface.js";
 
-function BotControl({ selectedBotName, setSelectedBotName, selectedBotStyle, setSelectedBotStyle }) {
+function BotControl({
+  selectedBotName,
+  setSelectedBotName,
+  selectedBotStyle,
+  setSelectedBotStyle,
+}) {
   return (
     <div className="row">
-
       <div className="col-md">
         <AddBot
           selectedBotName={selectedBotName}
@@ -18,7 +23,6 @@ function BotControl({ selectedBotName, setSelectedBotName, selectedBotStyle, set
       </div>
 
       <div className="col-md">
-
         {/* movement controls */}
         <div className="row">
           <MovementControls
@@ -30,12 +34,16 @@ function BotControl({ selectedBotName, setSelectedBotName, selectedBotStyle, set
         </div>
         <br />
         <div className="row">
+
           <GridView />
+
+          {/* <div className="col-2">
+            <VisionUserInterface />
+          </div> */}
         </div>
       </div>
     </div>
-
-  )
+  );
 }
 
 export default BotControl;

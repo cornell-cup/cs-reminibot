@@ -76,13 +76,6 @@ export default class GridView extends React.Component {
             y2={scaleFactor * this.state.world_height}
             strokeWidth="5"
           ></line>
-          <text
-            fill="white"
-            y={scaleFactor * this.state.world_height + textOffset}
-            dy="0.71em"
-          >
-            {`${xStart + xStep * i}`}
-          </text>
         </g>
       );
     }
@@ -116,13 +109,6 @@ export default class GridView extends React.Component {
             x2={scaleFactor * this.state.world_width}
             strokeWidth="5"
           ></line>
-          <text
-            fill="white"
-            x={scaleFactor * this.state.world_width + textOffset}
-            dx="0.71em"
-          >
-            {`${yStart - yStep * i}`}
-          </text>
         </g>
       );
     }
@@ -159,7 +145,7 @@ export default class GridView extends React.Component {
     let bots = [];
     for (const detection of this.state.detections) {
       switch (
-        detection["type"] ? String(detection["type"].toLowerCase().trim()) : ""
+      detection["type"] ? String(detection["type"].toLowerCase().trim()) : ""
       ) {
         case "minibot":
           bots.push(this.renderBot(detection));
@@ -220,7 +206,7 @@ export default class GridView extends React.Component {
     const height = detection["length"] ? detection["length"] : unknownMeasure;
     const radius = detection["radius"] ? detection["radius"] : unknownMeasure;
     switch (
-      detection["shape"] ? String(detection["shape"].toLowerCase().trim()) : ""
+    detection["shape"] ? String(detection["shape"].toLowerCase().trim()) : ""
     ) {
       case "cube":
       case "rectangular-prism":
@@ -311,9 +297,8 @@ export default class GridView extends React.Component {
         width={this.state.view_width}
         height={this.state.view_height}
         fill="white"
-        viewBox={`0 0 ${
-          scaleFactor * this.state.world_width + 2 * widthPadding
-        } ${scaleFactor * this.state.world_height + 2 * heightPadding}`}
+        viewBox={`0 0 ${scaleFactor * this.state.world_width + 2 * widthPadding
+          } ${scaleFactor * this.state.world_height + 2 * heightPadding}`}
       >
         <g transform={`translate(${widthPadding},${heightPadding})`}>
           {this.renderGrid()}
@@ -326,7 +311,7 @@ export default class GridView extends React.Component {
   /**
    * Executes after the component gets rendered.
    **/
-  componentDidMount() {}
+  componentDidMount() { }
 
   getVisionData() {
     // allows you to call global attributes in axios
@@ -368,7 +353,7 @@ export default class GridView extends React.Component {
           // },
         ],
       })
-      .then(function (response) {}.bind(this))
+      .then(function (response) { }.bind(this))
       .catch(function (error) {
         // console.log(error);
       });
@@ -390,7 +375,7 @@ export default class GridView extends React.Component {
           },
         ],
       })
-      .then(function (response) {}.bind(this))
+      .then(function (response) { }.bind(this))
       .catch(function (error) {
         // console.log(error);
       });
