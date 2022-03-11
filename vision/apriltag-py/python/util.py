@@ -297,7 +297,7 @@ def draw_pose(overlay, camera_params, tag_size, pose, z_sign=1):
     cv2.putText(overlay, 'Y', ipoints[2], font, 0.5, (0,255,0), 2, cv2.LINE_AA)
     cv2.putText(overlay, 'Z', ipoints[3], font, 0.5, (255,0,0), 2, cv2.LINE_AA)
 
-def draw_cube(overlay, camera_params, tag_size, pose, z_sign=1):
+def draw_cube(overlay, camera_params, tag_size, pose, z_sign=-1):
 
     opoints = np.array([
         -1, -1, 0,
@@ -342,6 +342,51 @@ def draw_cube(overlay, camera_params, tag_size, pose, z_sign=1):
 
     for i, j in edges:
         cv2.line(overlay, ipoints[i], ipoints[j], (0, 255, 0), 1, 16)
+def draw_square(overlay, camera_params, tag_size, pose, z_sign=-1):
+
+    opoints = np.array([
+        -1, -1, 0,
+        1, -1, 0,
+        1, 1, 0,
+        -1, 1, 0,
+        -1, -1, 1 * z_sign,
+        1, -1, 1 * z_sign,
+        1, 1, 1 * z_sign,
+        -1, 1, 1 * z_sign,
+    ]).reshape(-1, 1, 3) * 0.5 * tag_size
+
+    edges = np.array([
+        0, 1,
+        1, 2,
+        2, 3,
+        3, 0,
+        0, 4,
+        1, 5,
+        2, 6,
+        3, 7,
+        4, 5,
+        5, 6,
+        6, 7,
+        7, 4
+    ]).reshape(-1, 2)
+
+    fx, fy, cx, cy = camera_params
+
+    K = np.array([fx, 0, cx, 0, fy, cy, 0, 0, 1]).reshape(3, 3)
+
+    rvec, _ = cv2.Rodrigues(pose[:3, :3])
+    tvec = pose[:3, 3]
+
+    dcoeffs = np.zeros(5)
+
+    ipoints, _ = cv2.projectPoints(opoints, rvec, tvec, K, dcoeffs)
+
+    ipoints = np.round(ipoints).astype(int)
+
+    ipoints = [tuple(pt) for pt in ipoints.reshape(-1, 2)]
+
+    for i, j in edges[0:4]:
+        cv2.line(overlay, ipoints[i], ipoints[j], (0, 255, 0), 2, 16)
 
 def camera_matrix_to_camera_params(camera_matrix):
     fx = camera_matrix[0][0]

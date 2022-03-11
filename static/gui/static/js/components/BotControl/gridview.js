@@ -187,12 +187,16 @@ export default class GridView extends React.Component {
     const y = scaleFactor * (this.state.world_height / 2 - y_pos);
     const orientation_pos = parseFloat(detection["orientation"]);
     return (
-      <g>
+      <g className="popup" onClick={() => {
+        alert(`${detection["name"] ? detection["name"] : ""}: (${Math.round(
+          x_pos
+        )},${Math.round(y_pos)}) ${Math.round(orientation_pos)}°`)
+      }}>
         <title>{`${detection["name"] ? detection["name"] : ""}: (${Math.round(
           x_pos
         )},${Math.round(y_pos)}) ${Math.round(orientation_pos)}°`}</title>
         {this.renderShape(detection, image_path)}
-      </g>
+      </g >
     );
   }
 
@@ -311,7 +315,229 @@ export default class GridView extends React.Component {
   /**
    * Executes after the component gets rendered.
    **/
-  componentDidMount() { }
+  componentDidMount() {
+    axios
+      .post("/object-mapping", {
+        add: true,
+        mappings: [
+          {
+            id: "20",
+            name: "minibot20",
+            type: "minibot",
+            length: 10,
+            width: 10,
+            height: 7,
+            shape: "cube",
+            color: "red",
+          },
+          {
+            id: "21",
+            name: "minibot21",
+            type: "minibot",
+            length: 10,
+            width: 10,
+            height: 7,
+            shape: "cube",
+            color: "red",
+          },
+          {
+            id: "22",
+            name: "minibot22",
+            type: "minibot",
+            length: 10,
+            width: 10,
+            height: 7,
+            shape: "cube",
+            color: "red",
+          },
+          {
+            id: "23",
+            name: "minibot23",
+            type: "minibot",
+            length: 10,
+            width: 10,
+            height: 7,
+            shape: "cube",
+            color: "red",
+          },
+          {
+            id: "24",
+            name: "minibot24",
+            type: "minibot",
+            length: 10,
+            width: 10,
+            height: 7,
+            shape: "cube",
+            color: "red",
+          },
+          {
+            id: "25",
+            name: "minibot25",
+            type: "minibot",
+            length: 10,
+            width: 10,
+            height: 7,
+            shape: "cube",
+            color: "red",
+          },
+          {
+            id: "26",
+            name: "minibot26",
+            type: "minibot",
+            length: 10,
+            width: 10,
+            height: 7,
+            shape: "cube",
+            color: "red",
+          },
+          {
+            id: "27",
+            name: "minibot27",
+            type: "minibot",
+            length: 10,
+            width: 10,
+            height: 7,
+            shape: "cube",
+            color: "red",
+          },
+          {
+            id: "28",
+            name: "minibot28",
+            type: "minibot",
+            length: 10,
+            width: 10,
+            height: 7,
+            shape: "cube",
+            color: "red",
+          },
+          {
+            id: "29",
+            name: "minibot29",
+            type: "minibot",
+            length: 10,
+            width: 10,
+            height: 7,
+            shape: "cube",
+            color: "red",
+          },
+          {
+            id: "30",
+            name: "minibot30",
+            type: "minibot",
+            length: 10,
+            width: 10,
+            height: 7,
+            shape: "cube",
+            color: "red",
+          },
+          {
+            id: "31",
+            name: "minibot31",
+            type: "minibot",
+            length: 10,
+            width: 10,
+            height: 7,
+            shape: "cube",
+            color: "red",
+          },
+          {
+            id: "32",
+            name: "minibot32",
+            type: "minibot",
+            length: 10,
+            width: 10,
+            height: 7,
+            shape: "cube",
+            color: "red",
+          },
+          {
+            id: "33",
+            name: "minibot33",
+            type: "minibot",
+            length: 10,
+            width: 10,
+            height: 7,
+            shape: "cube",
+            color: "red",
+          },
+          {
+            id: "34",
+            name: "minibot34",
+            type: "minibot",
+            length: 10,
+            width: 10,
+            height: 7,
+            shape: "cube",
+            color: "red",
+          },
+          {
+            id: "35",
+            name: "minibot35",
+            type: "minibot",
+            length: 10,
+            width: 10,
+            height: 7,
+            shape: "cube",
+            color: "red",
+          },
+          {
+            id: "36",
+            name: "minibot36",
+            type: "minibot",
+            length: 10,
+            width: 10,
+            height: 7,
+            shape: "cube",
+            color: "red",
+          },
+          {
+            id: "37",
+            name: "minibot37",
+            type: "minibot",
+            length: 10,
+            width: 10,
+            height: 7,
+            shape: "cube",
+            color: "red",
+          },
+          {
+            id: "38",
+            name: "minibot38",
+            type: "minibot",
+            length: 10,
+            width: 10,
+            height: 7,
+            shape: "cube",
+            color: "red",
+          },
+          {
+            id: "39",
+            name: "minibot39",
+            type: "minibot",
+            length: 10,
+            width: 10,
+            height: 7,
+            shape: "cube",
+            color: "red",
+          },
+          {
+            id: "40",
+            name: "minibot40",
+            type: "minibot",
+            length: 10,
+            width: 10,
+            height: 7,
+            shape: "cube",
+            color: "red",
+          }
+        ],
+      })
+      .then(function (response) { }.bind(this))
+      .catch(function (error) {
+        // console.log(error);
+      });
+
+  }
 
   getVisionData() {
     // allows you to call global attributes in axios
@@ -329,56 +555,29 @@ export default class GridView extends React.Component {
         // console.log(error);
       });
 
-    axios
-      .post("/object-mapping", {
-        add: true,
-        mappings: [
-          {
-            id: "6",
-            name: "minibot6",
-            type: "minibot",
-            length: 5,
-            width: 10,
-            height: 7,
-            shape: "cube",
-            color: "red",
-          },
-          // {
-          //   id: "test id",
-          //   name: "test name",
-          //   type: "test type",
-          //   radius: 7,
-          //   shape: "sphere",
-          //   color: "blue",
-          // },
-        ],
-      })
-      .then(function (response) { }.bind(this))
-      .catch(function (error) {
-        // console.log(error);
-      });
-    // example of adding virtual object to base station
-    axios
-      .post("/virtual-objects", {
-        add: true,
-        virtual_objects: [
-          {
-            id: "test id",
-            x: 4,
-            y: 9,
-            orientation: 92,
-            name: "test name",
-            type: "test type",
-            radius: 7,
-            shape: "sphere",
-            color: "blue",
-          },
-        ],
-      })
-      .then(function (response) { }.bind(this))
-      .catch(function (error) {
-        // console.log(error);
-      });
+
+    // // example of adding virtual object to base station
+    // axios
+    //   .post("/virtual-objects", {
+    //     add: true,
+    //     virtual_objects: [
+    //       {
+    //         id: "test id",
+    //         x: 4,
+    //         y: 9,
+    //         orientation: 92,
+    //         name: "test name",
+    //         type: "test type",
+    //         radius: 7,
+    //         shape: "sphere",
+    //         color: "blue",
+    //       },
+    //     ],
+    //   })
+    //   .then(function (response) { }.bind(this))
+    //   .catch(function (error) {
+    //     // console.log(error);
+    //   });
   }
 
   displayRobot() {
