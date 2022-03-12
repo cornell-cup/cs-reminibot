@@ -118,7 +118,7 @@ while(True):
   
 
     # Display the frame, saved in the file   
-    cv2.imshow('output', with_contours)
+    cv2.imshow('output', frame)
 
     # Press Q on keyboard to stop recording
     if cv2.waitKey(1) & 0xFF == ord('Q'):
