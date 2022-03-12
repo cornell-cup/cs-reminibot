@@ -6,35 +6,34 @@ export default function VisionUserInterface() {
 
 
   return (
-    <div class="btn-group">
+    <React.Fragment>
+
       <button
         title="Add Polygon"
-        type="butto
-        " class="btn btn-secondary">
+        type="button"
+        class="btn btn-primary">
+        Add Polygon&nbsp;
         <FontAwesomeIcon icon={Icons.faDrawPolygon} />
       </button>
-
+      &nbsp;
       <button
         title="Add Circle"
         type="button"
-        class="btn btn-secondary"
-        data-bs-toggle="popover"
-        data-bs-placement="right"
-        html=""
+        class="btn btn-primary"
       >
+        Add Circle&nbsp;
         <FontAwesomeIcon icon={Icons.faCircle} />
       </button>
+      &nbsp;
       <button
         title="Add Square"
         type="button"
-        class="btn btn-secondary"
-        data-bs-toggle="popover"
-        data-bs-placement="right"
-        html=""
+        class="btn btn-primary"
       >
+        Add Square&nbsp;
         <FontAwesomeIcon icon={Icons.faSquare} />
       </button>
+    </React.Fragment>
 
-    </div>
   );
 }
