@@ -153,7 +153,6 @@ def read_once():
         # Without the delay, the Arduino will return 0
         time.sleep(0.02)
 
-
     return values[0]
 
 
@@ -181,7 +180,7 @@ def release_lock():
     will stop receiving commands from the Raspberry Pi
     """
     transmit_once(END_TRASMISSION_CMD)
-    # spi.close()
+    spi.close()
     tlock.end_transmit()
 
 
