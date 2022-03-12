@@ -108,7 +108,7 @@ const Platform = withCookies((props) => {
               loginEmail={loginEmail}
             />
           </Route>
-          <Route path="/vision">
+          <Route path="/vision-page">
             <Vision />
           </Route>
         </Switch>

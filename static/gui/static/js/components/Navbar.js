@@ -82,7 +82,7 @@ const Navbar = (props) => {
         {isLoggedIn &&
           <Link id="history-link" to="/history" className={`nav-link ${activeIndex === 3 ? "active" : ""}`} onClick={(e) => { setActiveIndex(3) }}><FontAwesomeIcon icon={Icons.faChartBar} /> History</Link>
         }
-        <Link id="vision-link" to="/vision" className={`nav-link ${activeIndex === 4 ? "active" : ""}`} onClick={(e) => { setActiveIndex(4) }}><FontAwesomeIcon icon={Icons.faCamera} /> Vision</Link>
+        <Link id="vision-link" to="/vision-page" className={`nav-link ${activeIndex === 4 ? "active" : ""}`} onClick={(e) => { setActiveIndex(4) }}><FontAwesomeIcon icon={Icons.faCamera} /> Vision</Link>
         {isLoggedIn ? (authorizationRestrictedRoutes.includes(pathname) ? <Link className="nav-link" to="/start" onClick={() => { handleLogout(); setActiveIndex(0) }}><FontAwesomeIcon icon={Icons.faSignOutAlt} /> Logout</Link> : <a className="nav-link" onClick={handleLogout}><FontAwesomeIcon icon={Icons.faSignOutAlt} /> Logout</a>) : <a className="nav-link" data-toggle="modal" data-target="#loginModal"><FontAwesomeIcon icon={Icons.faSignInAlt} /> Login</a>}
         {!isLoggedIn && <a className="nav-link" data-toggle="modal" data-target="#registerModal"><FontAwesomeIcon icon={Icons.faUserPlus} /> Signup</a>}
       </div>

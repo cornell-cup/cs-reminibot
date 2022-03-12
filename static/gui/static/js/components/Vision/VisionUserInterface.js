@@ -6,7 +6,7 @@ export default function VisionUserInterface() {
 
 
   return (
-    <div class="btn-group-vertical">
+    <div class="btn-group">
       <button
         title="Add Polygon"
         type="butto

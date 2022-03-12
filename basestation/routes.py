@@ -318,3 +318,7 @@ def user_analytics():
 @app.route('/history', methods=['GET'])
 def history():
     return render_template('index.html')
+
+@app.route('/vision-page', methods=['GET'])
+def vision_page():
+    return render_template('index.html')
