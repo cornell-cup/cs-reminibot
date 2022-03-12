@@ -153,8 +153,16 @@ export default class GridView extends React.Component {
     return deltas;
   }
 
-  getDeltasFromVertices(x, y, vertices) {
+  getDeltasFromVerticesXAndY(x, y, vertices) {
     return vertices.map((vertex) => ({ x: vertex['x'] - x, y: vertex['y'] - y }));
+  }
+
+  getPolygonInfoFromVertices(vertices) {
+    const center = vertices.reduce(
+      (previousValue, currentValue) => ({ x: previousValue['x'] + currentValue['x'] / vertices.length, y: previousValue['y'] + currentValue['y'] / vertices.length }),
+      { x: 0, y: 0 }
+    );
+    return { x: center['x'], y: center['y'], deltas: this.getDeltasFromVerticesXAndY(center['x'], center['y'], vertices) };
   }
 
   renderObjects() {
@@ -646,6 +654,8 @@ export default class GridView extends React.Component {
       .catch(function (error) {
         // console.log(error);
       });
+
+    const polygonInfo = this.getPolygonInfoFromVertices([{ x: 55, y: 55 }, { x: 95, y: 55 }, { x: 95, y: 75 }, { x: 75, y: 75 }, { x: 75, y: 95 }, { x: 55, y: 95 }]);
     // example of adding virtual object to base station
     axios
       .post("/virtual-objects", {
@@ -698,13 +708,13 @@ export default class GridView extends React.Component {
           },
           {
             id: "test id5",
-            x: 75,
-            y: 75,
-            orientation: 0,
+            x: polygonInfo['x'],
+            y: polygonInfo['y'],
+            orientation: 75,
             name: "test name5",
             type: "test type5",
             shape: "polygon",
-            deltas_to_vertices: [{ x: -20, y: -10 }, { x: 20, y: -10 }, { x: 20, y: 10 }, { x: -10, y: 10 }, { x: -10, y: 20 }, { x: -20, y: 20 }],
+            deltas_to_vertices: polygonInfo['deltas'],
             color: "pink",
           }
         ],
