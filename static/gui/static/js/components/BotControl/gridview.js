@@ -144,6 +144,7 @@ export default class GridView extends React.Component {
   renderObjects() {
     let bots = [];
     for (const detection of this.state.detections) {
+      console.log(JSON.stringify(detection));
       switch (
       detection["type"] ? String(detection["type"].toLowerCase().trim()) : ""
       ) {
@@ -167,7 +168,7 @@ export default class GridView extends React.Component {
     const y_pos = parseFloat(detection["y"]);
     const orientation_pos = parseFloat(detection["orientation"]);
     return this.renderShapeGroup(
-      {
+      detection["shape"] ? detection : {
         shape: "circle",
         x: x_pos,
         y: y_pos,
@@ -180,7 +181,7 @@ export default class GridView extends React.Component {
     );
   }
 
-  renderShapeGroup(detection, image_path) {
+  renderShapeGroup(detection, image_path = null) {
     const x_pos = parseFloat(detection["x"]);
     const y_pos = parseFloat(detection["y"]);
     const x = scaleFactor * (this.state.world_width / 2 + x_pos);
@@ -200,7 +201,7 @@ export default class GridView extends React.Component {
     );
   }
 
-  renderShape(detection, image_path = "./static/img/unknown-dot.png") {
+  renderShape(detection, image_path) {
     const x_pos = parseFloat(detection["x"]);
     const y_pos = parseFloat(detection["y"]);
     const x = scaleFactor * (this.state.world_width / 2 + x_pos);
@@ -209,6 +210,17 @@ export default class GridView extends React.Component {
     const width = detection["width"] ? detection["width"] : unknownMeasure;
     const height = detection["length"] ? detection["length"] : unknownMeasure;
     const radius = detection["radius"] ? detection["radius"] : unknownMeasure;
+    const radiusY = detection["radiusY"] ? detection["radiusY"] : unknownMeasure;
+    const deltas_to_vertices = detection["deltas_to_vertices"] ? detection["deltas_to_vertices"] : [];
+    const text_vertices = deltas_to_vertices.reduce(
+      (previousValue, currentValue) => `${previousValue} ${x + scaleFactor * currentValue['x']},${y + scaleFactor * currentValue['y']}`,
+      ""
+    );
+
+    const average_deltas_to_vertices_radius = deltas_to_vertices.reduce(
+      (previousValue, currentValue) => previousValue + Math.sqrt(currentValue['x'] * currentValue['x'] + currentValue['y'] * currentValue['y']) / deltas_to_vertices.length,
+      0
+    );
     switch (
     detection["shape"] ? String(detection["shape"].toLowerCase().trim()) : ""
     ) {
@@ -267,6 +279,33 @@ export default class GridView extends React.Component {
             )}
           </React.Fragment>
         );
+      case "oval":
+      case "ellipse":
+      case "ellipsoid":
+        return (
+          <React.Fragment>
+            <ellipse
+              cx={x}
+              cy={y}
+              rx={scaleFactor * radius}
+              ry={scaleFactor * radiusY}
+              fill={detection["color"] ? detection["color"] : unknownMeasure}
+              transform={`rotate(${orientation_pos}, ${x}, ${y})`}
+            ></ellipse>
+            {this.renderShape(
+              {
+                x: x_pos,
+                y: y_pos,
+                orientation: orientation_pos,
+                width: 2 * radius,
+                length: 2 * radiusY,
+                color: detection["color"],
+                shape: "image",
+              },
+              image_path
+            )}
+          </React.Fragment>
+        );
       case "image":
         return (
           <image
@@ -278,19 +317,54 @@ export default class GridView extends React.Component {
               scaleFactor *
               (detection["color"] ? detection["color"] : unknownMeasure)
             }
-            href={image_path}
+            href={image_path || "./static/img/unknown-dot.png"}
             transform={`rotate(${orientation_pos}, ${x}, ${y})`}
           ></image>
         );
+      case "regular_polygon":
+        return (
+          <React.Fragment>
+            <polygon
+              points={text_vertices}
+              fill={detection["color"] ? detection["color"] : unknownMeasure}
+              transform={`rotate(${orientation_pos}, ${x}, ${y})`}
+            ></polygon>
+            {this.renderShape(
+              {
+                x: x_pos,
+                y: y_pos,
+                orientation: orientation_pos,
+                width: average_deltas_to_vertices_radius,
+                length: average_deltas_to_vertices_radius,
+                color: detection["color"],
+                shape: "image",
+              },
+              image_path
+            )}
+          </React.Fragment>
+        );
+      case "polygon":
       default:
         return (
-          <circle
-            cx={x}
-            cy={y}
-            r={detection["radius"] ? detection["radius"] : unknownMeasure}
-            fill={detection["color"] ? detection["color"] : unknownMeasure}
-            transform={`rotate(${orientation_pos}, ${x}, ${y})`}
-          ></circle>
+          <React.Fragment>
+            <polygon
+              points={text_vertices}
+              fill={detection["color"] ? detection["color"] : unknownMeasure}
+              transform={`rotate(${orientation_pos}, ${x}, ${y})`}
+            ></polygon>
+            {image_path && this.renderShape(
+              {
+                x: x_pos,
+                y: y_pos,
+                orientation: orientation_pos,
+                width: average_deltas_to_vertices_radius,
+                length: average_deltas_to_vertices_radius,
+                color: detection["color"],
+                shape: "image",
+              },
+              image_path
+            )}
+          </React.Fragment>
         );
     }
   }
@@ -327,7 +401,8 @@ export default class GridView extends React.Component {
             length: 10,
             width: 10,
             height: 7,
-            shape: "cube",
+            shape: "polygon",
+            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
             color: "red",
           },
           {
@@ -337,7 +412,8 @@ export default class GridView extends React.Component {
             length: 10,
             width: 10,
             height: 7,
-            shape: "cube",
+            shape: "polygon",
+            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
             color: "red",
           },
           {
@@ -347,7 +423,8 @@ export default class GridView extends React.Component {
             length: 10,
             width: 10,
             height: 7,
-            shape: "cube",
+            shape: "polygon",
+            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
             color: "red",
           },
           {
@@ -357,7 +434,8 @@ export default class GridView extends React.Component {
             length: 10,
             width: 10,
             height: 7,
-            shape: "cube",
+            shape: "polygon",
+            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
             color: "red",
           },
           {
@@ -367,7 +445,8 @@ export default class GridView extends React.Component {
             length: 10,
             width: 10,
             height: 7,
-            shape: "cube",
+            shape: "polygon",
+            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
             color: "red",
           },
           {
@@ -377,7 +456,8 @@ export default class GridView extends React.Component {
             length: 10,
             width: 10,
             height: 7,
-            shape: "cube",
+            shape: "polygon",
+            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
             color: "red",
           },
           {
@@ -387,7 +467,8 @@ export default class GridView extends React.Component {
             length: 10,
             width: 10,
             height: 7,
-            shape: "cube",
+            shape: "polygon",
+            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
             color: "red",
           },
           {
@@ -397,7 +478,8 @@ export default class GridView extends React.Component {
             length: 10,
             width: 10,
             height: 7,
-            shape: "cube",
+            shape: "polygon",
+            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
             color: "red",
           },
           {
@@ -407,7 +489,8 @@ export default class GridView extends React.Component {
             length: 10,
             width: 10,
             height: 7,
-            shape: "cube",
+            shape: "polygon",
+            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
             color: "red",
           },
           {
@@ -417,7 +500,8 @@ export default class GridView extends React.Component {
             length: 10,
             width: 10,
             height: 7,
-            shape: "cube",
+            shape: "polygon",
+            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
             color: "red",
           },
           {
@@ -427,7 +511,8 @@ export default class GridView extends React.Component {
             length: 10,
             width: 10,
             height: 7,
-            shape: "cube",
+            shape: "polygon",
+            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
             color: "red",
           },
           {
@@ -437,7 +522,8 @@ export default class GridView extends React.Component {
             length: 10,
             width: 10,
             height: 7,
-            shape: "cube",
+            shape: "polygon",
+            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
             color: "red",
           },
           {
@@ -447,7 +533,8 @@ export default class GridView extends React.Component {
             length: 10,
             width: 10,
             height: 7,
-            shape: "cube",
+            shape: "polygon",
+            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
             color: "red",
           },
           {
@@ -457,7 +544,8 @@ export default class GridView extends React.Component {
             length: 10,
             width: 10,
             height: 7,
-            shape: "cube",
+            shape: "polygon",
+            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
             color: "red",
           },
           {
@@ -467,7 +555,8 @@ export default class GridView extends React.Component {
             length: 10,
             width: 10,
             height: 7,
-            shape: "cube",
+            shape: "polygon",
+            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
             color: "red",
           },
           {
@@ -477,7 +566,8 @@ export default class GridView extends React.Component {
             length: 10,
             width: 10,
             height: 7,
-            shape: "cube",
+            shape: "polygon",
+            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
             color: "red",
           },
           {
@@ -487,7 +577,8 @@ export default class GridView extends React.Component {
             length: 10,
             width: 10,
             height: 7,
-            shape: "cube",
+            shape: "polygon",
+            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
             color: "red",
           },
           {
@@ -497,7 +588,8 @@ export default class GridView extends React.Component {
             length: 10,
             width: 10,
             height: 7,
-            shape: "cube",
+            shape: "polygon",
+            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
             color: "red",
           },
           {
@@ -507,7 +599,8 @@ export default class GridView extends React.Component {
             length: 10,
             width: 10,
             height: 7,
-            shape: "cube",
+            shape: "polygon",
+            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
             color: "red",
           },
           {
@@ -517,7 +610,8 @@ export default class GridView extends React.Component {
             length: 10,
             width: 10,
             height: 7,
-            shape: "cube",
+            shape: "polygon",
+            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
             color: "red",
           },
           {
@@ -527,7 +621,8 @@ export default class GridView extends React.Component {
             length: 10,
             width: 10,
             height: 7,
-            shape: "cube",
+            shape: "polygon",
+            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
             color: "red",
           }
         ],
@@ -536,7 +631,40 @@ export default class GridView extends React.Component {
       .catch(function (error) {
         // console.log(error);
       });
-
+    // example of adding virtual object to base station
+    axios
+      .post("/virtual-objects", {
+        add: true,
+        virtual_objects: [
+          {
+            id: "test id",
+            x: 100,
+            y: -100,
+            orientation: 92,
+            name: "test name",
+            type: "test type",
+            shape: "regular_polygon",
+            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
+            color: "blue",
+          },
+          {
+            id: "test id2",
+            x: 50,
+            y: -50,
+            orientation: 12,
+            name: "test name2",
+            type: "test type2",
+            shape: "oval",
+            radius: 10,
+            radiusY: 20,
+            color: "blue",
+          },
+        ],
+      })
+      .then(function (response) { }.bind(this))
+      .catch(function (error) {
+        // console.log(error);
+      });
   }
 
   getVisionData() {
@@ -556,28 +684,7 @@ export default class GridView extends React.Component {
       });
 
 
-    // // example of adding virtual object to base station
-    // axios
-    //   .post("/virtual-objects", {
-    //     add: true,
-    //     virtual_objects: [
-    //       {
-    //         id: "test id",
-    //         x: 4,
-    //         y: 9,
-    //         orientation: 92,
-    //         name: "test name",
-    //         type: "test type",
-    //         radius: 7,
-    //         shape: "sphere",
-    //         color: "blue",
-    //       },
-    //     ],
-    //   })
-    //   .then(function (response) { }.bind(this))
-    //   .catch(function (error) {
-    //     // console.log(error);
-    //   });
+
   }
 
   displayRobot() {

@@ -146,7 +146,9 @@ class BaseStation:
                 "radius": virtual_object["radius"] if "radius" in virtual_object else None, 
                 "height": virtual_object["height"] if "height" in virtual_object else None, 
                 "shape": virtual_object["shape"] if "shape" in virtual_object else None, 
-                "color": virtual_object["color"] if "color" in virtual_object else None 
+                "color": virtual_object["color"] if "color" in virtual_object else None,
+                "deltas_to_vertices": virtual_object["deltas_to_vertices"] if "deltas_to_vertices" in virtual_object else None, 
+                "radiusY": virtual_object["radiusY"] if "radiusY" in virtual_object else None,  
             }
         else:
             print("The vision virtual object list was not given a valid update")
@@ -200,7 +202,9 @@ class BaseStation:
                 "radius": object_mapping["radius"] if "radius" in object_mapping else None, 
                 "height": object_mapping["height"] if "height" in object_mapping else None, 
                 "shape": object_mapping["shape"] if "shape" in object_mapping else None, 
-                "color": object_mapping["color"] if "color" in object_mapping else None 
+                "color": object_mapping["color"] if "color" in object_mapping else None, 
+                "deltas_to_vertices": object_mapping["deltas_to_vertices"] if "deltas_to_vertices" in object_mapping else None, 
+                "radiusY": object_mapping["radiusY"] if "radiusY" in object_mapping else None, 
             }
         else:
             print("The vision object map was not given a valid update")
@@ -260,36 +264,42 @@ class BaseStation:
             estimated_positions.append(
                 estimated_position
             )
-        for virtual_object_id, virtual_object_position_data in self.virtual_objects.items():
-            name = virtual_object_position_data["name"] if "name" in virtual_object_position_data else None
-            type = virtual_object_position_data["type"] if "type" in virtual_object_position_data else None
-            length = virtual_object_position_data["length"] if "length" in virtual_object_position_data else None
-            width = virtual_object_position_data["width"] if "width" in virtual_object_position_data else None
-            radius = virtual_object_position_data["radius"] if "radius" in virtual_object_position_data else None
-            height = virtual_object_position_data["height"] if "height" in virtual_object_position_data else None
-            shape = virtual_object_position_data["shape"] if "shape" in virtual_object_position_data else None
-            color = virtual_object_position_data["color"] if "color" in virtual_object_position_data else None
-            estimated_position = self.format_estimated_position(virtual_object_id, virtual_object_position_data["x"], virtual_object_position_data["y"], virtual_object_position_data["orientation"], name, type, length, width, radius, height, shape, color)
+        for virtual_object_id, virtual_object_data in self.virtual_objects.items():
+            
+
+            estimated_position = self.format_estimated_position(virtual_object_id, virtual_object_data["x"], virtual_object_data["y"], virtual_object_data["orientation"], virtual_object_data)
             estimated_positions.append(
                 estimated_position
             )
         return estimated_positions
 
-    def format_estimated_position(self, object_id, estimated_x, estimated_y, estimated_orientation, name = None, type = None, length = None, width = None, radius = None, height = None, shape = None, color = None):
+    def format_estimated_position(self, object_id, estimated_x, estimated_y, estimated_orientation, virtual_object_data={}):
+        name = virtual_object_data["name"] if "name" in virtual_object_data else None
+        type = virtual_object_data["type"] if "type" in virtual_object_data else None
+        deltas_to_vertices = virtual_object_data["deltas_to_vertices"] if "deltas_to_vertices" in virtual_object_data else None
+        length = virtual_object_data["length"] if "length" in virtual_object_data else None
+        width = virtual_object_data["width"] if "width" in virtual_object_data else None
+        radius = virtual_object_data["radius"] if "radius" in virtual_object_data else None
+        radiusY = virtual_object_data["radiusY"] if "radiusY" in virtual_object_data else None
+        height = virtual_object_data["height"] if "height" in virtual_object_data else None
+        shape = virtual_object_data["shape"] if "shape" in virtual_object_data else None
+        color = virtual_object_data["color"] if "color" in virtual_object_data else None
         estimated_position = {
-                    "id": object_id, 
-                    "name": name if name != None else (self.vision_object_map[object_id]["name"] if object_id in self.vision_object_map else None),
-                    "type": type if type != None else (self.vision_object_map[object_id]["type"] if object_id in self.vision_object_map else None),
-                    "length": length if length != None else (self.vision_object_map[object_id]["length"] if object_id in self.vision_object_map else None),
-                    "width": width if width != None else (self.vision_object_map[object_id]["width"] if object_id in self.vision_object_map else None), 
-                    "radius": radius if radius != None else (self.vision_object_map[object_id]["radius"] if object_id in self.vision_object_map else None), 
-                    "height": height if height != None else (self.vision_object_map[object_id]["height"] if object_id in self.vision_object_map else None), 
-                    "shape": shape if shape != None else (self.vision_object_map[object_id]["shape"] if object_id in self.vision_object_map else None), 
-                    "color": color if color != None else (self.vision_object_map[object_id]["color"] if object_id in self.vision_object_map else None), 
-                    "x": estimated_x, 
-                    "y": estimated_y, 
-                    "orientation": estimated_orientation
-                }
+            "id": object_id, 
+            "name": name if name != None else (self.vision_object_map[object_id]["name"] if object_id in self.vision_object_map else None),
+            "type": type if type != None else (self.vision_object_map[object_id]["type"] if object_id in self.vision_object_map else None),
+            "deltas_to_vertices": deltas_to_vertices if deltas_to_vertices != None else (self.vision_object_map[object_id]["deltas_to_vertices"] if object_id in self.vision_object_map else None),
+            "length": length if length != None else (self.vision_object_map[object_id]["length"] if object_id in self.vision_object_map else None),
+            "width": width if width != None else (self.vision_object_map[object_id]["width"] if object_id in self.vision_object_map else None), 
+            "radius": radius if radius != None else (self.vision_object_map[object_id]["radius"] if object_id in self.vision_object_map else None), 
+            "radiusY": radiusY if radiusY != None else (self.vision_object_map[object_id]["radiusY"] if object_id in self.vision_object_map else None), 
+            "height": height if height != None else (self.vision_object_map[object_id]["height"] if object_id in self.vision_object_map else None), 
+            "shape": shape if shape != None else (self.vision_object_map[object_id]["shape"] if object_id in self.vision_object_map else None), 
+            "color": color if color != None else (self.vision_object_map[object_id]["color"] if object_id in self.vision_object_map else None), 
+            "x": estimated_x, 
+            "y": estimated_y, 
+            "orientation": estimated_orientation
+        }
         for key in list(estimated_position.keys()):
             if estimated_position[key] == None:
                 estimated_position.pop(key, None) 
