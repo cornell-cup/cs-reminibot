@@ -22,6 +22,7 @@ import { CookiesProvider } from 'react-cookie';
 import { withCookies, Cookies } from 'react-cookie';
 import Dashboard from './components/Analytics/dashboard.js';
 import History from './components/Analytics/submissionHistory.js';
+import Vision from './components/Vision/Vision.js';
 
 
 /**
@@ -50,7 +51,7 @@ const Platform = withCookies((props) => {
   const [selectedBotName, setSelectedBotName] = useState('');
   const [selectedBotStyle, setSelectedBotStyleState] = useState(hiddenStyle);
   const [loginEmail, setLoginEmail] = useState(props.cookies.get('current_user_email') || "");
-  
+
   useEffect(() => {
     setLoginEmail(props.cookies.get('current_user_email') || "");
   }, [document.cookie]);
@@ -107,6 +108,9 @@ const Platform = withCookies((props) => {
               loginEmail={loginEmail}
             />
           </Route>
+          <Route path="/vision">
+            <Vision />
+          </Route>
         </Switch>
       </div>
     </div>
@@ -123,21 +127,21 @@ const ClientGUI = () => {
     };
   }, []);
   const alertUser = (e) => {
-      e.preventDefault();
-      e.returnValue = "";
+    e.preventDefault();
+    e.returnValue = "";
   };
 
-    return (
-      <div className="main-body">
-        <Router>
-          <Navbar
-          />
-          <div className="container">
-            <Platform />
-          </div>
-        </Router>
-      </div>
-    );
+  return (
+    <div className="main-body">
+      <Router>
+        <Navbar
+        />
+        <div className="container">
+          <Platform />
+        </div>
+      </Router>
+    </div>
+  );
 }
 
 // insert something here about localStorage function for first time tutorial
