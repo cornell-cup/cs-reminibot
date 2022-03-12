@@ -142,21 +142,20 @@ export default class GridView extends React.Component {
   }
 
   renderObjects() {
-    let bots = [];
+    let objects = [];
     for (const detection of this.state.detections) {
-      console.log(JSON.stringify(detection));
       switch (
       detection["type"] ? String(detection["type"].toLowerCase().trim()) : ""
       ) {
         case "minibot":
-          bots.push(this.renderBot(detection));
+          objects.push(this.renderBot(detection));
           break;
         default:
-          bots.push(this.renderUnknown(detection));
+          objects.push(this.renderUnknown(detection));
           break;
       }
     }
-    return <React.Fragment>{bots}</React.Fragment>;
+    return <React.Fragment>{objects}</React.Fragment>;
   }
 
   renderBot(detection) {
