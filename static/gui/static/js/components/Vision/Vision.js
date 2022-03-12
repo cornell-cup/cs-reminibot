@@ -5,7 +5,7 @@ import VisionUserInterface from './VisionUserInterface'
 export default function Vision() {
   return (
     <React.Fragment>Vision
-      <VisionUserInterface />
+      <circleForm/>
       <GridView view_width={1000}
         view_height={1000}
         world_width={300}

@@ -3,6 +3,10 @@ import axios from "axios";
 
 import { Button } from "../utils/Util.js";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import VisionUserInterface from "./VisionUserInterface.js";
+import polygonForm from "./polygonForm.js";
+import circleForm from "./circleForm.js";
+import squareForm from "./squareform.js";
 
 const scaleFactor = 40;
 const distanceBetweenTicks = 10;
@@ -155,6 +159,7 @@ export default class GridView extends React.Component {
     );
     return { x: center['x'], y: center['y'], deltas: this.getDeltasFromVerticesXAndY(center['x'], center['y'], vertices) };
   }
+
 
   renderObjects() {
     let objects = [];
@@ -804,13 +809,17 @@ export default class GridView extends React.Component {
   render() {
     return (
       <React.Fragment>
+        <VisionUserInterface/>
+        <circleForm/>
         {!this.props.defaultEnabled && <button
           onClick={this.displayRobot}
           name={"Display Bot"}
-          className="btn btn-secondary ml-auto"
+          className="btn btn-secondary ml-1"
         >
           Display Bot
         </button>}
+        
+        <br/>
         <TransformWrapper
           initialScale={1}
           initialPositionX={0}

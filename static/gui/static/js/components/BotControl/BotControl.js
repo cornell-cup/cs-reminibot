@@ -64,12 +64,6 @@ function BotControl({
               defaultEnabled={false} />
             < InformationBoxModal type={INFOBOXTYPE.VISION} />
           </div >
-
-
-
-
-
-
         </div>
       </div>
     </div>

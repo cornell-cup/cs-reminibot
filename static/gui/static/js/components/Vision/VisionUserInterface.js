@@ -16,7 +16,7 @@ export default function VisionUserInterface() {
         <button
           title="Add Circle"
           type="button"
-          class="btn btn-primary"
+          class="btn btn-secondary"
           onClick={() => { setFormId(0) }}
         >
           Add Circle&nbsp;
@@ -26,7 +26,7 @@ export default function VisionUserInterface() {
         <button
           title="Add Square"
           type="button"
-          class="btn btn-primary"
+          class="btn btn-secondary"
           onClick={() => { setFormId(1) }}
         >
           Add Square&nbsp;
@@ -36,7 +36,7 @@ export default function VisionUserInterface() {
         <button
           title="Add Regular Polygon"
           type="button"
-          class="btn btn-primary"
+          class="btn btn-secondary"
           onClick={() => { setFormId(2) }}
         >
           Add Regular Polygon&nbsp;
@@ -56,8 +56,6 @@ export default function VisionUserInterface() {
         <br />
         {(formId >= 0 && formId < forms.length) && forms[formId]}
       </div>
-
     </React.Fragment>
-
   );
 }
