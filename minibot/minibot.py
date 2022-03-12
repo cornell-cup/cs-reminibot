@@ -352,6 +352,7 @@ class Minibot:
 
             thread = Thread(target=ece.read_ir, args=[return_val])
             thread.start()
+            thread.join()
 
             now = datetime.now()
             file = open("/home/pi/Documents/" +
