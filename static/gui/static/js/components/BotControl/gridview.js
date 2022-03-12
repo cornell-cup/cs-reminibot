@@ -145,13 +145,11 @@ export default class GridView extends React.Component {
   generateRegularPolygonDeltas(numberOfSides, sideLength) {
     const individualVertexAngle = 2 * Math.PI / numberOfSides;
     const radius = Math.sqrt(sideLength * sideLength / (2 - 2 * Math.cos(individualVertexAngle)));
-    const initialAngleOffset = Math.PI / 2 + (numberOfSides % 2 == 0 ? individualVertexAngle / 2 : 0);
+    const initialAngleOffset = -Math.PI / 2 + (numberOfSides % 2 == 0 ? individualVertexAngle / 2 : 0);
     const deltas = [];
     for (let i = 0; i < numberOfSides; i++) {
-      console.log(JSON.stringify({ x: radius * Math.cos(i * individualVertexAngle), y: radius * Math.sin(i * individualVertexAngle) }))
-      deltas.push({ x: radius * Math.cos(i * individualVertexAngle), y: radius * Math.sin(i * individualVertexAngle) })
+      deltas.push({ x: radius * Math.cos(initialAngleOffset + i * individualVertexAngle), y: radius * Math.sin(initialAngleOffset + i * individualVertexAngle) })
     }
-    console.log(deltas.reduce((previousValue, currentValue) => `${previousValue}\n(${currentValue['x']},${currentValue['y']})`), "")
     return deltas;
   }
 
@@ -653,11 +651,11 @@ export default class GridView extends React.Component {
             id: "test id",
             x: 100,
             y: -100,
-            orientation: 92,
+            orientation: 0,
             name: "test name",
             type: "test type",
             shape: "regular_polygon",
-            deltas_to_vertices: this.generateRegularPolygonDeltas(8, 10),
+            deltas_to_vertices: this.generateRegularPolygonDeltas(4, 10),
             color: "blue",
           },
           {
@@ -672,6 +670,28 @@ export default class GridView extends React.Component {
             radiusY: 20,
             color: "blue",
           },
+          {
+            id: "test id3",
+            x: -50,
+            y: 50,
+            orientation: 0,
+            name: "test name3",
+            type: "test type3",
+            shape: "regular_polygon",
+            deltas_to_vertices: this.generateRegularPolygonDeltas(3, 10),
+            color: "pink",
+          },
+          {
+            id: "test id4",
+            x: 50,
+            y: 50,
+            orientation: 0,
+            name: "test name4",
+            type: "test type4",
+            shape: "regular_polygon",
+            deltas_to_vertices: this.generateRegularPolygonDeltas(6, 10),
+            color: "pink",
+          }
         ],
       })
       .then(function (response) { }.bind(this))
