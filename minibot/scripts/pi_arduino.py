@@ -157,7 +157,7 @@ def read_once():
     # val = median(values)
     # file.write("Median value read is {}".format(val) + "\n")
 
-    return 10
+    return 8
 
 
 def acquire_lock():
