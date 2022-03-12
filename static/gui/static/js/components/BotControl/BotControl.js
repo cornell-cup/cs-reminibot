@@ -34,12 +34,14 @@ function BotControl({
         </div>
         <br />
         <div className="row">
+          <div className="col-10">
+            <GridView />
+          </div>
 
-          <GridView />
 
-          {/* <div className="col-2">
+          <div className="col-2">
             <VisionUserInterface />
-          </div> */}
+          </div>
         </div>
       </div>
     </div>
