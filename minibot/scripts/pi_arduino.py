@@ -153,11 +153,8 @@ def read_once():
         # Without the delay, the Arduino will return 0
         time.sleep(0.02)
 
-    # file.write("Original values: {}".format(values) + "\n")
-    # val = median(values)
-    # file.write("Median value read is {}".format(val) + "\n")
 
-    return 8
+    return values[0]
 
 
 def acquire_lock():
@@ -239,9 +236,9 @@ def read_ultrasonic():
 def read_ir():
     acquire_lock()
     transmit_continuously('T')
-    # return_val = read_once()
+    return_val = read_once()
     release_lock()
-    # return return_val
+    return return_val
 
 
 def move_servo(angle):
