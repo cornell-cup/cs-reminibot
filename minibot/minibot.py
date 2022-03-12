@@ -70,7 +70,6 @@ class Minibot:
         self.blockly_python_proc = BlocklyPythonProcess(BOT_LIB_FUNCS)
         signal.signal(signal.SIGINT, self.sigint_handler)
 
-
     def main(self):
         """ Implements the main activity loop for the Minibot.  This activity 
         loop continuously listens for commands from the basestation, and 
@@ -342,14 +341,16 @@ class Minibot:
                 Thread(target=ece.stop).start()
         elif key == "IR":
             # shared queue
-            qq = Queue()
+            # qq = Queue()
 
-            proc = Process(target=ece.read_ir, args=((qq),))
-            proc.daemon = True
-            proc.start()
+            # proc = Process(target=ece.read_ir)
+            # proc.daemon = True
+            # proc.start()
+
+            Thread(target=ece.read_ir).start()
 
             # self.sendKV(sock, key, qq.get(block=True, timeout=timeout))
-            self.sendKV(sock, key, "VALUE")
+            # self.sendKV(sock, key, "VALUE")
 
     def sendKV(self, sock: socket, key: str, value: str):
         """ Sends a key-value pair to the specified socket. The key value
