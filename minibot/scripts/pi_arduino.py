@@ -135,7 +135,6 @@ def read_once():
     Returns: (int) The median value of reading from the Arduino
         "num_reads" times.  
     """
-    # num_reads = 5
 
     num_reads = 5
     # log the results
@@ -183,7 +182,7 @@ def release_lock():
     will stop receiving commands from the Raspberry Pi
     """
     transmit_once(END_TRASMISSION_CMD)
-    # spi.close()
+    spi.close()
     tlock.end_transmit()
 
 
