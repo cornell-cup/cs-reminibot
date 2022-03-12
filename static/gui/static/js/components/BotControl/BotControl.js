@@ -3,6 +3,12 @@ import React, { useState, useEffect, useRef } from "react";
 import AddBot from "./SetupBot/AddBot.js";
 import MovementControls from "./MovementControl/MovementControl.js";
 import GridView from "./gridview.js";
+import { library } from "@fortawesome/fontawesome-svg-core";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
+import InformationBoxModal from "../utils/InformationBoxModal.js";
+import { INFOBOXTYPE, INFOBOXID, INFO_ICON } from "../utils/Constants.js";
+library.add(faInfoCircle);
 import VisionUserInterface from "./VisionUserInterface.js";
 
 function BotControl({
@@ -34,14 +40,36 @@ function BotControl({
         </div>
         <br />
         <div className="row">
-          <div className="col-10">
-            <GridView />
-          </div>
+          <div className="control-option">
+            {/* <div id="component_view" className="box"> */}
+            <div className="mb-3 d-flex">
+              <h3 className="small-title">
+                Vision
+                <span style={{ leftMargin: "0.5em" }}> </span>
+                <input
+                  className="info-box"
+                  type="image"
+                  data-toggle="modal"
+                  data-target={"#" + INFOBOXID.VISION}
+                  src={INFO_ICON}
+                  width="18"
+                  height="18"
+                />
+              </h3>
+            </div>
+            <GridView view_width={520}
+              view_height={520}
+              world_width={300}
+              world_height={300}
+              defaultEnabled={false} />
+            < InformationBoxModal type={INFOBOXTYPE.VISION} />
+          </div >
 
 
-          <div className="col-2">
-            <VisionUserInterface />
-          </div>
+
+
+
+
         </div>
       </div>
     </div>

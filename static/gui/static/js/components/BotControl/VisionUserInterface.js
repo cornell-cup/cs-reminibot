@@ -7,7 +7,10 @@ export default function VisionUserInterface() {
 
   return (
     <div class="btn-group-vertical">
-      <button title="Add Polygon" type="button" class="btn btn-secondary">
+      <button
+        title="Add Polygon"
+        type="butto
+        " class="btn btn-secondary">
         <FontAwesomeIcon icon={Icons.faDrawPolygon} />
       </button>
 
@@ -31,6 +34,7 @@ export default function VisionUserInterface() {
       >
         <FontAwesomeIcon icon={Icons.faSquare} />
       </button>
+
     </div>
   );
 }

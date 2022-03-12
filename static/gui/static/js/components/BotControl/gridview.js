@@ -1,11 +1,6 @@
 import React from "react";
 import axios from "axios";
-import { library } from "@fortawesome/fontawesome-svg-core";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
-import InformationBoxModal from "../utils/InformationBoxModal.js";
-import { INFOBOXTYPE, INFOBOXID, INFO_ICON } from "../utils/Constants.js";
-library.add(faInfoCircle);
+
 import { Button } from "../utils/Util.js";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
@@ -28,10 +23,6 @@ export default class GridView extends React.Component {
     super(props);
 
     this.state = {
-      view_width: 520,
-      view_height: 520,
-      world_width: 300,
-      world_height: 300,
       xcor: 0,
       ycor: 0,
       count: 0,
@@ -61,8 +52,8 @@ export default class GridView extends React.Component {
 
   renderXAxis() {
     let ticks = [];
-    const xStart = -this.state.world_width / 2;
-    const numXAxisTicks = this.state.world_width / distanceBetweenTicks + 1;
+    const xStart = -this.props.world_width / 2;
+    const numXAxisTicks = this.props.world_width / distanceBetweenTicks + 1;
     const xStep = distanceBetweenTicks;
     for (let i = 0; i < numXAxisTicks; i++) {
       ticks.push(
@@ -73,7 +64,7 @@ export default class GridView extends React.Component {
         >
           <line
             stroke="currentColor"
-            y2={scaleFactor * this.state.world_height}
+            y2={scaleFactor * this.props.world_height}
             strokeWidth="5"
           ></line>
         </g>
@@ -94,8 +85,8 @@ export default class GridView extends React.Component {
 
   renderYAxis() {
     let ticks = [];
-    const yStart = this.state.world_height / 2;
-    const numYAxisTicks = this.state.world_height / distanceBetweenTicks + 1;
+    const yStart = this.props.world_height / 2;
+    const numYAxisTicks = this.props.world_height / distanceBetweenTicks + 1;
     const yStep = distanceBetweenTicks;
     for (let i = 0; i < numYAxisTicks; i++) {
       ticks.push(
@@ -106,7 +97,7 @@ export default class GridView extends React.Component {
         >
           <line
             stroke="currentColor"
-            x2={scaleFactor * this.state.world_width}
+            x2={scaleFactor * this.props.world_width}
             strokeWidth="5"
           ></line>
         </g>
@@ -129,8 +120,8 @@ export default class GridView extends React.Component {
     return (
       <React.Fragment>
         <rect
-          width={scaleFactor * this.state.world_width}
-          height={scaleFactor * this.state.world_height}
+          width={scaleFactor * this.props.world_width}
+          height={scaleFactor * this.props.world_height}
           fill="white"
         ></rect>
 
@@ -207,8 +198,8 @@ export default class GridView extends React.Component {
   renderShapeGroup(detection, image_path = null) {
     const x_pos = parseFloat(detection["x"]);
     const y_pos = parseFloat(detection["y"]);
-    const x = scaleFactor * (this.state.world_width / 2 + x_pos);
-    const y = scaleFactor * (this.state.world_height / 2 - y_pos);
+    const x = scaleFactor * (this.props.world_width / 2 + x_pos);
+    const y = scaleFactor * (this.props.world_height / 2 - y_pos);
     const orientation_pos = parseFloat(detection["orientation"]);
     return (
       <g className="popup" onClick={() => {
@@ -227,8 +218,8 @@ export default class GridView extends React.Component {
   renderShape(detection, image_path) {
     const x_pos = parseFloat(detection["x"]);
     const y_pos = parseFloat(detection["y"]);
-    const x = scaleFactor * (this.state.world_width / 2 + x_pos);
-    const y = scaleFactor * (this.state.world_height / 2 - y_pos);
+    const x = scaleFactor * (this.props.world_width / 2 + x_pos);
+    const y = scaleFactor * (this.props.world_height / 2 - y_pos);
     const orientation_pos = parseFloat(detection["orientation"]);
     const width = detection["width"] ? detection["width"] : unknownMeasure;
     const height = detection["length"] ? detection["length"] : unknownMeasure;
@@ -395,11 +386,11 @@ export default class GridView extends React.Component {
   renderSVG() {
     return (
       <svg
-        width={this.state.view_width}
-        height={this.state.view_height}
+        width={this.props.view_width}
+        height={this.props.view_height}
         fill="white"
-        viewBox={`0 0 ${scaleFactor * this.state.world_width + 2 * widthPadding
-          } ${scaleFactor * this.state.world_height + 2 * heightPadding}`}
+        viewBox={`0 0 ${scaleFactor * this.props.world_width + 2 * widthPadding
+          } ${scaleFactor * this.props.world_height + 2 * heightPadding}`}
       >
         <g transform={`translate(${widthPadding},${heightPadding})`}>
           {this.renderGrid()}
@@ -413,6 +404,9 @@ export default class GridView extends React.Component {
    * Executes after the component gets rendered.
    **/
   componentDidMount() {
+    if (this.props.defaultEnabled) {
+      this.displayRobot();
+    }
     axios
       .post("/object-mapping", {
         add: true,
@@ -809,30 +803,14 @@ export default class GridView extends React.Component {
 
   render() {
     return (
-      <div className="control-option">
-        {/* <div id="component_view" className="box"> */}
-        <div className="mb-3 d-flex">
-          <h3 className="small-title">
-            Vision
-            <span style={{ leftMargin: "0.5em" }}> </span>
-            <input
-              className="info-box"
-              type="image"
-              data-toggle="modal"
-              data-target={"#" + INFOBOXID.VISION}
-              src={INFO_ICON}
-              width="18"
-              height="18"
-            />
-          </h3>
-          <button
-            onClick={this.displayRobot}
-            name={"Display Bot"}
-            className="btn btn-secondary ml-auto"
-          >
-            Display Bot
-          </button>
-        </div>
+      <React.Fragment>
+        {!this.props.defaultEnabled && <button
+          onClick={this.displayRobot}
+          name={"Display Bot"}
+          className="btn btn-secondary ml-auto"
+        >
+          Display Bot
+        </button>}
         <TransformWrapper
           initialScale={1}
           initialPositionX={0}
@@ -844,10 +822,8 @@ export default class GridView extends React.Component {
             </React.Fragment>
           )}
         </TransformWrapper>
+      </React.Fragment>
 
-        {/* </div > */}
-        <InformationBoxModal type={INFOBOXTYPE.VISION} />
-      </div>
     );
   }
 }
