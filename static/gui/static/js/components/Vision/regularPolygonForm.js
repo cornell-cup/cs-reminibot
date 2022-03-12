@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function PolygonForm() {
+export default function RegularPolygonForm() {
   return (
     <React.Fragment>
       <form className='white-label'>
