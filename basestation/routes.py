@@ -200,11 +200,12 @@ def speech_recognition():
             error_json = {"error_msg": NO_BOT_ERROR_MSG}
             return json.dumps(error_json), status.HTTP_400_BAD_REQUEST
         command = data["command"]
-        base_station.toggle_speech_recognition(bot_name, command)
+        # base_station.toggle_speech_recognition(bot_name, command)
+        print(command)
+        base_station.send_command(bot_name, command)
         return json.dumps(True), status.HTTP_200_OK
     else:
-        message = base_station.get_speech_recognition_status()
-        return json.dumps(message), status.HTTP_200_OK
+        return json.dumps(), status.HTTP_200_OK
 
 
 @app.route('/bot_voice_control', methods=['POST', 'GET'])
@@ -220,7 +221,7 @@ def bot_voice_control():
         # send ece command
         message = base_station.send_command(bot_name, command)
         return json.dumps(message), status.HTTP_200_OK
-    
+
 
 @app.route('/chatbot-context', methods=['POST', 'GET'])
 def chatbot_context():

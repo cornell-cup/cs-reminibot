@@ -16,7 +16,7 @@ import socket
 import sys
 import time
 import threading
-import pyaudio
+# import pyaudio
 import speech_recognition as sr
 from .ChatbotWrapper import ChatbotWrapper
 
@@ -432,7 +432,7 @@ class BaseStation:
         """
         RECORDING_TIME_LIMIT = 5
         # dictionary of commmands
-        
+
         # open the Microphone as variable microphone
         with sr.Microphone() as microphone:
             recognizer = sr.Recognizer()
@@ -464,18 +464,18 @@ class BaseStation:
                     thread_safe_message_queue.push("Words not recognized!")
 
     # ==================== NEW SPEECH RECOGNITION ============================
-    def send_command(bot_name, command):
+    def send_command(self, bot_name, command):
         if command in self.commands:
             self.move_bot_wheels(bot_name, command, 100)
             return self.commands[command] + " command sent"
         else:
             return "invalid command"
 
-
     # ==================== CHATBOT ====================
-    def chatbot_listening_toggle(bot_name):
+
+    def chatbot_listening_toggle(self, bot_name):
         # start the chatbot_listening_context thread
-        if True: # TODO add condition to start the listening
+        if True:  # TODO add condition to start the listening
             # create a new thread that listens and converts speech
             # to text in the background.  Cannot run this non-terminating
             # function  in the current thread because the current post request
@@ -486,9 +486,10 @@ class BaseStation:
             )
             self.chatbot_listening_thread.start()
         # stop listening
-        elif False: # TODO add condition to stop the thread
+        elif False:  # TODO add condition to stop the thread
             if self.chatbot_listening_thread:
                 self.chatbot_listening_thread.stop()
+
     def chatbot_listening_context(
         self,
         thread_safe_condition: ThreadSafeVariable,
