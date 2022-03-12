@@ -695,6 +695,17 @@ export default class GridView extends React.Component {
             shape: "regular_polygon",
             deltas_to_vertices: this.generateRegularPolygonDeltas(6, 10),
             color: "pink",
+          },
+          {
+            id: "test id5",
+            x: 75,
+            y: 75,
+            orientation: 0,
+            name: "test name5",
+            type: "test type5",
+            shape: "polygon",
+            deltas_to_vertices: [{ x: -20, y: -10 }, { x: 20, y: -10 }, { x: 20, y: 10 }, { x: -10, y: 10 }, { x: -10, y: 20 }, { x: -20, y: 20 }],
+            color: "pink",
           }
         ],
       })
