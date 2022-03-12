@@ -33,8 +33,26 @@ while(True):
 
     contours, hierarchy = cv2.findContours(invertedBinary, cv2.RETR_TREE,
     cv2.CHAIN_APPROX_SIMPLE)
-    
-    with_contours = cv2.drawContours(output, contours, -1,(0,0,255),3)
+
+    for c in contours:
+      area = cv2.contourArea(c)
+
+      if area < 10:
+        cv2.fillPoly(binary, pts=[c], color=0)
+
+    binary = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (51,51)))
+
+    contours, hierarchy = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+
+
+    for c in contours:
+      rect = cv2.minAreaRect(c)
+      
+      box = cv2.boxPoints(rect)
+      print(box)
+      cv2.drawContours(frame, [box], 0, (0, 255, 0),1)
+
+    #wwith_contours = cv2.drawContours(output, contours, -1,(0,0,255),3)
 
     #with_contours = cv2.drawContours(frame, contours, -1,(0,0,255),3)
 
@@ -51,11 +69,11 @@ while(True):
           else:
             sumRight = sumRight + 1
 
-    cv2.putText(with_contours, fps, (650, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (100, 255, 0), 3, cv2.LINE_AA)
+    #cv2.putText(with_contours, fps, (650, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (100, 255, 0), 3, cv2.LINE_AA)
   
 
     # Display the frame, saved in the file   
-    cv2.imshow('output', with_contours)
+    cv2.imshow('output', frame)
 
 
 
