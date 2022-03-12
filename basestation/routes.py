@@ -200,7 +200,6 @@ def speech_recognition():
             error_json = {"error_msg": NO_BOT_ERROR_MSG}
             return json.dumps(error_json), status.HTTP_400_BAD_REQUEST
         command = data["command"]
-        # base_station.toggle_speech_recognition(bot_name, command)
         print(command)
         base_station.send_command(bot_name, command)
         return json.dumps(True), status.HTTP_200_OK
