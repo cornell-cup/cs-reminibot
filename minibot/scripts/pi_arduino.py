@@ -182,7 +182,7 @@ def release_lock():
     will stop receiving commands from the Raspberry Pi
     """
     transmit_once(END_TRASMISSION_CMD)
-    spi.close()
+    # spi.close()
     tlock.end_transmit()
 
 
