@@ -3,11 +3,20 @@
 import cv2
 import numpy as np
 from sqlalchemy import true
+import math
 
 # Create an object to read camera video 
 camVid = cv2.VideoCapture(0)
 
+leftRight = 0
+iteration = 0 
+
 while(True):
+    iteration+=1
+    if iteration > 10:
+      iteration = 0
+      leftRight = 0
+
     _, frame = camVid.read()
                 
     # Convert BGR to HSV
@@ -41,81 +50,41 @@ while(True):
     for c in contours:
       area = cv2.contourArea(c)
 
-      if area < 10:
+      if area < 20:
         cv2.fillPoly(binary, pts=[c], color=0)
 
     binary = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (51,51)))
-
     contours, hierarchy = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-    with_contours = cv2.drawContours(frame, contours, -1, (0, 255, 0),3)
-      
+
 
     rows = len(binary)
     cols = len(binary[0])
     middle = cols/2
+    diff = rows * cols 
+    if(len(contours) == 0):
+      continue
 
-    left = 0
-    right = 0 
+    con = contours[0]
+    cen = 0
 
-    for con in contours:
-      rect = cv2.minAreaRect(con)
-      poly = cv2.boxPoints(rect)
+    for c in contours:
+      center,radius = cv2.minEnclosingCircle(c)
+      cen = center[0]
+      area = cv2.contourArea(c)
+      circle = math.pi * radius * radius
+      if(abs(circle-area)/((area + circle)/2) < diff):
+        diff = circle - area 
+        con = c 
 
-      valid = False
-      minX = cols
-      maxX = 0
-      minY = rows
-      maxY = 0
-      
-      for i in range(len(poly)):
-        cur = poly[i]
-        x = cur[0]
-        y = cur[1]
-        if x < minX: 
-          minX = x 
-        if x > maxX: 
-          maxX = x
-        if y < minY:
-          minY = y
-        if y > maxY:
-          maxY = y
+    with_contours = cv2.drawContours(frame, [con], 0, (0, 255, 0),3)
 
-        if not (x < 10 or abs(x - cols) < 10 ) and (y < 10 or abs(y - rows) < 10 ):
-          valid = True
+    if(cen > middle): 
+      leftRight += 1
+    else:
+      leftRight -= 1
 
-      if valid:
-        area = cv2.contourArea(con)
-        medX = (minX + minY)/2
-        medY = (minY+maxY)/2
-
-        if(medX > middle): 
-          right += area
-        else:
-          left += area
-
-    if(left + right > 50):
-      if(left > right): 
-        print("go right")
-      else:
-        print("go left")
-
-    # print(poly)
-
-    # sumLeft = 0
-    # sumRight = 0
-
-    # rows = len(binary)
-    # columns = len(binary[0])
-    # for i in range(rows):
-    #   for j in range(columns):
-    #     if(binary[i][j]> 0):
-    #       if(columns/2 - 1 > j):
-    #        sumLeft = sumLeft + 1
-    #       else:
-    #         sumRight = sumRight + 1
-
-    # cv2.putText(with_contours, fps, (650, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (100, 255, 0), 3, cv2.LINE_AA)
-  
+    if(iteration == 10):
+      print("left" if leftRight < 0 else "right")  
 
     # Display the frame, saved in the file   
     cv2.imshow('output', frame)
