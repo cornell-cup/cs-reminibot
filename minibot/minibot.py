@@ -11,6 +11,7 @@ import sys
 import time
 import argparse
 import signal
+from datetime import datetime
 
 # NOTE: Please add "flush=True" to all print statements so that our test
 # harness (test_minibot.py) can pipe the stdout output, and use it
@@ -349,6 +350,8 @@ class Minibot:
 
             thread = Thread(target=ece.read_ir).start()
             ret = thread.join()
+
+            now = datetime.now()
             file = open("/home/pi/Documents/" +
                         now.strftime('%H:%M:%S.%f') + ".txt", "w")
 
