@@ -347,7 +347,14 @@ class Minibot:
             # proc.daemon = True
             # proc.start()
 
-            Thread(target=ece.read_ir).start()
+            thread = Thread(target=ece.read_ir).start()
+            ret = thread.join()
+            file = open("/home/pi/Documents/" +
+                        now.strftime('%H:%M:%S.%f') + ".txt", "w")
+
+            file.write("From Arduino\n")
+            file.write(str(ret))
+            file.close()
 
             # self.sendKV(sock, key, qq.get(block=True, timeout=timeout))
             # self.sendKV(sock, key, "VALUE")
