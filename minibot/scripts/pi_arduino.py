@@ -239,9 +239,9 @@ def read_ultrasonic():
 def read_ir():
     acquire_lock()
     transmit_continuously('T')
-    return_val = read_once()
+    # return_val = read_once()
     release_lock()
-    return return_val
+    # return return_val
 
 
 def move_servo(angle):
