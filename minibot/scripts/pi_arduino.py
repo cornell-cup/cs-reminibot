@@ -153,11 +153,11 @@ def read_once():
         # Without the delay, the Arduino will return 0
         time.sleep(0.02)
 
-    file.write("Original values: {}".format(values) + "\n")
-    val = median(values)
-    file.write("Median value read is {}".format(val) + "\n")
+    # file.write("Original values: {}".format(values) + "\n")
+    # val = median(values)
+    # file.write("Median value read is {}".format(val) + "\n")
 
-    return val
+    return 10
 
 
 def acquire_lock():
