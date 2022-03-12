@@ -70,6 +70,9 @@ class Minibot:
         self.blockly_python_proc = BlocklyPythonProcess(BOT_LIB_FUNCS)
         signal.signal(signal.SIGINT, self.sigint_handler)
 
+        # set slave for arduino
+        ece.start_transmit()
+
     def main(self):
         """ Implements the main activity loop for the Minibot.  This activity 
         loop continuously listens for commands from the basestation, and 

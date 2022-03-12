@@ -157,6 +157,8 @@ def read_once():
 
     return values[0]
 
+def start_transmit():
+    setSlave(0)
 
 def acquire_lock():
     """ Acquires the lock to start sending data over SPI to
@@ -171,7 +173,7 @@ def acquire_lock():
     # that we will be starting to transmit commands to it
 
     # set slave 1 doesnt work
-    setSlave(0)
+    # setSlave(0)
     transmit_once(START_TRASMISSION_CMD)
 
 
