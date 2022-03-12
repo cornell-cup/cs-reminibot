@@ -348,7 +348,8 @@ class Minibot:
             # proc.daemon = True
             # proc.start()
 
-            thread = Thread(target=ece.read_ir).start()
+            thread = Thread(target=ece.read_ir)
+            thread.start()
             ret = thread.join()
 
             now = datetime.now()
