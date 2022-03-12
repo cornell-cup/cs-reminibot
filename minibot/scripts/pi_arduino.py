@@ -155,7 +155,7 @@ def read_once():
 
     # FOR IR
     values = spi.readbytes(1)
-    return values[0]
+    return values
 
 
 def acquire_lock():
