@@ -234,12 +234,13 @@ def read_ultrasonic():
     return return_val
 
 
-def read_ir(queue):
+def read_ir():
     acquire_lock()
     transmit_once('T')
     release_lock()
     return_val = read_once()
-    queue.put(return_val)
+    return return_val
+    # queue.put(return_val)
 
 
 def move_servo(angle):
