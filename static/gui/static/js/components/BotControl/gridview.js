@@ -141,6 +141,20 @@ export default class GridView extends React.Component {
     );
   }
 
+  //returns an array of x and y deltas from center point to vertices of a regular polygon with a given numberOfSides and a given sideLength
+  generateRegularPolygonDeltas(numberOfSides, sideLength) {
+    const individualVertexAngle = 2 * Math.PI / numberOfSides;
+    const radius = Math.sqrt(sideLength * sideLength / (2 - 2 * Math.cos(individualVertexAngle)));
+    const initialAngleOffset = Math.PI / 2 + (numberOfSides % 2 == 0 ? individualVertexAngle / 2 : 0);
+    const deltas = [];
+    for (let i = 0; i < numberOfSides; i++) {
+      console.log(JSON.stringify({ x: radius * Math.cos(i * individualVertexAngle), y: radius * Math.sin(i * individualVertexAngle) }))
+      deltas.push({ x: radius * Math.cos(i * individualVertexAngle), y: radius * Math.sin(i * individualVertexAngle) })
+    }
+    console.log(deltas.reduce((previousValue, currentValue) => `${previousValue}\n(${currentValue['x']},${currentValue['y']})`), "")
+    return deltas;
+  }
+
   renderObjects() {
     let objects = [];
     for (const detection of this.state.detections) {
@@ -643,7 +657,7 @@ export default class GridView extends React.Component {
             name: "test name",
             type: "test type",
             shape: "regular_polygon",
-            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
+            deltas_to_vertices: this.generateRegularPolygonDeltas(8, 10),
             color: "blue",
           },
           {
