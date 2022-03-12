@@ -153,6 +153,10 @@ export default class GridView extends React.Component {
     return deltas;
   }
 
+  getDeltasFromVertices(x, y, vertices) {
+    return vertices.map((vertex) => ({ x: vertex['x'] - x, y: vertex['y'] - y }));
+  }
+
   renderObjects() {
     let objects = [];
     for (const detection of this.state.detections) {
