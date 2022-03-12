@@ -341,18 +341,14 @@ class Minibot:
                     self.blockly_python_proc.kill_proc()
                 Thread(target=ece.stop).start()
         elif key == "IR":
-            # shared queue
-            # qq = Queue()
-
-            # proc = Process(target=ece.read_ir)
-            # proc.daemon = True
-            # proc.start()
 
             return_val = 8
 
             thread = Thread(target=ece.read_ir, args=[return_val])
             thread.start()
-            thread.join()
+            
+            while thread.is_alive():
+                time.sleep(0.01)
 
             now = datetime.now()
             file = open("/home/pi/Documents/" +
