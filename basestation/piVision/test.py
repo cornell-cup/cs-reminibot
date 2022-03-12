@@ -43,10 +43,7 @@ while(True):
 
     contours, hierarchy = cv2.findContours(invertedBinary, cv2.RETR_TREE,
     cv2.CHAIN_APPROX_SIMPLE)
-    
-    # with_contours = cv2.drawContours(output, contours, -1,(0,0,255),3)
 
-    #with_contours = cv2.drawContours(frame, contours, -1,(0,0,255),3)
     for c in contours:
       area = cv2.contourArea(c)
 
@@ -55,7 +52,6 @@ while(True):
 
     binary = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (51,51)))
     contours, hierarchy = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-
 
     rows = len(binary)
     cols = len(binary[0])
@@ -76,7 +72,21 @@ while(True):
         diff = circle - area 
         con = c 
 
-    with_contours = cv2.drawContours(frame, [con], 0, (0, 255, 0),3)
+        
+    #draw contours on top of bitmask of video feed of particular color
+    #with_contours_bitmask = cv2.drawContours(output, contours, -1,(0,0,255),3)
+    #cv2.imshow('bitmask', with_contours_bitmask)
+    #if cv2.waitKey(1) & 0xFF == ord('q'):
+     # break
+
+    #draw contours on top of video feed of particular color
+    #with_Allcontours = cv2.drawContours(frame, contours, -1,(0,0,255),3)
+    #cv2.imshow('Allcontours', with_Allcontours)
+    #if cv2.waitKey(1) & 0xFF == ord('q'):
+    #break
+
+    #draw  contour of most circular shape w/ particular color
+    with_Circularcontours = cv2.drawContours(frame, [con], 0, (0, 255, 0),3)
 
     if(cen > middle): 
       leftRight += 1
@@ -87,15 +97,15 @@ while(True):
       print("left" if leftRight < 0 else "right")  
 
     # Display the frame, saved in the file   
-    cv2.imshow('output', frame)
+    cv2.imshow('MostCircularContour', frame)
 
-    # Press Q on keyboard to stop recording
-    if cv2.waitKey(1) & 0xFF == ord('Q'):
+    # Press q on keyboard to stop recording
+    if cv2.waitKey(1) & 0xFF == ord('q'):
       break
 
 # release video capture
 # and video write objects
-# cap.release()
+camVid.release()
 
 # Closes all the frames
 cv2.destroyAllWindows() 
