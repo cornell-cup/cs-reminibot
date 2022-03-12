@@ -236,7 +236,7 @@ def read_ir(return_value):
     acquire_lock()
     transmit_once('T')
     return_val = read_once()
-    return_value = return_val
+    return_value.append(return_val)
     release_lock()
 
 

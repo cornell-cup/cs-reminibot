@@ -342,7 +342,7 @@ class Minibot:
                 Thread(target=ece.stop).start()
         elif key == "IR":
 
-            return_val = 8
+            return_val = []
 
             thread = Thread(target=ece.read_ir, args=[return_val])
             thread.start()
