@@ -2,6 +2,7 @@
 Base Station for the MiniBot.
 """
 
+import math
 from basestation.bot import Bot
 from basestation.user_database import Submission, User
 from basestation import db
@@ -153,6 +154,17 @@ class BaseStation:
         else:
             print("The vision virtual object list was not given a valid update")
 
+    def add_minibot_to_virtual_objects(self, id, x, y, orientation):
+        minibot_virtual_object = {
+            "id": id,
+            "name": "minibot"+str(id), 
+            "type": "minibot",   
+            "x": x,  
+            "y": y,  
+            "orientation": orientation
+        }
+        self.add_to_virtual_objects(minibot_virtual_object)
+
     def add_multiple_to_virtual_objects(self, virtual_objects):
         """ Adds multiple virtual objects to virtual objects list """
         for value in virtual_objects:
@@ -233,6 +245,26 @@ class BaseStation:
     def get_vision_data(self):
         """ Returns most recent vision data """
         return self.vision_log[-1]["POSITION_DATA"] if self.vision_log and len(self.vision_log) > 0 else None
+
+    def get_vision_data_by_id(self, id):
+        """ Returns position data of an object given its id """
+        allVisionData = self.get_vision_data()
+        for object in allVisionData:
+            if object["id"] == id:
+                return object
+        print("Warning: Vision data for the object with the given ID could not be found")
+        return None
+
+    def get_vision_data_by_ids(self, ids):
+        """ Returns position data of multiple objects given a list of ids """
+        allVisionData = self.get_vision_data()
+        objects = []
+        for object in allVisionData:
+            if object["id"] == ids:
+                objects.append(object)
+        if len(objects) < len(ids):
+            print("Warning: Vision data for some of the objects with the given ID could not be found")
+        return objects
 
     def get_vision_object_map(self):
         """ Returns the mapping of vision objects to their corresponding ids """
@@ -445,7 +477,7 @@ class BaseStation:
         bot = self.get_bot(bot_name)
         direction = direction.lower()
         bot.sendKV("WHEELS", direction)
-
+        
     def set_bot_mode(self, bot_name: str, mode: str):
         """ Set the bot to either line follow or object detection mode """
         bot = self.get_bot(bot_name)

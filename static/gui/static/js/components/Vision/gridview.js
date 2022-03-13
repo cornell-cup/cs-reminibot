@@ -4,9 +4,7 @@ import axios from "axios";
 import { Button } from "../utils/Util.js";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import VisionUserInterface from "./VisionUserInterface.js";
-import polygonForm from "./polygonForm.js";
-import circleForm from "./circleForm.js";
-import squareForm from "./squareform.js";
+
 
 const scaleFactor = 40;
 const distanceBetweenTicks = 10;
@@ -54,6 +52,9 @@ export default class GridView extends React.Component {
     this.getArgs = this.getArgs.bind(this);
   }
 
+  componentWillUnmount() {
+    clearInterval(this.find);
+  }
   renderXAxis() {
     let ticks = [];
     const xStart = -this.props.world_width / 2;
@@ -62,7 +63,7 @@ export default class GridView extends React.Component {
     for (let i = 0; i < numXAxisTicks; i++) {
       ticks.push(
         <g
-          class="tick"
+          className="tick"
           opacity="1"
           transform={`translate(${scaleFactor * distanceBetweenTicks * i},0)`}
         >
@@ -76,11 +77,11 @@ export default class GridView extends React.Component {
     }
     return (
       <g
-        class="x-axis"
+        className="x-axis"
         fill="none"
-        font-size="40"
-        font-family="sans-serif"
-        text-anchor="middle"
+        fontSize="40"
+        fontFamily="sans-serif"
+        textAnchor="middle"
       >
         {ticks}
       </g>
@@ -95,7 +96,7 @@ export default class GridView extends React.Component {
     for (let i = 0; i < numYAxisTicks; i++) {
       ticks.push(
         <g
-          class="tick"
+          className="tick"
           opacity="1"
           transform={`translate(0,${scaleFactor * distanceBetweenTicks * i})`}
         >
@@ -109,11 +110,11 @@ export default class GridView extends React.Component {
     }
     return (
       <g
-        class="y-axis"
+        className="y-axis"
         fill="none"
-        font-size="40"
-        font-family="sans-serif"
-        text-anchor="start"
+        fontSize="40"
+        fontFamily="sans-serif"
+        textAnchor="start"
       >
         {ticks}
       </g>
@@ -136,29 +137,7 @@ export default class GridView extends React.Component {
     );
   }
 
-  //returns an array of x and y deltas from center point to vertices of a regular polygon with a given numberOfSides and a given sideLength
-  generateRegularPolygonDeltas(numberOfSides, sideLength) {
-    const individualVertexAngle = 2 * Math.PI / numberOfSides;
-    const radius = Math.sqrt(sideLength * sideLength / (2 - 2 * Math.cos(individualVertexAngle)));
-    const initialAngleOffset = -Math.PI / 2 + (numberOfSides % 2 == 0 ? individualVertexAngle / 2 : 0);
-    const deltas = [];
-    for (let i = 0; i < numberOfSides; i++) {
-      deltas.push({ x: radius * Math.cos(initialAngleOffset + i * individualVertexAngle), y: radius * Math.sin(initialAngleOffset + i * individualVertexAngle) })
-    }
-    return deltas;
-  }
 
-  getDeltasFromVerticesXAndY(x, y, vertices) {
-    return vertices.map((vertex) => ({ x: vertex['x'] - x, y: vertex['y'] - y }));
-  }
-
-  getPolygonInfoFromVertices(vertices) {
-    const center = vertices.reduce(
-      (previousValue, currentValue) => ({ x: previousValue['x'] + currentValue['x'] / vertices.length, y: previousValue['y'] + currentValue['y'] / vertices.length }),
-      { x: 0, y: 0 }
-    );
-    return { x: center['x'], y: center['y'], deltas: this.getDeltasFromVerticesXAndY(center['x'], center['y'], vertices) };
-  }
 
 
   renderObjects() {
@@ -170,6 +149,10 @@ export default class GridView extends React.Component {
         case "minibot":
           objects.push(this.renderBot(detection));
           break;
+        case "virtual_object":
+        case "physical_object":
+          objects.push(this.renderShapeGroup(detection));
+          break;
         default:
           objects.push(this.renderUnknown(detection));
           break;
@@ -179,6 +162,11 @@ export default class GridView extends React.Component {
   }
 
   renderBot(detection) {
+    detection["shape"] = "cube";
+    detection["width"] = 5;
+    detection["length"] = 5;
+    detection["height"] = 5;
+    detection["color"] = detection["color"] || "red";
     return this.renderShapeGroup(detection, "./static/img/bot-dot.png");
   }
 
@@ -206,8 +194,10 @@ export default class GridView extends React.Component {
     const x = scaleFactor * (this.props.world_width / 2 + x_pos);
     const y = scaleFactor * (this.props.world_height / 2 - y_pos);
     const orientation_pos = parseFloat(detection["orientation"]);
+    let orientation_adjusted_detection = JSON.parse(JSON.stringify(detection));
+    orientation_adjusted_detection["orientation"] = -orientation_adjusted_detection["orientation"]
     return (
-      <g className="popup" onClick={() => {
+      <g onClick={() => {
         alert(`${detection["name"] ? detection["name"] : ""}: (${Math.round(
           x_pos
         )},${Math.round(y_pos)}) ${Math.round(orientation_pos)}°`)
@@ -215,7 +205,7 @@ export default class GridView extends React.Component {
         <title>{`${detection["name"] ? detection["name"] : ""}: (${Math.round(
           x_pos
         )},${Math.round(y_pos)}) ${Math.round(orientation_pos)}°`}</title>
-        {this.renderShape(detection, image_path)}
+        {this.renderShape(orientation_adjusted_detection, image_path)}
       </g >
     );
   }
@@ -256,9 +246,9 @@ export default class GridView extends React.Component {
               transform={`rotate(${orientation_pos}, ${x}, ${y})`}
               width={scaleFactor * width}
               height={scaleFactor * height}
-              fill={detection["color"]}
+              fill={detection["color"] ? detection["color"] : unknownColor}
             ></rect>
-            {this.renderShape(
+            {image_path && this.renderShape(
               {
                 x: x_pos,
                 y: y_pos,
@@ -281,10 +271,10 @@ export default class GridView extends React.Component {
               cx={x}
               cy={y}
               r={scaleFactor * radius}
-              fill={detection["color"] ? detection["color"] : unknownMeasure}
+              fill={detection["color"] ? detection["color"] : unknownColor}
               transform={`rotate(${orientation_pos}, ${x}, ${y})`}
             ></circle>
-            {this.renderShape(
+            {image_path && this.renderShape(
               {
                 x: x_pos,
                 y: y_pos,
@@ -308,10 +298,10 @@ export default class GridView extends React.Component {
               cy={y}
               rx={scaleFactor * radius}
               ry={scaleFactor * radiusY}
-              fill={detection["color"] ? detection["color"] : unknownMeasure}
+              fill={detection["color"] ? detection["color"] : unknownColor}
               transform={`rotate(${orientation_pos}, ${x}, ${y})`}
             ></ellipse>
-            {this.renderShape(
+            {image_path && this.renderShape(
               {
                 x: x_pos,
                 y: y_pos,
@@ -332,10 +322,6 @@ export default class GridView extends React.Component {
             y={y - (scaleFactor * height) / 2}
             width={scaleFactor * width}
             height={scaleFactor * height}
-            fill={
-              scaleFactor *
-              (detection["color"] ? detection["color"] : unknownMeasure)
-            }
             href={image_path || "./static/img/unknown-dot.png"}
             transform={`rotate(${orientation_pos}, ${x}, ${y})`}
           ></image>
@@ -345,10 +331,10 @@ export default class GridView extends React.Component {
           <React.Fragment>
             <polygon
               points={text_vertices}
-              fill={detection["color"] ? detection["color"] : unknownMeasure}
+              fill={detection["color"] ? detection["color"] : unknownColor}
               transform={`rotate(${orientation_pos}, ${x}, ${y})`}
             ></polygon>
-            {this.renderShape(
+            {image_path && this.renderShape(
               {
                 x: x_pos,
                 y: y_pos,
@@ -368,7 +354,7 @@ export default class GridView extends React.Component {
           <React.Fragment>
             <polygon
               points={text_vertices}
-              fill={detection["color"] ? detection["color"] : unknownMeasure}
+              fill={detection["color"] ? detection["color"] : unknownColor}
               transform={`rotate(${orientation_pos}, ${x}, ${y})`}
             ></polygon>
             {image_path && this.renderShape(
@@ -412,316 +398,6 @@ export default class GridView extends React.Component {
     if (this.props.defaultEnabled) {
       this.displayRobot();
     }
-    axios
-      .post("/object-mapping", {
-        add: true,
-        mappings: [
-          {
-            id: "20",
-            name: "minibot20",
-            type: "minibot",
-            length: 10,
-            width: 10,
-            height: 7,
-            shape: "polygon",
-            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
-            color: "red",
-          },
-          {
-            id: "21",
-            name: "minibot21",
-            type: "minibot",
-            length: 10,
-            width: 10,
-            height: 7,
-            shape: "polygon",
-            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
-            color: "red",
-          },
-          {
-            id: "22",
-            name: "minibot22",
-            type: "minibot",
-            length: 10,
-            width: 10,
-            height: 7,
-            shape: "polygon",
-            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
-            color: "red",
-          },
-          {
-            id: "23",
-            name: "minibot23",
-            type: "minibot",
-            length: 10,
-            width: 10,
-            height: 7,
-            shape: "polygon",
-            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
-            color: "red",
-          },
-          {
-            id: "24",
-            name: "minibot24",
-            type: "minibot",
-            length: 10,
-            width: 10,
-            height: 7,
-            shape: "polygon",
-            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
-            color: "red",
-          },
-          {
-            id: "25",
-            name: "minibot25",
-            type: "minibot",
-            length: 10,
-            width: 10,
-            height: 7,
-            shape: "polygon",
-            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
-            color: "red",
-          },
-          {
-            id: "26",
-            name: "minibot26",
-            type: "minibot",
-            length: 10,
-            width: 10,
-            height: 7,
-            shape: "polygon",
-            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
-            color: "red",
-          },
-          {
-            id: "27",
-            name: "minibot27",
-            type: "minibot",
-            length: 10,
-            width: 10,
-            height: 7,
-            shape: "polygon",
-            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
-            color: "red",
-          },
-          {
-            id: "28",
-            name: "minibot28",
-            type: "minibot",
-            length: 10,
-            width: 10,
-            height: 7,
-            shape: "polygon",
-            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
-            color: "red",
-          },
-          {
-            id: "29",
-            name: "minibot29",
-            type: "minibot",
-            length: 10,
-            width: 10,
-            height: 7,
-            shape: "polygon",
-            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
-            color: "red",
-          },
-          {
-            id: "30",
-            name: "minibot30",
-            type: "minibot",
-            length: 10,
-            width: 10,
-            height: 7,
-            shape: "polygon",
-            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
-            color: "red",
-          },
-          {
-            id: "31",
-            name: "minibot31",
-            type: "minibot",
-            length: 10,
-            width: 10,
-            height: 7,
-            shape: "polygon",
-            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
-            color: "red",
-          },
-          {
-            id: "32",
-            name: "minibot32",
-            type: "minibot",
-            length: 10,
-            width: 10,
-            height: 7,
-            shape: "polygon",
-            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
-            color: "red",
-          },
-          {
-            id: "33",
-            name: "minibot33",
-            type: "minibot",
-            length: 10,
-            width: 10,
-            height: 7,
-            shape: "polygon",
-            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
-            color: "red",
-          },
-          {
-            id: "34",
-            name: "minibot34",
-            type: "minibot",
-            length: 10,
-            width: 10,
-            height: 7,
-            shape: "polygon",
-            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
-            color: "red",
-          },
-          {
-            id: "35",
-            name: "minibot35",
-            type: "minibot",
-            length: 10,
-            width: 10,
-            height: 7,
-            shape: "polygon",
-            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
-            color: "red",
-          },
-          {
-            id: "36",
-            name: "minibot36",
-            type: "minibot",
-            length: 10,
-            width: 10,
-            height: 7,
-            shape: "polygon",
-            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
-            color: "red",
-          },
-          {
-            id: "37",
-            name: "minibot37",
-            type: "minibot",
-            length: 10,
-            width: 10,
-            height: 7,
-            shape: "polygon",
-            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
-            color: "red",
-          },
-          {
-            id: "38",
-            name: "minibot38",
-            type: "minibot",
-            length: 10,
-            width: 10,
-            height: 7,
-            shape: "polygon",
-            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
-            color: "red",
-          },
-          {
-            id: "39",
-            name: "minibot39",
-            type: "minibot",
-            length: 10,
-            width: 10,
-            height: 7,
-            shape: "polygon",
-            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
-            color: "red",
-          },
-          {
-            id: "40",
-            name: "minibot40",
-            type: "minibot",
-            length: 10,
-            width: 10,
-            height: 7,
-            shape: "polygon",
-            deltas_to_vertices: [{ x: -10, y: -10 }, { x: -10, y: 10 }, { x: 10, y: 10 }, { x: 10, y: -10 }],
-            color: "red",
-          }
-        ],
-      })
-      .then(function (response) { }.bind(this))
-      .catch(function (error) {
-        // console.log(error);
-      });
-
-    const polygonInfo = this.getPolygonInfoFromVertices([{ x: 55, y: 55 }, { x: 95, y: 55 }, { x: 95, y: 75 }, { x: 75, y: 75 }, { x: 75, y: 95 }, { x: 55, y: 95 }]);
-    // example of adding virtual object to base station
-    axios
-      .post("/virtual-objects", {
-        add: true,
-        virtual_objects: [
-          {
-            id: "test id",
-            x: 100,
-            y: -100,
-            orientation: 0,
-            name: "test name",
-            type: "test type",
-            shape: "regular_polygon",
-            deltas_to_vertices: this.generateRegularPolygonDeltas(4, 10),
-            color: "blue",
-          },
-          {
-            id: "test id2",
-            x: 50,
-            y: -50,
-            orientation: 12,
-            name: "test name2",
-            type: "test type2",
-            shape: "oval",
-            radius: 10,
-            radiusY: 20,
-            color: "blue",
-          },
-          {
-            id: "test id3",
-            x: -50,
-            y: 50,
-            orientation: 0,
-            name: "test name3",
-            type: "test type3",
-            shape: "regular_polygon",
-            deltas_to_vertices: this.generateRegularPolygonDeltas(3, 10),
-            color: "pink",
-          },
-          {
-            id: "test id4",
-            x: 50,
-            y: 50,
-            orientation: 0,
-            name: "test name4",
-            type: "test type4",
-            shape: "regular_polygon",
-            deltas_to_vertices: this.generateRegularPolygonDeltas(6, 10),
-            color: "pink",
-          },
-          {
-            id: "test id5",
-            x: polygonInfo['x'],
-            y: polygonInfo['y'],
-            orientation: 75,
-            name: "test name5",
-            type: "test type5",
-            shape: "polygon",
-            deltas_to_vertices: polygonInfo['deltas'],
-            color: "pink",
-          }
-        ],
-      })
-      .then(function (response) { }.bind(this))
-      .catch(function (error) {
-        // console.log(error);
-      });
   }
 
   getVisionData() {
@@ -809,8 +485,6 @@ export default class GridView extends React.Component {
   render() {
     return (
       <React.Fragment>
-        <VisionUserInterface/>
-        <circleForm/>
         {!this.props.defaultEnabled && <button
           onClick={this.displayRobot}
           name={"Display Bot"}
@@ -818,8 +492,8 @@ export default class GridView extends React.Component {
         >
           Display Bot
         </button>}
-        
-        <br/>
+
+        <br />
         <TransformWrapper
           initialScale={1}
           initialPositionX={0}

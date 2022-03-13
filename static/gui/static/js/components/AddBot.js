@@ -347,15 +347,15 @@ export default class AddBot extends React.Component {
                                 </label>
                             </td>
                             <td><button style={styles.Button} onClick={this.addBotListener}>Add Bot</button></td>
-                            <div class="led-box">&nbsp;&nbsp;
-                              <div id="led-red"></div>
+                            <div className="led-box">&nbsp;&nbsp;
+                                <div id="led-red"></div>
                             </div>
                         </tr>
                         <tr>
                             <td>
                                 <label>
                                     Bot List:
-                          <select style={styles.Select} onChange={this.selectBotListener}>
+                                    <select style={styles.Select} onChange={this.selectBotListener}>
                                         {this.props.bot_list.map(function (bot_name, idx) {
                                             return <option
                                                 key={idx}
@@ -396,7 +396,7 @@ export default class AddBot extends React.Component {
                     <form className="newDiv">
                         <label>
                             Power:
-                          <input type="text" defaultValue="50" name="wheel_power" onChange={evt => this.updatePowerValue(evt)} />
+                            <input type="text" defaultValue="50" name="wheel_power" onChange={evt => this.updatePowerValue(evt)} />
                         </label>
                     </form>
                 </div>

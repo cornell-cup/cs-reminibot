@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import CircleForm from "./circleForm.js";
-import SquareForm from "./squareForm.js";
-import PolygonForm from "./polygonForm.js";
+import CircleForm from "./CircleForm.js";
+import RectangleForm from "./RectangleForm.js";
+import PolygonForm from "./PolygonForm.js";
 import * as Icons from "@fortawesome/free-solid-svg-icons";
-import RegularPolygonForm from "./regularPolygonForm.js";
+import RegularPolygonForm from "./RegularPolygonForm.js";
+import MinibotForm from "./MinibotForm.js";
 
 export default function VisionUserInterface() {
-  const forms = [<CircleForm />, <SquareForm />, <RegularPolygonForm />, <PolygonForm />];
+  const forms = [<CircleForm />, <RectangleForm />, <RegularPolygonForm />, <PolygonForm />, <MinibotForm />];
   const [formId, setFormId] = useState(-1);
 
   return (
@@ -16,7 +17,7 @@ export default function VisionUserInterface() {
         <button
           title="Add Circle"
           type="button"
-          class="btn btn-secondary"
+          className="btn btn-danger"
           onClick={() => { setFormId(0) }}
         >
           Add Circle&nbsp;
@@ -26,31 +27,41 @@ export default function VisionUserInterface() {
         <button
           title="Add Square"
           type="button"
-          class="btn btn-secondary"
+          className="btn btn-danger"
           onClick={() => { setFormId(1) }}
         >
-          Add Square&nbsp;
+          Add Rectangle&nbsp;
           <FontAwesomeIcon icon={Icons.faSquare} />
         </button>
         &nbsp;
         <button
           title="Add Regular Polygon"
           type="button"
-          class="btn btn-secondary"
+          className="btn btn-danger"
           onClick={() => { setFormId(2) }}
         >
           Add Regular Polygon&nbsp;
           <FontAwesomeIcon icon={Icons.faSquare} />
         </button>
-        &nbsp;
+        {/* &nbsp;
         <button
           title="Add Polygon"
           type="button"
-          class="btn btn-primary"
+          className="btn btn-secondary"
           onClick={() => { setFormId(3) }}
         >
           Add Polygon&nbsp;
           <FontAwesomeIcon icon={Icons.faDrawPolygon} />
+        </button> */}
+        &nbsp;
+        <button
+          title="Register Minibot"
+          type="button"
+          className="btn btn-danger"
+          onClick={() => { setFormId(4) }}
+        >
+          Add Minibot&nbsp;
+          <FontAwesomeIcon icon={Icons.faRobot} />
         </button>
         <br />
         <br />
