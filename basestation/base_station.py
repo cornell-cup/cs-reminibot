@@ -8,7 +8,7 @@ from basestation import db
 from basestation.util.stoppable_thread import StoppableThread, ThreadSafeVariable
 from basestation.util.helper_functions import distance
 
-from random import choice
+from random import choice, randint
 from string import digits, ascii_lowercase, ascii_uppercase
 from typing import Tuple, Optional
 import os
@@ -20,6 +20,8 @@ import threading
 import pyaudio
 import speech_recognition as sr
 from copy import deepcopy
+
+from basestation.util.units import AngleUnits, LengthUnits, convert_angle, convert_length
 
 MAX_VISION_LOG_LENGTH = 1000
 VISION_UPDATE_FREQUENCY = 30
@@ -116,6 +118,118 @@ class BaseStation:
 
     # ==================== VISION ====================
 
+    def print_location(self, id):
+        """ Prints the location of a minibot given its id """
+        #calls the get_vision_data_by_id method with the id (as a string hence the 
+        #casting with the str() function) of the minibot that you want 
+        #to track as the argument in order to get the position data for the minibot
+
+        minibot_data = self.get_vision_data_by_id(id)
+        #first check to make sure the method call was able to retrieve the data
+        if minibot_data:
+            """
+                minibot_data structure:
+                {"x": float, "y": float, "orientation": float}
+            """
+            #the minibots x coordinate in inches
+            minibot_x_coordinate_inches = minibot_data["x"]
+            #the minibots y coordinate in inches
+            minibot_y_coordinate_inches = minibot_data["y"]
+            #the minibots orientation in degrees
+            minibot_orientation_degrees = minibot_data["orientation"]
+            print("inches and degrees: ({},{}) {}°".format(
+                    minibot_x_coordinate_inches, 
+                    minibot_y_coordinate_inches, 
+                    minibot_orientation_degrees
+                )
+            )
+
+            """
+                You can convert units using the following functions:
+                convert_length(length, from_units, to_units)
+                convert_angle(angle, from_units, to_units)
+            """
+            #the minibots x coordinate in meters
+            minibot_x_coordinate_meters = convert_length(
+                minibot_data["x"], 
+                LengthUnits.INCHES, 
+                LengthUnits.METERS
+            )
+            #the minibots y coordinate in meters 
+            minibot_y_coordinate_meters = convert_length(
+                minibot_data["y"], 
+                LengthUnits.INCHES, 
+                LengthUnits.METERS
+            )
+            #the minibots orientation in radians
+            minibot_orientation_radians = convert_angle(
+                minibot_data["orientation"], 
+                AngleUnits.DEGREES, 
+                AngleUnits.RADIANS
+            )
+            print("meters and radians: ({},{}) {}".format(
+                    minibot_x_coordinate_meters, 
+                    minibot_y_coordinate_meters, 
+                    minibot_orientation_radians
+                )
+            )
+    def update_virtual_minibot_position_randomly(self, id):
+        """ Randomly updates the position of a virtual minibot given an id """ 
+        #generating random point and orientation (values can be decimals too 
+        #this is just an example)   
+        x = randint(-50,50)
+        y = randint(-50,50)
+        orientation = randint(0,360)
+        #calls the add_minibot_to_virtual_objects method with the id (as a string hence the 
+        #casting with the str() function) of the minibot that you want 
+        #to update the position of as the argument as well as the 
+        #new x coordinate in inches, y coordinate in inches, and orientation in degrees
+        self.add_minibot_to_virtual_objects(str(id),x,y,orientation)
+
+    def update_virtual_minibot_position_randomly_meters_radians(self, id):
+        """ Randomly updates the position of a virtual minibot given an id """ 
+        #generating random point and orientation (values can be decimals too 
+        #this is just an example)   
+        # x coordinate in meters
+        x_meters = randint(-50,50)
+        # y coordinate in meters
+        y_meters = randint(-50,50)
+        # orientation in radians
+        orientation_radians = randint(0,360)
+        # x coordinate in inches
+        x_inches = convert_length(
+            x_meters,  
+            LengthUnits.METERS,
+            LengthUnits.INCHES
+        )
+        # y coordinate in inches
+        y_inches = convert_length(
+            y_meters,  
+            LengthUnits.METERS,
+            LengthUnits.INCHES
+        )
+        # orientation in degrees
+        orientation_degrees = convert_angle(
+            orientation_radians,  
+            AngleUnits.RADIANS,
+            AngleUnits.DEGREES
+        )
+        #calls the add_minibot_to_virtual_objects method with the id 
+        #(as a string hence the casting with the str() function) of 
+        #the minibot that you want to update the position of as 
+        #the argument as well as the new x coordinate in inches, 
+        #y coordinate in inches, and orientation in degrees
+        self.add_minibot_to_virtual_objects(
+            str(id),
+            x_inches,
+            y_inches,
+            orientation_degrees
+        )
+            
+        
+
+
+
     def update_virtual_objects(self, update):
         """ Updates vision virtual objects list. """
         if "virtual_objects" in update and "add" in update and type(update["virtual_objects"]) is list and len(update["virtual_objects"]) > 0:
@@ -152,6 +266,22 @@ class BaseStation:
             }
         else:
             print("The vision virtual object list was not given a valid update")
+
+    # to be used for simulation
+    def add_minibot_to_virtual_objects(self, id, x, y, orientation):
+        """ Adds a minibot to the list of virtual objects given an id, x coordinate, y coordinate, and orientation
+            NOTE: This method is also used to update the position of the virtual minibot with the given id using 
+            with the given x coordinate, y coordinate, and orientation.
+        """
+        minibot_virtual_object = {
+            "id": id,
+            "name": "minibot"+str(id), 
+            "type": "minibot",   
+            "x": x,  
+            "y": y,  
+            "orientation": orientation
+        }
+        self.add_to_virtual_objects(minibot_virtual_object)
 
     def add_multiple_to_virtual_objects(self, virtual_objects):
         """ Adds multiple virtual objects to virtual objects list """
@@ -233,6 +363,27 @@ class BaseStation:
     def get_vision_data(self):
         """ Returns most recent vision data """
         return self.vision_log[-1]["POSITION_DATA"] if self.vision_log and len(self.vision_log) > 0 else None
+
+    # to be used for simulation
+    def get_vision_data_by_id(self, id):
+        """ Returns position data of an object given its id """
+        allVisionData = self.get_vision_data()
+        for object in allVisionData:
+            if object["id"] == id:
+                return object
+        print("Warning: Vision data for the object with the given ID could not be found")
+        return None
+
+    def get_vision_data_by_ids(self, ids):
+        """ Returns position data of multiple objects given a list of ids """
+        allVisionData = self.get_vision_data()
+        objects = []
+        for object in allVisionData:
+            if object["id"] == ids:
+                objects.append(object)
+        if len(objects) < len(ids):
+            print("Warning: Vision data for some of the objects with the given ID could not be found")
+        return objects
 
     def get_vision_object_map(self):
         """ Returns the mapping of vision objects to their corresponding ids """
