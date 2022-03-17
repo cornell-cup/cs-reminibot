@@ -45,6 +45,7 @@ function BotVoiceControl({ selectedBotName }) {
       let paragraph = pStart + queue[i] + pEnd;
       feedbackBox.innerHTML += paragraph;
     }
+    setText("");
   }, [text]);
 
   return (
