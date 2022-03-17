@@ -141,20 +141,20 @@ def read_once():
 
     # values = []
     # for _ in range(num_reads):
-        # now = datetime.now()
-        # file = open("/home/pi/Documents/" +
-        #             now.strftime('%H:%M:%S.%f') + ".txt", "w")
+    # now = datetime.now()
+    # file = open("/home/pi/Documents/" +
+    #             now.strftime('%H:%M:%S.%f') + ".txt", "w")
 
-        # file.write("Reading from Arduino\n")
-        # values += spi.readbytes(1)
-        # file.write(' '.join(str(val) for val in values))
-        # file.close()
-        # Need a short delay between each read from the Arduino
-        # Without the delay, the Arduino will return 0
-        # time.sleep(0.02)
+    # file.write("Reading from Arduino\n")
+    # values += spi.readbytes(1)
+    # file.write(' '.join(str(val) for val in values))
+    # file.close()
+    # Need a short delay between each read from the Arduino
+    # Without the delay, the Arduino will return 0
+    # time.sleep(0.02)
 
     # FOR IR
-    values = spi.readbytes(1)
+    values = spi.readbytes(5)
     return values
 
 

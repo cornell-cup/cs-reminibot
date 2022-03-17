@@ -46,11 +46,16 @@ void setup() {
     pinMode(IRPin, INPUT);
 }
 int val;
+int spdr_value;
 
 // SPI ISR (Interrupt Service Routine)
 
 ISR(SPI_STC_vect) {
+    Serial.println("SPDR" + String(SPDR));
+
     byte c = SPDR;  // get byte from the SPI data register
+                    //    Serial.println("c" + String(c));
+
     // detect the beginning of the buffer, do not put it in the buffer
     if (c == '\n') {
         valid = true;
@@ -76,9 +81,13 @@ ISR(SPI_STC_vect) {
 
 void read_IR() {
     val = digitalRead(IRPin);
-    // Serial.println("val" + String(val));
-    // Serial.println("SPDR" + String(SPDR));
-    // Serial.println("SPDR_value" + String(spdr_value));
+
+    //    SPDR = 0;
+    //    SPDR = val;
+
+    Serial.println("val" + String(val));
+    //    Serial.println("SPDR" + String(SPDR));
+    //    Serial.println("SPDR_value" + String(spdr_value));
 }
 
 boolean read_ir = false;
