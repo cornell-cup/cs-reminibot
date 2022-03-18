@@ -254,6 +254,7 @@ class BaseStation:
         """ Adds single virtual object to virtual objects list """
         if "id" in virtual_object and "name" in virtual_object and "type" in virtual_object and "x" in virtual_object and "y" in virtual_object and "orientation" in virtual_object:
             self.virtual_objects[virtual_object["id"]] = {
+                "virtual_room_id": virtual_object["virtual_room_id"] if "virtual_room_id" in virtual_object else None,
                 "name": virtual_object["name"], 
                 "type": virtual_object["type"],   
                 "x": virtual_object["x"],  
@@ -329,6 +330,7 @@ class BaseStation:
         """ Adds single mapping from the vision object map based on mapping's id """
         if "id" in object_mapping and "name" in object_mapping and "type" in object_mapping:
             self.vision_object_map[object_mapping["id"]] = {
+                "virtual_room_id": object_mapping["virtual_room_id"] if "virtual_room_id" in object_mapping else None,
                 "name": object_mapping["name"], 
                 "type": object_mapping["type"],                         
                 "length": object_mapping["length"] if "length" in object_mapping else None, 
@@ -364,9 +366,22 @@ class BaseStation:
         """ Returns most recent vision data """
         return self.vision_snapshot if self.vision_snapshot else None
     
-    def get_vision_data(self):
+    def get_vision_data(self, query_params):
         """ Returns most recent vision data """
-        return self.vision_log[-1]["POSITION_DATA"] if self.vision_log and len(self.vision_log) > 0 else None
+        return list(filter(lambda data_entry: self.matchesQuery(data_entry, query_params), self.vision_log[-1]["POSITION_DATA"])) if self.vision_log and len(self.vision_log) > 0 else None
+
+    def matchesQuery(self, data_entry, query_params):
+        matches = True
+        if query_params != None:
+            if "ids" in query_params:
+                matches &= data_entry["id"] in query_params["ids"]
+            if "id" in query_params:
+                matches &= data_entry["id"] == query_params["id"]
+            if "virtual_room_id" in query_params and "virtual_room_id" in data_entry:
+                matches &= data_entry["virtual_room_id"] == query_params["virtual_room_id"]
+        return matches
+
+            
 
     # to be used for simulation
     def get_vision_data_by_id(self, id):
@@ -429,6 +444,7 @@ class BaseStation:
         return estimated_positions
 
     def format_estimated_position(self, object_id, estimated_x, estimated_y, estimated_orientation, virtual_object_data={}):
+        virtual_room_id = virtual_object_data["virtual_room_id"] if "virtual_room_id" in virtual_object_data else None
         name = virtual_object_data["name"] if "name" in virtual_object_data else None
         type = virtual_object_data["type"] if "type" in virtual_object_data else None
         deltas_to_vertices = virtual_object_data["deltas_to_vertices"] if "deltas_to_vertices" in virtual_object_data else None
@@ -441,6 +457,7 @@ class BaseStation:
         color = virtual_object_data["color"] if "color" in virtual_object_data else None
         estimated_position = {
             "id": object_id, 
+            "virtual_room_id": virtual_room_id if virtual_room_id != None else (self.vision_object_map[object_id]["virtual_room_id"] if object_id in self.vision_object_map else None),
             "name": name if name != None else (self.vision_object_map[object_id]["name"] if object_id in self.vision_object_map else None),
             "type": type if type != None else (self.vision_object_map[object_id]["type"] if object_id in self.vision_object_map else None),
             "deltas_to_vertices": deltas_to_vertices if deltas_to_vertices != None else (self.vision_object_map[object_id]["deltas_to_vertices"] if object_id in self.vision_object_map else None),

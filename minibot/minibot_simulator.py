@@ -91,7 +91,7 @@ class Minibot:
                 pass
         
             try:
-                vision_data = requests.get("http://localhost:8080/vision",json={"id":"-1"}).json()
+                vision_data = requests.get("http://localhost:8080/vision",params={"id":"-1"}).json()
                 print(vision_data)
                 if vision_data:
                     requests.post("http://localhost:8080/virtual-objects", json={"add": True,

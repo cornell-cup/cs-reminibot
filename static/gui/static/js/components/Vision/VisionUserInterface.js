@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import CircleForm from "./CircleForm.js";
 import RectangleForm from "./RectangleForm.js";
@@ -6,10 +6,16 @@ import PolygonForm from "./PolygonForm.js";
 import * as Icons from "@fortawesome/free-solid-svg-icons";
 import RegularPolygonForm from "./RegularPolygonForm.js";
 import MinibotForm from "./MinibotForm.js";
+import { withCookies } from "react-cookie";
+import { nanoid } from "nanoid";
 
-export default function VisionUserInterface() {
-  const forms = [<CircleForm />, <RectangleForm />, <RegularPolygonForm />, <PolygonForm />, <MinibotForm />];
+const VisionUserInterface = (props) => {
   const [formId, setFormId] = useState(-1);
+  const [virtualRoomId, setVirtualRoomId] = useState(props.cookies.get('virtual_room_id'));
+  const forms = [<CircleForm virtualRoomId={virtualRoomId} />, <RectangleForm virtualRoomId={virtualRoomId} />, <RegularPolygonForm virtualRoomId={virtualRoomId} />, <PolygonForm virtualRoomId={virtualRoomId} />, <MinibotForm virtualRoomId={virtualRoomId} />];
+  useEffect(() => {
+    setVirtualRoomId(props.cookies.get('virtual_room_id'));
+  }, [document.cookie]);
 
   return (
     <React.Fragment>
@@ -70,3 +76,5 @@ export default function VisionUserInterface() {
     </React.Fragment>
   );
 }
+
+export default withCookies(VisionUserInterface);
