@@ -1,6 +1,7 @@
 /* ES6 */
 
 import React, { useEffect, useState } from 'react';
+import { nanoid } from 'nanoid'
 import ReactDOM from 'react-dom';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -55,6 +56,12 @@ const Platform = withCookies((props) => {
   useEffect(() => {
     setLoginEmail(props.cookies.get('current_user_email') || "");
   }, [document.cookie]);
+
+  useEffect(() => {
+    props.cookies.set('virtual_room_id', props.cookies.get('virtual_room_id') || nanoid(), { path: '/' });
+  }, []);
+
+
 
   function setSelectedBotStyle(style) {
     setSelectedBotStyleState(style === "hidden" ? hiddenStyle : visibleStyle);

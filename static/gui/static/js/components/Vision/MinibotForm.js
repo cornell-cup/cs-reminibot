@@ -3,9 +3,8 @@ import React, { useState } from 'react'
 import { INFOBOXID, INFOBOXTYPE, INFO_ICON } from '../utils/Constants'
 import InformationBoxModal from '../utils/InformationBoxModal'
 import { getRandomIntInclusive } from './helperFunctions';
-import { generateRegularPolygonDeltas } from './helperFunctions';
 
-export default function RegularPolygonForm(props) {
+export default function MinibotForm(props) {
   const step = .01;
   const actions = ["registerPhysicalObject", "addVirtualObject"];
   const [registerPhysicalObject, setRegisterPhysicalObject] = useState(true);
@@ -14,14 +13,12 @@ export default function RegularPolygonForm(props) {
   const [x, setX] = useState("");
   const [y, setY] = useState("");
   const [orientation, setOrientation] = useState("");
-  const [numberOfSides, setNumberOfSides] = useState("");
-  const [sideLength, setSideLength] = useState("");
   const [color, setColor] = useState("#000000");
 
   function handleFormSubmit(event) {
     event.preventDefault();
+    console.log(props)
     if (registerPhysicalObject) {
-
       axios
         .post("/object-mapping", {
           add: true,
@@ -30,19 +27,18 @@ export default function RegularPolygonForm(props) {
               id: id,
               virtual_room_id: props.virtualRoomId,
               name: name,
-              type: "physical_object",
-              shape: "regular_polygon",
-              deltas_to_vertices: generateRegularPolygonDeltas(numberOfSides, sideLength),
+              type: "minibot",
+              shape: "cube",
               color: color
             }
           ],
         })
         .then(function (response) {
-          alert(`Your object registration ${name} has been added!`);
+          alert(`Your minibot registration ${name} has been added!`);
           clearForm();
         })
         .catch(function (error) {
-          alert(`Sorry, there was an issue registering your object ${name}.`);
+          alert(`Sorry, there was an issue registering your minibot ${name}.`);
         });
     } else {
       axios
@@ -53,22 +49,21 @@ export default function RegularPolygonForm(props) {
               id: id,
               virtual_room_id: props.virtualRoomId,
               name: name,
-              type: "virtual_object",
+              type: "minibot",
               x: x,
               y: y,
-              shape: "regular_polygon",
+              shape: "cube",
               orientation: orientation,
-              deltas_to_vertices: generateRegularPolygonDeltas(numberOfSides, sideLength),
               color: color
             }
           ],
         })
         .then(function (response) {
-          alert(`Your virtual object ${name} has been added!`);
+          alert(`Your virtual minibot ${name} has been added!`);
           clearForm();
         })
         .catch(function (error) {
-          alert(`Sorry, there was an issue adding your virtual object ${name}.`);
+          alert(`Sorry, there was an issue adding your virtual minibot ${name}.`);
         });
     }
 
@@ -79,11 +74,10 @@ export default function RegularPolygonForm(props) {
     setName("");
     setX("");
     setY("");
-    setNumberOfSides("");
-    setSideLength("");
     setOrientation("");
     setColor("#000000");
   }
+
 
   return (
     <React.Fragment>
@@ -102,20 +96,12 @@ export default function RegularPolygonForm(props) {
         <br />
         <div className="form-row">
           <div className="form-group col-md-6">
-            <label htmlFor="id">{registerPhysicalObject ? "AprilTag ID" : "Virtual Object ID"}</label>
-            <input type="text" className="form-control mb-2 mr-sm-2" id="id" placeholder={registerPhysicalObject ? "AprilTag ID" : "Virtual Object ID"} value={id} onChange={(e) => { setId(e.target.value.replace(/\s/g, '')) }} />
+            <label htmlFor="id">{registerPhysicalObject ? "AprilTag ID" : "Virtual Minibot ID"}</label>
+            <input type="text" className="form-control mb-2 mr-sm-2" id="id" placeholder={registerPhysicalObject ? "AprilTag ID" : "Virtual Minibot ID"} value={id} onChange={(e) => { setId(e.target.value.replace(/\s/g, '')) }} required />
           </div>
           <div className="form-group col-md-6">
-            <label htmlFor="name">Object name</label>
-            <input type="text" className="form-control mb-2 mr-sm-2" id="name" placeholder="Object name" value={name} onChange={(e) => { setName(e.target.value) }} required />
-          </div>
-          <div className="form-group col-md-2">
-            <label htmlFor="numberOfSides">Number of sides</label>
-            <input type="number" className="form-control mb-2 mr-sm-2" id="numberOfSides" placeholder="Number of sides" step={step} value={numberOfSides} onChange={(e) => { setNumberOfSides(parseFloat(e.target.value)) }} required />
-          </div>
-          <div className="form-group col-md-2">
-            <label htmlFor="sideLength">Side length</label>
-            <input type="number" className="form-control mb-2 mr-sm-2" id="sideLength" placeholder="Side length" step={step} value={sideLength} onChange={(e) => { setSideLength(parseFloat(e.target.value)) }} required />
+            <label htmlFor="name">Minibot name</label>
+            <input type="text" className="form-control mb-2 mr-sm-2" id="name" placeholder="Minibot name" value={name} onChange={(e) => { setName(e.target.value) }} required />
           </div>
           <div className="form-group col-md-2">
             <label htmlFor="color">Color</label>
@@ -138,9 +124,9 @@ export default function RegularPolygonForm(props) {
             </React.Fragment>
           }
         </div>
-
         <button type="submit" className="btn btn-success">Submit</button>
       </form>
-    </React.Fragment>
+      <InformationBoxModal type={INFOBOXTYPE.APRIL_TAG_ID} />
+    </React.Fragment >
   )
 }

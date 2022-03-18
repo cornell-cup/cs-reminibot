@@ -3,9 +3,8 @@ import React, { useState } from 'react'
 import { INFOBOXID, INFOBOXTYPE, INFO_ICON } from '../utils/Constants'
 import InformationBoxModal from '../utils/InformationBoxModal'
 import { getRandomIntInclusive } from './helperFunctions';
-import { generateRegularPolygonDeltas } from './helperFunctions';
 
-export default function RegularPolygonForm(props) {
+export default function RectangleForm(props) {
   const step = .01;
   const actions = ["registerPhysicalObject", "addVirtualObject"];
   const [registerPhysicalObject, setRegisterPhysicalObject] = useState(true);
@@ -14,14 +13,14 @@ export default function RegularPolygonForm(props) {
   const [x, setX] = useState("");
   const [y, setY] = useState("");
   const [orientation, setOrientation] = useState("");
-  const [numberOfSides, setNumberOfSides] = useState("");
-  const [sideLength, setSideLength] = useState("");
+  const [width, setWidth] = useState("");
+  const [height, setHeight] = useState("");
   const [color, setColor] = useState("#000000");
 
   function handleFormSubmit(event) {
     event.preventDefault();
-    if (registerPhysicalObject) {
 
+    if (registerPhysicalObject) {
       axios
         .post("/object-mapping", {
           add: true,
@@ -31,8 +30,9 @@ export default function RegularPolygonForm(props) {
               virtual_room_id: props.virtualRoomId,
               name: name,
               type: "physical_object",
-              shape: "regular_polygon",
-              deltas_to_vertices: generateRegularPolygonDeltas(numberOfSides, sideLength),
+              shape: "rectangle",
+              width: width,
+              length: height,
               color: color
             }
           ],
@@ -56,9 +56,10 @@ export default function RegularPolygonForm(props) {
               type: "virtual_object",
               x: x,
               y: y,
-              shape: "regular_polygon",
+              shape: "rectangle",
               orientation: orientation,
-              deltas_to_vertices: generateRegularPolygonDeltas(numberOfSides, sideLength),
+              width: width,
+              length: height,
               color: color
             }
           ],
@@ -79,8 +80,8 @@ export default function RegularPolygonForm(props) {
     setName("");
     setX("");
     setY("");
-    setNumberOfSides("");
-    setSideLength("");
+    setWidth("");
+    setHeight("");
     setOrientation("");
     setColor("#000000");
   }
@@ -110,12 +111,12 @@ export default function RegularPolygonForm(props) {
             <input type="text" className="form-control mb-2 mr-sm-2" id="name" placeholder="Object name" value={name} onChange={(e) => { setName(e.target.value) }} required />
           </div>
           <div className="form-group col-md-2">
-            <label htmlFor="numberOfSides">Number of sides</label>
-            <input type="number" className="form-control mb-2 mr-sm-2" id="numberOfSides" placeholder="Number of sides" step={step} value={numberOfSides} onChange={(e) => { setNumberOfSides(parseFloat(e.target.value)) }} required />
+            <label htmlFor="width">Width</label>
+            <input type="number" className="form-control mb-2 mr-sm-2" id="width" placeholder="Width" step={step} value={width} onChange={(e) => { setWidth(parseFloat(e.target.value)) }} required />
           </div>
           <div className="form-group col-md-2">
-            <label htmlFor="sideLength">Side length</label>
-            <input type="number" className="form-control mb-2 mr-sm-2" id="sideLength" placeholder="Side length" step={step} value={sideLength} onChange={(e) => { setSideLength(parseFloat(e.target.value)) }} required />
+            <label htmlFor="height">Height</label>
+            <input type="number" className="form-control mb-2 mr-sm-2" id="height" placeholder="Height" step={step} value={height} onChange={(e) => { setHeight(parseFloat(e.target.value)) }} required />
           </div>
           <div className="form-group col-md-2">
             <label htmlFor="color">Color</label>
@@ -138,9 +139,9 @@ export default function RegularPolygonForm(props) {
             </React.Fragment>
           }
         </div>
-
         <button type="submit" className="btn btn-success">Submit</button>
       </form>
+      <InformationBoxModal type={INFOBOXTYPE.APRIL_TAG_ID} />
     </React.Fragment>
   )
 }

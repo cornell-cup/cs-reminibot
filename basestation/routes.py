@@ -112,7 +112,8 @@ def vision():
         base_station.update_vision_snapshot(info)
         return json.dumps(True), status.HTTP_200_OK
     else:
-        return json.dumps(base_station.get_vision_data()), status.HTTP_200_OK
+        info = request.args.to_dict()
+        return json.dumps(base_station.get_vision_data(info)), status.HTTP_200_OK
 
 @app.route('/object-mapping', methods=['POST', 'GET'])
 def object_mapping():

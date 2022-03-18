@@ -2,7 +2,7 @@ import React from 'react'
 import GridView from './gridview'
 import VisionUserInterface from './VisionUserInterface'
 
-export default function Vision() {
+const Vision = (props) => {
   return (
     <React.Fragment>Vision
       <circleForm/>
@@ -15,3 +15,5 @@ export default function Vision() {
     </React.Fragment>
   )
 }
+
+export default Vision;
