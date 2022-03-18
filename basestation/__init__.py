@@ -11,7 +11,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_filename}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 
-from basestation.user_database import Program, User
+# from basestation.user_database import Program, User
 
 db.init_app(app)
 with app.app_context():

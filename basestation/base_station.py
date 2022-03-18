@@ -3,7 +3,7 @@ Base Station for the MiniBot.
 """
 
 from basestation.bot import Bot
-from basestation.user_database import Program, User, Chatbot as Chatbot
+from basestation.user_database import Program, User, Chatbot as ChatbotTable
 from basestation import db
 from basestation.util.stoppable_thread import StoppableThread, ThreadSafeVariable
 
@@ -317,32 +317,53 @@ class BaseStation:
         db.session.commit()
         return True
 
-    def update_chatbot_context(self, context: str):
+    # ==================== NEW SPEECH RECOGNITION ============================
+    def send_command(self, bot_name, command):
+        if command in self.commands:
+            self.move_bot_wheels(bot_name, command, 100)
+            return self.commands[command] + " command sent"
+        else:
+            return "invalid command"
+
+    # ==================== CHATBOT ==========================================
+
+    def chatbot_compute_answer(self, question: str) -> str:
+        """ Computes answer for [question].
+        Returns: <answer> : string
+        """
+        return self.chatbot.compute_answer(question)
+
+    def update_chatbot_context(self, context: str) -> None:
         """ Update user's context to the Chatbot object
         """
         self.chatbot.update_context(context)
 
-    def update_chatbot_all_context(self, context: str):
+    def update_chatbot_all_context(self, context: str) -> None:
         """ Replaces all context in the Chatbot object
-        with the input context 
+        with the input context.
+
+        Usage: called when user logs in, replaces context with context fetched
+        from database.
         """
         self.chatbot.reset_context()
         self.chatbot.update_context(context)
 
-    def get_chatbot_obj_context(self):
+    def get_chatbot_obj_context(self) -> str:
+        """ Returns all context currently stored in the chatbot object. 
+        """
         return self.chatbot.get_all_context()
 
-    def update_chatbot_context_db(self, user_id, context):
-        """ Update user's context if user exists upon exiting the session
+    def update_chatbot_context_db(self, user_id: str, context: str) -> None:
+        """ Update user's context if user exists upon exiting the session.
         (closing the GUI tab)
         """
         if user_id != "":
-            user = ChatbotT.query.filter_by(id=user_id).first()
+            user = ChatbotTable.query.filter_by(id=user_id).first()
 
             # user is not logged in
             if user is None:
                 # make new record in chatbot table
-                new_context = ChatbotT(
+                new_context = ChatbotTable(
                     user_id=user_id,
                     context=context
                 )
@@ -354,14 +375,14 @@ class BaseStation:
             db.session.commit()
         return
 
-    def chatbot_get_context(self, user_id):
+    def chatbot_get_context(self, user_id: str) -> str:
         """Gets the stored context for the chatbot based on user_id.
          If user_id is nonexistent or empty, returns an empty
          json object. Otherwise, returns a json object with the context and its
          corresponding user_id """
 
         if user_id != "":
-            user = ChatbotT.query.filter_by(id=user_id).first()
+            user = ChatbotTable.query.filter_by(id=user_id).first()
 
             if user is None:
                 return {'context': '', 'user_id': ''}
@@ -373,72 +394,10 @@ class BaseStation:
         else:
             return {'context': '', 'user_id': ''}
 
-    def chatbot_clear_context(self):
+    def chatbot_clear_context(self) -> None:
+        """ Resets all context stored in the Chatbot object. 
+        """
         self.chatbot.reset_context()
-
-    def chatbot_ask_question(self, question):
-        return self.chatbot.compute_answer(question)
-
-    # ==================== NEW SPEECH RECOGNITION ============================
-    def send_command(self, bot_name, command):
-        if command in self.commands:
-            self.move_bot_wheels(bot_name, command, 100)
-            return self.commands[command] + " command sent"
-        else:
-            return "invalid command"
-
-    # ==================== CHATBOT ====================
-
-    def chatbot_listening_toggle(self, bot_name):
-        # start the chatbot_listening_context thread
-        if True:  # TODO add condition to start the listening
-            # create a new thread that listens and converts speech
-            # to text in the background.  Cannot run this non-terminating
-            # function  in the current thread because the current post request
-            # will not terminate and our server will not handle any more
-            # requests.
-            self.chatbot_listening_thread = StoppableThread(
-                self.chatbot_listening_context, bot_name
-            )
-            self.chatbot_listening_thread.start()
-        # stop listening
-        elif False:  # TODO add condition to stop the thread
-            if self.chatbot_listening_thread:
-                self.chatbot_listening_thread.stop()
-
-    def chatbot_listening_context(
-        self,
-        thread_safe_condition: ThreadSafeVariable,
-        thread_safe_message_queue: ThreadSafeVariable
-    ) -> None:
-        # bot_name: str
-        recognizer = sr.Recognizer()
-        heard_context = []
-        self.chatbot_temp_context = ""
-        while thread_safe_condition.get_val():
-            try:
-                print("chatbot listening")
-                with sr.Microphone() as microphone:
-                    recognizer = sr.Recognizer()
-                    audio = recognizer.listen(microphone)
-                    words = recognizer.recognize_google(audio)
-                    heard_context.append(words)
-                    print("heard context")
-                    print(heard_context)
-            except sr.WaitTimeoutError:
-                thread_safe_message_queue.push("Timed out!")
-            except sr.UnknownValueError:
-                thread_safe_message_queue.push("Words not recognized!")
-                # send the request
-
-        temp = ' '.join(heard_context)
-        self.chatbot_temp_context = temp if temp != "" else "Nothing was said!"
-        print("temp context is " + self.chatbot_temp_context)
-        # self.chatbot.update_context(' '.join(heard_context))
-        self.chatbot.update_context(self.chatbot_temp_context)
-
-    def chatbot_compute_answer(self, question):
-        return self.chatbot.compute_answer(question)
 
     # ==================== GETTERS and SETTERS ====================
     @property

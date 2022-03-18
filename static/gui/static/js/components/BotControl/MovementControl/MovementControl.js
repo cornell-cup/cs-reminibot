@@ -4,7 +4,6 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle, faMicrophone, faCaretDown, faCaretLeft, faCaretRight, faCaretUp, faStop } from '@fortawesome/free-solid-svg-icons';
 library.add(faInfoCircle, faMicrophone, faCaretDown, faCaretLeft, faCaretRight, faCaretUp, faStop);
-import SpeechRecognition from './SpeechRecognition.js';
 import BotVoiceControl from './BotVoiceControl.js';
 
 export default class MovementControls extends React.Component {
