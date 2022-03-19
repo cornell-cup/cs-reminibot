@@ -425,7 +425,6 @@ const GridView = (props) => {
       .get("/vision", { params: { virtual_room_id: virtualRoomId } })
       .then(
         function (response) {
-          // console.log(response.data);
           setDetections(response.data ? response.data : []);
         }.bind(this)
       )
