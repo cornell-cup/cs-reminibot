@@ -154,7 +154,7 @@ def read_once():
     # time.sleep(0.02)
 
     # FOR IR
-    values = spi.readbytes(5)
+    values = spi.readbytes(1)
     return values
 
 
