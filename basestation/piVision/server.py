@@ -11,7 +11,7 @@ import imutils
 import cv2
 import time
 from queue import Queue
-
+#
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-p", "--prototxt", default='piVision/MobileNetSSD_deploy.prototxt',
