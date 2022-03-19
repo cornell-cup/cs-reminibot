@@ -1,0 +1,8 @@
+{
+    "commands" : {
+        "turn left": [6,9], 
+        "turn right": [7], 
+        "go forwards": [10,11], 
+        "stop": [8]
+    }
+}
