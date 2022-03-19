@@ -305,6 +305,10 @@ class BaseStation:
         db.session.commit()
         return 1
 
+    def get_user_id_by_email(self, email: str) -> int:
+        id = User.query.filter(User.email == self.login_email).first()
+        return id
+
     def update_custom_function(self, custom_function: str) -> bool:
         """Adds custom function(s) for the logged in user if there is a user 
         logged in
@@ -359,7 +363,7 @@ class BaseStation:
         """
         if user_id != "":
             user = ChatbotTable.query.filter_by(id=user_id).first()
-
+            # print("USER HERE!!!!!!!! " + user)
             # user is not logged in
             if user is None:
                 # make new record in chatbot table
@@ -368,6 +372,7 @@ class BaseStation:
                     context=context
                 )
                 db.session.add(new_context)
+
             else:
                 # do this if user exists in chatbot database already
                 user.context += ". " + context
@@ -375,7 +380,7 @@ class BaseStation:
             db.session.commit()
         return
 
-    def chatbot_get_context(self, user_id: str) -> str:
+    def chatbot_get_context(self, user_id: str):
         """Gets the stored context for the chatbot based on user_id.
          If user_id is nonexistent or empty, returns an empty
          json object. Otherwise, returns a json object with the context and its

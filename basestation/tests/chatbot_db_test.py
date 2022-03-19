@@ -3,12 +3,12 @@
 import sys
 import os
 sys.path.append('../../')
-from basestation.base_station import BaseStation
-from flask_sqlalchemy import SQLAlchemy
-from flask import Flask
-import unittest
-import pytest
 import json
+import pytest
+import unittest
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from basestation.base_station import BaseStation
 
 
 
@@ -110,7 +110,7 @@ def app():
         # all commands indented under 'with' are run in the app context
         db.create_all()
         yield app
-        db.session.close()
+        db.session.remove()
         db.drop_all()
 
     return app
@@ -120,38 +120,38 @@ def app():
 
 # dont know what is going on below here
 
-def test_test(app):
+def test_add_user(app):
     print("test")
-    base_station = BaseStation(app.debug)
-    # with app.test_client() as client:
-    #     response = client.post(
-    #         '/register',
-    #         data=json.dumps(dict(
-    #             email='michael@realpython.com',
-    #             password='test123'
-    #         )),
-    #         content_type='application/json',
-    #     )
-    #     data = json.loads(response.data.decode())
-    #     assert response.status_code == 200
-    #     # assert 'michael@realpython.com was added!' in data['message']
-    #     assert 'success' in data['status']
+    base_station = BaseStation()
 
     assert base_station.register('user', 'pass') == 1
 
 
-def add_context_entry(app):
-    BaseStation.update_chatbot_context_db(id, 'context')
+def test_get_user(app):
+    base_station = BaseStation()
+    assert base_station.login('user', 'pass')[0] == 1
+    assert base_station.login('user', 'wrongpass')[0] == 0
 
-    # make a user
-    # check that the entries are empty
-    # commit 1 entry
-    # try to get it, make sure it's correct
-    # commit 2nd entry
-    # check it
-    # clear entry
-    # check
-    #
+
+def test_add_context_entry(app):
+    base_station = BaseStation()
+    id = base_station.get_user_id_by_email('user')
+    print(id)
+    base_station.update_chatbot_context_db(str(id), 'this is context')
+    data = base_station.chatbot_get_context(str(id))
+
+    assert data["context"] == 'this is context'
+
+
+# make a user
+# check that the entries are empty
+# commit 1 entry
+# try to get it, make sure it's correct
+# commit 2nd entry
+# check it
+# clear entry
+# check
+#
 
 
 if __name__ == "__main__":
