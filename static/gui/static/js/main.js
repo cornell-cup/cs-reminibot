@@ -31,7 +31,6 @@ import Vision from './components/Vision/Vision.js';
  */
 const Platform = withCookies((props) => {
 
-
   const hiddenStyle = {
     visibility: 'hidden',
   };

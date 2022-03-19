@@ -4,6 +4,22 @@ export function getRandomIntInclusive(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min); //The maximum is inclusive and the minimum is inclusive
 }
 
+export function getItemCircular(array, index){
+  if(index >= array.length){
+    return array[index%array.length];
+  }
+  else if(index < 0){
+    return array[index%array.length+array.length];
+  }
+  else{
+    return array[index];
+  }
+}
+
+export function removeAt(array, index){
+  array.splice(index,1);
+}
+
 //returns an array of x and y deltas from center point to vertices of a regular polygon with a given numberOfSides and a given sideLength
 export function generateRegularPolygonDeltas(numberOfSides, sideLength) {
   const individualVertexAngle = 2 * Math.PI / numberOfSides;

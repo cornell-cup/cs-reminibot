@@ -3,6 +3,8 @@ import axios from "axios";
 
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { withCookies } from "react-cookie";
+import { triangulate } from "./CollisionDetection/Polygon";
+import Vector from "./CollisionDetection/Vector";
 
 
 const scaleFactor = 40;
@@ -239,6 +241,9 @@ const GridView = (props) => {
     const radius = detection["radius"] ? detection["radius"] : unknownMeasure;
     const radiusY = detection["radiusY"] ? detection["radiusY"] : unknownMeasure;
     const deltas_to_vertices = detection["deltas_to_vertices"] ? detection["deltas_to_vertices"] : [];
+    const vertices = deltas_to_vertices.map(
+      (currentValue) => new Vector(currentValue['x'], currentValue['y'])
+    );
     const text_vertices = deltas_to_vertices.reduce(
       (previousValue, currentValue) => `${previousValue} ${x + scaleFactor * currentValue['x']},${y + scaleFactor * currentValue['y']}`,
       ""
@@ -349,29 +354,10 @@ const GridView = (props) => {
           ></image>
         );
       case "regular_polygon":
-        return (
-          <React.Fragment>
-            <polygon
-              points={text_vertices}
-              fill={detection["color"] ? detection["color"] : unknownMeasure}
-              transform={`rotate(${orientation_pos}, ${x}, ${y})`}
-            ></polygon>
-            {image_path && renderShape(
-              {
-                x: x_pos,
-                y: y_pos,
-                orientation: orientation_pos,
-                width: average_deltas_to_vertices_radius,
-                length: average_deltas_to_vertices_radius,
-                color: detection["color"],
-                shape: "image",
-              },
-              image_path
-            )}
-          </React.Fragment>
-        );
       case "polygon":
       default:
+        const triangles = triangulate(vertices);
+        const colors = ["red", "green", "yellow", "blue", "red", "purple", "orange"]
         return (
           <React.Fragment>
             <polygon
@@ -379,6 +365,11 @@ const GridView = (props) => {
               fill={detection["color"] ? detection["color"] : unknownMeasure}
               transform={`rotate(${orientation_pos}, ${x}, ${y})`}
             ></polygon>
+            {triangles.map((triangle, index) => (<polygon
+              points={`${x + scaleFactor * triangle[0][0]},${y + scaleFactor * triangle[0][1]} ${x + scaleFactor * triangle[1][0]},${y + scaleFactor * triangle[1][1]} ${x + scaleFactor * triangle[2][0]},${y + scaleFactor * triangle[2][1]}`}
+              fill={colors[index % colors.length]}
+              transform={`rotate(${orientation_pos}, ${x}, ${y})`}
+            ></polygon>))}
             {image_path && renderShape(
               {
                 x: x_pos,
