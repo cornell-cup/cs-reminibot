@@ -25,7 +25,7 @@ from basestation.util.units import AngleUnits, LengthUnits, convert_angle, conve
 
 MAX_VISION_LOG_LENGTH = 1000
 VISION_UPDATE_FREQUENCY = 30
-VISION_DATA_HOLD_THRESHOLD = 2
+VISION_DATA_HOLD_THRESHOLD = 1
 
 
 def make_thread_safe(func):
@@ -372,7 +372,8 @@ class BaseStation:
     
     def get_vision_data(self, query_params):
         """ Returns most recent vision data """
-        return list(filter(lambda data_entry: self.matchesQuery(data_entry, query_params), self.get_estimated_positions(True, query_params["virtual_room_id"]))) 
+        pass
+        #return list(filter(lambda data_entry: self.matchesQuery(data_entry, query_params), self.get_estimated_positions(True, query_params["virtual_room_id"]))) 
 
     def matchesQuery(self, data_entry, query_params):
         matches = True
