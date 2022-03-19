@@ -252,7 +252,6 @@ class BaseStation:
 
     def add_to_virtual_objects(self, virtual_object):
         """ Adds single virtual object to virtual objects list """
-        print(virtual_object)
         if "id" in virtual_object and "name" in virtual_object and "type" in virtual_object and "x" in virtual_object and "y" in virtual_object and "orientation" in virtual_object and "virtual_room_id" in virtual_object:
             if not (virtual_object["virtual_room_id"] in self.virtual_objects):
                 self.virtual_objects[virtual_object["virtual_room_id"]] = {}
@@ -473,9 +472,6 @@ class BaseStation:
             for key in list(estimated_position.keys()):
                 if estimated_position[key] == None:
                     estimated_position[key] = virtual_object_data[key] if key in virtual_object_data else None
-        print(self.vision_object_map)
-        print(virtual_room_id)
-        print(virtual_room_id in self.vision_object_map)
         if virtual_room_id and virtual_room_id in self.vision_object_map:
             for key in list(estimated_position.keys()):
                 if estimated_position[key] == None:
