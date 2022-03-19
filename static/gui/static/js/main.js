@@ -1,7 +1,7 @@
 /* ES6 */
 
 import React, { useEffect, useState } from 'react';
-import { nanoid } from 'nanoid'
+import { nanoid } from 'nanoid';
 import ReactDOM from 'react-dom';
 
 import { library } from '@fortawesome/fontawesome-svg-core';

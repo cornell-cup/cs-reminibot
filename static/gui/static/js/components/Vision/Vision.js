@@ -10,7 +10,7 @@ const Vision = (props) => {
         view_height={1000}
         world_width={300}
         world_height={300}
-        defaultEnabled={true} />
+        defaultEnabled={false} />
 
     </React.Fragment>
   )

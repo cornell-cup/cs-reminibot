@@ -9,6 +9,7 @@ import MinibotForm from "./MinibotForm.js";
 import { withCookies } from "react-cookie";
 import { nanoid } from "nanoid";
 
+
 const VisionUserInterface = (props) => {
   const [formId, setFormId] = useState(-1);
   const [virtualRoomId, setVirtualRoomId] = useState(props.cookies.get('virtual_room_id'));
@@ -61,13 +62,23 @@ const VisionUserInterface = (props) => {
         </button> */}
         &nbsp;
         <button
-          title="Register Minibot"
+          title="Add Minibot"
           type="button"
           className="btn btn-danger"
           onClick={() => { setFormId(4) }}
         >
           Add Minibot&nbsp;
           <FontAwesomeIcon icon={Icons.faRobot} />
+        </button>
+        &nbsp;
+        <button
+          title="Add Minibot"
+          type="button"
+          className="btn btn-danger"
+          onClick={() => { props.cookies.set('virtual_room_id', nanoid(), { path: '/' }); }}
+        >
+          Change virtual_room_id
+
         </button>
         <br />
         <br />
