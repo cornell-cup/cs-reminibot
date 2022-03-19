@@ -2,8 +2,8 @@
 # Minibot imports.
 import sys
 import os
-print (sys.path)
-sys.path.append('../')
+sys.path.append('../../')
+import json
 import pytest
 import unittest
 from flask import Flask
@@ -13,11 +13,15 @@ from basestation.base_station import BaseStation
 
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def app():
+    """ Test version of __init__.py for the flask server
+    """
+    print("creating app")
     app = Flask(
         __name__, template_folder='../static/gui/', static_folder='../static/gui/static'
     )
+    # create a dummy db so we don't modify the actual db
     db = SQLAlchemy()
     db_filename = 'db_test.db'
 
@@ -26,6 +30,15 @@ def app():
     app.config['SQLALCHEMY_ECHO'] = True
 
     db.init_app(app)
+
+    with app.app_context():
+        # alternative pattern to app.app_context().push()
+        # all commands indented under 'with' are run in the app context
+        db.create_all()
+        yield app
+        db.session.close()
+        db.drop_all()
+
     return app
 
     # from basestation.user_database import Program, User
@@ -33,8 +46,22 @@ def app():
 
 # dont know what is going on below here
 
-def test_make_user(app):
-    BaseStation.register('user', 'pass')
+def test_test(app):
+    print("test")
+    with app.test_client() as client:
+        response = client.post(
+            '/register',
+            data=json.dumps(dict(
+                email='michael@realpython.com',
+                password='test123'
+            )),
+            content_type='application/json',
+        )
+        data = json.loads(response.data.decode())
+        assert response.status_code == 200
+        # assert 'michael@realpython.com was added!' in data['message']
+        assert 'success' in data['status']
+    # BaseStation.register('user', 'pass')
 
 
 def add_context_entry(app):
@@ -49,3 +76,6 @@ def add_context_entry(app):
     # clear entry
     # check
     #
+
+if __name__=="__main__":
+    pytest.main([])
