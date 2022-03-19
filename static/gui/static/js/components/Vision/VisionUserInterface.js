@@ -8,12 +8,13 @@ import RegularPolygonForm from "./RegularPolygonForm.js";
 import MinibotForm from "./MinibotForm.js";
 import { withCookies } from "react-cookie";
 import { nanoid } from "nanoid";
+import VirtualRoomIdForm from "./VirtualRoomIdForm.js";
 
 
 const VisionUserInterface = (props) => {
   const [formId, setFormId] = useState(-1);
   const [virtualRoomId, setVirtualRoomId] = useState(props.cookies.get('virtual_room_id'));
-  const forms = [<CircleForm virtualRoomId={virtualRoomId} />, <RectangleForm virtualRoomId={virtualRoomId} />, <RegularPolygonForm virtualRoomId={virtualRoomId} />, <PolygonForm virtualRoomId={virtualRoomId} />, <MinibotForm virtualRoomId={virtualRoomId} />];
+  const forms = [<CircleForm virtualRoomId={virtualRoomId} />, <RectangleForm virtualRoomId={virtualRoomId} />, <RegularPolygonForm virtualRoomId={virtualRoomId} />, <PolygonForm virtualRoomId={virtualRoomId} />, <MinibotForm virtualRoomId={virtualRoomId} />, <VirtualRoomIdForm virtualRoomId={virtualRoomId}></VirtualRoomIdForm>];
   useEffect(() => {
     setVirtualRoomId(props.cookies.get('virtual_room_id'));
   }, [document.cookie]);
@@ -75,10 +76,10 @@ const VisionUserInterface = (props) => {
           title="Add Minibot"
           type="button"
           className="btn btn-danger"
-          onClick={() => { props.cookies.set('virtual_room_id', nanoid(), { path: '/' }); }}
+          onClick={() => { setFormId(5); }}
         >
-          Change virtual_room_id
-
+          View/Edit Virtual Room&nbsp;
+          <FontAwesomeIcon icon={Icons.faDoorOpen} />
         </button>
         <br />
         <br />
