@@ -41,6 +41,20 @@ export const zCrossProduct = (v1,v2) => {
     }
 }
 
+export const slope = (v1,v2) => {
+    if (v1.length != v2.length) {
+        throwUnequalLengthsError(v1,v2);
+    } else if(v1.length < 2) {
+        throwVectorTooSmallError(2);
+    }
+    else {
+      //(v2.Y-v1.Y)/(v2.X-v1.X)
+      return (v2[1]-v1[1])/(v2[0]-v1[0]);
+    }
+}
+
+
+
 
 
 

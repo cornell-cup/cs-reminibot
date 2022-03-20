@@ -5,6 +5,7 @@ import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { withCookies } from "react-cookie";
 import { triangulate } from "./CollisionDetection/Polygon";
 import Vector from "./CollisionDetection/Vector";
+import { logIfShapesCollide } from "./CollisionDetection/CollisionDection";
 
 
 const scaleFactor = 40;
@@ -23,7 +24,8 @@ const unknownColor = "black";
  */
 const GridView = (props) => {
 
-  const [intervalId, setIntervalId] = useState(null);
+  const [displayIntervalId, setDisplayIntervalId] = useState(null);
+  const [collisionIntervalId, setCollisionIntervalId] = useState(null);
   const [detections, setDetections] = useState([]);
   const [displayOn, setDisplayOn] = useState(false);
   const [virtualRoomId, setVirtualRoomId] = useState(props.cookies.get('virtual_room_id'));
@@ -33,11 +35,20 @@ const GridView = (props) => {
 
   useEffect(() => {
     if (displayOn) {
-      clearInterval(intervalId);
+      clearInterval(displayIntervalId);
+      clearInterval(collisionIntervalId);
       setDetections([]);
-      setIntervalId(setInterval(getVisionData, 100));
+      setDisplayIntervalId(setInterval(getVisionData, 100));
+      setCollisionIntervalId(setInterval(checkCollisions, 100));
     }
   }, [virtualRoomId]);
+
+  useEffect(() => {
+    if (displayOn) {
+      clearInterval(collisionIntervalId);
+      setCollisionIntervalId(setInterval(checkCollisions, 100));
+    }
+  }, [detections]);
 
 
 
@@ -332,7 +343,7 @@ const GridView = (props) => {
       case "regular_polygon":
       case "polygon":
       default:
-        const triangles = triangulate(vertices);
+        const triangles = detection["triangles_from_deltas"];
         const colors = ["red","green","yellow","blue","red","purple","orange"]
         return (
           <React.Fragment>
@@ -392,6 +403,7 @@ const GridView = (props) => {
       .get("/vision", { params: { virtual_room_id: virtualRoomId } })
       .then(
         function (response) {
+          // logIfShapesCollide(response.data ? response.data : []);
           setDetections(response.data ? response.data : []);
         }.bind(this)
       )
@@ -403,9 +415,14 @@ const GridView = (props) => {
 
   }
 
+  const checkCollisions = () => {
+    // logIfShapesCollide(detections);
+  }
+
   const toggleVisionDisplay = () => {
     if (displayOn) {
-      clearInterval(intervalId);
+      clearInterval(displayIntervalId);
+      clearInterval(collisionIntervalId);
       setDisplayOn(false);
       setDetections([]);
     }
@@ -416,7 +433,8 @@ const GridView = (props) => {
     // concurrently, or we need to use WebSockets which will hopefully
     // allow for faster communication
     else {
-      setIntervalId(setInterval(getVisionData, 100));
+      setDisplayIntervalId(setInterval(getVisionData, 100));
+      setCollisionIntervalId(setInterval(checkCollisions, 100));
       setDisplayOn(true);
     }
   }
