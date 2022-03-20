@@ -1,15 +1,15 @@
 import React from 'react'
-import GridView from './gridview'
+import DetectionOrganization from './DetectionOrganization'
+import GridviewWithPhysics from './gridviewWithPhysics'
 import VisionUserInterface from './VisionUserInterface'
 
 const Vision = (props) => {
   return (
     <React.Fragment>Vision
       <VisionUserInterface />
-      <GridView view_width={1000}
-        view_height={1000}
-        world_width={300}
-        world_height={300}
+      <GridviewWithPhysics
+        world_width={1000}
+        world_height={1000}
         defaultEnabled={true} />
 
     </React.Fragment>
