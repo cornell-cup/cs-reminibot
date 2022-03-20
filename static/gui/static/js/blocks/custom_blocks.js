@@ -1,5 +1,5 @@
 /*
-	Code generators for custom blocks.
+  Code generators for custom blocks.
 */
 var BOT_HEADER = "bot.";
 var FCN_ENDING = "\n";
@@ -160,6 +160,41 @@ Blockly.Python['move_power_time'] = function (block) {
   return BOT_HEADER + fcn + number_speed + ")\n" + generateWait(number_seconds);
 };
 
+
+Blockly.Blocks['move_distance'] = {
+  init: function () {
+    this.jsonInit(miniblocks.move_distance);
+  }
+};
+
+Blockly.Python['move_distance'] = function (block) {
+  var dropdown_direction = block.getFieldValue('direction');
+  var number_meters = block.getFieldValue('meters');
+
+  var fcn = {
+    fwd_dst: "move_forward_distance(",
+    bk_dst: "move_backward_distance("
+  }[dropdown_direction];
+
+  return BOT_HEADER + fcn + number_meters + ")\n";
+};
+
+Blockly.Blocks['move_to_position'] = {
+  init: function () {
+    this.jsonInit(miniblocks.move_to_position);
+  }
+};
+
+Blockly.Python['move_to_position'] = function (block) {
+  var x_meters = block.getFieldValue('x_meters');
+  var y_meters = block.getFieldValue('y_meters');
+
+  var fcn = "move_to("
+
+  return BOT_HEADER + fcn + x_meters + "," + y_meters + ")\n";
+};
+
+
 Blockly.Blocks['stop_moving'] = {
   init: function () {
     this.jsonInit(miniblocks.stop_moving);
@@ -226,6 +261,38 @@ Blockly.Python['turn_power_time'] = function (block) {
   return BOT_HEADER + fcn + number_percent + ")\n" + generateWait(number_seconds);
 };
 
+Blockly.Blocks['turn_angle'] = {
+  init: function () {
+    this.jsonInit(miniblocks.turn_angle);
+  }
+};
+
+Blockly.Python['turn_angle'] = function (block) {
+  var dropdown_direction = block.getFieldValue('direction');
+  var number_degrees = block.getFieldValue('degrees');
+
+  var fcn = {
+    turn_clockwise_angle: "turn_clockwise_angle(",
+    turn_counter_clockwise_angle: "turn_counter_clockwise_angle("
+  }[dropdown_direction];
+
+  return BOT_HEADER + fcn + number_degrees + ")\n";
+};
+
+Blockly.Blocks['turn_to_angle'] = {
+  init: function () {
+    this.jsonInit(miniblocks.turn_to_angle);
+  }
+};
+
+Blockly.Python['turn_to_angle'] = function (block) {
+  var angle_degrees = block.getFieldValue('angle_degrees');
+
+  var fcn = "turn_to("
+
+  return BOT_HEADER + fcn + angle_degrees + ")\n";
+};
+
 // ================ WAIT BLOCK ================ //
 
 Blockly.Blocks['wait_seconds'] = {
@@ -285,7 +352,7 @@ Blockly.Python['while_wait_for_commands'] = function (block) {
 // ================ SERVO BLOCKS ================ //
 
 Blockly.Blocks['move_servo'] = {
-  init: function() {
+  init: function () {
     this.jsonInit(miniblocks.move_servo);
   }
 }
@@ -294,13 +361,13 @@ Blockly.Python['move_servo'] = function (block) {
   var angle = block.getFieldValue('angle');
   var funcCall = "move_servo(" + angle + ")";
 
-  return BOT_HEADER + funcCall + FCN_ENDING; 
+  return BOT_HEADER + funcCall + FCN_ENDING;
 }
 
 // ================ ULTRASONIC BLOCKS ================ //
 
 Blockly.Blocks['read_ultrasonic'] = {
-  init: function() {
+  init: function () {
     this.jsonInit(miniblocks.read_ultrasonic)
   }
 }
@@ -311,7 +378,7 @@ Blockly.Python['read_ultrasonic'] = function (block) {
   var upperBound = " <= " + upperLimit;
   var funcName = "read_ultrasonic()";
 
-  return [lowerBound + BOT_HEADER + funcName + upperBound, Blockly.Python.ORDER_NONE]; 
+  return [lowerBound + BOT_HEADER + funcName + upperBound, Blockly.Python.ORDER_NONE];
 }
 
 // ================ COLOR SENSING BLOCKS ================ //

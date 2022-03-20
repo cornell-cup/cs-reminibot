@@ -16,3 +16,4 @@ Werkzeug==1.0.0
 pyaudio==0.2.11
 SpeechRecognition==3.8.1
 pint
+control

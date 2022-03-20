@@ -67,7 +67,9 @@ def script():
     script_code = data['script_code']
     login_email = data['login_email']
     try:
+        print("script code",script_code)
         submission = base_station.save_submission(script_code, login_email)
+        print("submissions",submission)
         submission_id = submission.id
     except Exception as exception:
         print(exception)
