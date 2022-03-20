@@ -264,6 +264,7 @@ class BaseStation:
             self.virtual_objects[virtual_object["virtual_room_id"]][virtual_object["id"]] = {
                 "name": virtual_object["name"], 
                 "type": virtual_object["type"],   
+                "is_physical": False,
                 "x": virtual_object["x"],  
                 "y": virtual_object["y"],  
                 "orientation": virtual_object["orientation"],                        
@@ -439,14 +440,14 @@ class BaseStation:
                 )
         if use_vision_log and len(self.vision_log) > 0:
             for object_position_data in self.vision_log[-1]["POSITION_DATA"]:
-                estimated_position = self.format_estimated_position(object_position_data["id"], object_position_data["x"], object_position_data["y"], object_position_data["orientation"], virtual_room_id=virtual_room_id)
+                estimated_position = self.format_estimated_position(object_position_data["id"], object_position_data["x"], object_position_data["y"], object_position_data["orientation"], virtual_room_id=virtual_room_id, is_physical=True)
                 estimated_positions.append(
                     estimated_position
                 )
         else:
             for object_id, object_position_data in object_positions.items():
                 estimated_x, estimated_y, estimated_orientation = self.get_estimated_position_data(object_position_data)
-                estimated_position = self.format_estimated_position(object_id, estimated_x, estimated_y, estimated_orientation, virtual_room_id=virtual_room_id)
+                estimated_position = self.format_estimated_position(object_id, estimated_x, estimated_y, estimated_orientation, virtual_room_id=virtual_room_id, is_physical=True)
                 estimated_positions.append(
                     estimated_position
                 )
@@ -459,7 +460,7 @@ class BaseStation:
                 )
         return estimated_positions
 
-    def format_estimated_position(self, object_id, estimated_x, estimated_y, estimated_orientation, virtual_object_data=None,virtual_room_id=None):
+    def format_estimated_position(self, object_id, estimated_x, estimated_y, estimated_orientation, virtual_object_data=None,virtual_room_id=None, is_physical=False):
         estimated_position = {
                 "id": object_id, 
                 "name": None,
@@ -475,7 +476,8 @@ class BaseStation:
                 "color": None, 
                 "x": estimated_x, 
                 "y": estimated_y, 
-                "orientation": estimated_orientation
+                "orientation": estimated_orientation,
+                "is_physical": is_physical
             }
         if virtual_object_data:
             for key in list(estimated_position.keys()):
