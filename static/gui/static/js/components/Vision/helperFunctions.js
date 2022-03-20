@@ -16,6 +16,17 @@ export function getItemCircular(array, index){
   }
 }
 
+//does not work for negative divisors
+export function modulusPositive(dividend, divisor){
+    if(dividend < 0){
+      return dividend%divisor+divisor;
+    }
+    else{
+      return dividend%divisor;
+    }
+
+}
+
 export function removeAt(array, index){
   array.splice(index,1);
 }
@@ -34,6 +45,10 @@ export function generateRegularPolygonDeltas(numberOfSides, sideLength) {
 
 export function getDeltasFromVerticesXAndY(x, y, vertices) {
   return vertices.map((vertex) => ({ x: vertex['x'] - x, y: vertex['y'] - y }));
+}
+
+export function getPolygonVertices(polygon) {
+  return polygon["deltas_to_vertices"].map((deltas) => ([deltas['x'] + polygon['x'], deltas['y'] + + polygon['y']]));
 }
 
 export function getPolygonInfoFromVertices(vertices) {

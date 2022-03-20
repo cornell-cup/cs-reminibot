@@ -1,4 +1,14 @@
-import { getItemCircular, removeAt } from "../helperFunctions";
+import { getItemCircular, modulusPositive, removeAt } from "../helperFunctions";
+import { isPointInCircle } from "./Circle";
+import {
+  doLinesIntersect,
+  getPolygonLineSegments,
+  isPointInLine,
+  projectPointOntoLine,
+} from "./LineSegment";
+import { isPointInOval } from "./Oval";
+import { arePointsColinear } from "./Point";
+import { getVerticesOfRectangle, isPointInRectangle } from "./Rectangle";
 import { subtractVectors, zCrossProduct } from "./Vector";
 
 const CLOCKWISE = "CLOCKWISE";
@@ -11,13 +21,13 @@ export const triangulate = (vertices) => {
     throw new Error("triangulate was not given enough vertices");
   }
 
-  // if(!isSimplePolygon(vertices)){
-  //     throw new Error("triangulate was not given vertices of a simple polygon");
-  // }
+   vertices = removeColinearEdges(vertices);
 
-  // vertices = removeColinearEdges(vertices);
+  if (!isSimplePolygon(vertices)) {
+    throw new Error("triangulate was not given vertices of a simple polygon");
+  }
 
-  // vertices = fixWinding(vertices);
+  fixWindingOrder(vertices);
 
   let indexList = vertices.map((_, index) => index);
 
@@ -114,15 +124,58 @@ export const triangulate = (vertices) => {
 };
 
 export const isSimplePolygon = (vertices) => {
-  throw new Error("Not implemented");
+  const lineSegments = getPolygonLineSegments(vertices);
+  for (let i = 0; i < lineSegments.length; i++) {
+    for (let k = 0; k < lineSegments.length; k++) {
+      if (
+        Math.abs(i - k) > 1 && !(i === 0 && k === lineSegments.length-1) && !(k === 0 && i === lineSegments.length-1) &&
+        doLinesIntersect(lineSegments[i], lineSegments[k])
+      ) {
+        console.log(`intersecting lines: ${lineSegments[i]} and ${lineSegments[k]} i: ${i} k: ${k}`)
+        return false;
+      }
+    }
+  }
+  return true;
 };
 
-export const removeColinearEdges = (verices) => {
-  throw new Error("Not implemented");
+//NOTE: MAY NEED TO ADD THRESHOLD FOR THIS FUNCTION
+export const removeColinearEdges = (vertices) => {
+  return vertices.filter((vertex, index) => {
+    const a = getItemCircular(vertices, index - 1);
+    const b = vertex;
+    const c = getItemCircular(vertices, index + 1);
+    //(b.x - a.x) * (c.y - a.y) - (c.x - a.x) * (b.y - a.y)
+    return !arePointsColinear(a, b, c);
+  });
 };
 
+//ensures that vertices are in a clockwise winding order for our triangulation
 export const fixWindingOrder = (vertices) => {
-  throw new Error("Not implemented");
+  const windingOrder =
+    calculateSignedArea(vertices) > 0 ? CLOCKWISE : COUNTERCLOCKWISE;
+  if (windingOrder === CLOCKWISE) {
+    vertices.reverse();
+  }
+};
+
+//Maybe negative or positive depending on the winding order of the vertices
+export const calculateSignedArea = (vertices) => {
+  let area = 0;
+  for (let i = 0; i < vertices.length; i++) {
+    let currentVertex = vertices[i];
+    let nextVertex = getItemCircular(vertices, i + 1);
+    let width = nextVertex[0] - currentVertex[0];
+    let height = (currentVertex[1] + nextVertex[1]) / 2;
+
+    area += width * height;
+  }
+
+  return area;
+};
+
+export const calculatePositiveArea = (vertices) => {
+  return Math.abs(calculateSignedArea(vertices));
 };
 
 //Considers points on edge as being in triangle
@@ -158,4 +211,126 @@ export const isPointInTriangle = (point, triangleVertices) => {
     return false;
   }
   return true;
+};
+
+export const isPointInPolygon = (point, vertices) => {
+  const triangles = triangulate(vertices);
+  return isPointInTriangles(point, triangle);
+};
+
+export const isPointInTriangles = (point, triangles) => {
+  for (const triangle of triangles) {
+    if (isPointInTriangle(point, triangle)) {
+      return true;
+    }
+  }
+  return false;
+};
+
+export const doPolygonsOverlap = (vertices1, vertices2) => {
+  const triangles1 = triangulate(vertices1);
+  const triangles2 = triangulate(vertices2);
+  return doPolygonsOverlapGivenTriangles(vertices1, triangles1, vertices2, triangles2);
+};
+
+export const doPolygonsOverlapGivenTriangles = (
+  vertices1,
+  triangles1,
+  vertices2,
+  triangles2
+) => {
+  const lineSegments1 = getPolygonLineSegments(vertices1);
+  const lineSegments2 = getPolygonLineSegments(vertices2);
+
+  for (const lineSegment1 of lineSegments1) {
+    for (const lineSegment2 of lineSegments2) {
+      if (doLinesIntersect(lineSegment1, lineSegment2)) {
+        return true;
+      }
+      console.log(`Do not intersect ${lineSegment1} and ${lineSegment2}`)
+    }
+  }
+
+  if (
+    isPointInTriangles(lineSegments1[0], triangles1) ||
+    isPointInTriangles(lineSegments2[0], triangles2)
+  ) {
+    return true;
+  }
+  return false;
+};
+
+export const doPolygonAndCircleOverlap = (vertices, circle) => {
+  for (const vertex of vertices) {
+    if (isPointInCircle(vertex, circle)) {
+      return true;
+    }
+  }
+  const triangles = triangulate(vertices);
+  if (isPointInTriangles([circle["x"], circle["y"]], triangles)) {
+    return true;
+  }
+
+  const lineSegments = getPolygonLineSegments(vertices);
+
+  for (const lineSegment of lineSegments) {
+    const projectedPoint = projectPointOntoLine(
+      [circle["x"], circle["y"]],
+      lineSegment
+    );
+    if (
+      isPointInCircle(projectedPoint, circle) &&
+      isPointInLine(projectedPoint, lineSegment)
+    ) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
+export const doPolygonAndRectangleOverlap = (vertices, rectangle) => {
+  for (const vertex of vertices) {
+    if (isPointInRectangle(vertex, rectangle)) {
+      return true;
+    }
+  }
+  const triangles = triangulate(vertices);
+  const rectangleVertices = getVerticesOfRectangle(rectangle);
+  for (const rectangleVertex in rectangleVertices) {
+    if (isPointInTriangles(rectangleVertex, triangles)) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
+export const doPolygonAndOvalOverlap = (vertices, oval) => {
+  for (const vertex of vertices) {
+    if (isPointInOval(vertex, oval)) {
+      return true;
+    }
+  }
+  const triangles = triangulate(vertices);
+  if (isPointInTriangles([oval["x"], oval["y"]], triangles)) {
+    return true;
+  }
+
+  const lineSegments = getPolygonLineSegments(vertices);
+
+  for (const lineSegment of lineSegments) {
+    const projectedPoint = projectPointOntoLine(
+      [oval["x"], oval["y"]],
+      lineSegment
+    );
+    if (
+      isPointInOval(projectedPoint, oval) &&
+      isPointInLine(projectedPoint, lineSegment)
+    ) {
+      return true;
+    }
+  }
+
+  return false;
 };

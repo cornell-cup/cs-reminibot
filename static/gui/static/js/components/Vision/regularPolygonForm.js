@@ -2,6 +2,8 @@ import axios from "axios";
 import React, { useState } from "react";
 import { INFOBOXID, INFOBOXTYPE, INFO_ICON } from "../utils/Constants";
 import InformationBoxModal from "../utils/InformationBoxModal";
+import { triangulate } from "./CollisionDetection/Polygon";
+import Vector from "./CollisionDetection/Vector";
 import { getRandomIntInclusive } from "./helperFunctions";
 import { generateRegularPolygonDeltas } from "./helperFunctions";
 
@@ -27,7 +29,7 @@ export default function RegularPolygonForm(props) {
     const vertices_from_deltas = deltas_to_vertices.map(
       (currentValue) => new Vector(currentValue["x"], currentValue["y"])
     );
-    const triangles_from_deltas = triangulate(vertices);
+    const triangles_from_deltas = triangulate(vertices_from_deltas);
     if (registerPhysicalObject) {
       axios
         .post("/object-mapping", {

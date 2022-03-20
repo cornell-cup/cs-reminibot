@@ -23,7 +23,7 @@ from copy import deepcopy
 
 from basestation.util.units import AngleUnits, LengthUnits, convert_angle, convert_length
 
-MAX_VISION_LOG_LENGTH = 5
+MAX_VISION_LOG_LENGTH = 1000
 VISION_UPDATE_FREQUENCY = 30
 VISION_DATA_HOLD_THRESHOLD = 1
 
@@ -267,6 +267,7 @@ class BaseStation:
                 "shape": virtual_object["shape"] if "shape" in virtual_object else None, 
                 "color": virtual_object["color"] if "color" in virtual_object else None,
                 "deltas_to_vertices": virtual_object["deltas_to_vertices"] if "deltas_to_vertices" in virtual_object else None, 
+                "triangles_from_deltas": virtual_object["triangles_from_deltas"] if "triangles_from_deltas" in virtual_object else None, 
                 "radiusY": virtual_object["radiusY"] if "radiusY" in virtual_object else None,  
             }
         else:
@@ -342,6 +343,7 @@ class BaseStation:
                 "shape": object_mapping["shape"] if "shape" in object_mapping else None, 
                 "color": object_mapping["color"] if "color" in object_mapping else None, 
                 "deltas_to_vertices": object_mapping["deltas_to_vertices"] if "deltas_to_vertices" in object_mapping else None, 
+                "triangles_from_deltas": object_mapping["triangles_from_deltas"] if "triangles_from_deltas" in object_mapping else None, 
                 "radiusY": object_mapping["radiusY"] if "radiusY" in object_mapping else None, 
             }
         else:
@@ -456,6 +458,7 @@ class BaseStation:
                 "name": None,
                 "type": None,
                 "deltas_to_vertices": None,
+                "triangles_from_deltas": None,
                 "length": None,
                 "width": None, 
                 "radius": None, 
