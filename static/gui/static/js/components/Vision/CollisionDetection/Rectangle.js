@@ -1,20 +1,29 @@
+import { getPolygonVertices } from "../helperFunctions";
 import { getPolygonLineSegments } from "./LineSegment";
-import { isPointInOval } from "./Oval";
+import { isPointInPolygon } from "./Polygon";
+import { isPointInCircle } from "./Circle";
+import { projectPointOntoLine, isPointInLine } from "./LineSegment";
 
 export const getVerticesOfRectangle = (rectangle) => {
-  const maxX = rectangle["x"] + rectangle["width"];
-  const minX = rectangle["x"] - rectangle["width"];
 
   //note length is the 2d height of the rectangle while height is the actual 3d height
-  const maxY = rectangle["y"] + rectangle["length"];
-  const minY = rectangle["y"] - rectangle["length"];
 
-  return [
-    [minX, maxY],
-    [maxX, maxY],
-    [maxX, minY],
-    [minX, minY],
+  const deltas_to_vertices = [
+    { "x": -rectangle["width"] / 2, "y": rectangle["length"] / 2 },
+    { "x": rectangle["width"] / 2, "y": rectangle["length"] / 2 },
+    { "x": rectangle["width"] / 2, "y": -rectangle["length"] / 2 },
+    { "x": -rectangle["width"] / 2, "y": -rectangle["length"] / 2 }
   ];
+
+  const polygon = {
+    x: rectangle["x"],
+    y: rectangle["y"],
+    orientation: rectangle["orientation"],
+    deltas_to_vertices: deltas_to_vertices
+  }
+
+  return getPolygonVertices(polygon)
+
 };
 
 export const getRectangleLineSegments = (rectangle) => {
@@ -22,15 +31,7 @@ export const getRectangleLineSegments = (rectangle) => {
 };
 
 export const isPointInRectangle = (point, rectangle) => {
-  const maxX = rectangle["x"] + rectangle["width"];
-  const minX = rectangle["x"] - rectangle["width"];
-
-  //note length is the 2d height of the rectangle while height is the actual 3d height
-  const maxY = rectangle["y"] + rectangle["length"];
-  const minY = rectangle["y"] - rectangle["length"];
-  return (
-    minX <= point[0] && point[0] <= maxX && minY <= point[1] && point[1] <= maxY
-  );
+  return isPointInPolygon(point, getVerticesOfRectangle(rectangle));
 };
 
 export const doRectangleAndCircleOverlap = (rectangle, circle) => {
@@ -64,45 +65,19 @@ export const doRectangleAndCircleOverlap = (rectangle, circle) => {
 };
 
 export const doRectangleAndOvalOverlap = (rectangle, oval) => {
-  const vertices = getVerticesOfRectangle(rectangle);
-  for (const vertex of vertices) {
-    if (isPointInOval(vertex, oval)) {
-      return true;
-    }
-  }
-
-  if (isPointInRectangle([oval["x"], oval["y"]], rectangle)) {
-    return true;
-  }
-
-  const lineSegments = getPolygonLineSegments(vertices);
-
-  for (const lineSegment of lineSegments) {
-    const projectedPoint = projectPointOntoLine(
-      [oval["x"], oval["y"]],
-      lineSegment
-    );
-    if (
-      isPointInOval(projectedPoint, oval) &&
-      isPointInLine(projectedPoint, lineSegment)
-    ) {
-      return true;
-    }
-  }
-
-  return false;
+  throw new Error("Not implemented");
 };
 
 export const doRectanglesOverlap = (rectangle1, rectangle2) => {
   const vertices1 = getVerticesOfRectangle(rectangle1);
   const vertices2 = getVerticesOfRectangle(rectangle2);
-  for (const vertex of vertices1){
-    if(isPointInRectangle(vertex,rectangle2)){
+  for (const vertex of vertices1) {
+    if (isPointInRectangle(vertex, rectangle2)) {
       return true;
     }
   }
-  for (const vertex of vertices2){
-    if(isPointInRectangle(vertex,rectangle1)){
+  for (const vertex of vertices2) {
+    if (isPointInRectangle(vertex, rectangle1)) {
       return true;
     }
   }

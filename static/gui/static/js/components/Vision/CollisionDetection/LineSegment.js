@@ -1,7 +1,7 @@
 import { getItemCircular } from "../helperFunctions";
 import { arePointsColinear } from "./Point";
 
-export default class LineSegment extends Array {}
+export default class LineSegment extends Array { }
 
 export const getPolygonLineSegments = (vertices) => {
   return vertices.map((vertex, i) => [
@@ -35,37 +35,37 @@ export const doLinesIntersect = (lineSegment1, lineSegment2) => {
     ((lineSegment2[1][0] - lineSegment2[0][0]) *
       (lineSegment1[0][1] - lineSegment2[0][1]) -
       (lineSegment2[1][1] - lineSegment2[0][1]) *
-        (lineSegment1[0][0] - lineSegment2[0][0])) /
+      (lineSegment1[0][0] - lineSegment2[0][0])) /
     ((lineSegment2[1][1] - lineSegment2[0][1]) *
       (lineSegment1[1][0] - lineSegment1[0][0]) -
       (lineSegment2[1][0] - lineSegment2[0][0]) *
-        (lineSegment1[1][1] - lineSegment1[0][1]));
+      (lineSegment1[1][1] - lineSegment1[0][1]));
   const Ub =
     ((lineSegment1[1][0] - lineSegment1[0][0]) *
       (lineSegment1[0][1] - lineSegment2[0][1]) -
       (lineSegment1[1][1] - lineSegment1[0][1]) *
-        (lineSegment1[0][0] - lineSegment2[0][0])) /
+      (lineSegment1[0][0] - lineSegment2[0][0])) /
     ((lineSegment2[1][1] - lineSegment2[0][1]) *
       (lineSegment1[1][0] - lineSegment1[0][0]) -
       (lineSegment2[1][0] - lineSegment2[0][0]) *
-        (lineSegment1[1][1] - lineSegment1[0][1]));
+      (lineSegment1[1][1] - lineSegment1[0][1]));
 
   return 0 <= Ua && Ua <= 1 && 0 <= Ub && Ub <= 1;
 };
 
 export const projectPointOntoLine = (point, lineSegment) => {
-  Ax = lineSegment[0][0];
-  Ay = lineSegment[0][1];
-  Bx = lineSegment[1][0];
-  By = lineSegment[1][1];
-  Cx = point[0];
-  Cy = point[1];
-  t =
+  const Ax = lineSegment[0][0];
+  const Ay = lineSegment[0][1];
+  const Bx = lineSegment[1][0];
+  const By = lineSegment[1][1];
+  const Cx = point[0];
+  const Cy = point[1];
+  const t =
     ((Cx - Ax) * (Bx - Ax) + (Cy - Ay) * (By - Ay)) /
     ((Bx - Ax) * (Bx - Ax) + (By - Ay) * (By - Ay));
 
-  Dx = Ax + t * (Bx - Ax);
-  Dy = Ay + t * (By - Ay);
+  const Dx = Ax + t * (Bx - Ax);
+  const Dy = Ay + t * (By - Ay);
 
   return [Dx, Dy];
 };

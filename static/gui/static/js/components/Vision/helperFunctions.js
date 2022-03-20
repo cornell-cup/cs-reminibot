@@ -1,34 +1,35 @@
+import { Matrix } from 'ml-matrix';
 export function getRandomIntInclusive(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min + 1) + min); //The maximum is inclusive and the minimum is inclusive
 }
 
-export function getItemCircular(array, index){
-  if(index >= array.length){
-    return array[index%array.length];
+export function getItemCircular(array, index) {
+  if (index >= array.length) {
+    return array[index % array.length];
   }
-  else if(index < 0){
-    return array[index%array.length+array.length];
+  else if (index < 0) {
+    return array[index % array.length + array.length];
   }
-  else{
+  else {
     return array[index];
   }
 }
 
 //does not work for negative divisors
-export function modulusPositive(dividend, divisor){
-    if(dividend < 0){
-      return dividend%divisor+divisor;
-    }
-    else{
-      return dividend%divisor;
-    }
+export function modulusPositive(dividend, divisor) {
+  if (dividend < 0) {
+    return dividend % divisor + divisor;
+  }
+  else {
+    return dividend % divisor;
+  }
 
 }
 
-export function removeAt(array, index){
-  array.splice(index,1);
+export function removeAt(array, index) {
+  array.splice(index, 1);
 }
 
 //returns an array of x and y deltas from center point to vertices of a regular polygon with a given numberOfSides and a given sideLength
@@ -48,7 +49,20 @@ export function getDeltasFromVerticesXAndY(x, y, vertices) {
 }
 
 export function getPolygonVertices(polygon) {
-  return polygon["deltas_to_vertices"].map((deltas) => ([deltas['x'] + polygon['x'], deltas['y'] + + polygon['y']]));
+  const o = polygon["orientation"] * Math.PI / 180;
+  const rotationMatrix = new Matrix(
+    [
+      [Math.cos(o), -Math.sin(o)],
+      [Math.sin(o), Math.cos(o)]
+    ]
+  );
+  return polygon["deltas_to_vertices"].map((delta) => {
+    const unrotatedDelta = new Matrix([[delta['x']], [delta['y']]]);
+    const data = rotationMatrix.mmul(unrotatedDelta).data;
+    const rotatedDelta = [data[0][0], data[1][0]];
+    return [rotatedDelta[0] + polygon['x'], rotatedDelta[1] + polygon['y']]
+  }
+  );
 }
 
 export function getPolygonInfoFromVertices(vertices) {

@@ -46,7 +46,10 @@ const GridView = (props) => {
   useEffect(() => {
     if (displayOn) {
       clearInterval(collisionIntervalId);
-      setCollisionIntervalId(setInterval(checkCollisions, 100));
+      if (detections && detections.length > 1) {
+        logIfShapesCollide(detections);
+        // setCollisionIntervalId(setInterval(checkCollisions, 100));
+      }
     }
   }, [detections]);
 
@@ -233,7 +236,7 @@ const GridView = (props) => {
     const radiusY = detection["radiusY"] ? detection["radiusY"] : unknownMeasure;
     const deltas_to_vertices = detection["deltas_to_vertices"] ? detection["deltas_to_vertices"] : [];
     const vertices = deltas_to_vertices.map(
-      (currentValue) => new Vector(currentValue['x'],currentValue['y'])
+      (currentValue) => new Vector(currentValue['x'], currentValue['y'])
     );
     const text_vertices = deltas_to_vertices.reduce(
       (previousValue, currentValue) => `${previousValue} ${x + scaleFactor * currentValue['x']},${y + scaleFactor * currentValue['y']}`,
@@ -344,7 +347,7 @@ const GridView = (props) => {
       case "polygon":
       default:
         const triangles = detection["triangles_from_deltas"];
-        const colors = ["red","green","yellow","blue","red","purple","orange"]
+        const colors = ["red", "green", "yellow", "blue", "red", "purple", "orange"]
         return (
           <React.Fragment>
             <polygon
@@ -353,8 +356,8 @@ const GridView = (props) => {
               transform={`rotate(${orientation_pos}, ${x}, ${y})`}
             ></polygon>
             {triangles.map((triangle, index) => (<polygon
-              points={`${x + scaleFactor *triangle[0][0]},${y + scaleFactor *triangle[0][1]} ${x + scaleFactor *triangle[1][0]},${y + scaleFactor *triangle[1][1]} ${x + scaleFactor *triangle[2][0]},${y + scaleFactor *triangle[2][1]}`}
-              fill={colors[index%colors.length]}
+              points={`${x + scaleFactor * triangle[0][0]},${y + scaleFactor * triangle[0][1]} ${x + scaleFactor * triangle[1][0]},${y + scaleFactor * triangle[1][1]} ${x + scaleFactor * triangle[2][0]},${y + scaleFactor * triangle[2][1]}`}
+              fill={colors[index % colors.length]}
               transform={`rotate(${orientation_pos}, ${x}, ${y})`}
             ></polygon>))}
             {image_path && renderShape(
@@ -403,7 +406,6 @@ const GridView = (props) => {
       .get("/vision", { params: { virtual_room_id: virtualRoomId } })
       .then(
         function (response) {
-          // logIfShapesCollide(response.data ? response.data : []);
           setDetections(response.data ? response.data : []);
         }.bind(this)
       )
@@ -416,7 +418,9 @@ const GridView = (props) => {
   }
 
   const checkCollisions = () => {
-    // logIfShapesCollide(detections);
+    if (detections && detections.length > 1) {
+      // logIfShapesCollide(detections);
+    }
   }
 
   const toggleVisionDisplay = () => {
