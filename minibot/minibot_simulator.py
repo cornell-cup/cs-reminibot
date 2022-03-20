@@ -91,14 +91,14 @@ class Minibot:
                 pass
         
             try:
-                vision_data = requests.get("http://localhost:8080/vision",params={"id":"-1", "virtual_room_id": "AL3032yreLgE5pmLIARrn",}).json()
+                vision_data = requests.get("http://localhost:8080/vision",params={"id":"-1", "virtual_room_id": "-pqCHcy9vxzzfyVQBVjJk",}).json()
                 print(vision_data)
                 if vision_data:
                     requests.post("http://localhost:8080/virtual-objects", json={"add": True,
-                    "virtual_objects": [{"virtual_room_id": "AL3032yreLgE5pmLIARrn","id":"-1", "name": "minibot-1", "type": "minibot","x": vision_data[0]['x']+delta_position*math.cos(math.radians(vision_data[0]['orientation'])), "y" : vision_data[0]['y']+delta_position*math.sin(math.radians(vision_data[0]['orientation'])), "orientation": vision_data[0]['orientation']+delta_orientation}]})
+                    "virtual_objects": [{"virtual_room_id": "-pqCHcy9vxzzfyVQBVjJk","id":"-1", "name": "minibot-1", "type": "minibot","x": vision_data[0]['x']+delta_position*math.cos(math.radians(vision_data[0]['orientation'])), "y" : vision_data[0]['y']+delta_position*math.sin(math.radians(vision_data[0]['orientation'])), "orientation": vision_data[0]['orientation']+delta_orientation}]})
                 else:
                     requests.post("http://localhost:8080/virtual-objects", json={"add": True,
-                    "virtual_objects": [{"virtual_room_id": "AL3032yreLgE5pmLIARrn","id":"-1",  "name": "minibot-1", "type": "minibot", "x": 0, "y" : 0, "orientation": 0}]})
+                    "virtual_objects": [{"virtual_room_id": "-pqCHcy9vxzzfyVQBVjJk","id":"-1",  "name": "minibot-1", "type": "minibot", "x": 0, "y" : 0, "orientation": 0}]})
             except Exception as e:
                 print(e)
 

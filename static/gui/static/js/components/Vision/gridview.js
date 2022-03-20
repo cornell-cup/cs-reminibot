@@ -46,7 +46,10 @@ const GridView = (props) => {
   useEffect(() => {
     if (displayOn) {
       clearInterval(collisionIntervalId);
-      setCollisionIntervalId(setInterval(checkCollisions, 100));
+      if (detections && detections.length > 1) {
+        logIfShapesCollide(detections);
+        // setCollisionIntervalId(setInterval(checkCollisions, 100));
+      }
     }
   }, [detections]);
 
@@ -427,7 +430,6 @@ const GridView = (props) => {
       .get("/vision", { params: { virtual_room_id: virtualRoomId } })
       .then(
         function (response) {
-          // logIfShapesCollide(response.data ? response.data : []);
           setDetections(response.data ? response.data : []);
         }.bind(this)
       )
@@ -440,7 +442,9 @@ const GridView = (props) => {
   }
 
   const checkCollisions = () => {
-    // logIfShapesCollide(detections);
+    if (detections && detections.length > 1) {
+      // logIfShapesCollide(detections);
+    }
   }
 
   const toggleVisionDisplay = () => {
