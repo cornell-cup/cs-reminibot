@@ -23,6 +23,8 @@ from copy import deepcopy
 
 from basestation.util.units import AngleUnits, LengthUnits, convert_angle, convert_length
 
+
+
 MAX_VISION_LOG_LENGTH = 1000
 VISION_UPDATE_FREQUENCY = 30
 VISION_DATA_HOLD_THRESHOLD = 1
@@ -61,10 +63,15 @@ class BaseStation:
 
         self.blockly_function_map = {
             "move_forward": "fwd",         "move_backward": "back",
+            "move_forward_distance": "fwd_dst",         "move_backward_distance": "back_dst",
+            "move_to": "move_to",
             "wait": "time.sleep",          "stop": "stop",
             "set_wheel_power":             "ECE_wheel_pwr",
             "turn_clockwise": "right",     "turn_counter_clockwise": "left",
+            "turn_clockwise_angle": "right_angle",     "turn_counter_clockwise_angle": "left_angle",
+            "turn_to": "turn_to",
             "move_servo": "move_servo",    "read_ultrasonic": "read_ultrasonic",
+
         }
         # functions that run continuously, and hence need to be started
         # in a new thread on the Minibot otherwise the Minibot will get
@@ -663,7 +670,7 @@ class BaseStation:
             else:
                 parsed_program.append(line + '\n')  # "normal" Python
         parsed_program_string = "".join(parsed_program)
-
+        print("Parsed:",parsed_program_string)
         # Now actually send to the bot
         bot.sendKV("SCRIPTS", parsed_program_string)
 
