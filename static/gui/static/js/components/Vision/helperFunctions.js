@@ -1,4 +1,5 @@
 import { Matrix } from 'ml-matrix';
+import { mapValues, keyBy } from 'lodash';
 export function getRandomIntInclusive(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
@@ -63,6 +64,13 @@ export function getPolygonVertices(polygon) {
     return [rotatedDelta[0] + polygon['x'], rotatedDelta[1] + polygon['y']]
   }
   );
+}
+
+export function indexArrayByProperty(array, property) {
+  return array.reduce((object, current_entry) => {
+    object[current_entry[property]] = current_entry;
+    return object;
+  }, {});
 }
 
 export function getPolygonInfoFromVertices(vertices) {

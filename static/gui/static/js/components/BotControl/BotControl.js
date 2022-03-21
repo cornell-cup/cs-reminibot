@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import AddBot from "./SetupBot/AddBot.js";
 import MovementControls from "./MovementControl/MovementControl.js";
 import GridView from "../Vision/gridview.js";
+import GridviewWithPhysics from "../Vision/gridviewWithPhysics.js";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
@@ -57,10 +58,9 @@ function BotControl({
                 />
               </h3>
             </div>
-            <GridView view_width={520}
-              view_height={520}
-              world_width={300}
-              world_height={300}
+            <GridviewWithPhysics
+              world_width={500}
+              world_height={500}
               defaultEnabled={false} />
             < InformationBoxModal type={INFOBOXTYPE.VISION} />
           </div >

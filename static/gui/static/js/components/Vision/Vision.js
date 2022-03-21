@@ -1,5 +1,4 @@
 import React from 'react'
-import DetectionOrganization from './DetectionOrganization'
 import GridviewWithPhysics from './gridviewWithPhysics'
 import VisionUserInterface from './VisionUserInterface'
 

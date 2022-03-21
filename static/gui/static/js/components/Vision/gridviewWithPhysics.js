@@ -4,8 +4,9 @@ import axios from "axios";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { withCookies } from "react-cookie";
 import Matter from "matter-js";
-import { cloneDeep } from "lodash"
-import DetectionOrganization from "./DetectionOrganization";
+import { cloneDeep, has, isEqual } from "lodash"
+import { indexArrayByProperty } from "./helperFunctions";
+
 
 
 
@@ -21,13 +22,15 @@ const outlineColor = "white";
  */
 const GridViewWithPhysics = (props) => {
 
-  const [displayIntervalId, setDisplayIntervalId] = useState(null);
-  const [resetRequested, setResetRequested] = useState(true);
-  let previousDetectionOrganization = new DetectionOrganization([]);
-  const [currentDetectionOrganization, setCurrentDetectionOrganization] = useState(new DetectionOrganization([]));
+  let displayIntervalId = null;
+  const [previousDetections, _setPreviousDetections] = useState({});
+  const [detections, setDetections] = useState([]);
+  const [detectionToObjectInfoMap, _setDetectionToObjectInfoMap] = useState({});
+  const [resetRequested, setResetRequested] = useState({ value: true });
   const [displayOn, setDisplayOn] = useState(false);
   const [virtualRoomId, setVirtualRoomId] = useState(props.cookies.get('virtual_room_id'));
-  const [engine, setEngine] = useState(Matter.Engine.create({ gravity: { scale: 0 } }))
+  const [engine, _setEngine] = useState(Matter.Engine.create({ gravity: { scale: 0 } }));
+
 
   useEffect(() => {
     let canvas = document.querySelector("#display_canvas");
@@ -54,9 +57,9 @@ const GridViewWithPhysics = (props) => {
   useEffect(() => {
     if (displayOn) {
       clearInterval(displayIntervalId);
-
-      setResetRequested(true);
-      setDisplayIntervalId(setInterval(getVisionData, 100));
+      setDetections([]);
+      setResetRequested({ value: true });
+      displayIntervalId = setInterval(getVisionData, 100);
     }
   }, [virtualRoomId]);
 
@@ -73,48 +76,92 @@ const GridViewWithPhysics = (props) => {
     }
     return () => {
       // Anything in here is fired on component unmount.
-      clearInterval(find);
+      clearInterval(displayIntervalId);
     }
   }, []);
 
 
 
   const updateEngine = () => {
-    if (resetRequested) {
-      removeObjects(currentDetectionOrganization.getAllEngineObjects());
-      console.log("Current objects", currentDetectionOrganization.getAllEngineObjects())
+    const allBodies = Matter.Composite.allBodies(engine.world);
+    if (resetRequested["value"]) {
+      //remove all bodies
+      for (let i = 0; i < allBodies.length; i++) {
+        const removeResult = Matter.Composite.remove(engine.world, allBodies[i]);
+      }
 
-      //removes all engine object mappings
-      currentDetectionOrganization.setDetectionEngineObjectMapping({});
-      addDetections(currentDetectionOrganization.detections);
+
+      //add all detections
+      addDetections(detections);
 
       //don't want rerender when reset is not requested look into fixing this
-      setResetRequested(false);
+      resetRequested["value"] = false;
     }
     else {
-      // console.log("")
-      // console.log("all physical objects", currentDetectionOrganization.getAllPhysicalEngineObjects());
-      removeObjects(currentDetectionOrganization.getAllPhysicalEngineObjects());
-      removeObjects(currentDetectionOrganization.getAllPhysicalEngineObjects());
-      removeObjects(currentDetectionOrganization.getAllPhysicalEngineObjects());
-
-      addDetections(currentDetectionOrganization.physicalObjects);
-    }
-    previousDetectionOrganization.from(currentDetectionOrganization);
-  }
-
-  const removeObjects = (engineObjects) => {
-    for (const object of engineObjects) {
-      if (object) {
-        Matter.Composite.remove(engine.world, object)
+      const detectionsToAdd = [];
+      const bodiesToRemain = [];
+      for (const detection of detections) {
+        const objectInfo = detectionToObjectInfoMap[detection["id"]];
+        //if detection already maps to objectInfo entry
+        if (objectInfo) {
+          //and the detection is NOT a physical object
+          const previousDetectionWithSameId = previousDetections[detection["id"]];
+          if (!detection["is_physical"] && isEqual(previousDetectionWithSameId, detection)) {
+            bodiesToRemain.push(Matter.Composite.get(engine.world, objectInfo["id"], objectInfo["type"]));
+          }
+          //and detection is a physical object
+          else {
+            //and the detection actually exists
+            if (detection) {
+              detectionsToAdd.push(detection);
+            }
+          }
+        }
+        //if detection does NOT map to objectInfo entry
+        else {
+          //and the detection actually exists
+          if (detection) {
+            detectionsToAdd.push(detection);
+          }
+        }
       }
+
+
+      //the bodies from all bodies that are not in bodies to remain must be removed
+      const bodiesToRemove = allBodies.filter((body) => {
+        for (const bodyToRemain of bodiesToRemain) {
+          if (bodyToRemain.id === body.id) {
+            return false;
+          }
+        }
+        return true;
+      })
+
+      //removed bodies
+      for (let i = 0; i < bodiesToRemove.length; i++) {
+        const removeResult = Matter.Composite.remove(engine.world, bodiesToRemove[i]);
+      }
+
+      addDetections(detectionsToAdd);
+    }
+    const indexedDetections = indexArrayByProperty(detections, "id");
+    for (const id in indexedDetections) {
+      previousDetections[id] = indexedDetections[id];
     }
   }
 
-  const addDetections = (detections) => {
-    for (const detections of detections) {
-      if (detections) {
-        let detectionClone = cloneDeep(detections);
+  // const removeObjects = (engineObjects) => {
+  //   for (const object of engineObjects) {
+  //     if (object) {
+  //       Matter.Composite.remove(engine.world, object)
+  //     }
+  //   }
+  // }
+
+  const addDetections = (detectionsToAdd) => {
+    for (const detectionToAdd of detectionsToAdd) {
+      if (detectionToAdd) {
+        let detectionClone = cloneDeep(detectionToAdd);
         switch (
         detectionClone["type"] ? String(detectionClone["type"].toLowerCase().trim()) : ""
         ) {
@@ -139,19 +186,19 @@ const GridViewWithPhysics = (props) => {
     detection["width"] = botWidth;
     detection["length"] = botLength;
     detection["color"] = detection["color"] || "red";
-    return renderShape(detection);
+    return renderShape(detection, "./static/img/bot-dot.png");
   }
 
   const renderUnknown = (detection) => {
     detection["shape"] = "circle";
     detection["radius"] = unknownMeasure;
     detection["color"] = detection["color"] || "white";
-    return renderShape(detection);
+    return renderShape(detection, "./static/img/unknown-dot.png");
   }
 
 
 
-  const renderShape = (detection) => {
+  const renderShape = (detection, imagePath = null) => {
     const id = detection["id"];
     const x_pos = parseFloat(detection["x"]);
     const y_pos = parseFloat(detection["y"]);
@@ -180,12 +227,16 @@ const GridViewWithPhysics = (props) => {
           angle: orientation_radians, render: {
             fillStyle: color,
             strokeStyle: outlineColor,
-            lineWidth: 3
+            lineWidth: 3,
+            sprite: {
+              texture: imagePath
+            }
           },
+
           isStatic: is_physical
         });
-        currentDetectionOrganization.addToDetectionEngineObjectMapping(id, newRectangle);
-        Matter.Composite.add(engine.world, [newRectangle]);
+        detectionToObjectInfoMap[id] = { id: newRectangle.id, type: 'body' }
+        Matter.Composite.add(engine.world, newRectangle);
         break;
       case "sphere":
       case "cylinder":
@@ -194,15 +245,15 @@ const GridViewWithPhysics = (props) => {
           angle: orientation_radians, render: {
             fillStyle: color,
             strokeStyle: outlineColor,
-            lineWidth: 3
+            lineWidth: 3,
+            sprite: {
+              texture: imagePath
+            }
           },
           isStatic: is_physical
         });
-        console.log("new circle:", newCircle);
-        currentDetectionOrganization.addToDetectionEngineObjectMapping(id, newCircle);
-        console.log("bodies before add:", engine.world.bodies);
-        Matter.Composite.add(engine.world, [newCircle]);
-        console.log("bodies after add:", engine.world.bodies);
+        detectionToObjectInfoMap[id] = { id: newCircle.id, type: 'body' }
+        Matter.Composite.add(engine.world, newCircle);
         break;
       case "regular_polygon":
       case "polygon":
@@ -210,12 +261,15 @@ const GridViewWithPhysics = (props) => {
           angle: orientation_radians, render: {
             fillStyle: color,
             strokeStyle: outlineColor,
-            lineWidth: 3
+            lineWidth: 3,
+            sprite: {
+              texture: imagePath
+            }
           },
           isStatic: is_physical
         });
-        currentDetectionOrganization.addToDetectionEngineObjectMapping(id, newPolygon);
-        Matter.Composite.add(engine.world, [newPolygon]);
+        detectionToObjectInfoMap[id] = { id: newPolygon.id, type: 'body' }
+        Matter.Composite.add(engine.world, newPolygon);
         break;
       default:
         break;
@@ -237,15 +291,7 @@ const GridViewWithPhysics = (props) => {
       .get("/vision", { params: { virtual_room_id: virtualRoomId } })
       .then(
         function (response) {
-          const newDetectionOrganization = new DetectionOrganization(response.data ? response.data : []);
-          if (!DetectionOrganization.areDetectionsEqual(currentDetectionOrganization, newDetectionOrganization)) {
-            console.log(currentDetectionOrganization.getAllPhysicalEngineObjects())
-            removeObjects(currentDetectionOrganization.getAllPhysicalEngineObjects());
-            removeObjects(currentDetectionOrganization.getAllPhysicalEngineObjects());
-            removeObjects(currentDetectionOrganization.getAllPhysicalEngineObjects());
-            newDetectionOrganization.setDetectionEngineObjectMapping(currentDetectionOrganization.detectionEngineObjectMapping);
-            setCurrentDetectionOrganization(newDetectionOrganization);
-          }
+          setDetections(response.data ? response.data : []);
         }
       )
       .catch(function (error) {
@@ -261,7 +307,7 @@ const GridViewWithPhysics = (props) => {
     if (displayOn) {
       clearInterval(displayIntervalId);
       setDisplayOn(false);
-      removeObjects(currentDetectionOrganization.getAllEngineObjects)
+      setDetections([])
     }
     // if we make this interval too small (like 10ms), the backend can't
     // process the requests fast enough and the server gets overloaded
@@ -270,7 +316,7 @@ const GridViewWithPhysics = (props) => {
     // concurrently, or we need to use WebSockets which will hopefully
     // allow for faster communication
     else {
-      setDisplayIntervalId(setInterval(getVisionData, 1000));
+      displayIntervalId = setInterval(getVisionData, 100);
       setDisplayOn(true);
     }
   }
@@ -287,7 +333,7 @@ const GridViewWithPhysics = (props) => {
         {displayOn ? "Stop Displaying Field" : "Display Field"}
       </button>}
       <button
-        onClick={() => { setResetRequested(true) }}
+        onClick={() => { setResetRequested({ value: true }) }}
         className="btn btn-secondary ml-1"
       >
         Reset

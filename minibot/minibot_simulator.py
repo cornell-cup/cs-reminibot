@@ -80,13 +80,13 @@ class Minibot:
             delta_position = 0
             delta_orientation = 0
             if self.direction == "forward":
-                delta_position = 1
+                delta_position = .1
             elif self.direction == "right":
-                delta_orientation = -5
+                delta_orientation = -.5
             elif self.direction == "backward":
-                delta_position = -1
+                delta_position = -.1
             elif self.direction == "left":
-                delta_orientation = 5
+                delta_orientation = .5
             else:
                 pass
         
