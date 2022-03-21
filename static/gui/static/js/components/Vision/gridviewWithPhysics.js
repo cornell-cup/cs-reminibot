@@ -15,7 +15,8 @@ const botLength = 5;
 const botHeight = 5;
 const unknownMeasure = 2.5;
 const unknownColor = "black";
-const outlineColor = "white";
+const normalOutlineColor = "white";
+const boundary_thickness = 5;
 
 /**
  * Component for the grid view of the simulated bots.
@@ -29,6 +30,7 @@ const GridViewWithPhysics = (props) => {
   const [resetRequested, setResetRequested] = useState({ value: true });
   const [displayOn, setDisplayOn] = useState(false);
   const [virtualRoomId, setVirtualRoomId] = useState(props.cookies.get('virtual_room_id'));
+  const [boundaryIds, _setBoundaryIds] = useState([]);
   const [engine, _setEngine] = useState(Matter.Engine.create({ gravity: { scale: 0 } }));
 
 
@@ -44,6 +46,21 @@ const GridViewWithPhysics = (props) => {
 
       engine: engine
     });
+    if (!props.zoomAndPan) {
+      let mouse = Matter.Mouse.create(render.canvas);
+      let mouseConstraint = Matter.MouseConstraint.create(engine, {
+        mouse: mouse,
+        constraint: {
+          render: { visible: false }
+        }
+      });
+      render.mouse = mouse;
+
+      Matter.Composite.add(engine.world, mouseConstraint);
+    }
+
+    addboundaries();
+
     Matter.Runner.run(engine);
     Matter.Render.run(render);
   }, [])
@@ -80,14 +97,35 @@ const GridViewWithPhysics = (props) => {
     }
   }, []);
 
+  const addboundaries = () => {
+    const boundaries = [
+      Matter.Bodies.rectangle(-boundary_thickness / 2, props.world_height / 2, boundary_thickness, props.world_height + 2 * boundary_thickness, {
+        isStatic: true
+      }),
+      Matter.Bodies.rectangle(props.world_width + boundary_thickness / 2, props.world_height / 2, boundary_thickness, props.world_height + 2 * boundary_thickness, {
+        isStatic: true
+      }),
+      Matter.Bodies.rectangle(props.world_width / 2, -boundary_thickness / 2, props.world_width + 2 * boundary_thickness, boundary_thickness, {
+        isStatic: true
+      }),
+      Matter.Bodies.rectangle(props.world_width / 2, props.world_height + boundary_thickness / 2, props.world_width + 2 * boundary_thickness, boundary_thickness, {
+        isStatic: true
+      }),
+    ];
 
+    for (const boundary of boundaries) {
+      boundaryIds.push(boundary.id);
+    }
+    Matter.Composite.add(engine.world, boundaries);
+  }
 
   const updateEngine = () => {
     const allBodies = Matter.Composite.allBodies(engine.world);
+    const allNonBoundaryBodies = allBodies.filter(body => !boundaryIds.includes(body.id))
     if (resetRequested["value"]) {
       //remove all bodies
-      for (let i = 0; i < allBodies.length; i++) {
-        const removeResult = Matter.Composite.remove(engine.world, allBodies[i]);
+      for (let i = 0; i < allNonBoundaryBodies.length; i++) {
+        const removeResult = Matter.Composite.remove(engine.world, allNonBoundaryBodies[i]);
       }
 
 
@@ -100,6 +138,9 @@ const GridViewWithPhysics = (props) => {
     else {
       const detectionsToAdd = [];
       const bodiesToRemain = [];
+      for (const id of boundaryIds) {
+        bodiesToRemain.push(Matter.Composite.get(engine.world, id, "body"))
+      }
       for (const detection of detections) {
         const objectInfo = detectionToObjectInfoMap[detection["id"]];
         //if detection already maps to objectInfo entry
@@ -130,7 +171,7 @@ const GridViewWithPhysics = (props) => {
       //the bodies from all bodies that are not in bodies to remain must be removed
       const bodiesToRemove = allBodies.filter((body) => {
         for (const bodyToRemain of bodiesToRemain) {
-          if (bodyToRemain.id === body.id) {
+          if (bodyToRemain && bodyToRemain.id === body.id) {
             return false;
           }
         }
@@ -144,19 +185,12 @@ const GridViewWithPhysics = (props) => {
 
       addDetections(detectionsToAdd);
     }
+
     const indexedDetections = indexArrayByProperty(detections, "id");
     for (const id in indexedDetections) {
       previousDetections[id] = indexedDetections[id];
     }
   }
-
-  // const removeObjects = (engineObjects) => {
-  //   for (const object of engineObjects) {
-  //     if (object) {
-  //       Matter.Composite.remove(engine.world, object)
-  //     }
-  //   }
-  // }
 
   const addDetections = (detectionsToAdd) => {
     for (const detectionToAdd of detectionsToAdd) {
@@ -215,6 +249,9 @@ const GridViewWithPhysics = (props) => {
     const vertices = deltas_to_vertices.map(
       (currentValue) => Matter.Vector.create(x + currentValue['x'], y + currentValue['y'])
     );
+
+    //set back to null
+    let newObject = null;
     switch (
     detection["shape"] ? String(detection["shape"].toLowerCase().trim()) : ""
     ) {
@@ -223,10 +260,10 @@ const GridViewWithPhysics = (props) => {
       case "rectangular-prism":
       case "square":
       case "rectangle":
-        let newRectangle = Matter.Bodies.rectangle(x, y, width, height, {
+        newObject = Matter.Bodies.rectangle(x, y, width, height, {
           angle: orientation_radians, render: {
             fillStyle: color,
-            strokeStyle: outlineColor,
+            strokeStyle: normalOutlineColor,
             lineWidth: 3,
             sprite: {
               texture: imagePath
@@ -235,16 +272,14 @@ const GridViewWithPhysics = (props) => {
 
           isStatic: is_physical
         });
-        detectionToObjectInfoMap[id] = { id: newRectangle.id, type: 'body' }
-        Matter.Composite.add(engine.world, newRectangle);
         break;
       case "sphere":
       case "cylinder":
       case "circle":
-        let newCircle = Matter.Bodies.circle(x, y, radius, {
+        newObject = Matter.Bodies.circle(x, y, radius, {
           angle: orientation_radians, render: {
             fillStyle: color,
-            strokeStyle: outlineColor,
+            strokeStyle: normalOutlineColor,
             lineWidth: 3,
             sprite: {
               texture: imagePath
@@ -252,15 +287,13 @@ const GridViewWithPhysics = (props) => {
           },
           isStatic: is_physical
         });
-        detectionToObjectInfoMap[id] = { id: newCircle.id, type: 'body' }
-        Matter.Composite.add(engine.world, newCircle);
         break;
       case "regular_polygon":
       case "polygon":
-        let newPolygon = Matter.Bodies.fromVertices(x, y, [vertices], {
+        newObject = Matter.Bodies.fromVertices(x, y, [vertices], {
           angle: orientation_radians, render: {
             fillStyle: color,
-            strokeStyle: outlineColor,
+            strokeStyle: normalOutlineColor,
             lineWidth: 3,
             sprite: {
               texture: imagePath
@@ -268,13 +301,16 @@ const GridViewWithPhysics = (props) => {
           },
           isStatic: is_physical
         });
-        detectionToObjectInfoMap[id] = { id: newPolygon.id, type: 'body' }
-        Matter.Composite.add(engine.world, newPolygon);
         break;
       default:
         break;
+    }
+    if (newObject) {
+      detectionToObjectInfoMap[id] = { id: newObject.id, type: 'body' }
+      Matter.Composite.add(engine.world, newObject);
 
     }
+
   }
 
 
@@ -339,19 +375,23 @@ const GridViewWithPhysics = (props) => {
         Reset
       </button>
       <br />
-      <TransformWrapper
-        initialScale={1}
-        initialPositionX={0}
-        initialPositionY={0}
-      >
-        {({ zoomIn, zoomOut, resetTransform }) => (
-          <React.Fragment>
-            <TransformComponent>
-              <canvas id="display_canvas"></canvas>
-            </TransformComponent>
-          </React.Fragment>
-        )}
-      </TransformWrapper>
+
+      {
+        props.zoomAndPan ? (<TransformWrapper
+          initialScale={1}
+          initialPositionX={0}
+          initialPositionY={0}
+        >
+          {({ zoomIn, zoomOut, resetTransform }) => (
+            <React.Fragment>
+              <TransformComponent>
+                <canvas id="display_canvas"></canvas>
+              </TransformComponent>
+            </React.Fragment>
+          )}
+        </TransformWrapper>) : <canvas id="display_canvas"></canvas>
+      }
+
 
     </React.Fragment>
 
