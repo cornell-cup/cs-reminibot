@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
@@ -6,6 +6,7 @@ import { withCookies } from "react-cookie";
 import Matter from "matter-js";
 import { cloneDeep, has, isEqual } from "lodash"
 import { indexArrayByProperty } from "./helperFunctions";
+import { PythonCodeContext } from "../../context/PythonCodeContext";
 
 
 
@@ -17,13 +18,19 @@ const unknownMeasure = 2.5;
 const unknownColor = "black";
 const normalOutlineColor = "white";
 const boundary_thickness = 5;
+const scaleFactor = 5;
 
 /**
  * Component for the grid view of the simulated bots.
  */
 const GridViewWithPhysics = (props) => {
 
+  const { pythonCode } = useContext(PythonCodeContext);
+  const [minibotId, setMinibotId] = useState("");
+  const [programData, setProgramData] = useState(null);
+
   let displayIntervalId = null;
+  const [programProgressionInfo, _setProgramProgressionInfo] = useState({ intervalId: null, entryIndex: 0 });
   const [previousDetections, _setPreviousDetections] = useState({});
   const [detections, setDetections] = useState([]);
   const [detectionToObjectInfoMap, _setDetectionToObjectInfoMap] = useState({});
@@ -71,14 +78,19 @@ const GridViewWithPhysics = (props) => {
     setVirtualRoomId(props.cookies.get('virtual_room_id'));
   }, [document.cookie]);
 
+
+
   useEffect(() => {
-    if (displayOn) {
-      clearInterval(displayIntervalId);
-      setDetections([]);
-      setResetRequested({ value: true });
-      displayIntervalId = setInterval(getVisionData, 100);
+    console.log(programData);
+    if (programData) {
+      clearInterval(programProgressionInfo["intervalId"])
+      programProgressionInfo["running"] = true;
+      programProgressionInfo["entryIndex"] = 0;
+      programProgressionInfo["intervalId"] = setInterval(executeStep, 100);
+
+
     }
-  }, [virtualRoomId]);
+  }, [programData]);
 
 
 
@@ -94,8 +106,52 @@ const GridViewWithPhysics = (props) => {
     return () => {
       // Anything in here is fired on component unmount.
       clearInterval(displayIntervalId);
+      clearInterval(programProgressionInfo["intervalId"])
     }
   }, []);
+
+  const executeStep = () => {
+    try {
+      const { x, y, orientation } = programData["velocities"][programProgressionInfo["entryIndex"]];
+      const objectInfo = detectionToObjectInfoMap[minibotId];
+      //if detection already maps to objectInfo entry
+      if (objectInfo) {
+        const object = Matter.Composite.get(engine.world, objectInfo["id"], objectInfo["type"]);
+        Matter.Body.setVelocity(object, Matter.Vector.create(scaleFactor * parseFloat(x), scaleFactor * parseFloat(y)));
+        //inverted since render does angle in clockwise
+        Matter.Body.setAngularVelocity(object, -parseFloat(orientation) * Math.PI / 180)
+      }
+    }
+    catch (error) {
+      console.log(error)
+    }
+
+    programProgressionInfo["entryIndex"] = programProgressionInfo["entryIndex"] + 1;
+    if (programProgressionInfo["entryIndex"] >= programData["velocities"].length) {
+      clearInterval(programProgressionInfo["intervalId"]);
+    }
+    console.log("current: " + programProgressionInfo["entryIndex"], "length: " + programData["velocities"].length)
+  }
+
+  const runCode = () => {
+    axios({
+      method: 'POST',
+      url: '/compile-virtual-program',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: JSON.stringify({
+        script_code: pythonCode
+      }),
+    }).then(function (response) {
+      setProgramData(response.data);
+    }).catch(function (error) {
+      if (error.response.data.error_msg.length > 0)
+        window.alert(error.response.data.error_msg);
+      else
+        console.warn(error);
+    });
+  }
 
   const addboundaries = () => {
     const boundaries = [
@@ -373,6 +429,14 @@ const GridViewWithPhysics = (props) => {
         className="btn btn-secondary ml-1"
       >
         Reset
+      </button>
+      <label htmlFor="minibotId">Virtual Minibot ID</label>
+      <input type="text" className="form-control mb-2 mr-sm-2" id="minibotId" placeholder="Object name" value={minibotId} onChange={(e) => { setMinibotId(e.target.value) }} />
+      <button
+        onClick={runCode}
+        className="btn btn-secondary ml-1"
+      >
+        Run Code
       </button>
       <br />
 
