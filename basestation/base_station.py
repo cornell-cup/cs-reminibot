@@ -4,6 +4,7 @@ Base Station for the MiniBot.
 
 import math
 from basestation.bot import Bot
+from basestation.controller.minibot_sim_gui_adapter import run_program_string_for_gui_data
 from basestation.user_database import Submission, User
 from basestation import db
 from basestation.util.stoppable_thread import StoppableThread, ThreadSafeVariable
@@ -11,7 +12,7 @@ from basestation.util.helper_functions import distance
 
 from random import choice, randint
 from string import digits, ascii_lowercase, ascii_uppercase
-from typing import Tuple, Optional
+from typing import Dict, List, Tuple, Optional
 import os
 import re
 import socket
@@ -23,6 +24,7 @@ import speech_recognition as sr
 from copy import deepcopy
 
 from basestation.util.units import AngleUnits, LengthUnits, convert_angle, convert_length
+
 
 
 
@@ -644,6 +646,15 @@ class BaseStation:
         bot = self.get_bot(bot_name)
         # reset the previous script_exec_result
         bot.script_exec_result = None
+        parsed_program_string = self.parse_program(script)
+        # Now actually send to the bot
+        bot.sendKV("SCRIPTS", parsed_program_string)
+
+    def get_virtual_program_execution_data(self, script: str) -> Dict[str, List[Dict]]:
+        parsed_program_string = self.parse_program(script)
+        return run_program_string_for_gui_data(parsed_program_string)
+
+    def parse_program(self, script: str) -> str:
         # Regex is for bot-specific functions (move forward, stop, etc)
         # 1st group is the whitespace (useful for def, for, etc),
         # 2nd group is for func name, 3rd group is for args,
@@ -673,9 +684,7 @@ class BaseStation:
             else:
                 parsed_program.append(line + '\n')  # "normal" Python
         parsed_program_string = "".join(parsed_program)
-        print("Parsed:",parsed_program_string)
-        # Now actually send to the bot
-        bot.sendKV("SCRIPTS", parsed_program_string)
+        return parsed_program_string
 
     def set_bot_ports(self, bot_name: str, ports: str):
         """Sets motor port(s) of the specific bot"""

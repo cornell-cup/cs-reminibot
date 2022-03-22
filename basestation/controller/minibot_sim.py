@@ -4,7 +4,6 @@
 """
 import control as ctrl
 import numpy as np
-import matplotlib.pyplot as plt
 
 n = 4
 r = 2
@@ -136,6 +135,6 @@ pentagon_commands = ((minibot_straight, 5),
                      (minibot_turn, -2/5*np.pi),
                      (minibot_straight, 5))
 
+#xs col 2 has orientation in radians, locs has x and y coordinates in meters
 xs, us, locs = run_commands(pentagon_commands)
 
-plt.plot(locs[:, 0], locs[:, 1])

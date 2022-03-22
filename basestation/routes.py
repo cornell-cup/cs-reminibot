@@ -74,7 +74,7 @@ def script():
     except Exception as exception:
         print(exception)
     base_station.send_bot_script(bot_name, script_code)
-    return json.dumps(True), status.HTTP_200_OK
+    return json.dumps(base_station.get_virtual_program_execution_data(script_code)), status.HTTP_200_OK
 
 
 @app.route('/ports', methods=['POST'])
