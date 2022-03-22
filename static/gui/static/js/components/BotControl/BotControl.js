@@ -11,6 +11,7 @@ import InformationBoxModal from "../utils/InformationBoxModal.js";
 import { INFOBOXTYPE, INFOBOXID, INFO_ICON } from "../utils/Constants.js";
 library.add(faInfoCircle);
 import VisionUserInterface from "../Vision/VisionUserInterface.js";
+import UltimateGridview from "../Vision/UltimateGridview.js";
 
 function BotControl({
   selectedBotName,
@@ -58,9 +59,11 @@ function BotControl({
                 />
               </h3>
             </div>
-            <GridviewWithPhysics
-              world_width={500}
-              world_height={500}
+            <UltimateGridview
+              view_width={520}
+              view_height={520}
+              world_width={300}
+              world_height={300}
               defaultEnabled={false} />
             < InformationBoxModal type={INFOBOXTYPE.VISION} />
           </div >
