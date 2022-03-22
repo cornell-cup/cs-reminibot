@@ -18,7 +18,7 @@ const unknownMeasure = 2.5;
 const unknownColor = "black";
 const normalOutlineColor = "white";
 const boundary_thickness = 5;
-const scaleFactor = 5;
+const scaleFactor = 1;
 
 /**
  * Component for the grid view of the simulated bots.
