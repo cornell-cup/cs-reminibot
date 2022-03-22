@@ -24,6 +24,7 @@ import { withCookies, Cookies } from 'react-cookie';
 import Dashboard from './components/Analytics/dashboard.js';
 import History from './components/Analytics/submissionHistory.js';
 import Vision from './components/Vision/Vision.js';
+import { PythonCodeContext } from './context/PythonCodeContext.js';
 
 
 /**
@@ -77,12 +78,14 @@ const Platform = withCookies((props) => {
             // the keyboard event handler for arrow key movement */}
           <Route exact path="/start">
             <div id="setup_control_tab" tabIndex="-1" className="tab-pane active" role="tabpanel">
-              <BotControl
-                selectedBotName={selectedBotName}
-                setSelectedBotName={setSelectedBotName}
-                selectedBotStyle={selectedBotStyle}
-                setSelectedBotStyle={setSelectedBotStyle}
-              />
+              <PythonCodeContext.Provider value={{ pythonCode: pythonCode }}>
+                <BotControl
+                  selectedBotName={selectedBotName}
+                  setSelectedBotName={setSelectedBotName}
+                  selectedBotStyle={selectedBotStyle}
+                  setSelectedBotStyle={setSelectedBotStyle}
+                />
+              </PythonCodeContext.Provider>
             </div>
           </Route>
 
@@ -115,7 +118,9 @@ const Platform = withCookies((props) => {
             />
           </Route>
           <Route path="/vision-page">
-            <Vision />
+            <PythonCodeContext.Provider value={{ pythonCode: pythonCode }}>
+              <Vision />
+            </PythonCodeContext.Provider>
           </Route>
         </Switch>
       </div>

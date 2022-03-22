@@ -64,6 +64,7 @@ def run_commands_for_gui_data(commands):
 
 def run_program_string_for_gui_data(program_string):
   commands = parse_program_string_to_commands(program_string)
+  print("commands:",commands)
   gui_data = run_commands_for_gui_data(commands)
   return gui_data
 
@@ -79,6 +80,7 @@ def run_program_string_for_gui_data(program_string):
 
 def get_command_from_function_and_arguments(function_and_arguments):
   given_function = function_and_arguments[0]
+  print(given_function)
   if given_function == "fwd_dst":
     argument1 = float(function_and_arguments[1])
     return (minibot_straight, INCHES_TO_METERS_CONVERSION_FACTOR * argument1)
@@ -88,13 +90,12 @@ def get_command_from_function_and_arguments(function_and_arguments):
   elif given_function == "move_to":
     pass
   elif given_function == "left_angle":
+    pass
+  elif given_function == "right_angle":
+    pass
+  elif given_function == "turn_to":
     argument1 = float(function_and_arguments[1])
     return (minibot_turn, DEGREES_TO_RADIANS_CONVERSION_FACTOR * argument1)
-  elif given_function == "right_angle":
-    argument1 = float(function_and_arguments[1])
-    return (minibot_turn, -DEGREES_TO_RADIANS_CONVERSION_FACTOR * argument1)
-  elif given_function == "turn_to":
-    pass
 
 
 

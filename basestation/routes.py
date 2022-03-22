@@ -74,7 +74,17 @@ def script():
     except Exception as exception:
         print(exception)
     base_station.send_bot_script(bot_name, script_code)
-    return json.dumps(base_station.get_virtual_program_execution_data(script_code)), status.HTTP_200_OK
+    return json.dumps(True), status.HTTP_200_OK
+
+@app.route('/compile-virtual-program', methods=['POST'])
+def compile_virtual_program():
+    """ Compile a Python script so that it can be use to run virtual minibots """
+    data = request.get_json()
+    for i in range(30):
+        print("Ive been called")
+    script_code = data['script_code']
+    data_to_send = base_station.get_virtual_program_execution_data(script_code)
+    return json.dumps(data_to_send), status.HTTP_200_OK
 
 
 @app.route('/ports', methods=['POST'])
