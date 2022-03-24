@@ -5,7 +5,7 @@ import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { withCookies } from "react-cookie";
 import Matter from "matter-js";
 import { cloneDeep, has, isEqual } from "lodash"
-import { indexArrayByProperty } from "./helperFunctions";
+import { indexArrayByProperty } from "../utils/helperFunctions";
 import { PythonCodeContext } from "../../context/PythonCodeContext";
 
 

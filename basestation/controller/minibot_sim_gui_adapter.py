@@ -83,10 +83,10 @@ def get_command_from_function_and_arguments(function_and_arguments):
   print(given_function)
   if given_function == "fwd_dst":
     argument1 = float(function_and_arguments[1])
-    return (minibot_straight, INCHES_TO_METERS_CONVERSION_FACTOR * argument1)
+    return (minibot_straight, argument1)
   elif given_function == "back_dst":
     argument1 = float(function_and_arguments[1])
-    return (minibot_straight, -INCHES_TO_METERS_CONVERSION_FACTOR * argument1)
+    return (minibot_straight, -argument1)
   elif given_function == "move_to":
     pass
   elif given_function == "left_angle":

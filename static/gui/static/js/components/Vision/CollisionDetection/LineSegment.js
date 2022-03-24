@@ -1,4 +1,4 @@
-import { getItemCircular } from "../helperFunctions";
+import { getItemCircular } from "../../utils/helperFunctions";
 import { arePointsColinear } from "./Point";
 
 export default class LineSegment extends Array { }

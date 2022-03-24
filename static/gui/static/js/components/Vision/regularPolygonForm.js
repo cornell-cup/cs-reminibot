@@ -1,11 +1,7 @@
-import axios from "axios";
-import React, { useState } from "react";
-import { INFOBOXID, INFOBOXTYPE, INFO_ICON } from "../utils/Constants";
-import InformationBoxModal from "../utils/InformationBoxModal";
-import { triangulate } from "./CollisionDetection/Polygon";
-import Vector from "./CollisionDetection/Vector";
-import { getRandomIntInclusive } from "./helperFunctions";
-import { generateRegularPolygonDeltas } from "./helperFunctions";
+import React, { useContext, useState } from 'react';
+import { generateRegularPolygonDeltas } from "../utils/helperFunctions";
+import { VirtualEnviromentContext } from '../../context/VirtualEnviromentContext';
+import { handleAddObjectFormSubmit } from './FormHandlers';
 
 export default function RegularPolygonForm(props) {
   const step = 0.01;
@@ -19,6 +15,7 @@ export default function RegularPolygonForm(props) {
   const [numberOfSides, setNumberOfSides] = useState("");
   const [sideLength, setSideLength] = useState("");
   const [color, setColor] = useState("#000000");
+  const { virtualEnviroment, setVirtualEnviroment } = useContext(VirtualEnviromentContext);
 
   function handleFormSubmit(event) {
     event.preventDefault();
@@ -26,65 +23,19 @@ export default function RegularPolygonForm(props) {
       numberOfSides,
       sideLength
     );
-    const vertices_from_deltas = deltas_to_vertices.map(
-      (currentValue) => new Vector(currentValue["x"], currentValue["y"])
-    );
-    const triangles_from_deltas = triangulate(vertices_from_deltas);
-    if (registerPhysicalObject) {
-      axios
-        .post("/object-mapping", {
-          add: true,
-          mappings: [
-            {
-              id: id,
-              virtual_room_id: props.virtualRoomId,
-              name: name,
-              type: "physical_object",
-              shape: "regular_polygon",
-              deltas_to_vertices: deltas_to_vertices,
-              triangles_from_deltas: triangles_from_deltas,
-              color: color,
-            },
-          ],
-        })
-        .then(function (response) {
-          alert(`Your object registration ${name} has been added!`);
-          clearForm();
-        })
-        .catch(function (error) {
-          alert(`Sorry, there was an issue registering your object ${name}.`);
-        });
-    } else {
-      axios
-        .post("/virtual-objects", {
-          add: true,
-          virtual_objects: [
-            {
-              id: id,
-              virtual_room_id: props.virtualRoomId,
-              name: name,
-              type: "virtual_object",
-              x: x,
-              y: y,
-              shape: "regular_polygon",
-              orientation: orientation,
-              deltas_to_vertices: deltas_to_vertices,
-              triangles_from_deltas: triangles_from_deltas,
-              color: color,
-            },
-          ],
-        })
-        .then(function (response) {
-          alert(`Your virtual object ${name} has been added!`);
-          clearForm();
-        })
-        .catch(function (error) {
-          alert(
-            `Sorry, there was an issue adding your virtual object ${name}.`
-          );
-        });
-    }
+    let object =
+    {
+      id: id,
+      virtual_room_id: props.virtualRoomId,
+      name: name,
+      type: registerPhysicalObject ? "physical_object" : "virtual_object",
+      shape: "regular_polygon",
+      deltas_to_vertices: deltas_to_vertices,
+      color: color,
+    };
+    handleAddObjectFormSubmit(registerPhysicalObject, object, virtualEnviroment, clearForm, x, y, orientation);
   }
+
 
   function clearForm() {
     setId("");

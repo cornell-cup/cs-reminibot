@@ -25,6 +25,8 @@ import Dashboard from './components/Analytics/dashboard.js';
 import History from './components/Analytics/submissionHistory.js';
 import Vision from './components/Vision/Vision.js';
 import { PythonCodeContext } from './context/PythonCodeContext.js';
+import { VirtualEnviromentContext } from './context/VirtualEnviromentContext.js';
+import VirtualEnviroment from './components/utils/VirtualEnviroment.js';
 
 
 /**
@@ -52,13 +54,16 @@ const Platform = withCookies((props) => {
   const [selectedBotName, setSelectedBotName] = useState('');
   const [selectedBotStyle, setSelectedBotStyleState] = useState(hiddenStyle);
   const [loginEmail, setLoginEmail] = useState(props.cookies.get('current_user_email') || "");
+  const [virtualRoomId, setVirtualRoomId] = useState(props.cookies.get('virtual_room_id') || nanoid())
+  const [virtualEnviroment, setVirtualEnviroment] = useState(new VirtualEnviroment([], []));
 
   useEffect(() => {
     setLoginEmail(props.cookies.get('current_user_email') || "");
+    setVirtualRoomId(props.cookies.get('virtual_room_id') || nanoid());
   }, [document.cookie]);
 
   useEffect(() => {
-    props.cookies.set('virtual_room_id', props.cookies.get('virtual_room_id') || nanoid(), { path: '/' });
+    props.cookies.set('virtual_room_id', virtualRoomId, { path: '/' });
   }, []);
 
 
@@ -79,12 +84,14 @@ const Platform = withCookies((props) => {
           <Route exact path="/start">
             <div id="setup_control_tab" tabIndex="-1" className="tab-pane active" role="tabpanel">
               <PythonCodeContext.Provider value={{ pythonCode: pythonCode }}>
-                <BotControl
-                  selectedBotName={selectedBotName}
-                  setSelectedBotName={setSelectedBotName}
-                  selectedBotStyle={selectedBotStyle}
-                  setSelectedBotStyle={setSelectedBotStyle}
-                />
+                <VirtualEnviromentContext.Provider value={{ virtualEnviroment, setVirtualEnviroment }}>
+                  <BotControl
+                    selectedBotName={selectedBotName}
+                    setSelectedBotName={setSelectedBotName}
+                    selectedBotStyle={selectedBotStyle}
+                    setSelectedBotStyle={setSelectedBotStyle}
+                  />
+                </VirtualEnviromentContext.Provider>
               </PythonCodeContext.Provider>
             </div>
           </Route>
@@ -119,7 +126,9 @@ const Platform = withCookies((props) => {
           </Route>
           <Route path="/vision-page">
             <PythonCodeContext.Provider value={{ pythonCode: pythonCode }}>
-              <Vision />
+              <VirtualEnviromentContext.Provider value={{ virtualEnviroment, setVirtualEnviroment }}>
+                <Vision />
+              </VirtualEnviromentContext.Provider>
             </PythonCodeContext.Provider>
           </Route>
         </Switch>

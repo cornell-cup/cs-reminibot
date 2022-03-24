@@ -1,8 +1,6 @@
-import axios from 'axios';
-import React, { useState } from 'react'
-import { INFOBOXID, INFOBOXTYPE, INFO_ICON } from '../utils/Constants'
-import InformationBoxModal from '../utils/InformationBoxModal'
-import { getRandomIntInclusive } from './helperFunctions';
+import React, { useContext, useState } from 'react'
+import { VirtualEnviromentContext } from '../../context/VirtualEnviromentContext';
+import { handleAddObjectFormSubmit } from './FormHandlers';
 
 export default function CircleForm(props) {
   const step = .01;
@@ -15,62 +13,20 @@ export default function CircleForm(props) {
   const [orientation, setOrientation] = useState("");
   const [radius, setRadius] = useState("");
   const [color, setColor] = useState("#000000");
+  const { virtualEnviroment, setVirtualEnviroment } = useContext(VirtualEnviromentContext);
 
   function handleFormSubmit(event) {
     event.preventDefault();
-
-    if (registerPhysicalObject) {
-      axios
-        .post("/object-mapping", {
-          add: true,
-          mappings: [
-            {
-              id: id,
-              virtual_room_id: props.virtualRoomId,
-              name: name,
-              type: "physical_object",
-              shape: "circle",
-              radius: radius,
-              color: color
-            }
-          ],
-        })
-        .then(function (response) {
-          alert(`Your object registration ${name} has been added!`);
-          clearForm();
-        })
-        .catch(function (error) {
-          alert(`Sorry, there was an issue registering your object ${name}.`);
-        });
-    } else {
-      axios
-        .post("/virtual-objects", {
-          add: true,
-          virtual_objects: [
-            {
-              id: id,
-              virtual_room_id: props.virtualRoomId,
-              name: name,
-              type: "virtual_object",
-              x: x,
-              y: y,
-              shape: "circle",
-              orientation: orientation,
-              radius: radius,
-              color: color
-            }
-          ],
-        })
-        .then(function (response) {
-          alert(`Your virtual object ${name} has been added!`);
-          clearForm();
-        })
-        .catch(function (error) {
-          alert(`Sorry, there was an issue adding your virtual object ${name}.`);
-        });
-    }
-
-
+    let object = {
+      id: id,
+      virtual_room_id: props.virtualRoomId,
+      name: name,
+      type: registerPhysicalObject ? "physical_object" : "virtual_object",
+      shape: "circle",
+      radius: radius,
+      color: color
+    };
+    handleAddObjectFormSubmit(registerPhysicalObject, object, virtualEnviroment, clearForm, x, y, orientation);
   }
 
   function clearForm() {
@@ -132,15 +88,8 @@ export default function CircleForm(props) {
             </React.Fragment>
           }
         </div>
-        <div class="form-group col-md-3">
-          <label class="sr-only" for="y">y</label>
-          <input type="text" class="form-control mb-2 mr-sm-2" id="y" placeholder="center y" />
-        </div>
-        <div class="form-group col-md-3">
-          <label class="sr-only" for="r">radius</label>
-          <input type="text" class="form-control mb-2 mr-sm-2" id="r" placeholder="radius" />
-        </div>
-      </div>
+        <button type="submit" className="btn btn-success">Submit</button>
+      </form>
     </React.Fragment>
 
   )

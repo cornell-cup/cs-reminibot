@@ -3,7 +3,6 @@ import axios from "axios";
 
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { withCookies } from "react-cookie";
-import { triangulate } from "./CollisionDetection/Polygon";
 import Vector from "./CollisionDetection/Vector";
 import { logIfShapesCollide } from "./CollisionDetection/CollisionDection";
 
@@ -370,8 +369,6 @@ const GridView = (props) => {
       case "regular_polygon":
       case "polygon":
       default:
-        const triangles = detection["triangles_from_deltas"];
-        const colors = ["red", "green", "yellow", "blue", "red", "purple", "orange"]
         return (
           <React.Fragment>
             <polygon
@@ -379,11 +376,6 @@ const GridView = (props) => {
               fill={detection["color"] ? detection["color"] : unknownMeasure}
               transform={`rotate(${orientation_pos}, ${x}, ${y})`}
             ></polygon>
-            {triangles.map((triangle, index) => (<polygon
-              points={`${x + scaleFactor * triangle[0][0]},${y + scaleFactor * triangle[0][1]} ${x + scaleFactor * triangle[1][0]},${y + scaleFactor * triangle[1][1]} ${x + scaleFactor * triangle[2][0]},${y + scaleFactor * triangle[2][1]}`}
-              fill={colors[index % colors.length]}
-              transform={`rotate(${orientation_pos}, ${x}, ${y})`}
-            ></polygon>))}
             {image_path && renderShape(
               {
                 x: x_pos,

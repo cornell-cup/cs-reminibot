@@ -1,4 +1,4 @@
-import { getPolygonVertices } from "../helperFunctions";
+import { getPolygonVertices } from "../../utils/helperFunctions";
 import {
   CIRCLE,
   get2DShapeClassification,
