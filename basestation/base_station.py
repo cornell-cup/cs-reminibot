@@ -256,7 +256,7 @@ class BaseStation:
             else:
                 self.remove_from_virtual_objects(update["virtual_object"])
         else:
-            print("The vision virtual object list was not given a valid update")
+            print("The vision virtual object list was not given a valid update in update_virtual_objects")
             
 
     def add_to_virtual_objects(self, virtual_object):
@@ -278,11 +278,10 @@ class BaseStation:
                 "shape": virtual_object["shape"] if "shape" in virtual_object else None, 
                 "color": virtual_object["color"] if "color" in virtual_object else None,
                 "deltas_to_vertices": virtual_object["deltas_to_vertices"] if "deltas_to_vertices" in virtual_object else None, 
-                "triangles_from_deltas": virtual_object["triangles_from_deltas"] if "triangles_from_deltas" in virtual_object else None, 
                 "radiusY": virtual_object["radiusY"] if "radiusY" in virtual_object else None,  
             }
         else:
-            print("The vision virtual object list was not given a valid update")
+            print("The vision virtual object list was not given a valid update in add_to_virtual_objects")
 
     # to be used for simulation
     def add_minibot_to_virtual_objects(self, id, x, y, orientation):
@@ -310,7 +309,7 @@ class BaseStation:
         if "virtual_room_id" in virtual_object and virtual_object["virtual_room_id"] in self.virtual_objects and "id" in virtual_object:
             self.virtual_objects[virtual_object["virtual_room_id"]].pop(virtual_object["id"], None)
         else:
-            print("The vision virtual object list was not given a valid update")
+            print("The vision virtual object list was not given a valid removal update")
 
     def remove_multiple_from_virtual_objects(self, virtual_objects):
         """ Removes multiple virtual objects from virtual objects list """
@@ -327,11 +326,13 @@ class BaseStation:
         """ Updates vision object mapping. """
         if "mappings" in update and "add" in update and type(update["mappings"]) is list and len(update["mappings"]) > 0:
             if update["add"]:
+                self.remove_multiple_from_vision_object_map(update["mappings"])
                 self.add_multiple_to_vision_object_map(update["mappings"])
             else:
                 self.remove_multiple_from_vision_object_map(update["mappings"])
         elif "mapping" in update and "add" in update:
             if update["add"]:
+                self.remove_from_vision_object_map(update["mapping"])
                 self.add_to_vision_object_map(update["mapping"])
             else:
                 self.remove_from_vision_object_map(update["mapping"])
@@ -354,7 +355,6 @@ class BaseStation:
                 "shape": object_mapping["shape"] if "shape" in object_mapping else None, 
                 "color": object_mapping["color"] if "color" in object_mapping else None, 
                 "deltas_to_vertices": object_mapping["deltas_to_vertices"] if "deltas_to_vertices" in object_mapping else None, 
-                "triangles_from_deltas": object_mapping["triangles_from_deltas"] if "triangles_from_deltas" in object_mapping else None, 
                 "radiusY": object_mapping["radiusY"] if "radiusY" in object_mapping else None, 
             }
         else:
@@ -469,7 +469,6 @@ class BaseStation:
                 "name": None,
                 "type": None,
                 "deltas_to_vertices": None,
-                "triangles_from_deltas": None,
                 "length": None,
                 "width": None, 
                 "radius": None, 

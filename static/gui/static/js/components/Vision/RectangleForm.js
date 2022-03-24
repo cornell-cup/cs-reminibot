@@ -1,8 +1,6 @@
-import axios from 'axios';
-import React, { useState } from 'react'
-import { INFOBOXID, INFOBOXTYPE, INFO_ICON } from '../utils/Constants'
-import InformationBoxModal from '../utils/InformationBoxModal'
-import { getRandomIntInclusive } from './helperFunctions';
+import React, { useContext, useState } from 'react'
+import { VirtualEnviromentContext } from '../../context/VirtualEnviromentContext';
+import { handleAddObjectFormSubmit } from './FormHandlers';
 
 export default function RectangleForm(props) {
   const step = .01;
@@ -16,63 +14,22 @@ export default function RectangleForm(props) {
   const [width, setWidth] = useState("");
   const [height, setHeight] = useState("");
   const [color, setColor] = useState("#000000");
+  const { virtualEnviroment, setVirtualEnviroment } = useContext(VirtualEnviromentContext);
+
 
   function handleFormSubmit(event) {
     event.preventDefault();
-
-    if (registerPhysicalObject) {
-      axios
-        .post("/object-mapping", {
-          add: true,
-          mappings: [
-            {
-              id: id,
-              virtual_room_id: props.virtualRoomId,
-              name: name,
-              type: "physical_object",
-              shape: "rectangle",
-              width: width,
-              length: height,
-              color: color
-            }
-          ],
-        })
-        .then(function (response) {
-          alert(`Your object registration ${name} has been added!`);
-          clearForm();
-        })
-        .catch(function (error) {
-          alert(`Sorry, there was an issue registering your object ${name}.`);
-        });
-    } else {
-      axios
-        .post("/virtual-objects", {
-          add: true,
-          virtual_objects: [
-            {
-              id: id,
-              virtual_room_id: props.virtualRoomId,
-              name: name,
-              type: "virtual_object",
-              x: x,
-              y: y,
-              shape: "rectangle",
-              orientation: orientation,
-              width: width,
-              length: height,
-              color: color
-            }
-          ],
-        })
-        .then(function (response) {
-          alert(`Your virtual object ${name} has been added!`);
-          clearForm();
-        })
-        .catch(function (error) {
-          alert(`Sorry, there was an issue adding your virtual object ${name}.`);
-        });
-    }
-
+    let object = {
+      id: id,
+      virtual_room_id: props.virtualRoomId,
+      name: name,
+      type: registerPhysicalObject ? "physical_object" : "virtual_object",
+      shape: "rectangle",
+      width: width,
+      length: height,
+      color: color
+    };
+    handleAddObjectFormSubmit(registerPhysicalObject, object, virtualEnviroment, clearForm, x, y, orientation);
   }
 
   function clearForm() {
@@ -141,7 +98,6 @@ export default function RectangleForm(props) {
         </div>
         <button type="submit" className="btn btn-success">Submit</button>
       </form>
-      <InformationBoxModal type={INFOBOXTYPE.APRIL_TAG_ID} />
     </React.Fragment>
   )
 }

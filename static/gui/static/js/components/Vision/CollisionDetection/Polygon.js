@@ -1,4 +1,4 @@
-import { getItemCircular, removeAt } from "../helperFunctions";
+import { getItemCircular, removeAt } from "../../utils/helperFunctions";
 import { isPointInCircle } from "./Circle";
 import {
   doLinesIntersect,

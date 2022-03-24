@@ -1,8 +1,6 @@
-import axios from 'axios';
-import React, { useState } from 'react'
-import { INFOBOXID, INFOBOXTYPE, INFO_ICON } from '../utils/Constants'
-import InformationBoxModal from '../utils/InformationBoxModal'
-import { getRandomIntInclusive } from './helperFunctions';
+import React, { useContext, useState } from 'react'
+import { VirtualEnviromentContext } from '../../context/VirtualEnviromentContext';
+import { handleAddObjectFormSubmit } from './FormHandlers';
 
 export default function MinibotForm(props) {
   const step = .01;
@@ -14,59 +12,20 @@ export default function MinibotForm(props) {
   const [y, setY] = useState("");
   const [orientation, setOrientation] = useState("");
   const [color, setColor] = useState("#000000");
+  const { virtualEnviroment, setVirtualEnviroment } = useContext(VirtualEnviromentContext);
+
 
   function handleFormSubmit(event) {
     event.preventDefault();
-    console.log(props)
-    if (registerPhysicalObject) {
-      axios
-        .post("/object-mapping", {
-          add: true,
-          mappings: [
-            {
-              id: id,
-              virtual_room_id: props.virtualRoomId,
-              name: name,
-              type: "minibot",
-              shape: "cube",
-              color: color
-            }
-          ],
-        })
-        .then(function (response) {
-          alert(`Your minibot registration ${name} has been added!`);
-          clearForm();
-        })
-        .catch(function (error) {
-          alert(`Sorry, there was an issue registering your minibot ${name}.`);
-        });
-    } else {
-      axios
-        .post("/virtual-objects", {
-          add: true,
-          virtual_objects: [
-            {
-              id: id,
-              virtual_room_id: props.virtualRoomId,
-              name: name,
-              type: "minibot",
-              x: x,
-              y: y,
-              shape: "cube",
-              orientation: orientation,
-              color: color
-            }
-          ],
-        })
-        .then(function (response) {
-          alert(`Your virtual minibot ${name} has been added!`);
-          clearForm();
-        })
-        .catch(function (error) {
-          alert(`Sorry, there was an issue adding your virtual minibot ${name}.`);
-        });
-    }
-
+    let object = {
+      id: id,
+      virtual_room_id: props.virtualRoomId,
+      name: name,
+      type: "minibot",
+      shape: "cube",
+      color: color
+    };
+    handleAddObjectFormSubmit(registerPhysicalObject, object, virtualEnviroment, clearForm, x, y, orientation);
   }
 
   function clearForm() {
@@ -126,7 +85,6 @@ export default function MinibotForm(props) {
         </div>
         <button type="submit" className="btn btn-success">Submit</button>
       </form>
-      <InformationBoxModal type={INFOBOXTYPE.APRIL_TAG_ID} />
     </React.Fragment >
   )
 }

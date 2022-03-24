@@ -1,4 +1,4 @@
-import { getPolygonVertices } from "../helperFunctions";
+import { getPolygonVertices } from "../../utils/helperFunctions";
 import { getPolygonLineSegments } from "./LineSegment";
 import { isPointInPolygon } from "./Polygon";
 import { isPointInCircle } from "./Circle";

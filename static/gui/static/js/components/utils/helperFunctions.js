@@ -26,11 +26,24 @@ export function modulusPositive(dividend, divisor) {
   else {
     return dividend % divisor;
   }
+}
 
+export function radiansToDegrees(radians) {
+  return radians * (180 / Math.PI);
 }
 
 export function removeAt(array, index) {
   array.splice(index, 1);
+}
+
+//IMPORTANT: Removes ALL elements with the value for the given property
+export function removeByPropertyValue(array, property, value) {
+  return array.filter(element => element[property] !== value);
+}
+
+//IMPORTANT: Removes ALL elements with the value for the given property
+export function removeByPropertyValues(array, property, values) {
+  return array.filter(element => !values.includes(element[property]));
 }
 
 //returns an array of x and y deltas from center point to vertices of a regular polygon with a given numberOfSides and a given sideLength
@@ -81,3 +94,16 @@ export function getPolygonInfoFromVertices(vertices) {
   return { x: center['x'], y: center['y'], deltas: getDeltasFromVerticesXAndY(center['x'], center['y'], vertices) };
 }
 
+export async function readFileAsText(file) {
+  let result = await new Promise((resolve) => {
+    let fileReader = new FileReader();
+    fileReader.onload = (e) => resolve(fileReader.result);
+    fileReader.readAsText(file);
+  });
+
+  return result;
+}
+
+export const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+export const getCurrentTimeMilliseconds = () => (new Date()).getMilliseconds();

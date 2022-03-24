@@ -6,8 +6,9 @@ import { withCookies } from "react-cookie";
 import Vector from "./CollisionDetection/Vector";
 import Matter from "matter-js";
 import { cloneDeep, has, isEqual } from "lodash"
-import { indexArrayByProperty } from "./helperFunctions";
+import { getCurrentTimeMilliseconds, indexArrayByProperty, radiansToDegrees, sleep } from "../utils/helperFunctions";
 import { PythonCodeContext } from "../../context/PythonCodeContext";
+import { VirtualEnviromentContext } from '../../context/VirtualEnviromentContext';
 
 
 const scaleFactor = 40;
@@ -34,7 +35,7 @@ const UltimateGridView = (props) => {
   const [programData, setProgramData] = useState(null);
 
   let displayIntervalId = null;
-  const [programProgressionInfo, _setProgramProgressionInfo] = useState({ intervalId: null, entryIndex: 0 });
+  const [programProgressionInfo, _setProgramProgressionInfo] = useState({ intervalId: null, entryIndex: 0, startTime: 0 });
   const [previousDetections, _setPreviousDetections] = useState({});
   const [detections, setDetections] = useState([]);
   const [detectionToObjectInfoMap, _setDetectionToObjectInfoMap] = useState({});
@@ -43,6 +44,7 @@ const UltimateGridView = (props) => {
   const [virtualRoomId, setVirtualRoomId] = useState(props.cookies.get('virtual_room_id'));
   const [boundaryIds, _setBoundaryIds] = useState([]);
   const [engine, _setEngine] = useState(Matter.Engine.create({ gravity: { scale: 0 } }));
+  const { virtualEnviroment, _setVirtualEnviroment } = useContext(VirtualEnviromentContext);
 
 
   useEffect(() => {
@@ -61,11 +63,11 @@ const UltimateGridView = (props) => {
 
 
   useEffect(() => {
-    console.log(programData);
     if (programData) {
       clearInterval(programProgressionInfo["intervalId"])
       programProgressionInfo["running"] = true;
       programProgressionInfo["entryIndex"] = 0;
+      programProgressionInfo["startTime"] = getCurrentTimeMilliseconds();
       programProgressionInfo["intervalId"] = setInterval(executeStep, 100);
 
 
@@ -85,32 +87,42 @@ const UltimateGridView = (props) => {
     Matter.Runner.run(engine);
     return () => {
       // Anything in here is fired on component unmount.
-      clearInterval(find);
+      clearInterval(displayIntervalId);
       clearInterval(programProgressionInfo["intervalId"]);
     }
   }, []);
 
-  const executeStep = () => {
+  const executeStep = async () => {
     try {
       const { x, y, orientation } = programData["velocities"][programProgressionInfo["entryIndex"]];
       const objectInfo = detectionToObjectInfoMap[minibotId];
       //if detection already maps to objectInfo entry
       if (objectInfo) {
         const object = Matter.Composite.get(engine.world, objectInfo["id"], objectInfo["type"]);
-        Matter.Body.setVelocity(object, Matter.Vector.create(parseFloat(x), parseFloat(y)));
-        //inverted since render does angle in clockwise
-        Matter.Body.setAngularVelocity(object, -parseFloat(orientation) * Math.PI / 180)
+        const currentOrientation = object.angle;
+        const currentX = object.position["x"];
+        const currentY = object.position["y"];
+        const giveXSpeed = parseFloat(x);
+        const givenYSpeed = parseFloat(y);
+        //inverted since engine does angle in clockwise
+        const giveAngularSpeed = -parseFloat(orientation);
+        const currentSpeed = Math.sqrt(giveXSpeed * giveXSpeed + givenYSpeed * givenYSpeed);
+        const dt = .1;
+
+        Matter.Body.setPosition(object, Matter.Vector.create(currentX + dt * currentSpeed * Math.cos(currentOrientation), currentY + dt * currentSpeed * Math.sin(currentOrientation)));
+
+        Matter.Body.setAngle(object, currentOrientation + dt * giveAngularSpeed * Math.PI / 180)
       }
     }
     catch (error) {
+
       console.log(error)
     }
-
+    console.log("current: " + programProgressionInfo["entryIndex"], "length: " + programData["velocities"].length)
     programProgressionInfo["entryIndex"] = programProgressionInfo["entryIndex"] + 1;
     if (programProgressionInfo["entryIndex"] >= programData["velocities"].length) {
       clearInterval(programProgressionInfo["intervalId"]);
     }
-    console.log("current: " + programProgressionInfo["entryIndex"], "length: " + programData["velocities"].length)
   }
 
   const runCode = () => {
@@ -440,6 +452,7 @@ const UltimateGridView = (props) => {
 
   const renderObjects = () => {
     let objects = [];
+
     for (const detection of detections) {
       const detectionClone = cloneDeep(detection)
       const objectInfo = detectionToObjectInfoMap[detectionClone["id"]];
@@ -449,7 +462,7 @@ const UltimateGridView = (props) => {
         const physicsEnginedBody = Matter.Composite.get(engine.world, objectInfo["id"], objectInfo["type"]);
         detectionClone["x"] = physicsEnginedBody.position["x"];
         detectionClone["y"] = physicsEnginedBody.position["y"];
-        detectionClone["orientation"] = physicsEnginedBody.angle;
+        detectionClone["orientation"] = radiansToDegrees(physicsEnginedBody.angle);
         switch (
         detectionClone["type"] ? String(detectionClone["type"].toLowerCase().trim()) : ""
         ) {
@@ -463,6 +476,12 @@ const UltimateGridView = (props) => {
           default:
             objects.push(renderUnknown(detectionClone));
             break;
+        }
+        if (!detectionClone["is_physical"]) {
+          detectionClone["x"] = parseFloat(detectionClone["x"]) - props.world_width / 2;
+          detectionClone["y"] = props.world_height / 2 - parseFloat(detectionClone["y"]);
+          detectionClone["orientation"] = -parseFloat(detectionClone["orientation"]);
+          virtualEnviroment.addVirtualObject(detectionClone);
         }
       }
     }
@@ -499,7 +518,8 @@ const UltimateGridView = (props) => {
   const renderShapeGroup = (detection, image_path = null) => {
     const x_pos = parseFloat(detection["x"]) - props.world_width / 2;
     const y_pos = props.world_height / 2 - parseFloat(detection["y"]);
-    const orientation_pos = parseFloat(detection["orientation"]);
+    //inverted since rendering angles angle the actual display angles are in different directions
+    const orientation_pos = -parseFloat(detection["orientation"]);
     return (
       <g onClick={() => {
         alert(`${detection["name"] ? detection["name"] : ""}: (${Math.round(
@@ -636,8 +656,6 @@ const UltimateGridView = (props) => {
       case "regular_polygon":
       case "polygon":
       default:
-        const triangles = detection["triangles_from_deltas"];
-        const colors = ["red", "green", "yellow", "blue", "red", "purple", "orange"]
         return (
           <React.Fragment>
             <polygon
@@ -645,11 +663,6 @@ const UltimateGridView = (props) => {
               fill={detection["color"] ? detection["color"] : unknownColor}
               transform={`rotate(${orientation_pos}, ${x}, ${y})`}
             ></polygon>
-            {triangles.map((triangle, index) => (<polygon
-              points={`${x + scaleFactor * triangle[0][0]},${y + scaleFactor * triangle[0][1]} ${x + scaleFactor * triangle[1][0]},${y + scaleFactor * triangle[1][1]} ${x + scaleFactor * triangle[2][0]},${y + scaleFactor * triangle[2][1]}`}
-              fill={colors[index % colors.length]}
-              transform={`rotate(${orientation_pos}, ${x}, ${y})`}
-            ></polygon>))}
             {image_path && renderShape(
               {
                 x: x_pos,
