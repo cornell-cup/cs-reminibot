@@ -16,3 +16,4 @@ export const CARROT_EXPAND = "./static/img/carrot_orange_expand.png";
 export const INFO_ICON = "./static/img/info_icon.png";
 export const X_BTN = "./static/img/close_btn.png";
 export const MIC_BTN = "./static/img/microphone-white.png";
+export const MIC_BTNON = "./static/img/microphone-green.png";
