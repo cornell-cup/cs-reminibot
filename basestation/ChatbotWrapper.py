@@ -13,38 +13,42 @@ Make sure to SMASH the like button and hit \
 subscribe and turn on the notification bell.  \
 See you guys in the next episode. Join my Twitch, Patreon, and Instagram."
 
+default_context = "The sky is blue."
+
 SUCCESS = 200
 FAILURE = 400
 
+
 class ChatbotWrapper:
-    
+
     def __init__(self, context=default_context):
         self.context_stack = [context]  # context
-        
+
     def update_context(self, context):
         if context != "":
             self.context_stack.append(context)
-       
+
     def get_latest_context(self):
         return self.context_stack[-1]
 
     def get_all_context(self):
         return self.context_stack
-  
+
     def reset_context(self):
         self.context_stack = [default_context]
 
     def undo_context(self):
         if len(self.context_stack) > 1:
-          self.context_stack.pop()
-          return SUCCESS
+            self.context_stack.pop()
+            return SUCCESS
         else:
-          return FAILURE
+            return FAILURE
 
     def compute_answer(self, input_question):
         # self.context_stack = ['. '.join(self.context_stack)]
-        url = "http://3.133.110.167/qa"
+        url = "http://3.135.244.37:8000/qa"
         # TODO set this using startup parameters
-        data = {"question": input_question, "context":'. '.join(self.context_stack) }
+        data = {"question": input_question,
+                "context": '. '.join(self.context_stack)}
         resp = requests.get(url, json=data)
         return resp.text

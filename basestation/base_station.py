@@ -3,7 +3,7 @@ Base Station for the MiniBot.
 """
 
 from basestation.bot import Bot
-from basestation.user_database import Program, User, Chatbot as Chatbot
+from basestation.user_database import Program, User, Chatbot as ChatbotTable
 from basestation import db
 from basestation.util.stoppable_thread import StoppableThread, ThreadSafeVariable
 
@@ -16,8 +16,6 @@ import socket
 import sys
 import time
 import threading
-import pyaudio
-import speech_recognition as sr
 from .ChatbotWrapper import ChatbotWrapper
 
 MAX_VISION_LOG_LENGTH = 1000
@@ -92,6 +90,13 @@ class BaseStation:
         self.speech_recog_thread = None
         self.chatbot_listening_thread = None
         self.lock = threading.Lock()
+        self.commands = {
+            "forward": "Minibot moves forward",
+            "backward": "Minibot moves backwards",
+            "left": "Minibot moves left",
+            "right": "Minibot moves right",
+            "stop": "Minibot stops",
+        }
 
     # ==================== VISION ====================
 
@@ -300,6 +305,10 @@ class BaseStation:
         db.session.commit()
         return 1
 
+    def get_user_id_by_email(self, email: str) -> int:
+        id = User.query.filter(User.email == self.login_email).first()
+        return id
+
     def update_custom_function(self, custom_function: str) -> bool:
         """Adds custom function(s) for the logged in user if there is a user 
         logged in
@@ -312,36 +321,58 @@ class BaseStation:
         db.session.commit()
         return True
 
-    def update_chatbot_context(self, context: str):
+    # ==================== NEW SPEECH RECOGNITION ============================
+    def send_command(self, bot_name, command):
+        if command in self.commands:
+            self.move_bot_wheels(bot_name, command, 100)
+            return self.commands[command] + " command sent"
+        else:
+            return "invalid command"
+
+    # ==================== CHATBOT ==========================================
+
+    def chatbot_compute_answer(self, question: str) -> str:
+        """ Computes answer for [question].
+        Returns: <answer> : string
+        """
+        return self.chatbot.compute_answer(question)
+
+    def update_chatbot_context(self, context: str) -> None:
         """ Update user's context to the Chatbot object
         """
         self.chatbot.update_context(context)
 
-    def update_chatbot_all_context(self, context: str):
+    def update_chatbot_all_context(self, context: str) -> None:
         """ Replaces all context in the Chatbot object
-        with the input context 
+        with the input context.
+
+        Usage: called when user logs in, replaces context with context fetched
+        from database.
         """
         self.chatbot.reset_context()
         self.chatbot.update_context(context)
 
-    def get_chatbot_obj_context(self):
+    def get_chatbot_obj_context(self) -> str:
+        """ Returns all context currently stored in the chatbot object. 
+        """
         return self.chatbot.get_all_context()
 
-    def update_chatbot_context_db(self, user_id, context):
-        """ Update user's context if user exists upon exiting the session
+    def update_chatbot_context_db(self, user_id: str, context: str) -> None:
+        """ Update user's context if user exists upon exiting the session.
         (closing the GUI tab)
         """
         if user_id != "":
-            user = ChatbotT.query.filter_by(id=user_id).first()
-
+            user = ChatbotTable.query.filter_by(id=user_id).first()
+            # print("USER HERE!!!!!!!! " + user)
             # user is not logged in
             if user is None:
                 # make new record in chatbot table
-                new_context = ChatbotT(
+                new_context = ChatbotTable(
                     user_id=user_id,
                     context=context
                 )
                 db.session.add(new_context)
+
             else:
                 # do this if user exists in chatbot database already
                 user.context += ". " + context
@@ -349,14 +380,14 @@ class BaseStation:
             db.session.commit()
         return
 
-    def chatbot_get_context(self, user_id):
+    def chatbot_get_context(self, user_id: str):
         """Gets the stored context for the chatbot based on user_id.
          If user_id is nonexistent or empty, returns an empty
          json object. Otherwise, returns a json object with the context and its
          corresponding user_id """
 
         if user_id != "":
-            user = ChatbotT.query.filter_by(id=user_id).first()
+            user = ChatbotTable.query.filter_by(id=user_id).first()
 
             if user is None:
                 return {'context': '', 'user_id': ''}
@@ -368,150 +399,10 @@ class BaseStation:
         else:
             return {'context': '', 'user_id': ''}
 
-    def chatbot_clear_context(self):
-        self.chatbot.reset_context()
-
-    def chatbot_ask_question(self, question):
-        return self.chatbot.compute_answer(question)
-
-    # ==================== SPEECH RECOGNITION ====================
-    def get_speech_recognition_status(self) -> str:
-        """Retrieves the speech recognition status string"""
-        message = (
-            self.speech_recog_thread.message_queue.pop()
-            if self.speech_recog_thread else ""
-        )
-        # could be None because message_queue.pop() can return None
-        message = "" if message is None else message
-        return message
-
-    def toggle_speech_recognition(self, bot_name: str, command: str) -> None:
-        """Toggles the speech recognition between states of running and stopped"""
-        if command == "START":
-            # create a new thread that listens and converts speech
-            # to text in the background.  Cannot run this non-terminating
-            # function  in the current thread because the current post request
-            # will not terminate and our server will not handle any more
-            # requests.
-            self.speech_recog_thread = StoppableThread(
-                self.speech_recognition, bot_name
-            )
-            self.speech_recog_thread.start()
-        # stop listening
-        elif command == "STOP":
-            if self.speech_recog_thread:
-                self.speech_recog_thread.stop()
-
-    def speech_recognition(
-        self,
-        thread_safe_condition: ThreadSafeVariable,
-        thread_safe_message_queue: ThreadSafeVariable,
-        bot_name: str
-    ) -> None:
-        """ Listens to the user and converts the user's speech to text. 
-        Arguments:
-            thread_safe_condition: This variable is used by the parent function 
-                to stop this speech recognition thread.  As long as this variable
-                is True, the speech recognition service runs.  When it becomes 
-                False, the service exits its loop.
-            thread_safe_message_queue:  The queue of messages to be displayed 
-                on the GUI. Needs to be thread safe because messages are pushed 
-                on to the queue by this thread, and the parent function / thread
-                pops messages from this queue. The parent function relays these 
-                messages to the front-end as the response of a post request.
-            session_id:  Unique identifier for the user's current session.
-            bot_id:  Unique identifier for the Minibot we are connected to 
-                currently.
+    def chatbot_clear_context(self) -> None:
+        """ Resets all context stored in the Chatbot object. 
         """
-        RECORDING_TIME_LIMIT = 5
-        # dictionary of commmands
-        commands = {
-            "forward": "Minibot moves forward",
-            "backward": "Minibot moves backwards",
-            "left": "Minibot moves left",
-            "right": "Minibot moves right",
-            "stop": "Minibot stops",
-        }
-        # open the Microphone as variable microphone
-        with sr.Microphone() as microphone:
-            recognizer = sr.Recognizer()
-            while thread_safe_condition.get_val():
-                thread_safe_message_queue.push("Say something!")
-                try:
-                    # listen for 5 seconds
-                    audio = recognizer.listen(microphone, RECORDING_TIME_LIMIT)
-                    thread_safe_message_queue.push(
-                        "Converting from speech to text")
-
-                    # convert speech to text
-                    words = recognizer.recognize_google(audio)
-
-                    # remove non-alphanumeric characters
-                    regex = re.compile('[^a-zA-Z]')  # removing punctuation
-                    regex.sub('', words)
-                    thread_safe_message_queue.push(f"You said: {words}")
-
-                    # check if the command is valid
-                    if words in commands:
-                        thread_safe_message_queue.push(commands[words])
-                        self.move_bot_wheels(bot_name, words, 100)
-                    else:
-                        thread_safe_message_queue.push("Invalid command!")
-                except sr.WaitTimeoutError:
-                    thread_safe_message_queue.push("Timed out!")
-                except sr.UnknownValueError:
-                    thread_safe_message_queue.push("Words not recognized!")
-
-    # ==================== CHATBOT ====================
-    def chatbot_listening_toggle(bot_name):
-        # start the chatbot_listening_context thread
-        if True: # TODO add condition to start the listening
-            # create a new thread that listens and converts speech
-            # to text in the background.  Cannot run this non-terminating
-            # function  in the current thread because the current post request
-            # will not terminate and our server will not handle any more
-            # requests.
-            self.chatbot_listening_thread = StoppableThread(
-                self.chatbot_listening_context, bot_name
-            )
-            self.chatbot_listening_thread.start()
-        # stop listening
-        elif False: # TODO add condition to stop the thread
-            if self.chatbot_listening_thread:
-                self.chatbot_listening_thread.stop()
-    def chatbot_listening_context(
-        self,
-        thread_safe_condition: ThreadSafeVariable,
-        thread_safe_message_queue: ThreadSafeVariable
-    ) -> None:
-        # bot_name: str
-        recognizer = sr.Recognizer()
-        heard_context = []
-        self.chatbot_temp_context = ""
-        while thread_safe_condition.get_val():
-            try:
-                print("chatbot listening")
-                with sr.Microphone() as microphone:
-                    recognizer = sr.Recognizer()
-                    audio = recognizer.listen(microphone)
-                    words = recognizer.recognize_google(audio)
-                    heard_context.append(words)
-                    print("heard context")
-                    print(heard_context)
-            except sr.WaitTimeoutError:
-                thread_safe_message_queue.push("Timed out!")
-            except sr.UnknownValueError:
-                thread_safe_message_queue.push("Words not recognized!")
-                # send the request
-
-        temp = ' '.join(heard_context)
-        self.chatbot_temp_context = temp if temp != "" else "Nothing was said!"
-        print("temp context is " + self.chatbot_temp_context)
-        # self.chatbot.update_context(' '.join(heard_context))
-        self.chatbot.update_context(self.chatbot_temp_context)
-
-    def chatbot_compute_answer(self, question):
-        return self.chatbot.compute_answer(question)
+        self.chatbot.reset_context()
 
     # ==================== GETTERS and SETTERS ====================
     @property

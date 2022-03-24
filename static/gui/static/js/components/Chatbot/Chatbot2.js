@@ -3,15 +3,15 @@ import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as Icons from '@fortawesome/free-solid-svg-icons';
 
-import { X_BTN, MIC_BTN, MIC_BTNON } from "../utils/Constants.js";
+import { X_BTN, MIC_BTN } from "../utils/Constants.js";
+import SpeechRecognitionComp from "../utils/SpeechRecognitionComp.js";
 
-//speech recognition
-const SpeechRecognition = SpeechRecognition || webkitSpeechRecognition
-const recognition = new SpeechRecognition()
+// const SpeechRecognition = SpeechRecognition || webkitSpeechRecognition
+// const recognition = new SpeechRecognition()
 
-recognition.continous = true
-recognition.interimResults = true
-recognition.lang = 'en-US'
+// recognition.continous = true
+// recognition.interimResults = true
+// recognition.lang = 'en-US'
 
 //Chat messages
 let id = 2;
@@ -124,10 +124,12 @@ function Chatbot2({ }) {
     id++;
     var time = new Date().toLocaleString('en-GB');
     time = time.substring(time.indexOf(',') + 2);
-    const newList = messages.concat({ id: id, who: "self", message: inputText, timeStamp: time});
+    console.log(time);
+    const newList = messages.concat({ id: id, who: "self", message: inputText, timeStamp: time });
     setInputText("");
     setMessages(newList);
-  
+    scrollToBottom();
+
     axios({
       method: 'POST',
       url: '/chatbot-context',
@@ -189,7 +191,6 @@ function Chatbot2({ }) {
     e.preventDefault();
     console.log("toggle mic");
     setMic(!mic);
-    if (mic == false) recognition.stop();
   }
 
   const handleListen = () => {
@@ -320,6 +321,7 @@ function Chatbot2({ }) {
                 toggleMic(e);
               }} />
           </div>
+          <SpeechRecognitionComp setText={setInputText} mic={mic} />
           <button 
           // style={{
           //   width: "30%",

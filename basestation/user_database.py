@@ -65,17 +65,17 @@ class Chatbot(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), unique=True)
     context = db.Column(db.String, nullable=False)
 
-    def __init__ (self, user_id: int, context: str):
+    def __init__(self, user_id: int, context: str):
         self.user_id = user_id
         self.context = context
 
     def add_context(self, new_context: str):
         self.context += new_context
-        
+
     def clear_context(self):
         # set the context to empty string
         self.context = ""
-    
+
     def serialize(self) -> dict:
         return{
             'id': self.user_id,
