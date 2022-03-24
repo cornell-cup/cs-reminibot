@@ -3,7 +3,7 @@ import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as Icons from '@fortawesome/free-solid-svg-icons';
 
-import { X_BTN, MIC_BTN } from "../utils/Constants.js";
+import { X_BTN, MIC_BTN, MIC_BTNON } from "../utils/Constants.js";
 import SpeechRecognitionComp from "../utils/SpeechRecognitionComp.js";
 
 // const SpeechRecognition = SpeechRecognition || webkitSpeechRecognition
@@ -192,38 +192,6 @@ function Chatbot2({ }) {
     console.log("toggle mic");
     setMic(!mic);
   }
-
-  const handleListen = () => {
-    if (mic) {
-      console.log("start listening");
-      recognition.start()
-      recognition.onend = () => recognition.start()
-    } else {
-      recognition.stop()
-      recognition.onend = () => {
-        console.log("Stopped listening per click")
-      }
-    }
-    let finalTranscript = ''
-    recognition.onresult = event => {
-      let interimTranscript = ''
-
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcript = event.results[i][0].transcript;
-        if (event.results[i].isFinal) finalTranscript += transcript + ' ';
-        else interimTranscript += transcript;
-      }
-      // document.getElementById('interim').innerHTML = interimTranscript
-      setInputText(interimTranscript);
-      setInputText(finalTranscript);
-    }
-  }
-
-  useEffect(() => {
-    handleListen();
-    console.log("mic", mic);
-  }, [mic]);
-
 
   const scrollToBottom = () => {
     messagesEndRef.current.scrollIntoView({    
