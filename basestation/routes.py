@@ -62,11 +62,14 @@ def ir():
     if not bot_name:
         error_json = {"error_msg": NO_BOT_ERROR_MSG}
         return json.dumps(error_json), status.HTTP_400_BAD_REQUEST
-    if request.method == 'POST':
-        base_station.start_ir(bot_name)
-        return json.dumps(True), status.HTTP_200_OK
+
+    ir_data = base_station.start_ir(bot_name)
+    if ir_data == -1:
+        received = False
     else:
-        return json.dumps(True), status.HTTP_200_OK
+        received = True
+    response_dict = {"data": ir_data, "received": received}
+    return json.dumps(response_dict), status.HTTP_200_OK
 
 
 @app.route('/script', methods=['POST'])

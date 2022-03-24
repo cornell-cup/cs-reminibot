@@ -34,6 +34,7 @@ class Bot:
         self.last_status_time = time.time()
         self.is_socket_connected = True
         self._script_exec_result = None
+        self.ir_sensor_data = 0
 
     def try_receive_data(self, peek: bool = False) -> Optional[str]:
         """ Tries to receive data from the Minibot. 
@@ -100,6 +101,11 @@ class Bot:
                 self.last_status_time = time.time()
             elif key == "SCRIPT_EXEC_RESULT":
                 self.script_exec_result = value
+            elif key == "IR":
+                if value == "":
+                    self.ir_sensor_data = -1
+                else:
+                    self.ir_sensor_data = int(value)
 
             data_str = data_str[end + token_len:]
 

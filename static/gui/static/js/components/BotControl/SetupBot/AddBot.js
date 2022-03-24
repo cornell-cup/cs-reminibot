@@ -243,6 +243,47 @@ export default class AddBot extends React.Component {
                 else
                     console.log(error);
             });
+
+        /*
+     * Repeatedly call the ErrorMessageHandler in base_station_interface.py
+     * until a non-empty execution result of the Python program is received.
+     */
+        let interval = setInterval(function () {
+            axios({
+                method: 'POST',
+                url: '/ir',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                data: JSON.stringify({
+                    bot_name: _this.props.selectedBotName
+                }),
+            }).then((response) => {
+                console.log(response.data);
+                // if the code is -1 it means the result hasn't arrived yet, hence
+                // we shouldn't clear the interval and should continue polling
+                if (response.data["data"] !== -1) {
+                    // if (response.data["code"] === 1) {
+                    //     // lime green
+                    //     document.getElementById("error-message").style.color = "#32CD32";
+                    // }
+                    // else {
+                    //     // red
+                    //     document.getElementById("error-message").style.color = "#FF0000";
+                    // }
+                    // result has arrived so go ahead and clear the interval (stop polling
+                    // the server)
+
+                    clearInterval(interval);
+                }
+            }).catch((err) => {
+                clearInterval(interval);
+                if (error.response.data.error_msg.length > 0)
+                    window.alert(error.response.data.error_msg);
+                else
+                    console.log(error);
+            })
+        }, 500);
     }
 
     objectDetectionOnClick() {

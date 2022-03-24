@@ -439,8 +439,9 @@ class BaseStation:
         submissions = Submission.query.filter_by(user_id=User.id)
         return submissions
 
-    @make_thread_safe
     def start_ir(self, bot_name: str):
-        """ Starts IR sensor """
+        """ Starts and reads from the IR sensor """
         bot = self.get_bot(bot_name)
         bot.sendKV("IR", "")
+        bot.readKV()
+        return bot.ir_sensor_data
