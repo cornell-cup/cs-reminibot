@@ -36,12 +36,12 @@ export function removeAt(array, index) {
   array.splice(index, 1);
 }
 
-//IMPORTANT: Removes ALL elements with the value for the given property
+//IMPORTANT: returns and array with ALL elements with the value for the given property removed
 export function removeByPropertyValue(array, property, value) {
   return array.filter(element => element[property] !== value);
 }
 
-//IMPORTANT: Removes ALL elements with the value for the given property
+//IMPORTANT: returns and array with ALL elements with the values for the given property removed
 export function removeByPropertyValues(array, property, values) {
   return array.filter(element => !values.includes(element[property]));
 }
@@ -97,7 +97,7 @@ export function getPolygonInfoFromVertices(vertices) {
 export async function readFileAsText(file) {
   let result = await new Promise((resolve) => {
     let fileReader = new FileReader();
-    fileReader.onload = (e) => resolve(fileReader.result);
+    fileReader.onloadend = (e) => resolve(fileReader.result);
     fileReader.readAsText(file);
   });
 

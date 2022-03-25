@@ -147,6 +147,24 @@ def virtual_objects():
     else:
         return json.dumps(base_station.get_virtual_objects()), status.HTTP_200_OK
 
+@app.route('/delete_virtual_room', methods=['POST', 'GET'])
+def delete_virtual_room():
+    """Deletes a virtual enviroment given a virtual_room_id"""
+    if request.method == 'POST':
+        info = request.get_json()
+        print(info)
+        if info and info["virtual_room_id"]:
+            base_station.delete_virtual_room(info["virtual_room_id"])
+            return json.dumps(True), status.HTTP_200_OK
+        else:
+            error_json = {"error_msg": "/delete_virtual_room was not given a virtual_room_id field"}
+            return json.dumps(error_json), status.HTTP_400_BAD_REQUEST
+    else:
+        error_json = {"error_msg": "/delete_virtual_room only accepts post requests"}
+        return json.dumps(error_json), status.HTTP_400_BAD_REQUEST
+
+
+
 
 @app.route('/result', methods=['POST'])
 def error_message_update():
