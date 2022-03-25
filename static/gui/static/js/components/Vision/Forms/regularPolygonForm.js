@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
-import { generateRegularPolygonDeltas } from "../utils/helperFunctions";
-import { VirtualEnviromentContext } from '../../context/VirtualEnviromentContext';
+import { generateRegularPolygonDeltas } from "../../utils/helperFunctions";
+import { VirtualEnviromentContext } from '../../../context/VirtualEnviromentContext';
 import { handleAddObjectFormSubmit } from './FormHandlers';
 
 export default function RegularPolygonForm(props) {

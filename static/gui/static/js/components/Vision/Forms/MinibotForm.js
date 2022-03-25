@@ -1,8 +1,8 @@
 import React, { useContext, useState } from 'react'
-import { VirtualEnviromentContext } from '../../context/VirtualEnviromentContext';
+import { VirtualEnviromentContext } from '../../../context/VirtualEnviromentContext';
 import { handleAddObjectFormSubmit } from './FormHandlers';
 
-export default function CircleForm(props) {
+export default function MinibotForm(props) {
   const step = .01;
   const actions = ["registerPhysicalObject", "addVirtualObject"];
   const [registerPhysicalObject, setRegisterPhysicalObject] = useState(true);
@@ -11,9 +11,9 @@ export default function CircleForm(props) {
   const [x, setX] = useState("");
   const [y, setY] = useState("");
   const [orientation, setOrientation] = useState("");
-  const [radius, setRadius] = useState("");
   const [color, setColor] = useState("#000000");
   const { virtualEnviroment, setVirtualEnviroment } = useContext(VirtualEnviromentContext);
+
 
   function handleFormSubmit(event) {
     event.preventDefault();
@@ -21,9 +21,8 @@ export default function CircleForm(props) {
       id: id,
       virtual_room_id: props.virtualRoomId,
       name: name,
-      type: registerPhysicalObject ? "physical_object" : "virtual_object",
-      shape: "circle",
-      radius: radius,
+      type: "minibot",
+      shape: "cube",
       color: color
     };
     handleAddObjectFormSubmit(registerPhysicalObject, object, virtualEnviroment, clearForm, x, y, orientation);
@@ -34,10 +33,10 @@ export default function CircleForm(props) {
     setName("");
     setX("");
     setY("");
-    setRadius("");
     setOrientation("");
     setColor("#000000");
   }
+
 
   return (
     <React.Fragment>
@@ -56,16 +55,12 @@ export default function CircleForm(props) {
         <br />
         <div className="form-row">
           <div className="form-group col-md-6">
-            <label htmlFor="id">{registerPhysicalObject ? "AprilTag ID" : "Virtual Object ID"}</label>
-            <input type="text" className="form-control mb-2 mr-sm-2" id="id" placeholder={registerPhysicalObject ? "AprilTag ID" : "Virtual Object ID"} value={id} onChange={(e) => { setId(e.target.value.replace(/\s/g, '')) }} />
+            <label htmlFor="id">{registerPhysicalObject ? "AprilTag ID" : "Virtual Minibot ID"}</label>
+            <input type="text" className="form-control mb-2 mr-sm-2" id="id" placeholder={registerPhysicalObject ? "AprilTag ID" : "Virtual Minibot ID"} value={id} onChange={(e) => { setId(e.target.value.replace(/\s/g, '')) }} required />
           </div>
           <div className="form-group col-md-6">
-            <label htmlFor="name">Object name</label>
-            <input type="text" className="form-control mb-2 mr-sm-2" id="name" placeholder="Object name" value={name} onChange={(e) => { setName(e.target.value) }} required />
-          </div>
-          <div className="form-group col-md-2">
-            <label htmlFor="r">Radius</label>
-            <input type="number" className="form-control mb-2 mr-sm-2" id="r" placeholder="Radius" min={step} step={step} value={radius} onChange={(e) => { setRadius(parseFloat(e.target.value)) }} required />
+            <label htmlFor="name">Minibot name</label>
+            <input type="text" className="form-control mb-2 mr-sm-2" id="name" placeholder="Minibot name" value={name} onChange={(e) => { setName(e.target.value) }} required />
           </div>
           <div className="form-group col-md-2">
             <label htmlFor="color">Color</label>
@@ -90,7 +85,6 @@ export default function CircleForm(props) {
         </div>
         <button type="submit" className="btn btn-success">Submit</button>
       </form>
-    </React.Fragment>
-
+    </React.Fragment >
   )
 }

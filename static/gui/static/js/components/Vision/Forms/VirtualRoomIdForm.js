@@ -3,7 +3,6 @@ import { withCookies } from 'react-cookie';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 const VirtualRoomIdForm = (props) => {
-  const step = .01;
   const [virtualRoomId, setVirtualRoomId] = useState(props.virtualRoomId);
 
 

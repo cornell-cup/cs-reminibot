@@ -90,8 +90,14 @@ export default class VirtualEnviroment {
 
   getJSON() {
     return ({
-      virtualObjects: this.virtualObjects,
-      objectMappings: this.objectMappings
+      virtualObjects: this.virtualObjects.map(virtualObject => {
+        virtualObject["virtual_room_id"] = undefined;
+        return virtualObject;
+      }),
+      objectMappings: this.objectMappings.map(objectMapping => {
+        objectMapping["virtual_room_id"] = undefined;
+        return objectMapping;
+      })
     });
   }
 
@@ -100,7 +106,9 @@ export default class VirtualEnviroment {
   }
 
   getDownloadableFileHref() {
-    return 'data:text/plain;charset=utf-8,' + this.getJSONString();
+    let blob = new Blob([this.getJSONString()], { type: "application/json" });
+    let url = window.URL.createObjectURL(blob);
+    return url;
   }
 
 }
