@@ -18,7 +18,7 @@ def app():
     """
     print("creating app")
     app = Flask(
-        __name__, template_folder='../static/gui/', static_folder='../static/gui/static'
+        __name__, template_folder='../../static/gui/', static_folder='../../static/gui/static'
     )
     # create a dummy db so we don't modify the actual db
     db = SQLAlchemy()
@@ -113,34 +113,38 @@ def app():
         db.session.remove()
         db.drop_all()
 
+
     return app
 
     # from basestation.user_database import Program, User
 
+@pytest.fixture(scope = "module")
+def base_station(app):
+    return BaseStation(app.debug)
+
 
 # dont know what is going on below here
 
-def test_add_user(app):
-    print("test")
-    base_station = BaseStation()
+def test_add_user(app, base_station):
+    print("test 1")
 
     assert base_station.register('user', 'pass') == 1
 
 
-def test_get_user(app):
-    base_station = BaseStation()
-    assert base_station.login('user', 'pass')[0] == 1
-    assert base_station.login('user', 'wrongpass')[0] == 0
+# def test_get_user(app, base_station):
+#     print("test 2")
+#     assert base_station.login('user', 'pass')[0] == 1
+#     assert base_station.login('user', 'wrongpass')[0] == 0
 
 
-def test_add_context_entry(app):
-    base_station = BaseStation()
-    id = base_station.get_user_id_by_email('user')
-    print(id)
-    base_station.update_chatbot_context_db(str(id), 'this is context')
-    data = base_station.chatbot_get_context(str(id))
+# def test_add_context_entry(app, base_station):
+#     print("test 3")
+#     id = base_station.get_user_id_by_email('user')
+#     print(id)
+#     base_station.update_chatbot_context_db(str(id), 'this is context')
+#     data = base_station.chatbot_get_context(str(id))
 
-    assert data["context"] == 'this is context'
+#     assert data["context"] == 'this is context'
 
 
 # make a user
@@ -155,4 +159,5 @@ def test_add_context_entry(app):
 
 
 if __name__ == "__main__":
-    pytest.main(["-s", "."])
+    # pytest.main(["-s", "."])
+    pytest.main([])

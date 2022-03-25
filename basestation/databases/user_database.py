@@ -3,8 +3,11 @@ import datetime
 import hashlib
 import os
 import json
-from basestation import db
+# from databases import db
+from flask_sqlalchemy import SQLAlchemy
+from flask import Flask
 
+db = SQLAlchemy()
 
 class Program(db.Model):
     __tablename__ = 'program'

@@ -3,7 +3,7 @@ Main file from which BaseStation Websocket interface begins.
 """
 
 from flask import Flask
-from flask import request, render_template, jsonify, session, redirect
+from flask import Blueprint, request, render_template, jsonify, session, redirect
 from flask_api import status
 import os.path
 import json
@@ -12,34 +12,38 @@ import time
 
 # Minibot imports.
 from basestation.base_station import BaseStation
-from basestation import app
+# from basestation import app
+from flask import current_app
 
-base_station = BaseStation(app.debug)
+base_station = BaseStation(False)
 
 # Error messages
 NO_BOT_ERROR_MSG = "Please connect to a Minibot!"
 
+index_bp = Blueprint('index',
+                     __name__,
+                     url_prefix='/')
 
-@app.route('/start', methods=['GET'])
+@index_bp.route('/start', methods=['GET'])
 def start():
     """ Display the WebGUI """
     return render_template('index.html')
 
 
-@app.route('/discover-bots', methods=['GET'])
+@index_bp.route('/discover-bots', methods=['GET'])
 def discover_bots():
     """ Get all Minibots connected to the Basestation """
     base_station.listen_for_minibot_broadcast()
     return json.dumps(True), status.HTTP_200_OK
 
 
-@app.route('/active-bots', methods=['GET'])
+@index_bp.route('/active-bots', methods=['GET'])
 def active_bots():
     """ Get all Minibots connected to the Basestation """
     return json.dumps(base_station.get_active_bots()), status.HTTP_200_OK
 
 
-@app.route('/wheels', methods=['POST'])
+@index_bp.route('/wheels', methods=['POST'])
 def wheels():
     """ Makes the Minibot move. """
     data = request.get_json()
@@ -53,7 +57,7 @@ def wheels():
     return json.dumps(True), status.HTTP_200_OK
 
 
-@app.route('/script', methods=['POST'])
+@index_bp.route('/script', methods=['POST'])
 def script():
     """ Make Minibot run a Python script """
     data = request.get_json()
@@ -66,7 +70,7 @@ def script():
     return json.dumps(True), status.HTTP_200_OK
 
 
-@app.route('/ports', methods=['POST'])
+@index_bp.route('/ports', methods=['POST'])
 def ports():
     """ Configures which sensors and motors are connected to which ports on the 
     Minibot's PCB (Printed Circuit Board)
@@ -81,7 +85,7 @@ def ports():
     return json.dumps(True), status.HTTP_200_OK
 
 
-@app.route('/mode', methods=['POST'])
+@index_bp.route('/mode', methods=['POST'])
 def mode():
     """ Makes the minibot run in either line follow or object detection mode """
     data = request.get_json()
@@ -94,7 +98,7 @@ def mode():
     return json.dumps(True), status.HTTP_200_OK
 
 
-@app.route('/vision', methods=['POST', 'GET'])
+@index_bp.route('/vision', methods=['POST', 'GET'])
 def vision():
     """Updates vision status"""
     if request.method == 'POST':
@@ -105,7 +109,7 @@ def vision():
         return json.dumps(base_station.get_vision_data()), status.HTTP_200_OK
 
 
-@app.route('/result', methods=['POST'])
+@index_bp.route('/result', methods=['POST'])
 def error_message_update():
     """Returns the result (either a successful execution or an error message) of running the user's code"""
     data = request.get_json()
@@ -124,7 +128,7 @@ def error_message_update():
     return json.dumps(response_dict), status.HTTP_200_OK
 
 
-@app.route('/login/', methods=['POST'])
+@index_bp.route('/login/', methods=['POST'])
 def login():
     """Logs the user in"""
     email = request.form['email']
@@ -143,7 +147,7 @@ def login():
     return json.dumps(response_dict), response_status
 
 
-@app.route('/register/', methods=['POST'])
+@index_bp.route('/register/', methods=['POST'])
 def register_account():
     """Registers the user"""
     email = request.form['email']
@@ -164,7 +168,7 @@ def register_account():
     return json.dumps(response_dict), response_status
 
 
-@app.route('/logout/', methods=['POST'])
+@index_bp.route('/logout/', methods=['POST'])
 def logout():
     """Logs the user out"""
     login_email = base_station.login_email
@@ -177,7 +181,7 @@ def logout():
     return content, status.HTTP_200_OK
 
 
-@app.route('/custom_function/', methods=['POST'])
+@index_bp.route('/custom_function/', methods=['POST'])
 def update_custom_function():
     """Updates the logged in user's custom functions"""
     custom_function = request.form['custom_function']
@@ -189,7 +193,7 @@ def update_custom_function():
         return json.dumps({'error': ''}), status.HTTP_200_OK
 
 
-@app.route('/speech_recognition', methods=['POST', 'GET'])
+@index_bp.route('/speech_recognition', methods=['POST', 'GET'])
 def speech_recognition():
     """Toggles speech recognition on/off for a POST request; returns the first message 
     in the BaseStation speech recognition queue for a GET request"""
@@ -207,7 +211,7 @@ def speech_recognition():
         return json.dumps(), status.HTTP_200_OK
 
 
-@app.route('/bot_voice_control', methods=['POST', 'GET'])
+@index_bp.route('/bot_voice_control', methods=['POST', 'GET'])
 def bot_voice_control():
     """ docstring """
     if request.method == 'POST':
@@ -222,7 +226,7 @@ def bot_voice_control():
         return json.dumps(message), status.HTTP_200_OK
 
 
-@app.route('/chatbot-context', methods=['POST', 'GET'])
+@index_bp.route('/chatbot-context', methods=['POST', 'GET'])
 def chatbot_context():
     if request.method == 'POST':
         data = request.get_json()
@@ -252,7 +256,7 @@ def chatbot_context():
                 return json.dumps({'error': 'Not logged in'}), status.HTTP_401_UNAUTHORIZED
 
 
-@app.route('/chatbot-ask', methods=['POST', 'GET'])
+@index_bp.route('/chatbot-ask', methods=['POST', 'GET'])
 def chatbot_ask():
     if request.method == 'POST':
         data = request.get_json()

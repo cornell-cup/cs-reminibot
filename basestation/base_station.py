@@ -3,8 +3,8 @@ Base Station for the MiniBot.
 """
 
 from basestation.bot import Bot
-from basestation.user_database import Program, User, Chatbot as ChatbotTable
-from basestation import db
+from basestation.databases.user_database import Program, User, Chatbot as ChatbotTable
+from basestation.databases.user_database import db
 from basestation.util.stoppable_thread import StoppableThread, ThreadSafeVariable
 
 from random import choice
@@ -76,15 +76,15 @@ class BaseStation:
         # empty string means 0.0.0.0, which is all IP addresses on the local
         # machine, because some machines can have multiple Network Interface
         # Cards, and therefore will have multiple ip_addresses
-        server_address = ("0.0.0.0", 9434)
+        server_address = ("0.0.0.0", 9343)
 
         # only bind in debug mode if you are the debug server, if you are the
         # monitoring program which restarts the debug server, do not bind,
         # otherwise the debug server won't be able to bind
-        if app_debug and os.environ["WERKZEUG_RUN_MAIN"] == "true":
-            self.sock.bind(server_address)
-        else:
-            self.sock.bind(server_address)
+        # if app_debug and os.environ["WERKZEUG_RUN_MAIN"] == "true":
+            # self.sock.bind(server_address)
+        # else:
+        #     self.sock.bind(server_address)
 
         self._login_email = None
         self.speech_recog_thread = None
@@ -301,8 +301,8 @@ class BaseStation:
         if user:
             return -2
         user = User(email=email, password=password)
-        db.session.add(user)
-        db.session.commit()
+        self.db.session.add(user)
+        self.db.session.commit()
         return 1
 
     def get_user_id_by_email(self, email: str) -> int:
@@ -318,7 +318,7 @@ class BaseStation:
 
         user = User.query.filter(User.email == self.login_email).first()
         user.custom_function = custom_function
-        db.session.commit()
+        self.db.session.commit()
         return True
 
     # ==================== NEW SPEECH RECOGNITION ============================
@@ -371,13 +371,13 @@ class BaseStation:
                     user_id=user_id,
                     context=context
                 )
-                db.session.add(new_context)
+                self.db.session.add(new_context)
 
             else:
                 # do this if user exists in chatbot database already
                 user.context += ". " + context
 
-            db.session.commit()
+            self.db.session.commit()
         return
 
     def chatbot_get_context(self, user_id: str):
