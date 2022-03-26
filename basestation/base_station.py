@@ -77,7 +77,7 @@ class BaseStation:
         # empty string means 0.0.0.0, which is all IP addresses on the local
         # machine, because some machines can have multiple Network Interface
         # Cards, and therefore will have multiple ip_addresses
-        server_address = ("0.0.0.0", 9434)
+        server_address = ("0.0.0.0", 5001)
 
         # only bind in debug mode if you are the debug server, if you are the
         # monitoring program which restarts the debug server, do not bind,
