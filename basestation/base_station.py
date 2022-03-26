@@ -88,6 +88,8 @@ class BaseStation:
         self.speech_recog_thread = None
         self.lock = threading.Lock()
 
+        self.is_reading_ir = False
+
     # ==================== VISION ====================
 
     def update_vision_log(self, value):
@@ -442,6 +444,15 @@ class BaseStation:
     def start_ir(self, bot_name: str):
         """ Starts and reads from the IR sensor """
         bot = self.get_bot(bot_name)
-        bot.sendKV("IR", "")
-        bot.readKV()
+
+        if not self.is_reading_ir:
+            print("SENDING KV")
+            bot.sendKV("IR", "")
+            self.is_reading_ir = True
+        else:
+            print("READING KV")
+            bot.readKV()
+            if bot.ir_sensor_data != "":
+                self.is_reading_ir = False
+
         return bot.ir_sensor_data

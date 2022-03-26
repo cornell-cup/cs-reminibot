@@ -223,26 +223,26 @@ export default class AddBot extends React.Component {
 
     lineFollowOnClick() {
         const _this = this;
-        axios({
-            method: 'POST',
-            url: '/ir', //url to backend endpoint
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            data: JSON.stringify({
-                bot_name: _this.props.selectedBotName,
-            })
-        }).then(function (response) {
-            if (response.data) {
-                console.log(response.data);
-            }
-        })
-            .catch(function (error) {
-                if (error.response.data.error_msg.length > 0)
-                    window.alert(error.response.data.error_msg);
-                else
-                    console.log(error);
-            });
+        // axios({
+        //     method: 'POST',
+        //     url: '/ir', //url to backend endpoint
+        //     headers: {
+        //         'Content-Type': 'application/json'
+        //     },
+        //     data: JSON.stringify({
+        //         bot_name: _this.props.selectedBotName,
+        //     })
+        // }).then(function (response) {
+        //     if (response.data) {
+        //         console.log(response.data);
+        //     }
+        // })
+        //     .catch(function (error) {
+        //         if (error.response.data.error_msg.length > 0)
+        //             window.alert(error.response.data.error_msg);
+        //         else
+        //             console.log(error);
+        //     });
 
         /*
      * Repeatedly call the ErrorMessageHandler in base_station_interface.py
@@ -262,7 +262,7 @@ export default class AddBot extends React.Component {
                 console.log(response.data);
                 // if the code is -1 it means the result hasn't arrived yet, hence
                 // we shouldn't clear the interval and should continue polling
-                if (response.data["data"] !== -1) {
+                if (response.data["data"] != "") {
                     // if (response.data["code"] === 1) {
                     //     // lime green
                     //     document.getElementById("error-message").style.color = "#32CD32";
@@ -278,10 +278,7 @@ export default class AddBot extends React.Component {
                 }
             }).catch((err) => {
                 clearInterval(interval);
-                if (error.response.data.error_msg.length > 0)
-                    window.alert(error.response.data.error_msg);
-                else
-                    console.log(error);
+                console.log(error);
             })
         }, 500);
     }

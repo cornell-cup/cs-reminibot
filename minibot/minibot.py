@@ -346,7 +346,7 @@ class Minibot:
 
             thread = Thread(target=ece.read_ir, args=[return_val])
             thread.start()
-            
+
             while thread.is_alive():
                 time.sleep(0.01)
 
@@ -358,8 +358,12 @@ class Minibot:
             file.write(str(return_val))
             file.close()
 
-            # self.sendKV(sock, key, qq.get(block=True, timeout=timeout))
-            # self.sendKV(sock, key, "VALUE")
+            if return_val == 0:
+                self.sendKV(sock, key, "LOW")
+            elif return_val == 1:
+                self.sendKV(sock, key, "HIGH")
+            else:
+                self.sendKV(sock, key, "")
 
     def sendKV(self, sock: socket, key: str, value: str):
         """ Sends a key-value pair to the specified socket. The key value

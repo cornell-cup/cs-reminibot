@@ -64,7 +64,7 @@ def ir():
         return json.dumps(error_json), status.HTTP_400_BAD_REQUEST
 
     ir_data = base_station.start_ir(bot_name)
-    if ir_data == -1:
+    if ir_data == "":
         received = False
     else:
         received = True
