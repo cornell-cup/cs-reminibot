@@ -19,7 +19,7 @@ QTRSensors qtr;
 #define PN532_RESET (3) // pin 4 of the RJ12 9  (3)
 
 // IR
-int IRPin = 2;
+int IRPin = 7;
 
 int send_data[6];
 
@@ -107,7 +107,8 @@ void read_IR()
 {
   val = digitalRead(IRPin);
 
-  SPDR = val;
+  SPDR = 1;
+  //  Serial.println(val);
 }
 
 void loop()
