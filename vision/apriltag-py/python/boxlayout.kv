@@ -1,3 +1,4 @@
+#:import checkerboard part1_checkerboard
 WindowManager:
 	FirstWindow:
 	InputWindow:
@@ -40,9 +41,7 @@ WindowManager:
 				Rectangle:
 					size: self.size
 					pos: self.pos
-			color: (0, 0, 0, 1)
-
-					
+			color: (0, 0, 0, 1)					
 
 		RoundedButton:
 			font_size: 80
@@ -58,14 +57,14 @@ WindowManager:
 
 	FloatLayout:
 		Label:
-			id: "rows"
+			id: rows
 			markup: True
 			pos_hint: {'center_x': 0.45, 'center_y': 0.9}
 			font_size: 60
 			text: "[b]Number of Rows[/b]: "
 
 		TextInput:
-			id: "rowsInput"
+			id: rowsInput
 			multiline: False
 			input_filter: 'int'
 			pos_hint: {'center_x': 0.63, 'center_y': 0.9}
@@ -76,14 +75,14 @@ WindowManager:
 			font_size: 37
 
 		Label:
-			id: "columns"
+			id: columns
 			markup: True
 			pos_hint: {'center_x': 0.425, 'center_y': 0.8}
 			font_size: 60
 			text: "[b]Number of Columns[/b]: "
 
 		TextInput:
-			id: "columnsInput"
+			id: columnsInput
 			multiline: False
 			pos_hint: {'center_x': 0.63, 'center_y': 0.8}
 			size_hint_y: None
@@ -91,6 +90,34 @@ WindowManager:
 			size_hint_x: None
 			width: 100
 			font_size: 37
+
+		RoundedButton:
+			id: calibrationButton
+			font_size: 80
+			pos_hint: {'center_x': 0.5, 'center_y': 0.2}
+			size_hint: (0.4, 0.1)
+			text: "Begin"
+			on_press:
+				checkerboard.checkerboardTest(int(rowsInput.text), int(columnsInput.text))
+				#calls the checkerboard calibration
+		
+		#FloatLayout:
+			#id: fileChooser
+			#size: (20, 20)
+			#canvas.before:
+				#Color:
+					#rgba: (1,0,0, 1)
+				#RoundedRectangle:
+					#size: self.size
+					#pos: self.pos
+					#radius: [15]
+				#Color:
+					#rgba: (253/255, 245/255, 230/255, 1)
+				#RoundedRectangle:
+					#size: self.width-10, self.height-10
+					#pos: self.x+5, self.y+5
+
+
 
 		#FileChooser: 
 		#	id: fc
