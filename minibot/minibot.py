@@ -341,7 +341,6 @@ class Minibot:
                     self.blockly_python_proc.kill_proc()
                 Thread(target=ece.stop).start()
         elif key == "IR":
-
             return_val = []
 
             thread = Thread(target=ece.read_ir, args=[return_val])
