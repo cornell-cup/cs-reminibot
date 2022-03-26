@@ -13,47 +13,10 @@ from queue import Queue
 import cv2
 from sqlalchemy import true
 import math
-# construct the argument parser and parse the arguments
-ap = argparse.ArgumentParser()
-ap.add_argument("-p", "--prototxt", default='piVision/MobileNetSSD_deploy.prototxt',
-                help="path to Caffe 'deploy' prototxt file")
-ap.add_argument("-m", "--model", default='piVision/MobileNetSSD_deploy.caffemodel',
-                help="path to Caffe pre-trained model")
-ap.add_argument("-c", "--confidence", type=float, default=0.2,
-                help="minimum probability to filter weak detections")
-ap.add_argument("-mW", "--montageW", type=int, default=2,
-                help="montage frame width")
-ap.add_argument("-mH", "--montageH", type=int, default=2,
-                help="montage frame height")
-args = vars(ap.parse_args())
+
 
 # initialize the ImageHub object
 imageHub = imagezmq.ImageHub()
-
-
-# load our serialized model from disk
-print("[INFO] loading model...")
-net = cv2.dnn.readNetFromCaffe(
-    "basestation\piVision\MobileNetSSD_deploy.prototxt", "basestation\piVision\MobileNetSSD_deploy.caffemodel")
-
-
-# initialize the dictionary which will contain  information regarding
-# when a device was last active, then store the last time the check
-# was made was now
-lastActive = {}
-lastActiveCheck = datetime.now()
-
-# stores the estimated number of Pis, active checking period, and
-# calculates the duration seconds to wait before making a check to
-# see if a device was active
-ESTIMATED_NUM_PIS = 4
-ACTIVE_CHECK_PERIOD = 10
-ACTIVE_CHECK_SECONDS = ESTIMATED_NUM_PIS * ACTIVE_CHECK_PERIOD
-
-# assign montage width and height so we can view all incoming frames
-# in a single "dashboard"
-mW = args["montageW"]
-mH = args["montageH"]
 
 # used to record the time when we processed last frame
 prev_frame_time = 0
@@ -74,21 +37,9 @@ while True:
     # receive RPi name and frame from the RPi and acknowledge
     # the receipt
     (rpiName, frame) = imageHub.recv_image()
-    # cv2.imshow("hey", frame)
-    # key = cv2.waitKey(1) & 0xFF
 
 
     imageHub.send_reply(b'OK')
-
-
-    # if a device is not in the last active dictionary then it means
-    # that its a newly connected device
-    # if rpiName not in lastActive.keys():
-    #     print("[INFO] receiving data from {}...".format(rpiName))
-
-    # record the last active time for the device from which we just
-    # received a frame
-    # lastActive[rpiName] = datetime.now()
 
     frame_count += 1
 
@@ -182,6 +133,8 @@ while True:
     else:
       leftRight -= 1
 
+
+    #This print statement isn't displaying anywhere
     if(iteration == 10):
       print("left" if leftRight < 0 else "right")  
     
@@ -197,21 +150,6 @@ while True:
 
     # detect any kepresses
     key = cv2.waitKey(1) & 0xFF
-
-    # if current time *minus* last time when the active device check
-    # was made is greater than the threshold set then do a check
-    # if (datetime.now() - lastActiveCheck).seconds > ACTIVE_CHECK_SECONDS:
-    #     # loop over all previously active devices
-    #     for (rpiName, ts) in list(lastActive.items()):
-    #         # remove the RPi from the last active and frame
-    #         # dictionaries if the device hasn't been active recently
-    #         if (datetime.now() - ts).seconds > ACTIVE_CHECK_SECONDS:
-    #             print("[INFO] lost connection to {}".format(rpiName))
-    #             lastActive.pop(rpiName)
-    #             frameDict.pop(rpiName)
-
-    #     # set the last active check time as current time
-    #     lastActiveCheck = datetime.now()
 
     # if the `q` key was pressed, break from the loop
     if key == ord("q"):
