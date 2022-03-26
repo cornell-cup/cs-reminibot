@@ -5,10 +5,7 @@ import os
 sys.path.append('../../')
 import json
 import pytest
-import unittest
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from basestation.base_station import BaseStation
 from basestation import create_app
 
 

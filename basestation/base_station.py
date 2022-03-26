@@ -76,13 +76,14 @@ class BaseStation:
         # empty string means 0.0.0.0, which is all IP addresses on the local
         # machine, because some machines can have multiple Network Interface
         # Cards, and therefore will have multiple ip_addresses
-        server_address = ("0.0.0.0", 9343)
+        server_address = ("0.0.0.0", 5001)
 
         # only bind in debug mode if you are the debug server, if you are the
         # monitoring program which restarts the debug server, do not bind,
         # otherwise the debug server won't be able to bind
+
         # if app_debug and os.environ["WERKZEUG_RUN_MAIN"] == "true":
-            # self.sock.bind(server_address)
+        #     self.sock.bind(server_address)
         # else:
         #     self.sock.bind(server_address)
 
@@ -291,6 +292,7 @@ class BaseStation:
     def register(self, email: str, password: str) -> int:
         """Registers a new user if the email and password are not null and 
         there is no account associated wth the email yet"""
+        print("registering new account")
         if not email:
             return -1
         if not password:
@@ -301,8 +303,8 @@ class BaseStation:
         if user:
             return -2
         user = User(email=email, password=password)
-        self.db.session.add(user)
-        self.db.session.commit()
+        db.session.add(user)
+        db.session.commit()
         return 1
 
     def get_user_id_by_email(self, email: str) -> int:
@@ -318,7 +320,7 @@ class BaseStation:
 
         user = User.query.filter(User.email == self.login_email).first()
         user.custom_function = custom_function
-        self.db.session.commit()
+        db.session.commit()
         return True
 
     # ==================== NEW SPEECH RECOGNITION ============================
@@ -371,13 +373,13 @@ class BaseStation:
                     user_id=user_id,
                     context=context
                 )
-                self.db.session.add(new_context)
+                db.session.add(new_context)
 
             else:
                 # do this if user exists in chatbot database already
                 user.context += ". " + context
 
-            self.db.session.commit()
+            db.session.commit()
         return
 
     def chatbot_get_context(self, user_id: str):

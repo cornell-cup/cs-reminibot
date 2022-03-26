@@ -29,6 +29,13 @@ def start():
     """ Display the WebGUI """
     return render_template('index.html')
 
+@index_bp.route('/ping', methods=['GET'])
+def ping_pong():
+    print("pinggggggg")
+    return jsonify({
+        'status': 'Epic success',
+        'message': 'pong!'
+    })
 
 @index_bp.route('/discover-bots', methods=['GET'])
 def discover_bots():
@@ -128,7 +135,7 @@ def error_message_update():
     return json.dumps(response_dict), status.HTTP_200_OK
 
 
-@index_bp.route('/login/', methods=['POST'])
+@index_bp.route('/login', methods=['POST'])
 def login():
     """Logs the user in"""
     email = request.form['email']
@@ -147,12 +154,20 @@ def login():
     return json.dumps(response_dict), response_status
 
 
-@index_bp.route('/register/', methods=['POST'])
+@index_bp.route('/register', methods=['POST'])
 def register_account():
     """Registers the user"""
+    print("register route")
+    print(request.form)
     email = request.form['email']
+    print("email", email)
     password = request.form['password']
+    print("password", password)
     response_dict = {"error_msg": ""}
+
+    # response_status = status.HTTP_200_OK
+    # return json.dumps(response_dict), response_status
+    
     login_status = base_station.register(email, password)
     if login_status == -2:
         response_dict["error_msg"] = "Email already exists"
