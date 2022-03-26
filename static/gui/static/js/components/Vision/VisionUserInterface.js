@@ -51,16 +51,15 @@ const VisionUserInterface = (props) => {
           Add Regular Polygon&nbsp;
           <FontAwesomeIcon icon={Icons.faSquare} />
         </button>
-        {/* 
         <button
           title="Add Polygon"
           type="button"
-          className="btn btn-secondary"
+          className="btn btn-danger mb-2 mr-sm-2"
           onClick={() => { setFormId(3) }}
         >
           Add Polygon&nbsp;
           <FontAwesomeIcon icon={Icons.faDrawPolygon} />
-        </button> */}
+        </button>
         <button
           title="Add Minibot"
           type="button"

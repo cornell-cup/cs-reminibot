@@ -1,22 +1,28 @@
 import { FontAwesomeIcon } from '@fortawesome/free-solid-svg-icons';
 import * as Icons from "@fortawesome/free-solid-svg-icons";
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext, useRef } from 'react'
 import { withCookies } from 'react-cookie';
 import { VirtualEnviromentContext } from '../../../context/VirtualEnviromentContext';
-import { handleVirtualEnviromentForm } from './FormHandlers';
+import { handleVirtualEnviromentImportForm } from './FormHandlers';
 
 const ImportVirtualEnviromentForm = (props) => {
 
   const { virtualEnviroment, _setVirtualEnviroment } = useContext(VirtualEnviromentContext);
   const [virtualEnviromentFile, setVirtualEnviromentFile] = useState(null);
+  const fileInput = useRef("");
 
   function handleFormSubmit(event) {
     event.preventDefault();
-    handleVirtualEnviromentForm(virtualEnviroment, virtualEnviromentFile, props.virtualRoomId);
+    handleVirtualEnviromentImportForm(virtualEnviroment, virtualEnviromentFile, props.virtualRoomId, clearForm);
   }
 
   function hasValidFile(files) {
     return files && files.length > 0 && files[0];
+  }
+
+  function clearForm() {
+    document.querySelector("#virtualEnviromentFile").value = "";
+    setVirtualEnviromentFile(null)
   }
 
   return (
@@ -27,7 +33,7 @@ const ImportVirtualEnviromentForm = (props) => {
             <label htmlFor="id">Virtual Enviroment File</label>
             <div class="input-group">
               <div class="custom-file">
-                <input type="file" class="custom-file-input" id="virtualEnviromentFile" accept=".json" onChange={(e) => {
+                <input type="file" ref={fileInput} class="custom-file-input" id="virtualEnviromentFile" accept=".json" onChange={(e) => {
                   if (hasValidFile(e.target.files)) {
                     setVirtualEnviromentFile(e.target.files[0]);
                   }
