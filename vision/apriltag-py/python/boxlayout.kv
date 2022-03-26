@@ -1,0 +1,116 @@
+WindowManager:
+	FirstWindow:
+	InputWindow:
+
+<FirstWindow>
+	name: "first"
+
+	BoxLayout:
+		size: root.width, root.height
+		padding: 50
+		spacing: 10
+		orientation: "vertical"
+
+		Label: 
+			font_size: 90
+			text: "Calibration"
+			background_color: (153/255, 158/255, 154/255, 1)
+			pos_hint: {'center_x': 0.5}
+			size_hint: (1, 0.2)
+			canvas.before:
+				Color:
+					rgba: self.background_color
+				Rectangle:
+					size: self.size
+					pos: self.pos
+			color: (0, 0, 0, 1)
+
+		Label: 
+			font_size: 40
+			text_size: root.width, root.height
+			valign: "center"
+			halign: "center"
+			text: "<description>"
+			background_color: (153/255, 158/255, 154/255, 1)
+			pos_hint: {'center_x': 0.5}
+			size_hint: (1, 1)
+			canvas.before:
+				Color:
+					rgba: self.background_color
+				Rectangle:
+					size: self.size
+					pos: self.pos
+			color: (0, 0, 0, 1)
+
+					
+
+		RoundedButton:
+			font_size: 80
+			text: "Start"
+			pos_hint: {'center_x': 0.5}
+			size_hint: (0.5, 0.2)
+			on_release: 
+				app.root.current = "input"
+			
+
+<InputWindow>
+	name: "input"
+
+	FloatLayout:
+		Label:
+			id: "rows"
+			markup: True
+			pos_hint: {'center_x': 0.45, 'center_y': 0.9}
+			font_size: 60
+			text: "[b]Number of Rows[/b]: "
+
+		TextInput:
+			id: "rowsInput"
+			multiline: False
+			input_filter: 'int'
+			pos_hint: {'center_x': 0.63, 'center_y': 0.9}
+			size_hint_y: None
+			height: 60
+			size_hint_x: None
+			width: 100
+			font_size: 37
+
+		Label:
+			id: "columns"
+			markup: True
+			pos_hint: {'center_x': 0.425, 'center_y': 0.8}
+			font_size: 60
+			text: "[b]Number of Columns[/b]: "
+
+		TextInput:
+			id: "columnsInput"
+			multiline: False
+			pos_hint: {'center_x': 0.63, 'center_y': 0.8}
+			size_hint_y: None
+			height: 60
+			size_hint_x: None
+			width: 100
+			font_size: 37
+
+		#FileChooser: 
+		#	id: fc
+		#	FileChooserIconLayout
+		#	FileChooserListLayout
+
+		
+
+
+
+
+
+
+<RoundedButton@Button>
+	background_color: (0,0,0,0)
+	background_normal: ''
+	canvas.before:
+		Color:
+			rgba: (0,139/255,139/255,1)
+		RoundedRectangle:
+			size: self.size
+			pos: self.pos
+			radius: [40]
