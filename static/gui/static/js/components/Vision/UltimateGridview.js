@@ -6,7 +6,7 @@ import { withCookies } from "react-cookie";
 import Vector from "./CollisionDetection/Vector";
 import Matter from "matter-js";
 import { cloneDeep, has, isEqual } from "lodash"
-import { getCurrentTimeMilliseconds, indexArrayByProperty, radiansToDegrees, sleep } from "../utils/helperFunctions";
+import { getCurrentTimeMilliseconds, indexArrayByProperty, isValidDetection, radiansToDegrees, sleep } from "../utils/helperFunctions";
 import { PythonCodeContext } from "../../context/PythonCodeContext";
 import { VirtualEnviromentContext } from '../../context/VirtualEnviromentContext';
 
@@ -44,7 +44,7 @@ const UltimateGridView = (props) => {
   const [virtualRoomId, setVirtualRoomId] = useState(props.cookies.get('virtual_room_id'));
   const [boundaryIds, _setBoundaryIds] = useState([]);
   const [engine, _setEngine] = useState(Matter.Engine.create({ gravity: { scale: 0 } }));
-  const { virtualEnviroment, _setVirtualEnviroment } = useContext(VirtualEnviromentContext);
+  const { virtualEnviroment, setVirtualEnviroment } = useContext(VirtualEnviromentContext);
 
 
   useEffect(() => {
@@ -98,7 +98,12 @@ const UltimateGridView = (props) => {
       const objectInfo = detectionToObjectInfoMap[minibotId];
       //if detection already maps to objectInfo entry
       if (objectInfo) {
+
         const object = Matter.Composite.get(engine.world, objectInfo["id"], objectInfo["type"]);
+        if (!object) {
+          delete detectionToObjectInfoMap[detection["id"]];
+          clearInterval(programProgressionInfo["intervalId"]);
+        }
         const currentOrientation = object.angle;
         const currentX = object.position["x"];
         const currentY = object.position["y"];
@@ -168,6 +173,11 @@ const UltimateGridView = (props) => {
   }
 
   const updateEngine = () => {
+    for (const detection of detections) {
+      if (!isValidDetection(detection)) {
+        throw new Error("Missing require fields to add shape to physics engine.")
+      }
+    }
     const allBodies = Matter.Composite.allBodies(engine.world);
     const allNonBoundaryBodies = allBodies.filter(body => !boundaryIds.includes(body.id))
     if (resetRequested["value"]) {
@@ -176,6 +186,9 @@ const UltimateGridView = (props) => {
         const removeResult = Matter.Composite.remove(engine.world, allNonBoundaryBodies[i]);
       }
 
+      for (const id in detectionToObjectInfoMap) {
+        delete detectionToObjectInfoMap[id];
+      }
 
       //add all detections
       addDetections(detections);
@@ -196,7 +209,14 @@ const UltimateGridView = (props) => {
           //and the detection is NOT a physical object
           const previousDetectionWithSameId = previousDetections[detection["id"]];
           if (!detection["is_physical"] && isEqual(previousDetectionWithSameId, detection)) {
-            bodiesToRemain.push(Matter.Composite.get(engine.world, objectInfo["id"], objectInfo["type"]));
+            const bodyToRemain = Matter.Composite.get(engine.world, objectInfo["id"], objectInfo["type"]);
+            if (bodyToRemain) {
+              bodiesToRemain.push(bodyToRemain);
+            }
+            else {
+              delete detectionToObjectInfoMap[detection["id"]];
+            }
+
           }
           //and detection is a physical object
           else {
@@ -284,11 +304,13 @@ const UltimateGridView = (props) => {
     const id = detection["id"];
     const x_pos = parseFloat(detection["x"]);
     const y_pos = parseFloat(detection["y"]);
+    //inverted orientation since the display rotates clockwise, but detected angles are counter clockwise
+    const orientation_radians = -parseFloat(detection["orientation"]) * Math.PI / 180;
+
+
     const is_physical = detection["is_physical"]
     const x = (props.world_width / 2 + x_pos);
     const y = (props.world_height / 2 - y_pos);
-    //inverted orientation since the display rotates clockwise, but detected angles are counter clockwise
-    const orientation_radians = -parseFloat(detection["orientation"]) * Math.PI / 180;
     const width = detection["width"] ? detection["width"] : unknownMeasure;
     const height = detection["length"] ? detection["length"] : unknownMeasure;
     const radius = detection["radius"] ? detection["radius"] : unknownMeasure;
@@ -454,12 +476,22 @@ const UltimateGridView = (props) => {
     let objects = [];
 
     for (const detection of detections) {
+      if (!isValidDetection(detection)) {
+        throw new Error("Missing require fields to add shape to physics engine.")
+      }
       const detectionClone = cloneDeep(detection)
       const objectInfo = detectionToObjectInfoMap[detectionClone["id"]];
       //if detection already maps to objectInfo entry
       if (objectInfo) {
 
         const physicsEnginedBody = Matter.Composite.get(engine.world, objectInfo["id"], objectInfo["type"]);
+
+
+        if (!physicsEnginedBody) {
+          delete detectionToObjectInfoMap[detection["id"]];
+          continue;
+        }
+
         detectionClone["x"] = physicsEnginedBody.position["x"];
         detectionClone["y"] = physicsEnginedBody.position["y"];
         detectionClone["orientation"] = radiansToDegrees(physicsEnginedBody.angle);
@@ -549,7 +581,8 @@ const UltimateGridView = (props) => {
       (currentValue) => new Vector(currentValue['x'], currentValue['y'])
     );
     const text_vertices = deltas_to_vertices.reduce(
-      (previousValue, currentValue) => `${previousValue} ${x + scaleFactor * currentValue['x']},${y + scaleFactor * currentValue['y']}`,
+      //y - scaleFactor * currentValue['y'] because the top left hand corner is (0,0)
+      (previousValue, currentValue) => `${previousValue} ${x + scaleFactor * currentValue['x']},${y - scaleFactor * currentValue['y']}`,
       ""
     );
 
@@ -681,6 +714,18 @@ const UltimateGridView = (props) => {
   }
 
   const renderSVG = () => {
+    let renderedObjects = <React.Fragment></React.Fragment>;
+    try {
+      renderedObjects = renderObjects();
+    }
+    catch (e) {
+      alert(`It seems like you might have a corrupted virtual enviroment. Sorry, but we will have to reset it now.${e}`);
+      virtualEnviroment.virtualObjects = [];
+      virtualEnviroment.objectMappings = [];
+      virtualEnviroment.synchronizeRemoteVirtualEnviromentWithLocal(virtualRoomId).then((res) => {
+        setVirtualEnviroment(virtualEnviroment);
+      });
+    }
     return (
       <svg
         width={props.view_width}
@@ -691,7 +736,7 @@ const UltimateGridView = (props) => {
       >
         <g transform={`translate(${widthPadding},${heightPadding})`}>
           {renderGrid()}
-          {renderObjects()}
+          {renderedObjects}
         </g>
       </svg>
     );
@@ -741,7 +786,18 @@ const UltimateGridView = (props) => {
   }
 
 
-  updateEngine();
+  try {
+    updateEngine();
+  }
+  catch (e) {
+    alert(`It seems like you might have a corrupted virtual enviroment. Sorry, but we will have to reset it now. ${e}`);
+    virtualEnviroment.virtualObjects = [];
+    virtualEnviroment.objectMappings = [];
+    virtualEnviroment.synchronizeRemoteVirtualEnviromentWithLocal(virtualRoomId).then((res) => {
+      setVirtualEnviroment(virtualEnviroment);
+    });
+  }
+
 
   return (
     <React.Fragment>
@@ -758,7 +814,7 @@ const UltimateGridView = (props) => {
         Reset
       </button>
       <label htmlFor="minibotId">Virtual Minibot ID</label>
-      <input type="text" className="form-control mb-2 mr-sm-2" id="minibotId" placeholder="Object name" value={minibotId} onChange={(e) => { setMinibotId(e.target.value) }} />
+      <input type="text" className="form-control mb-2 mr-sm-2" id="minibotId" placeholder="Object ID" value={minibotId} onChange={(e) => { setMinibotId(e.target.value) }} />
       <button
         onClick={runCode}
         className="btn btn-secondary ml-1"

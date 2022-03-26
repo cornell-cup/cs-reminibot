@@ -129,7 +129,8 @@ export default function RegularPolygonForm(props) {
               className="form-control mb-2 mr-sm-2"
               id="numberOfSides"
               placeholder="Number of sides"
-              step={step}
+              step={1}
+              min={3}
               value={numberOfSides}
               onChange={(e) => {
                 setNumberOfSides(parseFloat(e.target.value));

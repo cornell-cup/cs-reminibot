@@ -107,3 +107,13 @@ export async function readFileAsText(file) {
 export const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 export const getCurrentTimeMilliseconds = () => (new Date()).getMilliseconds();
+
+export const isValidDetection = (detection) => {
+
+  const isObject = typeof detection === 'object' && detection !== null;
+  const hasValidId = typeof detection["id"] === 'string' && detection["id"] !== "";
+  const hasValidX = typeof detection["x"] === 'number';
+  const hasValidY = typeof detection["y"] === 'number';
+  const hasValidOrientation = typeof detection["orientation"] === 'number';
+  return isObject && hasValidId && hasValidX && hasValidY && hasValidOrientation;
+}

@@ -1,3 +1,4 @@
+import axios from "axios";
 import { readFileAsText, removeByPropertyValue, removeByPropertyValues } from "./helperFunctions";
 
 export default class VirtualEnviroment {
@@ -23,6 +24,8 @@ export default class VirtualEnviroment {
     this.getJSON = this.getJSON.bind(this);
     this.getJSONString = this.getJSONString.bind(this);
     this.getDownloadableFileHref = this.getDownloadableFileHref.bind(this);
+
+    this.synchronizeRemoteVirtualEnviromentWithLocal = this.synchronizeRemoteVirtualEnviromentWithLocal.bind(this);
   }
 
   static async createEnviromentFromFile(file) {
@@ -109,6 +112,19 @@ export default class VirtualEnviroment {
     let blob = new Blob([this.getJSONString()], { type: "application/json" });
     let url = window.URL.createObjectURL(blob);
     return url;
+  }
+
+  async synchronizeRemoteVirtualEnviromentWithLocal(virtualRoomId) {
+    await axios.post("/delete_virtual_room", { virtual_room_id: virtualRoomId });
+
+    try {
+      await axios.post("/object-mapping", { add: true, mappings: this.objectMappings });
+      await axios.post("/virtual-objects", { add: true, virtual_objects: this.virtualObjects });
+      alert(`Your virtual enviroment has been imported successfully!`);
+    }
+    catch (e) {
+      alert(`Sorry, there was an issue importing the virtual enviroment from the given file. ${e}`);
+    }
   }
 
 }

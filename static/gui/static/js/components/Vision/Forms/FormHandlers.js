@@ -33,7 +33,7 @@ export const handleAddObjectFormSubmit = (registerPhysicalObject, object, virtua
         clearForm();
       })
       .catch(function (error) {
-        alert(`Sorry, there was an issue adding your virtual object ${object["name"]}.`);
+        alert(`Sorry, there was an issue adding your virtual object ${object["name"]}. ${error}`);
       });
     virtualEnviroment.addVirtualObject(object);
   }
@@ -77,7 +77,7 @@ export const handleRemoveObjectFormSubmit = (registerPhysicalObject, object, vir
 
 }
 
-export function handleVirtualEnviromentForm(virtualEnviroment, virtualEnviromentFile, virtualRoomId) {
+export function handleVirtualEnviromentImportForm(virtualEnviroment, virtualEnviromentFile, virtualRoomId, clearForm) {
   VirtualEnviroment.createEnviromentFromFile(virtualEnviromentFile).then(async importedVirtualEnviroment => {
     virtualEnviroment.virtualObjects = importedVirtualEnviroment.virtualObjects.map(
       virtualObject => {
@@ -92,16 +92,10 @@ export function handleVirtualEnviromentForm(virtualEnviroment, virtualEnviroment
       }
     );
 
-    await axios.post("/delete_virtual_room", { virtual_room_id: virtualRoomId });
-
-    try {
-      await axios.post("/object-mapping", { add: true, mappings: virtualEnviroment.objectMappings });
-      await axios.post("/virtual-objects", { add: true, virtual_objects: virtualEnviroment.virtualObjects });
-      alert(`Your virtual enviroment has been imported successfully!`);
-    }
-    catch (e) {
-      alert(`Sorry, there was an issue importing the virtual enviroment from the given file. ${e}`);
-    }
-  }).catch(e => alert(`Sorry, there was an issue importing the virtual enviroment from the given file. ${e}`));
+    await virtualEnviroment.synchronizeRemoteVirtualEnviromentWithLocal(virtualRoomId);
+    clearForm();
+  }).catch(e => { alert(`Sorry, there was an issue importing the virtual enviroment from the given file. ${e}`); clearForm(); });
 }
+
+
 
