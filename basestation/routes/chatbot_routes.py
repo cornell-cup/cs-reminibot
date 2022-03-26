@@ -1,0 +1,56 @@
+from flask import Flask
+from flask import Blueprint, request, render_template, session, redirect
+from flask_api import status
+import os.path
+import json
+import sys
+import time
+
+# Minibot imports.
+from .basestation_init import base_station
+from flask import current_app
+
+# Error messages
+NO_BOT_ERROR_MSG = "Please connect to a Minibot!"
+
+chatbot_bp = Blueprint('chatbot',
+                     __name__,
+                     url_prefix='/')
+
+@chatbot_bp.route('/chatbot-context', methods=['POST', 'GET'])
+def chatbot_context():
+    if request.method == 'POST':
+        print("route to chatbot context")
+        data = request.get_json()
+        command = data['command']
+        if command == 'update':
+            print("update chatbot local context")
+            context = data['context']
+            base_station.update_chatbot_context(context)
+            return json.dumps(True), status.HTTP_200_OK
+        elif command == 'clear':
+            base_station.chatbot_clear_context()
+            return json.dumps(True), status.HTTP_200_OK
+        elif command == 'get-all-local-context':
+            context = base_station.get_chatbot_obj_context()
+            return json.dumps({"context": context}), status.HTTP_200_OK
+        elif command == 'commit-to-db':
+            base_station.update_chatbot_context_db()
+            return json.dumps(True), status.HTTP_200_OK
+        elif command == 'get-all-db-context':
+            # TODO properly deal with guest users?
+            user = base_station.login_email
+            if user != "":
+                answer = base_station.chatbot_get_context()
+                return json.dumps(answer), status.HTTP_200_OK
+            else:
+                return json.dumps({'error': 'Not logged in'}), status.HTTP_401_UNAUTHORIZED
+
+
+@chatbot_bp.route('/chatbot-ask', methods=['POST', 'GET'])
+def chatbot_ask():
+    if request.method == 'POST':
+        data = request.get_json()
+        question = data['question']
+        answer = base_station.chatbot_ask_question(question)
+        return json.dumps(answer), status.HTTP_200_OK

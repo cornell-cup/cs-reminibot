@@ -2,8 +2,11 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 from .user_database import db
 
-# from basestation import db
 
-# def init_app(app):
-#   db.init_app(app)
+def init_app(app):
+  db_filename = 'program.db'
+  app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_filename}'  
+  db.init_app(app)
+
+
 

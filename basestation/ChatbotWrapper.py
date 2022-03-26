@@ -31,7 +31,8 @@ class ChatbotWrapper:
     def get_latest_context(self):
         return self.context_stack[-1]
 
-    def get_all_context(self):
+    def get_all_context(self) -> list[str]:
+        '''Returns all local context as a list.'''
         return self.context_stack
 
     def reset_context(self):

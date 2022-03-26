@@ -303,13 +303,19 @@ class BaseStation:
         if user:
             return -2
         user = User(email=email, password=password)
+        context = ChatbotTable(
+                    user_id=user.id,
+                    context=''
+        )
+        db.session.add(context)
         db.session.add(user)
         db.session.commit()
+        self.login(email, password)
         return 1
 
     def get_user_id_by_email(self, email: str) -> int:
-        id = User.query.filter(User.email == self.login_email).first()
-        return id
+        user = User.query.filter(User.email == email).first()
+        return user.id
 
     def update_custom_function(self, custom_function: str) -> bool:
         """Adds custom function(s) for the logged in user if there is a user 
@@ -359,38 +365,35 @@ class BaseStation:
         """
         return self.chatbot.get_all_context()
 
-    def update_chatbot_context_db(self, user_id: str, context: str) -> None:
+    def update_chatbot_context_db(self) -> None:
         """ Update user's context if user exists upon exiting the session.
         (closing the GUI tab)
         """
-        if user_id != "":
-            user = ChatbotTable.query.filter_by(id=user_id).first()
-            # print("USER HERE!!!!!!!! " + user)
-            # user is not logged in
-            if user is None:
-                # make new record in chatbot table
-                new_context = ChatbotTable(
-                    user_id=user_id,
-                    context=context
-                )
-                db.session.add(new_context)
-
-            else:
-                # do this if user exists in chatbot database already
-                user.context += ". " + context
-
+        user_email = self.login_email
+        if user_email is not None:
+            # get user_id from user_email
+            print("user email", user_email)
+            user_id = self.get_user_id_by_email(user_email)
+            print("user id", user_id)
+            user = ChatbotTable.query.filter_by(id=user_id)
+            # get current context from chatbot_wrapper
+            new_context = ' '.join(self.chatbot.get_all_context())
+            # commit it to the db
+            user.update({'context': new_context})
             db.session.commit()
         return
 
-    def chatbot_get_context(self, user_id: str):
+    def chatbot_get_context(self):
         """Gets the stored context for the chatbot based on user_id.
          If user_id is nonexistent or empty, returns an empty
          json object. Otherwise, returns a json object with the context and its
          corresponding user_id """
 
-        if user_id != "":
-            user = ChatbotTable.query.filter_by(id=user_id).first()
+        user_email = self.login_email
 
+        if user_email is not None:
+            user_id = self.get_user_id_by_email(user_email)
+            user = ChatbotTable.query.filter_by(id=user_id).first()
             if user is None:
                 return {'context': '', 'user_id': ''}
             else:
