@@ -1,3 +1,16 @@
+""" Test file for chatbot database.
+
+*** IMPORTANT ***
+The test will not pass unless 
+
+
+
+Command to run: python chatbot_db_test.py
+"""
+
+
+
+
 # import bs
 # Minibot imports.
 import sys
@@ -60,35 +73,66 @@ def test_add_user(client):
     data = json.loads(response.data.decode())
     print(response)
     assert response.status_code == 200
-        
-
-# @pytest.fixture(scope = "module")
-# def base_station(app):
-#     return BaseStation(app.debug)
 
 
-# dont know what is going on below here
+def test_add_local_context(client):
+    """Test that adding context works"""
+    # change local context
+    response = client.post(
+        '/chatbot-context',
+        data = json.dumps(dict(
+            command = 'update',
+            context = "the sky is green."
+        )),
+        content_type='application/json'
+    )
+    data = json.loads(response.data.decode())
+    assert response.status_code == 200
 
-# def test_add_user(app, base_station):
-#     print("test 1")
+def test_get_local_context(client):
+    # make sure local context was updated
+    response = client.post(
+        '/chatbot-context',
+        data = json.dumps(dict(
+        command = 'get-all-local-context',
+        )),
+        content_type='application/json'
+    )
+    data = json.loads(response.data.decode())
+    returned_context = data['context']
+    assert response.status_code == 200
+    assert "the sky is green" in ' '.join(returned_context).lower()
+    assert "the sky is blue" in ' '.join(returned_context).lower()
 
-#     assert base_station.register('user', 'pass') == 1
+def test_commit_local_context(client):
+    # commit it to db
+    response = client.post(
+        '/chatbot-context',
+        data = json.dumps(dict(command = 'commit-to-db')),
+        content_type='application/json'
+    )
+    data = json.loads(response.data.decode())
+    assert response.status_code == 200
+    
+def test_get_db_context(client):
+    # get back what we just committed
+    response = client.post(
+        '/chatbot-context',
+        data = json.dumps(dict(command = 'get-all-db-context')),
+        content_type='application/json'
+    )
+    data = json.loads(response.data.decode())
+    returned_context = data['context']
+    assert response.status_code == 200
+    assert "the sky is green" in (returned_context).lower()
+    assert "the sky is blue" in (returned_context).lower()
 
+# TODO corner cases:
+# log in without registering
+# add/get context without logging in
+# 
 
-# def test_get_user(app, base_station):
-#     print("test 2")
-#     assert base_station.login('user', 'pass')[0] == 1
-#     assert base_station.login('user', 'wrongpass')[0] == 0
-
-
-# def test_add_context_entry(app, base_station):
-#     print("test 3")
-#     id = base_station.get_user_id_by_email('user')
-#     print(id)
-#     base_station.update_chatbot_context_db(str(id), 'this is context')
-#     data = base_station.chatbot_get_context(str(id))
-
-#     assert data["context"] == 'this is context'
+    
 
 
 # make a user
