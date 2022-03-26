@@ -531,3 +531,10 @@ table {
   border-radius: 25px;
   padding: 5px 5px 5px 5px;
 }
+
+
+/* IR STUFF */
+.ir-label{
+  color: white;
+  font-size: 18px;
+}
