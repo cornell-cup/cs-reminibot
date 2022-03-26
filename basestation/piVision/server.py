@@ -3,10 +3,8 @@
 
 # import the necessary packages
 from imutils import build_montages
-from datetime import datetime
 import numpy as np
 from imagezmq import imagezmq
-import argparse
 import imutils
 import time
 from queue import Queue
