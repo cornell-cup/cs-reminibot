@@ -8,10 +8,11 @@ import numpy as np
 from imagezmq import imagezmq
 import argparse
 import imutils
-import cv2
 import time
 from queue import Queue
-
+import cv2
+from sqlalchemy import true
+import math
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-p", "--prototxt", default='piVision/MobileNetSSD_deploy.prototxt',
@@ -29,23 +30,12 @@ args = vars(ap.parse_args())
 # initialize the ImageHub object
 imageHub = imagezmq.ImageHub()
 
-# initialize the list of class labels MobileNet SSD was trained to
-# detect, then generate a set of bounding box colors for each class
-CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat",
-           "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
-           "dog", "horse", "motorbike", "person", "pottedplant", "sheep",
-           "sofa", "train", "tvmonitor"]
 
 # load our serialized model from disk
 print("[INFO] loading model...")
 net = cv2.dnn.readNetFromCaffe(
     "basestation\piVision\MobileNetSSD_deploy.prototxt", "basestation\piVision\MobileNetSSD_deploy.caffemodel")
 
-# initialize the consider set (class labels we care about and want
-# to count), the object count dictionary, and the frame  dictionary
-CONSIDER = set(["dog", "person", "car"])
-objCount = {obj: 0 for obj in CONSIDER}
-frameDict = {}
 
 # initialize the dictionary which will contain  information regarding
 # when a device was last active, then store the last time the check
@@ -64,8 +54,6 @@ ACTIVE_CHECK_SECONDS = ESTIMATED_NUM_PIS * ACTIVE_CHECK_PERIOD
 # in a single "dashboard"
 mW = args["montageW"]
 mH = args["montageH"]
-print("[INFO] detecting: {}...".format(", ".join(obj for obj in
-                                                 CONSIDER)))
 
 # used to record the time when we processed last frame
 prev_frame_time = 0
@@ -76,6 +64,8 @@ new_frame_time = 0
 frame_count = 0
 
 fps = 0
+leftRight = 0
+iteration = 0 
 
 frame_time_queue = Queue(maxsize=5)
 
@@ -84,16 +74,21 @@ while True:
     # receive RPi name and frame from the RPi and acknowledge
     # the receipt
     (rpiName, frame) = imageHub.recv_image()
+    # cv2.imshow("hey", frame)
+    # key = cv2.waitKey(1) & 0xFF
+
+
     imageHub.send_reply(b'OK')
+
 
     # if a device is not in the last active dictionary then it means
     # that its a newly connected device
-    if rpiName not in lastActive.keys():
-        print("[INFO] receiving data from {}...".format(rpiName))
+    # if rpiName not in lastActive.keys():
+    #     print("[INFO] receiving data from {}...".format(rpiName))
 
     # record the last active time for the device from which we just
     # received a frame
-    lastActive[rpiName] = datetime.now()
+    # lastActive[rpiName] = datetime.now()
 
     frame_count += 1
 
@@ -117,52 +112,79 @@ while True:
     # by using putText function
     fps = str(fps)
 
+    iteration+=1
+    if iteration > 10:
+      iteration = 0
+      leftRight = 0
+
     # resize the frame to have a maximum width of 400 pixels, then
     # grab the frame dimensions and construct a blob
     frame = imutils.resize(frame, width=700, inter=cv2.INTER_NEAREST)
-    (h, w) = frame.shape[:2]
-    # blob = cv2.dnn.blobFromImage(cv2.resize(frame, (300, 300)),
-    #                              0.007843, (300, 300), 127.5)
 
-    # pass the blob through the network and obtain the detections and
-    # predictions
-    # net.setInput(blob)
-    # detections = net.forward()
+                 
+    # Convert BGR to HSV
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-    # reset the object count for each object in the CONSIDER set
-    #objCount = {obj: 0 for obj in CONSIDER}
+    # define blue color range
+    light_blue = np.array([50,50,50])
+    dark_blue = np.array([150,255,255])
 
-    # loop over the detections
-    # for i in np.arange(0, detections.shape[2]):
-    #     # extract the confidence (i.e., probability) associated with
-    #     # the prediction
-    #     confidence = detections[0, 0, i, 2]
+    #light_blue = np.array([50,50,50])
+    #dark_blue = np.array([150,255,255])
 
-    #     # filter out weak detections by ensuring the confidence is
-    #     # greater than the minimum confidence
-    #     if confidence > args["confidence"]:
-    #         # extract the index of the class label from the
-    #         # detections
-    #         idx = int(detections[0, 0, i, 1])
+    # Threshold the HSV image to get only blue colors
+    mask = cv2.inRange(hsv, light_blue, dark_blue)
 
-    #         # check to see if the predicted class is in the set of
-    #         # classes that need to be considered
-    #         if CLASSES[idx] in CONSIDER:
-    #             # increment the count of the particular object
-    #             # detected in the frame
-    #             objCount[CLASSES[idx]] += 1
+    # Bitwise-AND mask and original image
+    output = cv2.bitwise_and(frame,frame, mask= mask)
 
-    #             # compute the (x, y)-coordinates of the bounding box
-    #             # for the object
-    #             box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
-    #             (startX, startY, endX, endY) = box.astype("int")
+    gray = cv2.cvtColor(output, cv2.COLOR_BGR2GRAY)
 
-    #             # draw the bounding box around the detected object on
-    #             # the frame
-    #             cv2.rectangle(frame, (startX, startY), (endX, endY),
-    #                           (255, 0, 0), 2)
+    ret, binary = cv2.threshold(gray, 100, 255, cv2.THRESH_OTSU)
 
-    # draw the sending device name on the frame
+    invertedBinary = ~binary
+
+    contours, hierarchy = cv2.findContours(invertedBinary, cv2.RETR_TREE,
+    cv2.CHAIN_APPROX_SIMPLE)
+
+    for c in contours:
+      area = cv2.contourArea(c)
+
+      if area < 20:
+        cv2.fillPoly(binary, pts=[c], color=0)
+
+    binary = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (51,51)))
+    contours, hierarchy = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+
+    rows = len(binary)
+    cols = len(binary[0])
+    middle = cols/2
+    diff = rows * cols 
+    if(len(contours) == 0):
+      continue
+
+    con = contours[0]
+    cen = 0
+
+    for c in contours:
+      center,radius = cv2.minEnclosingCircle(c)
+      cen = center[0]
+      area = cv2.contourArea(c)
+      circle = math.pi * radius * radius
+      if(abs(circle-area)/((area + circle)/2) < diff):
+        diff = circle - area 
+        con = c 
+    
+    with_Circularcontours = cv2.drawContours(frame, [con], 0, (0, 255, 0),3)
+
+    if(cen > middle): 
+      leftRight += 1
+    else:
+      leftRight -= 1
+
+    if(iteration == 10):
+      print("left" if leftRight < 0 else "right")  
+    
     cv2.putText(frame, rpiName, (10, 25),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
 
@@ -170,23 +192,7 @@ while True:
     cv2.putText(frame, fps, (650, 30), cv2.FONT_HERSHEY_SIMPLEX,
                 1, (100, 255, 0), 3, cv2.LINE_AA)
 
-    # draw the object count on the frame
-    # label = ", ".join("{}: {}".format(obj, count) for (obj, count) in
-    #                   objCount.items())
-    # cv2.putText(frame, label, (10, h - 20),
-    #             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-
-    # update the new frame in the frame dictionary
-    # frameDict[rpiName] = frame
-
-    # build a montage using images in the frame dictionary
-    # montages = build_montages(frameDict.values(), (w, h), (mW, mH))
-
-    # display the montage(s) on the screen
-    # for (i, montage) in enumerate(montages):
-    #     cv2.imshow("On-Bot Video Stream ({})".format(i),
-    #                montage)
-    #print(i, datetime.now())
+    
     cv2.imshow("On-Bot Video Stream", frame)
 
     # detect any kepresses
