@@ -221,29 +221,8 @@ export default class AddBot extends React.Component {
     //     });
     // }
 
-    lineFollowOnClick() {
+    startIROnClick() {
         const _this = this;
-        // axios({
-        //     method: 'POST',
-        //     url: '/ir', //url to backend endpoint
-        //     headers: {
-        //         'Content-Type': 'application/json'
-        //     },
-        //     data: JSON.stringify({
-        //         bot_name: _this.props.selectedBotName,
-        //     })
-        // }).then(function (response) {
-        //     if (response.data) {
-        //         console.log(response.data);
-        //     }
-        // })
-        //     .catch(function (error) {
-        //         if (error.response.data.error_msg.length > 0)
-        //             window.alert(error.response.data.error_msg);
-        //         else
-        //             console.log(error);
-        //     });
-
         /*
      * Repeatedly call the ErrorMessageHandler in base_station_interface.py
      * until a non-empty execution result of the Python program is received.
@@ -260,25 +239,15 @@ export default class AddBot extends React.Component {
                 }),
             }).then((response) => {
                 console.log(response.data);
-                // if the code is -1 it means the result hasn't arrived yet, hence
+                // if the code is "" it means the result hasn't arrived yet, hence
                 // we shouldn't clear the interval and should continue polling
                 if (response.data["data"] != "") {
-                    // if (response.data["code"] === 1) {
-                    //     // lime green
-                    //     document.getElementById("error-message").style.color = "#32CD32";
-                    // }
-                    // else {
-                    //     // red
-                    //     document.getElementById("error-message").style.color = "#FF0000";
-                    // }
-                    // result has arrived so go ahead and clear the interval (stop polling
-                    // the server)
-
+                    document.getElementById("ir-value").value = response.data["data"];
                     clearInterval(interval);
                 }
             }).catch((err) => {
                 clearInterval(interval);
-                console.log(error);
+                console.log(err);
             })
         }, 500);
     }
@@ -357,9 +326,12 @@ export default class AddBot extends React.Component {
                 <div className="container">
                     <div className="row">
                         <div className="col horizontalDivCenter">
-                            <p className="small-title"> Custom Modes </p>
-                            <button className="btn btn-success element-wrapper mr-1" onClick={() => this.objectDetectionOnClick()}>Object Detection</button>
-                            <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.lineFollowOnClick()}>Line Follow</button>
+                            <p className="small-title"> Sensor Data </p>
+                            {/* <button className="btn btn-success element-wrapper mr-1" onClick={() => this.objectDetectionOnClick()}>Object Detection</button> */}
+                            <div className="element-wrapper">
+                                <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.startIROnClick()}>Start IR</button>
+                                <label id='ir-value' className='ir-label'></label>
+                            </div>
                         </div>
                     </div>
                     <br />
