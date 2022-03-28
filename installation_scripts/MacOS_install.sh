@@ -4,14 +4,19 @@ cd ../..
 
 # installing brew
 echo "Installing brew."
+sleep 5
 sudo /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 # general dependencies installation
 echo "Installing general dependencies."
+sleep 5
+brew update 
 brew upgrade 
+brew cleanup
 brew install git
 brew install python
 brew install node
+sudo chown -R $(whoami) ~/.npm
 npm install npm@latest -g
 brew install portaudio
 brew install --cask anaconda
@@ -19,22 +24,27 @@ brew install cmake
 
 # basestation dependecnies installation
 echo "Installing basestation dependencies."
+sleep 5
 cd cs-reminibot/basestation
 
 # Attempting normal basestation dependencies installation.
 echo "Attempting normal basestation dependencies installation."
+sleep 5
 pip3 install -r requirements.txt
 
 # Attempting to install scipy with brew.
 echo "Attempting to install scipy with brew."
+sleep 5
 brew install scipy
 
 # Attempting normal basestation dependencies installation again.
 echo "Attempting normal basestation dependencies installation again."
+sleep 5
 pip3 install -r requirements.txt
 
 # Attempting manual basestation dependencies installation with correct versions.
 echo "Attempting manual basestation dependencies installation with correct versions."
+sleep 5
 pip3 install bcrypt==3.1.7   
 pip3 install cffi==1.14.5
 pip3 install click==6.7        
@@ -57,6 +67,7 @@ pip3 install control
 
 # Attempting manual basestation dependencies installation with any versions.
 echo "Attempting manual basestation dependencies installation with any versions."
+sleep 5
 pip3 install bcrypt   
 pip3 install cffi
 pip3 install click        
@@ -79,6 +90,7 @@ pip3 install control
 
 # Attempting installing pyaudio with anaconda.
 echo "Attempting installing pyaudio with anaconda."
+sleep 5
 conda install pyaudio
 
 cd ..
@@ -88,10 +100,12 @@ cd static/gui
 
 # Attempting normal GUI dependencies installation.
 echo "Attempting normal GUI dependencies installation." 
+sleep 5
 npm install
 
 # Attempting forceful GUI dependencies installation.
 echo "Attempting forceful GUI dependencies installation." 
+sleep 5
 npm install --force
 
 cd ../..
@@ -101,10 +115,12 @@ cd vision/apriltag-py/python
 
 # Attempting to install Vision dependencies.
 echo "Attempting to install Vision dependencies."
+sleep 5
 pip3 install -r requirements.txt
 
 # Attempting to install AprilTag dependencies.
 echo "Attempting to install AprilTag dependencies."
+sleep 5
 cd ..
 mkdir build
 cd build
