@@ -807,19 +807,19 @@ const UltimateGridView = (props) => {
       >
         {displayOn ? "Stop Displaying Field" : "Display Field"}
       </button>}
+      <label htmlFor="minibotId">Virtual Minibot ID</label>
+      <input type="text" className="form-control mb-2 mr-sm-2" id="minibotId" placeholder="Object ID" value={minibotId} onChange={(e) => { setMinibotId(e.target.value) }} />
+      <button
+        onClick={runCode}
+        className="btn btn-success ml-1"
+      >
+        Run Code
+      </button>
       <button
         onClick={() => { setResetRequested({ value: true }) }}
         className="btn btn-secondary ml-1"
       >
         Reset
-      </button>
-      <label htmlFor="minibotId">Virtual Minibot ID</label>
-      <input type="text" className="form-control mb-2 mr-sm-2" id="minibotId" placeholder="Object ID" value={minibotId} onChange={(e) => { setMinibotId(e.target.value) }} />
-      <button
-        onClick={runCode}
-        className="btn btn-secondary ml-1"
-      >
-        Run Code
       </button>
       <br />
       <TransformWrapper
