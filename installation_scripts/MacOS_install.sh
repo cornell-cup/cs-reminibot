@@ -4,7 +4,7 @@ cd ../..
 
 # installing brew
 echo "Installing brew."
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+sudo /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 # general dependencies installation
 echo "Installing general dependencies."
