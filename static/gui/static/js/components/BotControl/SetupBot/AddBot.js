@@ -13,6 +13,7 @@ import {
     CARROT_EXPAND,
     INFO_ICON
 } from '../../utils/Constants.js';
+import SensorPopup from '../SensorPopup.js';
 
 export default class AddBot extends React.Component {
     constructor(props) {
@@ -23,6 +24,7 @@ export default class AddBot extends React.Component {
             botList: [],
             power: 50,
             showPorts: false,
+            showSensorPopup: false,
         };
 
         // Needed to use a ref for react
@@ -221,36 +223,6 @@ export default class AddBot extends React.Component {
     //     });
     // }
 
-    startIROnClick() {
-        const _this = this;
-        /*
-     * Repeatedly call the ErrorMessageHandler in base_station_interface.py
-     * until a non-empty execution result of the Python program is received.
-     */
-        let interval = setInterval(function () {
-            axios({
-                method: 'POST',
-                url: '/ir',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                data: JSON.stringify({
-                    bot_name: _this.props.selectedBotName
-                }),
-            }).then((response) => {
-                console.log(response.data);
-                // if the code is "" it means the result hasn't arrived yet, hence
-                // we shouldn't clear the interval and should continue polling
-                if (response.data["data"] != "") {
-                    document.getElementById("ir-value").value = response.data["data"];
-                    clearInterval(interval);
-                }
-            }).catch((err) => {
-                clearInterval(interval);
-                console.log(err);
-            })
-        }, 500);
-    }
 
     objectDetectionOnClick() {
         const _this = this;
@@ -327,11 +299,11 @@ export default class AddBot extends React.Component {
                     <div className="row">
                         <div className="col horizontalDivCenter">
                             <p className="small-title"> Sensor Data </p>
-                            {/* <button className="btn btn-success element-wrapper mr-1" onClick={() => this.objectDetectionOnClick()}>Object Detection</button> */}
                             <div className="element-wrapper">
-                                <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.startIROnClick()}>Start IR</button>
+                                <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.setState({ showSensorPopup: !this.state.showSensorPopup })}>Start IR</button>
                                 <label id='ir-value' className='ir-label'></label>
                             </div>
+                            {<SensorPopup /> && this.state.showSensorPopup}
                         </div>
                     </div>
                     <br />
