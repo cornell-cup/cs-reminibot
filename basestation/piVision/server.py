@@ -92,10 +92,6 @@ while True:
   (rpiName, frame) = imageHub.recv_image()
   imageHub.send_reply(b'OK')
 
-  cv2.imshow("On-Bot Video Stream", frame)
-  # detect any kepresses
-  key = cv2.waitKey(1) & 0xFF
-
   # if a device is not in the last active dictionary then it means
   # that its a newly connected device
   if rpiName not in lastActive.keys():
@@ -183,7 +179,7 @@ while True:
 
     
   #draw the object count on the frame
-  label = ", ".join("{}: {}".format(obj, count) for (obj, count) inobjCount.items())
+  label = ", ".join("{}: {}".format(obj, count) for (obj, count) in objCount.items())
   cv2.putText(frame, label, (10, h - 20),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
   #update the new frame in the frame dictionary
