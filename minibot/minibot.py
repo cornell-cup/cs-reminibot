@@ -358,9 +358,9 @@ class Minibot:
             file.close()
 
             if return_val[0] == 0:
-                self.sendKV(sock, key, "LOW")
-            elif return_val[0] == 1:
                 self.sendKV(sock, key, "HIGH")
+            elif return_val[0] == 1:
+                self.sendKV(sock, key, "LOW")
             else:
                 self.sendKV(sock, key, "")
 

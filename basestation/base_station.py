@@ -447,6 +447,7 @@ class BaseStation:
 
         if not self.is_reading_ir:
             print("SENDING KV")
+            bot.ir_sensor_data = ""
             bot.sendKV("IR", "")
             self.is_reading_ir = True
         else:
