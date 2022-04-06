@@ -18,11 +18,17 @@ default_context = "The sky is blue."
 SUCCESS = 200
 FAILURE = 400
 
+#TODO:
+# 1. Replace context stack with new context stack
+
 
 class ChatbotWrapper:
 
     def __init__(self, context=default_context):
         self.context_stack = [context]  # context
+
+    def replace_context_stack(self, context_stack):
+        self.context_stack = context_stack
 
     def update_context(self, context):
         if context != "":

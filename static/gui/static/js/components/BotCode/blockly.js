@@ -708,7 +708,7 @@ export default class MinibotBlockly extends React.Component {
         let temp = _this.props.customBlockList;
         axios({
             method: 'POST',
-            url: '/login/',
+            url: '/',
             data: formData,
             headers: { 'Content-Type': 'multipart/form-data' }
         }).then((response) => {

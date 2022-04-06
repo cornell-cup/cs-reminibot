@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect} from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as Icons from '@fortawesome/free-solid-svg-icons';
@@ -34,7 +34,7 @@ const defaultFontSize = {
   }
 }
 
-function Chatbot2({ }) {
+function Chatbot2({ setParentContext }) {
   const [open, setOpen] = useState(false);
   const [expand, setExpand] = useState("");
   const [enter, setEnter] = useState("");
@@ -47,12 +47,12 @@ function Chatbot2({ }) {
   const [fullSize, setFullSize] = useState(false);
 
   const styles = {
-    leftWindow:{
+    leftWindow: {
       width: fullSize ? "50%" : "25%",
       height: fullSize ? "80%" : "60%",
       left: "10px",
     },
-    rightWindow:{
+    rightWindow: {
       width: fullSize ? "50%" : "25%",
       height: fullSize ? "80%" : "60%",
       right: "10px",
@@ -61,7 +61,7 @@ function Chatbot2({ }) {
   };
   const [fontSize, setFontSize] = useState(defaultFontSize);
   const [canChangeFont, setCanChangeFont] = useState(false);
-  const[scroll, setScroll]= useState(false);
+  const [scroll, setScroll] = useState(false);
 
 
   const changeInputText = (event) => {
@@ -129,7 +129,7 @@ function Chatbot2({ }) {
     setInputText("");
     setMessages(newList);
     scrollToBottom();
-
+    setParentContext(inputText);
     axios({
       method: 'POST',
       url: '/chatbot-context',
@@ -194,18 +194,19 @@ function Chatbot2({ }) {
   }
 
   const scrollToBottom = () => {
-    messagesEndRef.current.scrollIntoView({    
-    block: "nearest",
-    inline: "center",
-    behavior: "smooth",
-    alignToTop: false });
+    messagesEndRef.current.scrollIntoView({
+      block: "nearest",
+      inline: "center",
+      behavior: "smooth",
+      alignToTop: false
+    });
   }
 
   useEffect(() => {
-    if (messages && messagesEndRef.current){
+    if (messages && messagesEndRef.current) {
       console.log("scroll");
       scrollToBottom();
-      messagesEndRef.current.scrollIntoView({block: 'center', inline: 'nearest'});
+      messagesEndRef.current.scrollIntoView({ block: 'center', inline: 'nearest' });
     }
   }, [messages]);
 
@@ -231,15 +232,15 @@ function Chatbot2({ }) {
   //   }
   // }
 
- 
+
 
   return (
-    <div class={"floating-chat enter " + expand} style={expand === "expand" ? (right ? styles.leftWindow : styles.rightWindow) : styles.empty} 
-    onClick={(e) => openChatbox(e)}> {/* add 'expand' to class for this to turn into a chat */}
+    <div class={"floating-chat enter " + expand} style={expand === "expand" ? (right ? styles.leftWindow : styles.rightWindow) : styles.empty}
+      onClick={(e) => openChatbox(e)}> {/* add 'expand' to class for this to turn into a chat */}
       <i class="fa fa-comments" aria-hidden={true}></i>
       <div class={"chat " + enter}> {/* add 'enter' to class for the rest to display */}
         <div class="header">
-          <button style={{transform: "scale(1.25,1)"}} onClick={(e) => switchSide(e)}>
+          <button style={{ transform: "scale(1.25,1)" }} onClick={(e) => switchSide(e)}>
             <FontAwesomeIcon icon={right ? Icons.faAngleRight : Icons.faAngleLeft} />
           </button>
           <button onClick={(e) => toggleWindowSize(e)}>
@@ -247,13 +248,13 @@ function Chatbot2({ }) {
           </button>
           <button class="popup">
             <FontAwesomeIcon icon={Icons.faEllipsisV} onClick={(e) => toggleChangeFont(e)} />
-            <span class="popuptext" id="myPopup" style={ canChangeFont ? {visibility: 'visible'} : {visibility: 'hidden'}}>
-              <FontAwesomeIcon style={{transform: "scale(0.75, 0.75)"}} onClick={(e) => changeFontSize(e, -1)} icon={Icons.faFont} />&nbsp;&nbsp;
+            <span class="popuptext" id="myPopup" style={canChangeFont ? { visibility: 'visible' } : { visibility: 'hidden' }}>
+              <FontAwesomeIcon style={{ transform: "scale(0.75, 0.75)" }} onClick={(e) => changeFontSize(e, -1)} icon={Icons.faFont} />&nbsp;&nbsp;
               <FontAwesomeIcon onClick={(e) => changeFontSize(e, 1)} icon={Icons.faFont} />
             </span>
           </button>
           &nbsp;
-          <span class="title" style={ fontSize.header }>
+          <span class="title" style={fontSize.header}>
             Chatbot uwu
           </span>
           <div style={{ width: "10px", height: "10px", }}>
@@ -267,15 +268,15 @@ function Chatbot2({ }) {
         <ul class="messages">
           {messages.map((item) => (
             <li class={item.who} key={item.id} time={item.timeStamp} style={fontSize.body}>{item.message}<br /><br /><div id="msgTime">Me {item.timeStamp}</div></li>
-          ))}  
+          ))}
         </ul>
         <div class="footer">
           <input class="text-box" id="textbox" onChange={changeInputText} value={inputText}
             onKeyPress={(e) => {
-              if (e.key === 'Enter') {sendContext(e);}
-              if (e.key === '`') {sendQuestion(e); }
-            }}>  
-          
+              if (e.key === 'Enter') { sendContext(e); }
+              if (e.key === '`') { sendQuestion(e); }
+            }}>
+
           </input>
           <div style={{ width: "50px", height: "50px", }}>
             <input type="image"
@@ -290,19 +291,19 @@ function Chatbot2({ }) {
               }} />
           </div>
           <SpeechRecognitionComp setText={setInputText} mic={mic} />
-          <button 
-          // style={{
-          //   width: "30%",
-          //   fontSize: "10px", //too slow if coded as window.screen.availWidth * 0.01
-          //   borderRadius: "20%",
-          // }} 
-          onClick={(e) => {sendContext(e); }}><FontAwesomeIcon icon={Icons.faPaperPlane} />  
-         </button>
-         <button onClick={(e) => {sendQuestion(e); }}><FontAwesomeIcon icon={Icons.faQuestion} />
-         </button>
-         <div ref={messagesEndRef} />
+          <button
+            // style={{
+            //   width: "30%",
+            //   fontSize: "10px", //too slow if coded as window.screen.availWidth * 0.01
+            //   borderRadius: "20%",
+            // }} 
+            onClick={(e) => { sendContext(e); }}><FontAwesomeIcon icon={Icons.faPaperPlane} />
+          </button>
+          <button onClick={(e) => { sendQuestion(e); }}><FontAwesomeIcon icon={Icons.faQuestion} />
+          </button>
+          <div ref={messagesEndRef} />
         </div>
-      </div> 
+      </div>
     </div>
   );
 }

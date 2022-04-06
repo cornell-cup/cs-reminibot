@@ -1,0 +1,16 @@
+.contextHistoryTab {
+  color: white;
+}
+
+.contextHistoryList {
+  transform: rotate(180deg);
+}
+
+/* .contextHistoryList ContextBox {
+  transform: rotate(-180deg);
+} doesnt work ;- ; */
+
+.contextBox {
+  transform: rotate(-180deg);
+  background: gray;
+}

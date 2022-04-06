@@ -66,7 +66,7 @@ class LoginModal extends React.Component {
 
         axios({
             method: 'POST',
-            url: '/login/',
+            url: '/login',
             data: formData,
             headers: { 'Content-Type': 'multipart/form-data' }
         }).then((response) => {

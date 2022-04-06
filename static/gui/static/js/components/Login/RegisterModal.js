@@ -4,7 +4,7 @@ import { withCookies, Cookies } from 'react-cookie';
 // import { Form, Button, Card } from 'react-bootstrap';
 
 class RegisterModal extends React.Component {
-    
+
     constructor(props) {
         // super();
         super(props);
@@ -43,7 +43,7 @@ class RegisterModal extends React.Component {
             && formData.get('password') == formData.get('password_confirmation')) {
             axios({
                 method: 'POST',
-                url: '/register/',
+                url: '/register',
                 data: formData,
                 // data: {
                 //     email: this.state.email,
@@ -57,7 +57,7 @@ class RegisterModal extends React.Component {
 
 
                 this.props.cookies.set('current_user_email', formData.get('email'), { path: '/' });
-    this.setState({ current_user_email :  formData.get('email')});
+                this.setState({ current_user_email: formData.get('email') });
                 // this.handleCloseModal();
             })
                 .catch((error) => {

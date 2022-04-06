@@ -86,6 +86,7 @@ class BaseStation:
         #     self.sock.bind(server_address)
         # else:
         #     self.sock.bind(server_address)
+        # self.sock.bind(server_address)
 
         self._login_email = None
         self.speech_recog_thread = None
@@ -349,6 +350,11 @@ class BaseStation:
         """ Update user's context to the Chatbot object
         """
         self.chatbot.update_context(context)
+
+    def replace_context_stack(self, context_stack) -> None:
+        """ Replace chatbot obj contextStack with <context_stack>.
+        """ 
+        self.chatbot.replace_context_stack(context_stack)
 
     def update_chatbot_all_context(self, context: str) -> None:
         """ Replaces all context in the Chatbot object

@@ -28,6 +28,11 @@ def chatbot_context():
             context = data['context']
             base_station.update_chatbot_context(context)
             return json.dumps(True), status.HTTP_200_OK
+        elif command == "replace-context-stack":
+            context_stack = data['contextStack']
+            print(context_stack)
+            base_station.replace_context_stack(context_stack)
+            return json.dumps(True), status.HTTP_200_OK
         elif command == 'clear':
             base_station.chatbot_clear_context()
             return json.dumps(True), status.HTTP_200_OK
@@ -52,5 +57,5 @@ def chatbot_ask():
     if request.method == 'POST':
         data = request.get_json()
         question = data['question']
-        answer = base_station.chatbot_ask_question(question)
+        answer = base_station.chatbot_compute_answer(question)
         return json.dumps(answer), status.HTTP_200_OK

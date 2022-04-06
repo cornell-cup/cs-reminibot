@@ -7,7 +7,7 @@ and these same two lines are
 UNCOMMENTED in basestation/databases/__init__.py
 
 THE TWO LINES:
-# db_filename = 'program.db'
+# db_filename = 'program.db' #or 'test.db' in chatbot_db_test.py
 # app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_filename}'  
 
 ******************
