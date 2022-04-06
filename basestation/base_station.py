@@ -85,8 +85,7 @@ class BaseStation:
         # if app_debug and os.environ["WERKZEUG_RUN_MAIN"] == "true":
         #     self.sock.bind(server_address)
         # else:
-        #     self.sock.bind(server_address)
-        # self.sock.bind(server_address)
+        self.sock.bind(server_address)
 
         self._login_email = None
         self.speech_recog_thread = None
@@ -164,6 +163,7 @@ class BaseStation:
 
     def add_bot(self, port: int, ip_address: str, bot_name: str = None):
         """ Adds a bot to the list of active bots """
+        print("added bot")
         if not bot_name:
             # bot name is "minibot" + <last three digits of ip_address> + "_" +
             # <port number>
@@ -305,8 +305,8 @@ class BaseStation:
             return -2
         user = User(email=email, password=password)
         context = ChatbotTable(
-                    user_id=user.id,
-                    context=''
+            user_id=user.id,
+            context=''
         )
         db.session.add(context)
         db.session.add(user)
@@ -336,7 +336,7 @@ class BaseStation:
             self.move_bot_wheels(bot_name, command, 100)
             return self.commands[command] + " command sent"
         else:
-            return "invalid command"
+            return "invalid commands"
 
     # ==================== CHATBOT ==========================================
 
@@ -371,12 +371,12 @@ class BaseStation:
         """
         return self.chatbot.get_all_context()
 
-    def update_chatbot_context_db(self) -> None:
+    def update_chatbot_context_db(self) -> int:
         """ Update user's context if user exists upon exiting the session.
         (closing the GUI tab)
         """
         user_email = self.login_email
-        if user_email is not None:
+        if user_email is not None and user_email != "":
             # get user_id from user_email
             print("user email", user_email)
             user_id = self.get_user_id_by_email(user_email)
@@ -387,7 +387,8 @@ class BaseStation:
             # commit it to the db
             user.update({'context': new_context})
             db.session.commit()
-        return
+            return 1
+        return -1
 
     def chatbot_get_context(self):
         """Gets the stored context for the chatbot based on user_id.
@@ -397,7 +398,7 @@ class BaseStation:
 
         user_email = self.login_email
 
-        if user_email is not None:
+        if user_email is not None and user_email != "":
             user_id = self.get_user_id_by_email(user_email)
             user = ChatbotTable.query.filter_by(id=user_id).first()
             if user is None:
