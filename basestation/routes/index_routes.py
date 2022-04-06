@@ -185,6 +185,7 @@ def register_account():
 
 @index_bp.route('/logout/', methods=['POST'])
 def logout():
+    print("logged out")
     """Logs the user out"""
     login_email = base_station.login_email
     if login_email == "":
@@ -192,7 +193,7 @@ def logout():
         return content, status.HTTP_400_BAD_REQUEST
 
     content = {'success': 'user ' + login_email + ' was logged out.'}
-    login_email = ""
+    base_station.login_email = ""
     return content, status.HTTP_200_OK
 
 
@@ -210,35 +211,18 @@ def update_custom_function():
 
 @index_bp.route('/speech_recognition', methods=['POST', 'GET'])
 def speech_recognition():
-    """Toggles speech recognition on/off for a POST request; returns the first message 
-    in the BaseStation speech recognition queue for a GET request"""
+    """Sends the voice command to the connected minibot."""
     if request.method == 'POST':
         data = request.get_json()
         bot_name = data['bot_name']
         if not bot_name:
-            error_json = {"error_msg": NO_BOT_ERROR_MSG}
-            return json.dumps(error_json), status.HTTP_400_BAD_REQUEST
+            # error_json = {"error_msg": NO_BOT_ERROR_MSG}
+            # return json.dumps(error_json), status.HTTP_400_BAD_REQUEST
+            print( data["command"])
         command = data["command"]
-        print(command)
+        # print(command)
         base_station.send_command(bot_name, command)
         return json.dumps(True), status.HTTP_200_OK
     else:
         return json.dumps(), status.HTTP_200_OK
-
-
-@index_bp.route('/bot_voice_control', methods=['POST', 'GET'])
-def bot_voice_control():
-    """ docstring """
-    if request.method == 'POST':
-        data = request.get_json()
-        bot_name = data['bot_name']
-        if not bot_name:
-            error_json = {"error_msg": NO_BOT_ERROR_MSG}
-            return json.dumps(error_json), status.HTTP_400_BAD_REQUEST
-        command = data["command"]
-        # send ece command
-        message = base_station.send_command(bot_name, command)
-        return json.dumps(message), status.HTTP_200_OK
-
-
 
