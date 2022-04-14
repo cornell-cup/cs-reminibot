@@ -1,7 +1,10 @@
 #:import checkerboard part1_checkerboard
+#:import tagcalib part2_tag_calib
 WindowManager:
 	FirstWindow:
 	InputWindow:
+	ProgressWindow:
+
 
 <FirstWindow>
 	name: "first"
@@ -52,6 +55,7 @@ WindowManager:
 				app.root.current = "input"
 			
 
+
 <InputWindow>
 	name: "input"
 
@@ -94,35 +98,77 @@ WindowManager:
 		RoundedButton:
 			id: calibrationButton
 			font_size: 80
-			pos_hint: {'center_x': 0.5, 'center_y': 0.2}
+			pos_hint: {'center_x': 0.5, 'center_y': 0.1}
 			size_hint: (0.4, 0.1)
 			text: "Begin"
 			on_press:
+				app.root.current: "progress"
 				checkerboard.checkerboardTest(int(rowsInput.text), int(columnsInput.text))
-				#calls the checkerboard calibration
-		
-		#FloatLayout:
-			#id: fileChooser
-			#size: (20, 20)
-			#canvas.before:
-				#Color:
-					#rgba: (1,0,0, 1)
-				#RoundedRectangle:
-					#size: self.size
-					#pos: self.pos
-					#radius: [15]
-				#Color:
-					#rgba: (253/255, 245/255, 230/255, 1)
-				#RoundedRectangle:
-					#size: self.width-10, self.height-10
-					#pos: self.x+5, self.y+5
+				#calls the checkerboard calibration and stuff before switching to the results window
 
+				#calling part2 of calibration
+
+				
+
+
+		RoundedButton:
+			id: fileChooser
+			canvas.before:
+				Color:
+					rgba: (0,1/255,1/255,1)
+				RoundedRectangle:
+					size: self.size
+					pos: self.pos
+					radius: [10]
+			font_size: 20
+			pos_hint: {'center_x': 0.5, 'center_y': 0.3}
+			size_hint: (0.2, 0.1)
+			text: "Select File"
+			on_press: root.isShowChooser = not root.isShowChooser
+			
+				
+
+	BoxLayout:
+		#layout for the FileChooser
+		orientation: 'vertical'
+		size_hint_y: 1 if root.isShowChooser else 0
+		size_hint_x: 1 if root.isShowChooser else 0
+		pos_hint: {'center_x': 0.5, 'center_y': 0.5} if root.isShowChooser else {'center_x': -1, 'center_y': -1}
+		FileChooserListView:
+			canvas.before:
+				Color:
+					rgba: 153/255, 142/255, 142/255, 1
+				Rectangle:
+					pos: self.pos
+					size: self.size
+				#on_selection: root.file_fire_select(*args)
+			RoundedButton:
+				id: test
+				canvas.before:
+					Color:
+						rgba: 140/255, 60/255, 60/255, 1
+					RoundedRectangle:
+						size: self.size
+						pos: self.pos
+						radius: [10]
+				font_size: 40
+				pos_hint: {'center_x': 0.5, 'center_y': 0.955}
+				size_hint: (0.1, 0.05)
+				text: "Exit"
+				on_press: root.isShowChooser = not root.isShowChooser
 
 
 		#FileChooser: 
 		#	id: fc
 		#	FileChooserIconLayout
 		#	FileChooserListLayout
+
+<ProgressWindow>
+	name: "progress"
+
+	FloatLayout:
+		
+
 
 		
 
