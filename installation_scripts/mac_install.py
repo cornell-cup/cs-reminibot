@@ -1,3 +1,4 @@
+from random import randint
 import subprocess, sys
 import tkinter as tk
 from tkinter import filedialog
@@ -31,58 +32,45 @@ def select_folder():
     run_vision_code = f"""
             #!/bin/bash
             cd {cs_reminibot_filepath}vision/apriltag-py/python/
-            conda activate opencv_py37
             python calibrationgui.py
         """
 
-    p = subprocess.call(["powershell.exe", 
-        f"""
-            #!/bin/bash
-            cd {folder};
+    install_code = f"""
+    
+            cd {folder}
 
-            #installing general dependencies;
-            echo "Installing general dependencies.";
-            sleep 5;
-            brew install git;
-            brew install python;
-            brew install node@16;
-            brew install --cask anaconda;
+            echo "Installing general dependencies."
+            sleep 5
+            brew install git
+            brew install python
+            brew install node@16
+            brew install --cask anaconda
             brew install cmake
 
-            #reloading updated path
-            echo "export PATH=\$PATH:/home/user/test" >> ~/.bashrc
-            PS1='$ '
-            source ~/.bashrc 
 
-            #cloning repo
+            sudo . ~/.bash_profile
+
+
             git clone https://github.com/cornell-cup/cs-reminibot.git
 
             cd cs-reminibot
 
-            #switching to correct branch
+
             git checkout origin/vision_doc_updated_gui_interpolation
 
-            #initializing kernals for anaconda use
             conda init bash
 
-            #reloading updated path
-            echo "export PATH=\$PATH:/home/user/test" >> ~/.bashrc
-            PS1='$ '
-            source ~/.bashrc 
+
+
+            sudo . ~/.bash_profile
 
         
-            pwd; 
-            echo hello; 
-            cd vision/apriltag-py/python;
-            pwd; 
-            conda env remove -n opencv_py37 -y;
-            echo Removed; 
-            conda create --name opencv_py37 python=3.7 --file opencv_py37_conda-forge.txt -c conda-forge -y;
-            echo Created; 
-            conda activate opencv_py37;
-            echo Activated; 
-            pip3 install https://github.com/ai4ce/pyAprilTag/releases/download/0.0.6/pyAprilTag-0.0.6-cp37-cp37m-win_amd64.whl;
-            echo Installed; 
+            pwd 
+            echo hello 
+            cd vision/apriltag-py/python
+            
+
+
             echo "Attempting to install Vision dependencies."
             pip3 install -r requirements.txt
             echo "Attempting to install Vision dependencies individually."
@@ -92,13 +80,23 @@ def select_folder():
             pip3 install kivy
 
 
+            echo "Attempting to install AprilTag dependencies."
+            sleep 5
+            cd ..
+            mkdir build
+            cd build
+            cmake .. -DCMAKE_BUILD_TYPE=Release
+            make -j4
+
+            sudo make install
+
+
             cd ../../../basestation
 
-            #Attempting normal basestation dependencies installation.
             echo "Attempting normal basestation dependencies installation."
             pip3 install -r requirements.txt
 
-            #Attempting manual basestation dependencies installation with correct versions.
+
             echo "Attempting manual basestation dependencies installation with correct versions."
             pip3 install bcrypt==3.1.7   
             pip3 install cffi==1.14.5
@@ -120,12 +118,11 @@ def select_folder():
             pip3 install pint
             pip3 install control
 
-            #Attempting manual basestation dependencies installation with any versions.
             echo "Attempting manual basestation dependencies installation with any versions."
             pip3 install bcrypt   
             pip3 install cffi
             pip3 install click        
-            pip3 install Flask     
+            pip3 install Flask    
             pip3 install Flask-API
             pip3 install Flask-SQLAlchemy  
             pip3 install itsdangerous
@@ -142,9 +139,8 @@ def select_folder():
             pip3 install pint
             pip3 install control
 
-            #Attempting to install pyaudio with pip3win
-            pip3 install pip3win
-            pip3win install pyaudio
+
+            conda install pyaudio
 
             cd ../installation_scripts
             ./Node_dependencies_install.sh
@@ -154,21 +150,28 @@ def select_folder():
 
             echo '{run_BS_code}' >> {run_bs_filepath}
 
+            chmod +x {run_bs_filepath}
 
             echo '{run_vision_code}' >> {run_vision_filepath}
 
-        """], 
-        stdout=sys.stdout)
+            chmod +x {run_vision_filepath}
+
+        """
+
+    command = ""
+    for line in install_code.splitlines():
+        stripped_line = line.strip()
+        if stripped_line != "":
+            command += stripped_line+";"
+    subprocess.call(command, stdout=sys.stdout, shell=True)
 
 
-    
     with open(run_bs_filepath, 'w') as run_BS_file:
         run_BS_file.write(run_BS_code)
 
     with open(run_vision_filepath, 'w') as run_vision_file:
         run_vision_file.write(run_vision_code)
-
-
+        
 
 tk.Button(text='Click to Select Folder for Installation', 
        command=select_folder).pack(fill=tk.X)
