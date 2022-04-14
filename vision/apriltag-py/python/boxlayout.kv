@@ -34,7 +34,7 @@ WindowManager:
 			text_size: root.width, root.height
 			valign: "center"
 			halign: "center"
-			text: "<description>"
+			text: "Please have a printed checkerboard ready for calibration."
 			background_color: (153/255, 158/255, 154/255, 1)
 			pos_hint: {'center_x': 0.5}
 			size_hint: (1, 1)
@@ -98,13 +98,36 @@ WindowManager:
 		RoundedButton:
 			id: calibrationButton
 			font_size: 80
-			pos_hint: {'center_x': 0.5, 'center_y': 0.1}
+			pos_hint: {'center_x': 0.8, 'center_y': 0.2}
 			size_hint: (0.4, 0.1)
 			text: "Begin"
 			on_press:
 				app.root.current: "progress"
 				checkerboard.checkerboardTest(int(rowsInput.text), int(columnsInput.text))
-				#calls the checkerboard calibration and stuff before switching to the results window
+				#calls the checkerboard calibration
+		RoundedButton:
+			id: backButton
+			font_size: 80
+			pos_hint: {'center_x' : 0.2, 'center_y': 0.2}
+			size_hint: (0.4, 0.1)
+			text: "Back"
+			on_release:
+				app.root.current = "first"
+		#FloatLayout:
+			#id: fileChooser
+			#size: (20, 20)
+			#canvas.before:
+				#Color:
+					#rgba: (1,0,0, 1)
+				#RoundedRectangle:
+					#size: self.size
+					#pos: self.pos
+					#radius: [15]
+				#Color:
+					#rgba: (253/255, 245/255, 230/255, 1)
+				#RoundedRectangle:
+					#size: self.width-10, self.height-10
+					#pos: self.x+5, self.y+5
 
 				#calling part2 of calibration
 
