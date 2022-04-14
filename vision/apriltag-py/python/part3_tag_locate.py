@@ -4,7 +4,6 @@ import numpy as np
 import sys
 import time
 import requests
-from sqlalchemy import true
 import util
 from detector import Detector
 from platform import node as platform_node
@@ -22,7 +21,8 @@ TAG_SIZE = 6.5 # The length of one side of an apriltag, in inches
 SEND_DATA = True  # Sends data to URL if True. Set to False for debug
 
 
-BASE_STATION_DEVICE_ID = hash(platform_node()+str(randint(0,1000000))+environ["USER"]+str(randint(0,1000000))+str(DEVICE_ID)+str(time.time()))
+BASE_STATION_DEVICE_ID = 1
+# hash(platform_node()+str(randint(0,1000000))+environ["USER"]+str(randint(0,1000000))+str(DEVICE_ID)+str(time.time()))
 
 def main():
     # DEBUGGING AND TIMING VARIABLES

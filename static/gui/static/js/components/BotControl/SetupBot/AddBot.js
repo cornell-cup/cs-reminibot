@@ -221,6 +221,26 @@ export default class AddBot extends React.Component {
         });
     }
 
+    physicalBlocklyClick() {
+        const _this = this;
+        axios({
+            method: 'POST',
+            url: '/mode', //url to backend endpoint
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: JSON.stringify({
+                bot_name: _this.props.selectedBotName,
+                mode: "physical-blockly",
+            })
+        }).catch(function (error) {
+            if (error.response.data.error_msg.length > 0)
+                window.alert(error.response.data.error_msg);
+            else
+                console.log(error);
+        });
+    }
+
     objectDetectionOnClick() {
         const _this = this;
         console.log("Object Detection")
@@ -297,6 +317,7 @@ export default class AddBot extends React.Component {
                             <p className="small-title"> Custom Modes </p>
                             <button className="btn btn-success element-wrapper mr-1" onClick={() => this.objectDetectionOnClick()}>Object Detection</button>
                             <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.lineFollowOnClick()}>Line Follow</button>
+                            <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.physicalBlocklyClick()}>Physical Blockly</button>
                         </div>
                     </div>
                     <br />
