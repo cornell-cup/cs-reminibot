@@ -1,3 +1,0 @@
-/home/cornellcup/cs-reminibot/vision/CMakeFiles/edit_cache.dir
-/home/cornellcup/cs-reminibot/vision/CMakeFiles/rebuild_cache.dir
-/home/cornellcup/cs-reminibot/vision/CMakeFiles/locate_tags.dir

@@ -1,3 +1,3 @@
-FLASK_APP=app.py
+FLASK_APP=minibot_server.py
 FLASK_RUN_PORT=8080
 FLASK_ENV=development

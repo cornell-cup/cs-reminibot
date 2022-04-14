@@ -95,7 +95,7 @@ def mode():
     """ Makes the minibot run in either line follow or object detection mode """
     data = request.get_json()
     bot_name = data['bot_name']
-    if not bot_name and data['mode'] != "physical-blockly":
+    if not bot_name:
         error_json = {"error_msg": NO_BOT_ERROR_MSG}
         return json.dumps(error_json), status.HTTP_400_BAD_REQUEST
     mode = data['mode']
