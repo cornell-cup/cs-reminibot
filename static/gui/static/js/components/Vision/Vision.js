@@ -1,5 +1,4 @@
 import React from 'react'
-import GridviewWithPhysics from './gridviewWithPhysics'
 import UltimateGridview from './UltimateGridview'
 import VisionUserInterface from './VisionUserInterface'
 

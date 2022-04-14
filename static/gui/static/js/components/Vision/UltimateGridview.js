@@ -807,7 +807,9 @@ const UltimateGridView = (props) => {
       >
         {displayOn ? "Stop Displaying Field" : "Display Field"}
       </button>}
-      <label htmlFor="minibotId">Virtual Minibot ID</label>
+      {props.experimentalFeaturesEnabled && 
+        <React.Fragment>
+          <label htmlFor="minibotId">Virtual Minibot ID</label>
       <input type="text" className="form-control mb-2 mr-sm-2" id="minibotId" placeholder="Object ID" value={minibotId} onChange={(e) => { setMinibotId(e.target.value) }} />
       <button
         onClick={runCode}
@@ -821,6 +823,7 @@ const UltimateGridView = (props) => {
       >
         Reset
       </button>
+        </React.Fragment>}
       <br />
       <TransformWrapper
         initialScale={1}
