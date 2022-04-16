@@ -1,14 +1,21 @@
 # -*- coding: utf-8 -*-
 """
+Written by Roger Chu
+Minibot Dynamics Simulator and Proof-of-concept for function blocks
+Fundamental Premises:
+    1. Angular velocity of each motor is controllable.
+    2. Zero percent tire slip.
 
+Also added path_to_commands function to execute path planning algorithm.
 """
 import control as ctrl
 import numpy as np
+# import matplotlib.pyplot as plt
 
 n = 4
 r = 2
 dt = 0.1
-threshold = 0.001
+threshold = 0.01
 T = 100
 
 A = np.zeros((2, 2))
@@ -20,8 +27,8 @@ sysc = ctrl.ss(A, B, C, D)
 sysd = ctrl.sample_system(sysc, dt)
 Ad, Bd, Cd, Dd = sysd.A, sysd.B, sysd.C, sysd.D
 
-Q = np.array([[1, 0], [0, 10000]])
-R = 200 * np.eye(2)
+Q = np.array([[1, 0], [0, 100]])
+R = 25 * np.eye(2)
 
 K = ctrl.dare(Ad, Bd, Q, R)[-1]
 
@@ -100,12 +107,22 @@ def yd_straight(dist, y, loc, target):
     return y - ref
 
 
+def yd_hit(dest, y, loc, target):
+    vec = dest - loc
+    ref = np.array([y[0]+np.linalg.norm(vec), angle(vec)])
+    return y - ref
+
+
 def minibot_turn(turn, xs, us, locs):
     return minibot_action(yd_turn, turn, xs, us, locs)
 
 
 def minibot_straight(dist, xs, us, locs):
     return minibot_action(yd_straight, dist, xs, us, locs)
+
+
+def minibot_hit(dest, xs, us, locs):
+    return minibot_action(yd_hit, dest, xs, us, locs)
 
 
 def run_commands(commands, xs=np.array([[0, 0]]),
@@ -117,24 +134,45 @@ def run_commands(commands, xs=np.array([[0, 0]]),
                             *commands[0][0](commands[0][1], xs, us, locs))
 
 
-triangle_commands = ((minibot_straight, 5),
-                     (minibot_turn, 2/3*np.pi),
-                     (minibot_straight, 5),
-                     (minibot_turn, -2/3*np.pi),
-                     (minibot_straight, 5))
+# triangle_commands = ((minibot_straight, 5),
+#                      (minibot_turn, 2/3*np.pi),
+#                      (minibot_straight, 5),
+#                      (minibot_turn, -2/3*np.pi),
+#                      (minibot_straight, 5))
 
-# xs, us, locs = run_commands(triangle_commands)
+# # xs, us, locs = run_commands(triangle_commands)
 
-pentagon_commands = ((minibot_straight, 5),
-                     (minibot_turn, 2/5*np.pi),
-                     (minibot_straight, 5),
-                     (minibot_turn, 4/5*np.pi),
-                     (minibot_straight, 5),
-                     (minibot_turn, -4/5*np.pi),
-                     (minibot_straight, 5),
-                     (minibot_turn, -2/5*np.pi),
-                     (minibot_straight, 5))
+# pentagon_commands = ((minibot_straight, 5),
+#                      (minibot_turn, 2/5*np.pi),
+#                      (minibot_straight, 5),
+#                      (minibot_turn, 4/5*np.pi),
+#                      (minibot_straight, 5),
+#                      (minibot_turn, -4/5*np.pi),
+#                      (minibot_straight, 5),
+#                      (minibot_turn, -2/5*np.pi),
+#                      (minibot_straight, 5))
 
-#xs col 2 has orientation in radians, locs has x and y coordinates in meters
-xs, us, locs = run_commands(pentagon_commands)
+# somewhere_commands = ((minibot_hit, (5, 5)),
+#                       (minibot_turn, 0),
+#                       (minibot_straight, 3),
+#                       (minibot_turn, np.pi/2),
+#                       (minibot_hit, (2, 1)))
 
+# hit_commands = ((minibot_hit, (1, 1)),
+#                 (minibot_hit, (2, 4)),
+#                 (minibot_hit, (3, 9)),
+#                 (minibot_hit, (4, 16)),
+#                 (minibot_hit, (5, 25)))
+
+
+def path_to_commands(path):
+    return [(minibot_hit, i) for i in path]
+
+
+# commands = path_to_commands([(x, np.sin(x)) for x in np.linspace(0, 10, 50)])
+
+
+# # xs col 2 has orientation in radians, locs has x and y coordinates in meters
+# xs, us, locs = run_commands(commands)
+
+# plt.plot(locs[:, 0], locs[:, 1])

@@ -1,5 +1,5 @@
 import numpy as np
-from basestation.controller.minibot_sim import minibot_straight, minibot_turn, run_commands, dt
+from basestation.controller.minibot_sim import minibot_hit, minibot_straight, minibot_turn, run_commands, dt
 from math import pi
 from re import split
 
