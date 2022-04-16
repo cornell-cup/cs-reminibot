@@ -65,8 +65,8 @@ class Bot:
     def sendKV(self, key: str, value: str):
         """ Send message with specified key and value. """
         if not self.is_socket_connected:
+            print("socket not connected")
             return
-
         data = f"<<<<{key},{value}>>>>".encode()
         # check whether the socket connection is still open
         line = self.try_receive_data(peek=True)
