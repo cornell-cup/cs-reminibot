@@ -1,7 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
+import { faInfoCircle, faLessThan } from '@fortawesome/free-solid-svg-icons';
 library.add(faInfoCircle);
 import InformationBoxModal from '../../utils/InformationBoxModal.js';
 import RefreshingList from './RefreshingList.js';
@@ -300,10 +300,10 @@ export default class AddBot extends React.Component {
                         <div className="col horizontalDivCenter">
                             <p className="small-title"> Sensor Data </p>
                             <div className="element-wrapper">
-                                <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.setState({ showSensorPopup: !this.state.showSensorPopup })}>Start IR</button>
+                                <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.setState({ showSensorPopup: true })}>Start IR</button>
                                 <label id='ir-value' className='ir-label'></label>
                             </div>
-                            {<SensorPopup /> && this.state.showSensorPopup}
+                            {this.state.showSensorPopup ? <SensorPopup handleClose={() => this.setState({ showSensorPopup: false })} /> : <div />}
                         </div>
                     </div>
                     <br />

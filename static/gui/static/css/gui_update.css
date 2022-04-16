@@ -121,16 +121,25 @@
 
 /* The side navigation menu */
 .sidenav {
-  height: 100%; /* 100% Full-height */
-  width: 0; /* 0 width - change this with JavaScript */
-  position: fixed; /* Stay in place */
-  z-index: 1; /* Stay on top */
-  top: 0; /* Stay at the top */
+  height: 100%;
+  /* 100% Full-height */
+  width: 0;
+  /* 0 width - change this with JavaScript */
+  position: fixed;
+  /* Stay in place */
+  z-index: 1;
+  /* Stay on top */
+  top: 0;
+  /* Stay at the top */
   right: 0;
-  background-color: #111; /* Black*/
-  overflow-x: hidden; /* Disable horizontal scroll */
-  padding-top: 60px; /* Place content 60px from the top */
-  transition: 0.25s; /* 0.5 second transition effect to slide in the sidenav */
+  background-color: #111;
+  /* Black*/
+  overflow-x: hidden;
+  /* Disable horizontal scroll */
+  padding-top: 60px;
+  /* Place content 60px from the top */
+  transition: 0.25s;
+  /* 0.5 second transition effect to slide in the sidenav */
 }
 
 /* The navigation menu links */
@@ -168,8 +177,13 @@
 
 /* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
 @media screen and (max-height: 450px) {
-  .sidenav {padding-top: 15px;}
-  .sidenav a {font-size: 18px;}
+  .sidenav {
+    padding-top: 15px;
+  }
+
+  .sidenav a {
+    font-size: 18px;
+  }
 }
 
 .logo {
@@ -296,6 +310,7 @@ table {
 .button-movement .row {
   margin: 4px 0;
 }
+
 .button-movement .movement {
   margin: 0 4px;
   line-height: 0;
@@ -307,7 +322,7 @@ table {
   padding: 0 15px;
 }
 
-#setup_control_tab > .row {
+#setup_control_tab>.row {
   margin: 0;
 }
 
@@ -366,7 +381,7 @@ table {
   position: absolute;
 }
 
-#main_nav li:hover > ul {
+#main_nav li:hover>ul {
   visibility: visible;
   opacity: 1;
 }
@@ -435,7 +450,7 @@ table {
   font-weight: bold;
 }
 
-.available-bots{
+.available-bots {
   padding: 5px;
 }
 
@@ -534,7 +549,7 @@ table {
 
 
 /* IR STUFF */
-.ir-label{
+.ir-label {
   color: white;
   font-size: 18px;
 }
@@ -546,13 +561,14 @@ table {
   height: 100vh;
   top: 0;
   left: 0;
+  z-index: 10;
 }
- 
+
 .box {
   position: relative;
   width: 70%;
   margin: 0 auto;
-  height: auto;
+  height: 70%;
   max-height: 70vh;
   margin-top: calc(100vh - 85vh - 20px);
   background: #fff;
@@ -560,4 +576,16 @@ table {
   padding: 20px;
   border: 1px solid #999;
   overflow: auto;
+}
+
+.close-icon {
+  float: right;
+  padding: 20px;
+  width: 5px;
+  height: 5px;
+  top: 0;
+  padding: 15px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
 }

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 
-const SensorPopup = () => {
+const SensorPopup = ({ handleClose }) => {
 	function startIROnClick() {
 		const _this = this;
 		/*
@@ -35,8 +35,8 @@ const SensorPopup = () => {
 
 	return (
 		<div className="popup-box">
-			<div className="box">
-				<span className="close-icon" onClick={props.handleClose}>x</span>
+			<div className='box'>
+				<button className="close-icon" onClick={() => handleClose()}>x</button>
 			</div>
 		</div>
 
