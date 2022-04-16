@@ -44,7 +44,7 @@ def active_bots():
 @app.route('/wheels', methods=['POST'])
 def wheels():
     """ Makes the Minibot move. """
-    data = request.get_json()
+    data = json.loads(request.data, strict=False)
     bot_name = data['bot_name']
     if not bot_name:
         error_json = {"error_msg": NO_BOT_ERROR_MSG}

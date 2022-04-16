@@ -16,10 +16,8 @@ from typing import Tuple, Optional
 import os
 import re
 import socket
-import sys
 import time
 import threading
-import pyaudio
 import speech_recognition as sr
 from copy import deepcopy
 
@@ -618,6 +616,7 @@ class BaseStation:
 
     @make_thread_safe
     def move_bot_wheels(self, bot_name: str, direction: str, power: str):
+        print("basestation: bot name = " + bot_name)
         """ Gives wheels power based on user input """
         bot = self.get_bot(bot_name)
         direction = direction.lower()
@@ -626,11 +625,10 @@ class BaseStation:
     def set_bot_mode(self, bot_name: str, mode: str):
         """ Set the bot to either line follow or object detection mode """
         bot = self.get_bot(bot_name)
-        print(bot)
-        #not functional, a first attempt at integrating pb camera stream into gui 
         if(mode == "physical-blockly"):
             print("starting phys blockly subprocess")
             self.phys_blockly_py = subprocess.Popen(['python', 'pb.py', bot_name], cwd = 'basestation/piVision')
+        print(self.active_bots)
         bot.sendKV("MODE", mode)
 
     def send_bot_script(self, bot_name: str, script: str):

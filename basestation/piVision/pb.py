@@ -25,14 +25,16 @@ def send_request(args):
     url = "http://localhost:8080/wheels"
 
     # url = "/wheels"
-    data={
+    headers = {
+        "Content-Type": "application/json"
+    }
+    data=json.dumps({
         "bot_name": cur, 
         "direction": args[1], 
         "power": "5", 
         "mode": "physical blockly"
-    }
-    requests.post(url, data=data)
-    base_station.move_bot_wheels(cur, args[1], "5")
+    })
+    requests.post(url, data=data, headers=headers)
 
 def classify(command, commands):
     if command in commands["commands"]["turn left"]: 
