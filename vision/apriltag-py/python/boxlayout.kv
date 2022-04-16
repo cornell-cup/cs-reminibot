@@ -103,7 +103,8 @@ WindowManager:
 			text: "Begin"
 			on_press:
 				app.root.current: "progress"
-				checkerboard.checkerboardTest(int(rowsInput.text), int(columnsInput.text))
+				root.handle_input(rowsInput.text,columnsInput.text)
+				# checkerboard.checkerboardTest(int(rowsInput.text), int(columnsInput.text))
 				#calls the checkerboard calibration
 		RoundedButton:
 			id: backButton
