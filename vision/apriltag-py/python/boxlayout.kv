@@ -121,9 +121,7 @@ WindowManager:
 			text: "Begin"
 			on_press:
 				app.root.current: "progress"
-				root.handle_input(rowsInput.text,columnsInput.text)
-				# checkerboard.checkerboardTest(int(rowsInput.text), int(columnsInput.text))
-				#calls the checkerboard calibration
+				root.handle_input(rowsInput.text,columnsInput.text, fileCalibrationChooser.selection, filePositionChooser.selection)
 		RoundedButton:
 			id: backButton
 			font_size: 80
@@ -136,17 +134,11 @@ WindowManager:
 			on_release:
 				app.root.current = "first"
 
-
-
-						#calls the checkerboard calibration and stuff before switching to the results window
-
-				#calling part2 of calibration
-
 				
 
 
 		RoundedButton:
-			id: fileChooser
+			id: calibrationChooser
 			canvas.before:
 				Color:
 					rgba: (0,1/255,1/255,1)
@@ -156,10 +148,26 @@ WindowManager:
 					radius: [10]
 			font_size: 20
 			font_name: "RobotoMono-Regular"
-			pos_hint: {'center_x': 0.5, 'center_y': 0.3}
+			pos_hint: {'center_x': 0.5, 'center_y': 0.55}
 			size_hint: (0.2, 0.1)
-			text: "Select File"
-			on_press: root.isShowChooser = not root.isShowChooser
+			text: "Select Calibration File"
+			on_press: root.showCalibrationChooser = not root.showCalibrationChooser
+
+		RoundedButton:
+			id: positionChooser
+			canvas.before:
+				Color:
+					rgba: (0,1/255,1/255,1)
+				RoundedRectangle:
+					size: self.size
+					pos: self.pos
+					radius: [10]
+			font_size: 20
+			font_name: "RobotoMono-Regular"
+			pos_hint: {'center_x': 0.5, 'center_y': 0.4}
+			size_hint: (0.2, 0.1)
+			text: "Select Position File"
+			on_press: root.showPositionChooser = not root.showPositionChooser
 			
 	
 		#FloatLayout:
@@ -181,13 +189,14 @@ WindowManager:
 	BoxLayout:
 		#layout for the FileChooser
 		orientation: 'vertical'
-		size_hint_y: 1 if root.isShowChooser else 0
-		size_hint_x: 1 if root.isShowChooser else 0
-		pos_hint: {'center_x': 0.5, 'center_y': 0.5} if root.isShowChooser else {'center_x': -1, 'center_y': -1}
+		size_hint_y: 1 if root.showCalibrationChooser else 0
+		size_hint_x: 1 if root.showCalibrationChooser else 0
+		pos_hint: {'center_x': 0.5, 'center_y': 0.5} if root.showCalibrationChooser else {'center_x': -1, 'center_y': -1}
 		FileChooserListView:
+			id: fileCalibrationChooser
 			canvas.before:
 				Color:
-					rgba: 153/255, 142/255, 142/255, 1
+					rgba: 23/255, 37/255, 41/255, 1
 				Rectangle:
 					pos: self.pos
 					size: self.size
@@ -205,7 +214,36 @@ WindowManager:
 				pos_hint: {'center_x': 0.5, 'center_y': 0.955}
 				size_hint: (0.1, 0.05)
 				text: "Exit"
-				on_press: root.isShowChooser = not root.isShowChooser
+				on_press: root.showCalibrationChooser = not root.showCalibrationChooser
+	BoxLayout:
+		#layout for the FileChooser
+		orientation: 'vertical'
+		size_hint_y: 1 if root.showPositionChooser else 0
+		size_hint_x: 1 if root.showPositionChooser else 0
+		pos_hint: {'center_x': 0.5, 'center_y': 0.5} if root.showPositionChooser else {'center_x': -1, 'center_y': -1}
+		FileChooserListView:
+			id: filePositionChooser
+			canvas.before:
+				Color:
+					rgba: 23/255, 37/255, 41/255, 1
+				Rectangle:
+					pos: self.pos
+					size: self.size
+				#on_selection: root.file_fire_select(*args)
+			RoundedButton:
+				id: test
+				canvas.before:
+					Color:
+						rgba: 140/255, 60/255, 60/255, 1
+					RoundedRectangle:
+						size: self.size
+						pos: self.pos
+						radius: [10]
+				font_size: 40
+				pos_hint: {'center_x': 0.5, 'center_y': 0.955}
+				size_hint: (0.1, 0.05)
+				text: "Exit"
+				on_press: root.showPositionChooser = not root.showPositionChooser
 
 
 		#FileChooser: 
@@ -215,8 +253,8 @@ WindowManager:
 
 <ProgressWindow>
 	name: "progress"
-
 	FloatLayout:
+
 		
 
 

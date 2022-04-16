@@ -9,22 +9,17 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.popup import Popup
 from kivy.properties import BooleanProperty
 import part1_checkerboard as checkerboard #importing the calibration function
-
-'''
-TODO Create a Layout for the File Chooser
-- The layout should begin hidden, however it will be displayed after a button is pressed
-- Once the user has selected a file, there will be another button on the layout to exit out and make
-  the layout hidden
-- Then, use the user's input (whichever file was selected) in calibration function
-
-'''
+from subprocess import call #to call calibration functions
+from kivy.config import Config
+Config.set('input', 'mouse', 'mouse,multitouch_on_demand')
 
 class FirstWindow(Screen):
 	pass
 
 class InputWindow(Screen):
-	isShowChooser = BooleanProperty(False)
-	def handle_input(self, row, col):
+	showCalibrationChooser = BooleanProperty(False)
+	showPositionChooser = BooleanProperty(False)
+	def handle_input(self, row, col, calibFile, posFile):
 		try:
 			row = int(row)
 			col = int(col)
@@ -35,11 +30,18 @@ class InputWindow(Screen):
 		if isinstance(row, int) and isinstance(col, int):
 				if row > 2 and col > 2:
 					checkerboard.checkerboardTest(row, col)
+					#if calibFile or posFile is 0, then that means the default files should be used
+					calibFile = calibFile[0] if len(calibFile) != 0 else "calibration_test.json"
+					posFile = posFile[0] if len(posFile) != 0 else "corner_positions.json"
+
+					call(["python3", "part2_tag_calib.py", "-cf", calibFile, "-pf", posFile, "-b", "1.1811"])
+					call(["python3", "part3_tag_locate.py", "-f", calibFile, "-s", "1.1811", "-u", "http://localhost:8080/vision"])
 		else:
 			# display error message
 			pass
 
-class ProgressWindow(Screen):
+
+class ProgressWindow(Screen):			
 	pass
 
 class WindowManager(ScreenManager):
