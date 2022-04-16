@@ -25,7 +25,11 @@ function ContextHistory(props) {
     }).then(function (response) {
       if (response.data) {
         let context = response.data['context'];
-        contextArr = context.split(".");
+        if (context != "") {
+          contextArr = context.split(".");
+        } else {
+          contextArr = [];
+        }
       }
     }).catch(function (error) {
       console.log("Chatbot", error);

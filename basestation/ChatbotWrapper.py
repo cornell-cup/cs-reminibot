@@ -18,7 +18,7 @@ default_context = "The sky is blue."
 SUCCESS = 200
 FAILURE = 400
 
-#TODO:
+# TODO:
 # 1. Replace context stack with new context stack
 
 
@@ -55,6 +55,9 @@ class ChatbotWrapper:
             return FAILURE
 
     def delete_context_by_id(self, id):
+        print("delete")
+        print(self.context_stack)
+        print(id)
         if len(self.context_stack) > id:
             self.context_stack[id] = ""
             return SUCCESS
@@ -62,6 +65,9 @@ class ChatbotWrapper:
             return FAILURE
 
     def edit_context_by_id(self, id, context):
+        print("edit")
+        print(self.context_stack)
+        print(id + context)
         if len(self.context_stack) > id:
             if context[-1] == ".":
                 self.context_stack[id] = context
@@ -75,7 +81,7 @@ class ChatbotWrapper:
         # self.context_stack = ['. '.join(self.context_stack)]
         url = "http://3.135.244.37:8000/qa"
         # TODO set this using startup parameters
-        print("context: " + ' '.join(self.context_stack))
+        print("context: ", self.context_stack)
         data = {"question": input_question,
                 "context": ' '.join(self.context_stack)}
         resp = requests.get(url, json=data)
