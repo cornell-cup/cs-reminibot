@@ -24,7 +24,20 @@ class FirstWindow(Screen):
 
 class InputWindow(Screen):
 	isShowChooser = BooleanProperty(False)
-	pass
+	def handle_input(self, row, col):
+		try:
+			row = int(row)
+			col = int(col)
+		except: 
+			# display error msg
+			pass
+
+		if isinstance(row, int) and isinstance(col, int):
+				if row > 2 and col > 2:
+					checkerboard.checkerboardTest(row, col)
+		else:
+			# display error message
+			pass
 
 class ProgressWindow(Screen):
 	pass
@@ -41,31 +54,8 @@ class CalibrationApp(App):
 	def build(self):
 		Window.clearcolor = (153/255, 158/255, 154/255, 1)
 		return kv
-
+		
 
 
 if __name__ == '__main__':
 	CalibrationApp().run()
-
-
-'''
-BoxLayout:
-			id: fclayout
-			pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-			size_hint_y: 0.1
-			size_hint_x: 0.1
-			#to draw an outline around the layout
-			canvas:
-				#draws the first rectangle (the one with the color that will outline the layout)
-				Color:
-					rgba: 1,0,0,1
-				RoundedRectangle:
-					pos: self.pos
-					size: self.size
-				#draws the second rectangle (the one where other widgets will be placed over)
-				Color:
-					rgba: 0.5,0.5,0.5,1
-				RoundedRectangle:
-					pos: self.x+5, self.y+5
-					size: self.width-10, self.height-10
-'''
