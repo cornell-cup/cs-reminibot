@@ -60,7 +60,8 @@ function BotControl({
               view_height={520}
               world_width={300}
               world_height={300}
-              defaultEnabled={false} />
+              defaultEnabled={false}
+              experimentalFeaturesEnabled={true} />
             < InformationBoxModal type={INFOBOXTYPE.VISION} />
           </div >
         </div>

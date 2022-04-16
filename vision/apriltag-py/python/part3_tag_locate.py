@@ -4,7 +4,6 @@ import numpy as np
 import sys
 import time
 import requests
-from sqlalchemy import true
 import util
 from detector import Detector
 from platform import node as platform_node
@@ -132,7 +131,8 @@ def main():
             if detector.detector != None:
                 pose, e0, e1 = detector.detector.detection_pose(d, util.camera_matrix_to_camera_params(camera_matrix), TAG_SIZE)
                 util.draw_square(undst,util.camera_matrix_to_camera_params(camera_matrix), TAG_SIZE, pose)
-            
+                # displaying tag id
+                cv2.putText(undst, str(d.tag_id),(int(ctr_x), int(ctr_y)), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 0, 255),2)
            
 
             # prints DEVICE_ID tag id x y z angle

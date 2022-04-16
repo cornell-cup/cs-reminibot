@@ -88,7 +88,9 @@ def get_command_from_function_and_arguments(function_and_arguments):
     argument1 = float(function_and_arguments[1])
     return (minibot_straight, -argument1)
   elif given_function == "move_to":
-    pass
+    argument1 = float(function_and_arguments[1])
+    argument2 = float(function_and_arguments[2])
+    return (minibot_hit, argument1, argument2)
   elif given_function == "left_angle":
     pass
   elif given_function == "right_angle":
