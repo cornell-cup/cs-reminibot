@@ -17,8 +17,10 @@ WindowManager:
 
 		Label: 
 			font_size: 90
+			font_name: "RobotoMono-Regular"
+			color: (1, 1, 1, 1)
 			text: "Calibration"
-			background_color: (153/255, 158/255, 154/255, 1)
+			background_color: (23/255, 37/255, 41/255, 1)
 			pos_hint: {'center_x': 0.5}
 			size_hint: (1, 0.2)
 			canvas.before:
@@ -27,15 +29,17 @@ WindowManager:
 				Rectangle:
 					size: self.size
 					pos: self.pos
-			color: (0, 0, 0, 1)
+			color: (1, 1, 1, 1)
 
 		Label: 
 			font_size: 40
+			font_name: "RobotoMono-Regular"
+			color: (1, 1, 1, 1)
 			text_size: root.width, root.height
 			valign: "center"
 			halign: "center"
 			text: "Please have a printed checkerboard ready for calibration."
-			background_color: (153/255, 158/255, 154/255, 1)
+			background_color: (23/255, 37/255, 41/255, 1)
 			pos_hint: {'center_x': 0.5}
 			size_hint: (1, 1)
 			canvas.before:
@@ -44,10 +48,13 @@ WindowManager:
 				Rectangle:
 					size: self.size
 					pos: self.pos
-			color: (0, 0, 0, 1)					
+			color: (1, 1, 1, 1)					
 
 		RoundedButton:
 			font_size: 80
+			font_name: "RobotoMono-Regular"
+			background_color: (240/255, 116/255, 112/255,1)
+			color: (1, 1, 1, 1)
 			text: "Start"
 			pos_hint: {'center_x': 0.5}
 			size_hint: (0.5, 0.2)
@@ -65,6 +72,8 @@ WindowManager:
 			markup: True
 			pos_hint: {'center_x': 0.45, 'center_y': 0.9}
 			font_size: 60
+			font_name: "RobotoMono-Regular"
+			color: (1, 1, 1, 1)
 			text: "[b]Number of Rows[/b]: "
 
 		TextInput:
@@ -77,12 +86,16 @@ WindowManager:
 			size_hint_x: None
 			width: 100
 			font_size: 37
+			font_name: "RobotoMono-Regular"
+			color: (1, 1, 1, 1)
 
 		Label:
 			id: columns
 			markup: True
 			pos_hint: {'center_x': 0.425, 'center_y': 0.8}
 			font_size: 60
+			font_name: "RobotoMono-Regular"
+			color: (1, 1, 1, 1)
 			text: "[b]Number of Columns[/b]: "
 
 		TextInput:
@@ -94,10 +107,15 @@ WindowManager:
 			size_hint_x: None
 			width: 100
 			font_size: 37
+			font_name: "RobotoMono-Regular"
+			color: (1, 1, 1, 1)
 
 		RoundedButton:
 			id: calibrationButton
 			font_size: 80
+			font_name: "RobotoMono-Regular"
+			color: (1, 1, 1, 1)
+			background_color: (240/255, 116/255, 112/255,1)
 			pos_hint: {'center_x': 0.8, 'center_y': 0.2}
 			size_hint: (0.4, 0.1)
 			text: "Begin"
@@ -109,6 +127,9 @@ WindowManager:
 		RoundedButton:
 			id: backButton
 			font_size: 80
+			font_name: "RobotoMono-Regular"
+			color: (1, 1, 1, 1)
+			background_color: (240/255, 116/255, 112/255,1)
 			pos_hint: {'center_x' : 0.2, 'center_y': 0.2}
 			size_hint: (0.4, 0.1)
 			text: "Back"
@@ -134,6 +155,7 @@ WindowManager:
 					pos: self.pos
 					radius: [10]
 			font_size: 20
+			font_name: "RobotoMono-Regular"
 			pos_hint: {'center_x': 0.5, 'center_y': 0.3}
 			size_hint: (0.2, 0.1)
 			text: "Select File"

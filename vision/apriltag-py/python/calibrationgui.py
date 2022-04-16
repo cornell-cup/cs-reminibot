@@ -52,7 +52,8 @@ kv = Builder.load_file('boxlayout.kv')
 
 class CalibrationApp(App):
 	def build(self):
-		Window.clearcolor = (153/255, 158/255, 154/255, 1)
+		#33, 37, 41
+		Window.clearcolor = (23/255, 37/255, 41/255, 1)
 		return kv
 		
 
