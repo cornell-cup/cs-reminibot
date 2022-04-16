@@ -3,6 +3,7 @@ Base Station for the MiniBot.
 """
 
 import math
+import subprocess
 from basestation.bot import Bot
 from basestation.user_database import Submission, User
 from basestation import db
@@ -18,9 +19,9 @@ import socket
 import sys
 import time
 import threading
+import pyaudio
 import speech_recognition as sr
 from copy import deepcopy
-import subprocess
 
 from basestation.util.units import AngleUnits, LengthUnits, convert_angle, convert_length
 
@@ -119,8 +120,6 @@ class BaseStation:
             "procs": dict(),
             "next_req_id": 0
         }
-
-        self.phys_blockly_py = None
 
     # ==================== VISION ====================
 
@@ -232,7 +231,10 @@ class BaseStation:
             orientation_degrees
         )
             
-    
+        
+
+
+
     def update_virtual_objects(self, update):
         """ Updates vision virtual objects list. """
         if "virtual_objects" in update and "add" in update and type(update["virtual_objects"]) is list and len(update["virtual_objects"]) > 0:
@@ -620,7 +622,7 @@ class BaseStation:
         bot = self.get_bot(bot_name)
         direction = direction.lower()
         bot.sendKV("WHEELS", direction)
-
+        
     def set_bot_mode(self, bot_name: str, mode: str):
         """ Set the bot to either line follow or object detection mode """
         bot = self.get_bot(bot_name)

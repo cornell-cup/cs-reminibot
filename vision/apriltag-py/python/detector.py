@@ -11,6 +11,8 @@ except ImportError:
 import util
 from detection import Detection
 
+
+
 class Detector:
   def __init__(self):
     self.detector = None
