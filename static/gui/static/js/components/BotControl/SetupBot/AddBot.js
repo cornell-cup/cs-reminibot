@@ -243,7 +243,25 @@ export default class AddBot extends React.Component {
         });
     }
 
-
+    physicalBlocklyClick() {
+        const _this = this;
+        axios({
+            method: 'POST',
+            url: '/mode', //url to backend endpoint
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: JSON.stringify({
+                bot_name: _this.props.selectedBotName,
+                mode: "physical-blockly",
+            })
+        }).catch(function (error) {
+            if (error.response.data.error_msg.length > 0)
+                window.alert(error.response.data.error_msg);
+            else
+                console.log(error);
+        });
+    }
 
     render() {
         const _this = this;
