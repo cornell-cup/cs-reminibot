@@ -4,10 +4,11 @@ import axios from 'axios';
 import ContextBox from './ContextBox.js';
 
 const initialHistory = []
-let id = 0;
+
 
 function ContextHistory(props) {
   const [contextHistory, setContextHistory] = useState(initialHistory);
+  const [id, setID] = useState(0);
 
   useEffect(() => {
     console.log("get context history")
@@ -51,7 +52,7 @@ function ContextHistory(props) {
     let contextHistoryTemp = []
     contextArr.forEach((context) => {
       contextHistoryTemp.append({ "id": id, "context": context });
-      id++;
+      setID(id + 1);
     })
     setContextHistory(contextHistoryTemp);
   }, [props.cookies.get('current_user_email')])
@@ -60,7 +61,7 @@ function ContextHistory(props) {
     if (props.parentContext != "") {
       console.log("new context is added")
       let newContextHist = contextHistory.concat({ "id": id, "context": props.parentContext })
-      id++;
+      setID(id + 1);
       setContextHistory(newContextHist);
       console.log(contextHistory);
     }
@@ -70,7 +71,7 @@ function ContextHistory(props) {
     <div className="contextHistoryTab">
       <ul className="contextHistoryList">
         {contextHistory.map((item) => (
-          <ContextBox key={item.id} context={item.context} />
+          <ContextBox key={item.id} id={item.id} context={item.context} />
         ))}
       </ul>
     </div>

@@ -85,7 +85,7 @@ class BaseStation:
         # if app_debug and os.environ["WERKZEUG_RUN_MAIN"] == "true":
         #     self.sock.bind(server_address)
         # else:
-        self.sock.bind(server_address)
+        # self.sock.bind(server_address)
 
         self._login_email = None
         self.speech_recog_thread = None
@@ -415,6 +415,16 @@ class BaseStation:
         """ Resets all context stored in the Chatbot object. 
         """
         self.chatbot.reset_context()
+
+    def chatbot_delete_context_idx(self, idx) -> None:
+        """ Deletes the local context at a given index. 
+        """
+        return self.chatbot.delete_context_by_id(idx)
+
+    def chatbot_edit_context_idx(self, idx, context) -> None:
+        """ Edits the local context based on input.
+        """
+        return self.chatbot.edit_context_by_id(idx, context)
 
     # ==================== GETTERS and SETTERS ====================
     @property

@@ -32,7 +32,10 @@ class ChatbotWrapper:
 
     def update_context(self, context):
         if context != "":
-            self.context_stack.append(context)
+            if context[-1] == ".":
+                self.context_stack.append(context)
+            else:
+                self.context_stack.append(context + ".")
 
     def get_latest_context(self):
         return self.context_stack[-1]
@@ -51,11 +54,29 @@ class ChatbotWrapper:
         else:
             return FAILURE
 
+    def delete_context_by_id(self, id):
+        if len(self.context_stack) > id:
+            self.context_stack[id] = ""
+            return SUCCESS
+        else:
+            return FAILURE
+
+    def edit_context_by_id(self, id, context):
+        if len(self.context_stack) > id:
+            if context[-1] == ".":
+                self.context_stack[id] = context
+            else:
+                self.context_stack[id] = context + "."
+            return SUCCESS
+        else:
+            return FAILURE
+
     def compute_answer(self, input_question):
         # self.context_stack = ['. '.join(self.context_stack)]
         url = "http://3.135.244.37:8000/qa"
         # TODO set this using startup parameters
+        print("context: " + ' '.join(self.context_stack))
         data = {"question": input_question,
-                "context": '. '.join(self.context_stack)}
+                "context": ' '.join(self.context_stack)}
         resp = requests.get(url, json=data)
         return resp.text

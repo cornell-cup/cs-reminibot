@@ -52,6 +52,16 @@ def chatbot_context():
                 return json.dumps(answer), status.HTTP_200_OK
             else:
                 return json.dumps({'error': 'Not logged in'}), status.HTTP_401_UNAUTHORIZED
+        elif command == "delete-context-by-id":
+            idx = data['idx']
+            res = base_station.chatbot_delete_context_idx(idx)
+            return json.dumps({"res": res}), status.HTTP_200_OK
+        elif command == "edit-context-by-id":
+            idx = data['idx']
+            context = data['context']
+            res = base_station.chatbot_edit_context_idx(idx, context)
+            return json.dumps({"res": res}), status.HTTP_200_OK
+            
 
 
 @chatbot_bp.route('/chatbot-ask', methods=['POST', 'GET'])

@@ -14,3 +14,18 @@
   transform: rotate(-180deg);
   background: gray;
 }
+
+.context-box {
+  width: 95%;
+  min-height: 60%;
+  overflow-y: auto;
+  padding: 12px 20px;
+  margin: 8px 0;
+  box-sizing: border-box;
+  display: inline-block;
+}
+
+input [type=text]:focus {
+  border-color: dodgerblue;
+  box-shadow: 0 0 8px 0 dodgerblue;
+}
