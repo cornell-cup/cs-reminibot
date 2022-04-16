@@ -4,5 +4,7 @@
         "turn right": [1,3], 
         "go forwards": [2], 
         "stop": [4]
-    }
+    }, 
+    "tagRangeStart": 0, 
+    "tagRangeEnd": 5
 }

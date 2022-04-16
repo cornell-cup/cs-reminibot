@@ -58,12 +58,17 @@ print(commands["commands"]["turn right"])
 previous = None
 
 q = queue.Queue()
-seen = []
+seen = {}
+
+start = commands["tagRangeStart"]
+end = commands["tagRangeEnd"]
+
+for i in range(start, end+1):
+    seen[i] = False
 
 def worker():
     while True:
         task = q.get()
-        print(q.qsize())
         sleep(1.0)
         send_request(task)
 
@@ -84,9 +89,9 @@ while(True):
         list.sort(detections, key=lambda d: d.center[0]) #then sort by x to get left to right, 
                                                          #bottom up ordering
         for d in detections:
-            if not d.tag_id in seen:
+            if not seen[d.tag_id]:
                 args = classify(d.tag_id, commands)
-                seen.append(d.tag_id)
+                seen[d.tag_id] = True
                 q.put(args)
     
     cv2.imshow("Tag Locations", frame)
