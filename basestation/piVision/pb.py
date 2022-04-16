@@ -1,7 +1,7 @@
 import sys 
 sys.path.append('../../vision/apriltag-py/python')
 sys.path.append('../..')
-from detector import Detector
+# sys.path.append('../vision/apriltag-py/python')
 import cv2
 import json 
 import os 
@@ -10,17 +10,18 @@ from time import sleep
 import requests
 
 from basestation.routes import base_station
+from detector import Detector
+
+bot_name = sys.argv[1]
+print(bot_name)
+
 
 def get_rightmost(detections):
     list.sort(detections, key=lambda d: d.center[0])
     return detections[-1]
 
 def send_request(args):
-    bots = base_station.get_active_bots()
-
-    if len(bots) == 0:
-        print("no bot connected")
-    cur = "minibot31_10000"
+    cur = bot_name
     url = "http://localhost:8080/wheels"
 
     # url = "/wheels"
@@ -46,6 +47,8 @@ def classify(command, commands):
         return ["fake_bot", "stop"] #do nothing if invalid command received 
 
 detector = Detector()
+bots = base_station.get_active_bots()
+print(len(bots))
 
 file = os.path.join("tag_insns.json")
 f = open(file)

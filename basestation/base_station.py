@@ -624,10 +624,11 @@ class BaseStation:
     def set_bot_mode(self, bot_name: str, mode: str):
         """ Set the bot to either line follow or object detection mode """
         bot = self.get_bot(bot_name)
+        print(bot)
         #not functional, a first attempt at integrating pb camera stream into gui 
         if(mode == "physical-blockly"):
             print("starting phys blockly subprocess")
-            self.phys_blockly_py = subprocess.Popen(['python', './basestation/piVision/pb.py'])
+            self.phys_blockly_py = subprocess.Popen(['python', 'pb.py', bot_name], cwd = 'basestation/piVision')
         bot.sendKV("MODE", mode)
 
     def send_bot_script(self, bot_name: str, script: str):
