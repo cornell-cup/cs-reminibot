@@ -13,12 +13,10 @@ from basestation.routes import base_station
 from detector import Detector
 
 bot_name = sys.argv[1]
-print(bot_name)
 
-
-def get_rightmost(detections):
-    list.sort(detections, key=lambda d: d.center[0])
-    return detections[-1]
+# def get_rightmost(detections):
+#     list.sort(detections, key=lambda d: d.center[0])
+#     return detections[-1]
 
 def send_request(args):
     cur = bot_name
@@ -50,20 +48,23 @@ def classify(command, commands):
 
 detector = Detector()
 bots = base_station.get_active_bots()
-print(len(bots))
 
 file = os.path.join("tag_insns.json")
 f = open(file)
 commands = json.load(f)
 
+print(commands["commands"]["turn right"])
+
 previous = None
 
 q = queue.Queue()
+seen = []
 
 def worker():
     while True:
         task = q.get()
-        sleep(3.0)
+        print(q.qsize())
+        sleep(1.0)
         send_request(task)
 
 threading.Thread(target=worker, daemon=True).start()
@@ -79,11 +80,14 @@ while(True):
     detections, det_image = detector.detect(frame, return_image=True)
 
     if(detections != None and len(detections) > 0):
-        rightmost = get_rightmost(detections)
-        if(rightmost.tag_id != previous):
-            previous = rightmost.tag_id 
-            args = classify(rightmost.tag_id, commands)
-            q.put(args)
+        list.sort(detections, key=lambda d: d.center[1]) #list.sort is stable so sort by y first 
+        list.sort(detections, key=lambda d: d.center[0]) #then sort by x to get left to right, 
+                                                         #bottom up ordering
+        for d in detections:
+            if not d.tag_id in seen:
+                args = classify(d.tag_id, commands)
+                seen.append(d.tag_id)
+                q.put(args)
     
     cv2.imshow("Tag Locations", frame)
 
