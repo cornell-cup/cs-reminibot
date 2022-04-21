@@ -67,5 +67,8 @@
   "eslintConfig": {
     "extends": "google",
     "rules": {}
-  }
+  },
+  "browser":{
+    "child_process": false
+  }  
 }

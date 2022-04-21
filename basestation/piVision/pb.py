@@ -14,6 +14,11 @@ from detector import Detector
 
 bot_name = sys.argv[1]
 
+#todo list: 
+#   make sure you can't input other commands while in PB mode 
+#   Potentially make it so that python (and ideally blockly) code shows up real time 
+#   Maybe move the PB button to the code page 
+
 # def get_rightmost(detections):
 #     list.sort(detections, key=lambda d: d.center[0])
 #     return detections[-1]
@@ -52,13 +57,18 @@ bots = base_station.get_active_bots()
 file = os.path.join("tag_insns.json")
 f = open(file)
 commands = json.load(f)
-
-print(commands["commands"]["turn right"])
-
 previous = None
 
 q = queue.Queue()
+q2 = queue.Queue() 
+
 seen = {}
+pythonCode = {
+    "forwards" : "bot.move_forward(100)",
+    "stop" : "bot.stop()",
+    "right" : "bot.turn_clockwise(100)",
+    "left" : "bot.turn_counter_clockwise(100)"
+}
 
 start = commands["tagRangeStart"]
 end = commands["tagRangeEnd"]
@@ -69,8 +79,11 @@ for i in range(start, end+1):
 def worker():
     while True:
         task = q.get()
-        sleep(1.0)
+        py_code = pythonCode[task[1]]
+        print("pb:" + py_code + "\n")
+        sys.stdout.flush()
         send_request(task)
+        sleep(1.0)
 
 threading.Thread(target=worker, daemon=True).start()
 
@@ -99,7 +112,6 @@ while(True):
     # Press q on keyboard to stop recording
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
-
 
 # release video capture
 # and video write objects

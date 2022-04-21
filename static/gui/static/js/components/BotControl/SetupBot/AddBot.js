@@ -315,7 +315,7 @@ export default class AddBot extends React.Component {
                             <p className="small-title"> Custom Modes </p>
                             <button className="btn btn-success element-wrapper mr-1" onClick={() => this.objectDetectionOnClick()}>Object Detection</button>
                             <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.lineFollowOnClick()}>Line Follow</button>
-                            <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.physicalBlocklyClick()}>Physical Blockly</button>
+                            {/* <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.physicalBlocklyClick()}>Physical Blockly</button> */}
                         </div>
                     </div>
                     <br />

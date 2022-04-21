@@ -34,12 +34,15 @@ def discover_bots():
     base_station.listen_for_minibot_broadcast()
     return json.dumps(True), status.HTTP_200_OK
 
+@app.route('/get-py-command', methods=['GET'])
+def get_py_command(): 
+    v = base_station.get_next_py_command()
+    return json.dumps(v)
 
 @app.route('/active-bots', methods=['GET'])
 def active_bots():
     """ Get all Minibots connected to the Basestation """
     return json.dumps(base_station.get_active_bots()), status.HTTP_200_OK
-
 
 @app.route('/wheels', methods=['POST'])
 def wheels():

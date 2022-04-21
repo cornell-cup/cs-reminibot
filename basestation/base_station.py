@@ -20,8 +20,10 @@ import time
 import threading
 import speech_recognition as sr
 from copy import deepcopy
+import queue 
 
 from basestation.util.units import AngleUnits, LengthUnits, convert_angle, convert_length
+import shlex
 
 MAX_VISION_LOG_LENGTH = 5
 VISION_UPDATE_FREQUENCY = 30
@@ -58,6 +60,8 @@ class BaseStation:
         self.virtual_objects = {}
         self.vision_snapshot = {}
         self.vision_object_map = {}
+
+        self.py_commands = []
 
         self.blockly_function_map = {
             "move_forward": "fwd",         "move_backward": "back",
@@ -627,9 +631,26 @@ class BaseStation:
         bot = self.get_bot(bot_name)
         if(mode == "physical-blockly"):
             print("starting phys blockly subprocess")
-            self.phys_blockly_py = subprocess.Popen(['python', 'pb.py', bot_name], cwd = 'basestation/piVision')
-        print(self.active_bots)
+            self.phys_blockly_py = subprocess.Popen(['python', 'pb.py', bot_name], cwd = 'basestation/piVision', 
+                stdout=subprocess.PIPE, bufsize=1)
+            while True:
+                output = self.phys_blockly_py.stdout.readline()
+                if output == '' and self.phys_blockly_py.poll() is not None:
+                    break
+                if output:
+                    s = output.strip().decode("utf-8")
+                    if(s[0:3] != "pb:"):
+                        continue; 
+                    self.py_commands.append(s)
+                rc = self.phys_blockly_py.poll()
         bot.sendKV("MODE", mode)
+
+    def get_next_py_command(self):
+        if(len(self.py_commands) == 0):
+            return ""
+        val = self.py_commands[0]
+        self.py_commands.pop(0) 
+        return val
 
     def send_bot_script(self, bot_name: str, script: str):
         """Sends a python program to the specific bot"""
@@ -858,7 +879,7 @@ class BaseStation:
         submission.result = result
         db.session.commit()
 
-    def get_all_submissions(self, user: User) -> []:
+    def get_all_submissions(self, user: User):
         submissions = []
         submissions = Submission.query.filter_by(user_id=User.id)
         return submissions

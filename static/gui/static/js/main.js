@@ -24,6 +24,7 @@ import { withCookies, Cookies } from 'react-cookie';
 import Dashboard from './components/Analytics/dashboard.js';
 import History from './components/Analytics/submissionHistory.js';
 import Vision from './components/Vision/Vision.js';
+import PhysicalBlockly from './components/PhysicalBlockly/PhysicalBlockly.js';
 
 
 /**
@@ -52,6 +53,8 @@ const Platform = withCookies((props) => {
   const [selectedBotStyle, setSelectedBotStyleState] = useState(hiddenStyle);
   const [loginEmail, setLoginEmail] = useState(props.cookies.get('current_user_email') || "");
 
+  const [pb, setPb] = useState(""); 
+
   useEffect(() => {
     setLoginEmail(props.cookies.get('current_user_email') || "");
   }, [document.cookie]);
@@ -60,7 +63,8 @@ const Platform = withCookies((props) => {
     props.cookies.set('virtual_room_id', props.cookies.get('virtual_room_id') || nanoid(), { path: '/' });
   }, []);
 
-
+  useEffect(() => {
+  }, [pb]); 
 
   function setSelectedBotStyle(style) {
     setSelectedBotStyleState(style === "hidden" ? hiddenStyle : visibleStyle);
@@ -113,6 +117,13 @@ const Platform = withCookies((props) => {
             <History
               loginEmail={loginEmail}
             />
+          </Route>
+          <Route path="/physical-blockly">
+              <PhysicalBlockly
+                selectedBotName = {selectedBotName}
+                pb = {pb}
+                setPb = {setPb}
+              />
           </Route>
           <Route path="/vision-page">
             <Vision />
