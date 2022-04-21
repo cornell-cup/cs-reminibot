@@ -13,6 +13,7 @@ from basestation.routes import base_station
 from detector import Detector
 
 bot_name = sys.argv[1]
+mode = sys.argv[2] #0 = camera mode, 1=real time 
 
 #todo list: 
 #   make sure you can't input other commands while in PB mode 
@@ -82,7 +83,8 @@ def worker():
         py_code = pythonCode[task[1]]
         print("pb:" + py_code + "\n")
         sys.stdout.flush()
-        send_request(task)
+        if(mode == 1):
+            send_request(task)
         sleep(1.0)
 
 threading.Thread(target=worker, daemon=True).start()

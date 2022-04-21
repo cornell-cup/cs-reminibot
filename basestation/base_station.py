@@ -60,6 +60,7 @@ class BaseStation:
         self.virtual_objects = {}
         self.vision_snapshot = {}
         self.vision_object_map = {}
+        self.phys_blockly_py = None
 
         self.py_commands = []
 
@@ -629,10 +630,12 @@ class BaseStation:
     def set_bot_mode(self, bot_name: str, mode: str):
         """ Set the bot to either line follow or object detection mode """
         bot = self.get_bot(bot_name)
-        if(mode == "physical-blockly"):
+        if(mode == "physical-blockly" or mode == "physical-blockly-2"):
             print("starting phys blockly subprocess")
-            self.phys_blockly_py = subprocess.Popen(['python', 'pb.py', bot_name], cwd = 'basestation/piVision', 
-                stdout=subprocess.PIPE, bufsize=1)
+            
+            self.phys_blockly_py = subprocess.Popen(['python', 'pb.py', bot_name, 0], cwd = 'basestation/piVision', 
+                    stdout=subprocess.PIPE, bufsize=1) if (mode == "physical-blockly") else subprocess.Popen(['python', 'pb.py', bot_name, 1], cwd = 'basestation/piVision', 
+                    stdout=subprocess.PIPE, bufsize=1)
             while True:
                 output = self.phys_blockly_py.stdout.readline()
                 if output == '' and self.phys_blockly_py.poll() is not None:
@@ -644,6 +647,9 @@ class BaseStation:
                     self.py_commands.append(s)
                 rc = self.phys_blockly_py.poll()
         bot.sendKV("MODE", mode)
+        
+    def end_physical_blockly(self): 
+        self.phys_blockly_py.kill()
 
     def get_next_py_command(self):
         if(len(self.py_commands) == 0):

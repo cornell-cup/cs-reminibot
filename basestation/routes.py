@@ -105,6 +105,10 @@ def mode():
     base_station.set_bot_mode(bot_name, mode)
     return json.dumps(True), status.HTTP_200_OK
 
+@app.route('/end_physical_blockly', methods=['GET'])
+def end_physical_blockly():
+    base_station.end_physical_blockly()
+    return json.dumps(True), status.HTTP_200_OK
 
 @app.route('/vision', methods=['POST', 'GET'])
 def vision():

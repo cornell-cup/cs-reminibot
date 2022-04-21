@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Button, LabeledTextBox } from '../utils/Util.js';
 import axios from 'axios';
-
 import CodeMirror from 'react-codemirror';
 require('codemirror/mode/python/python');
 
@@ -12,13 +11,17 @@ export default class PhysicalBlockly extends React.Component {
 		this.state = {text: ""}; 
         this.codeRef = React.createRef();
 		this.tempClick = this.tempClick.bind(this); 
+		this.stage = 0; //0 = show both buttons, 1 = show stop button 
 	}
 
 	componentDidMount() {
 		setInterval(this.tempClick, 1000); 
 	}
 
-    physicalBlocklyClick() {
+	//mode = 1 -> real time mode
+	//mode = 0 -> camera mode 
+	
+    physicalBlocklyClick(mode) {
 		// setInterval(tempClick, 1000);
         const _this = this;
 		_this.codeRef["current"].getCodeMirror().setValue("");
@@ -30,7 +33,7 @@ export default class PhysicalBlockly extends React.Component {
             },
             data: JSON.stringify({
                 bot_name: _this.props.selectedBotName,
-                mode: "physical-blockly",
+                mode: mode == 0 ? "physical-blockly" : "physical-blockly-2",
             })
         }).catch(function (error) {
             if (error.response.data.error_msg.length > 0)
@@ -39,6 +42,11 @@ export default class PhysicalBlockly extends React.Component {
                 console.log(error);
         });
     }
+
+	endProcess(){
+		this.stage = 0; 
+		//post request to basestation to stop the process
+	}
 
 	tempClick(){
 		const _this = this;
@@ -60,7 +68,6 @@ export default class PhysicalBlockly extends React.Component {
 			zIndex: 0,
 		}
 
-
 		let options = {
 			lineNumbers: true,
 			mode: 'python',
@@ -69,8 +76,13 @@ export default class PhysicalBlockly extends React.Component {
 			<div className="row">
 				<div className="col">
 					<p className="small-title"> Physical Blockly </p>
-                    {this.props.selectedBotName != '' ? 
-                    <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.physicalBlocklyClick()}>Start Camera</button> : 
+                    {this.props.selectedBotName != '' && this.stage == 0 ? 
+                    <div><button className="btn btn-primary element-wrapper mr-1" onClick={() => this.physicalBlocklyClick()}>Start Camera Mode</button>
+					<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.physicalBlocklyClick()}>Start Real Time Mode</button> 
+					</div>: 
+					this.props.selectedBotName != '' && this.stage == 1 ? 
+					<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.endProcess()}>End Process</button> 
+					:
                     <p  className="white-label">Please return to Bot Control and connect to a minibot before proceeding.</p>
                     }   
 					{/* <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.tempClick()}>Get command</button> */}
