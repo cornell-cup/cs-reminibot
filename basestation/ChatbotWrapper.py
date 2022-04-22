@@ -67,7 +67,7 @@ class ChatbotWrapper:
     def edit_context_by_id(self, id, context):
         print("edit")
         print(self.context_stack)
-        print(id + context)
+        print(str(id) + " " + context)
         if len(self.context_stack) > id:
             if context[-1] == ".":
                 self.context_stack[id] = context
@@ -82,7 +82,10 @@ class ChatbotWrapper:
         url = "http://3.135.244.37:8000/qa"
         # TODO set this using startup parameters
         print("context: ", self.context_stack)
-        data = {"question": input_question,
-                "context": ' '.join(self.context_stack)}
-        resp = requests.get(url, json=data)
-        return resp.text
+        if ' '.join(self.context_stack) == "":
+            return "Tell me something first!"
+        else:
+            data = {"question": input_question,
+                    "context": ' '.join(self.context_stack)}
+            resp = requests.get(url, json=data)
+            return resp.text
