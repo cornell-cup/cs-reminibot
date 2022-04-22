@@ -11,6 +11,7 @@ function ContextHistory(props) {
   const [id, setID] = useState(0);
 
   useEffect(() => {
+    setID(0);
     console.log("get context history")
     let contextArr = [];
     axios({
@@ -25,9 +26,12 @@ function ContextHistory(props) {
     }).then(function (response) {
       if (response.data) {
         let context = response.data['context'];
-        if (context != "") {
+        if (!context) {
+          console.log("ContextHistory.js 29: not empty context")
           contextArr = context.split(".");
+          console.log("ContextHistory.js 31 contextarr: " + contextArr)
         } else {
+          console.log("ContextHistory.js: empty context")
           contextArr = [];
         }
       }
@@ -67,7 +71,7 @@ function ContextHistory(props) {
       let newContextHist = contextHistory.concat({ "id": id, "context": props.parentContext })
       setID(id + 1);
       setContextHistory(newContextHist);
-      console.log(contextHistory);
+      console.log("ContextHistory.js FormatLoop: ", contextHistory);
     }
   }, [props.parentContext])
 

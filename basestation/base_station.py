@@ -353,7 +353,7 @@ class BaseStation:
 
     def replace_context_stack(self, context_stack) -> None:
         """ Replace chatbot obj contextStack with <context_stack>.
-        """ 
+        """
         self.chatbot.replace_context_stack(context_stack)
 
     def update_chatbot_all_context(self, context: str) -> None:

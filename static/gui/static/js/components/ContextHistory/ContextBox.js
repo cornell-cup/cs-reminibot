@@ -15,6 +15,7 @@ function ContextBox({ id, context }) {
   }
 
   const editContext = (e) => {
+    console.log("ContextBox.js Edit: ", id, " Context: ", currContext);
     setEditing(!editing);
     if (!editing) return;
     e.preventDefault();
@@ -37,8 +38,8 @@ function ContextBox({ id, context }) {
   }
 
   const deleteContext = (e) => {
+    console.log("ContextBox.js Delete: ", id, " Context: ", currContext);
     e.preventDefault();
-    console.log("id", id);
     axios({
       method: 'POST',
       url: '/chatbot-context',

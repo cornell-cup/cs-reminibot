@@ -56,8 +56,9 @@ class ChatbotWrapper:
 
     def delete_context_by_id(self, id):
         print("delete")
+        print("ChabotWrapper 59 DeleteContext: " +
+              str(id) + " " + str(self.context_stack))
         print(self.context_stack)
-        print(id)
         if len(self.context_stack) > id:
             self.context_stack[id] = ""
             print(self.context_stack)
@@ -68,7 +69,8 @@ class ChatbotWrapper:
     def edit_context_by_id(self, id, context):
         print("edit")
         print(self.context_stack)
-        print(str(id) + " " + context)
+        print("ChabotWrapper 71 EditContext: " +
+              str(id) + " " + str(self.context_stack))
         if len(self.context_stack) > id:
             if context[-1] == ".":
                 self.context_stack[id] = context
@@ -82,7 +84,7 @@ class ChatbotWrapper:
         # self.context_stack = ['. '.join(self.context_stack)]
         url = "http://3.135.244.37:8000/qa"
         # TODO set this using startup parameters
-        print("context: ", self.context_stack)
+        print("chatbotwrapper 85 context: ", self.context_stack)
         if ' '.join(self.context_stack) == "":
             return "Tell me something first!"
         else:

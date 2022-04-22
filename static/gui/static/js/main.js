@@ -7,19 +7,15 @@ import Platform from './components/Platform.js';
 import Chatbot from './components/Chatbot/chatbot2.js';
 
 function ClientGUI({ }) {
-  const [context, setContext] = useState("");
-
-  useEffect(() => {
-    console.log(context);
-  }, [context]);
+  const [chatbotContext, setChatbotContext] = useState("");
 
   return (
     <div className="main-body">
       <Navbar />
       <div className="container">
-        <Platform parentContext={context} />
+        <Platform parentContext={chatbotContext} />
       </div>
-      <Chatbot setParentContext={setContext} />
+      <Chatbot setParentContext={setChatbotContext} />
     </div>
   );
 }
