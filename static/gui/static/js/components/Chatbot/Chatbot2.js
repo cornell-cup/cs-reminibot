@@ -210,30 +210,6 @@ function Chatbot2({ setParentContext }) {
     }
   }, [messages]);
 
-  // componentDidUpdate(prevProps, prevState) {
-  //   //maybe add conditional logic to only scroll when the posts have changed
-  //   this.msgEnd.scrollIntoView({
-  //     block: "nearest",
-  //     inline: "center",
-  //     behavior: "smooth",
-  //     alignToTop: false
-  //   });
-  // }
-
-
-  // const scrollToBottom = (e) => {
-  //   e.preventDefault();
-  //   setScroll(!scroll);
-  //   console.log("scroll");
-  //   if (!scroll){
-  //   messages.current.scrollIntoView(
-  //       {behavior: 'smooth',
-  //       block: "start" });
-  //   }
-  // }
-
-
-
   return (
     <div class={"floating-chat enter " + expand} style={expand === "expand" ? (right ? styles.leftWindow : styles.rightWindow) : styles.empty}
       onClick={(e) => openChatbox(e)}> {/* add 'expand' to class for this to turn into a chat */}

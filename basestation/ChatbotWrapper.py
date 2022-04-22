@@ -57,6 +57,7 @@ class ChatbotWrapper:
     def delete_context_by_id(self, id):
         if len(self.context_stack) > id:
             self.context_stack[id] = ""
+            print(self.context_stack)
             return SUCCESS
         else:
             return FAILURE
