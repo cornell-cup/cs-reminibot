@@ -3,7 +3,9 @@ import axios from 'axios';
 import {
 	LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
 } from 'recharts';
-
+// ES6 module
+import Plotly from 'plotly.js-dist-min'
+var Plotly = require('plotly.js-dist-min')
 
 const SensorPopup = ({ handleClose, selectedBotName }) => {
 	const [sensordata, setData] = useState([{ name: new Date().toLocaleTimeString(), value: 0 }]);
@@ -29,15 +31,18 @@ const SensorPopup = ({ handleClose, selectedBotName }) => {
 
 				var value = -1;
 				if (response.data['data'] == 'HIGH') {
-					value = 1;
+					value = 0;
+					console.log(value);
 				}
 				else if (response.data['data'] == 'LOW') {
-					value = 0;
+					value = 1;
+					console.log(value);
 				}
 
 				if (value != -1) {
 					sensordata.push({ name: (new Date().toLocaleTimeString()), value: value });
 					setData(sensordata);
+					return value;
 				}
 
 				console.log(sensordata);
@@ -57,30 +62,48 @@ const SensorPopup = ({ handleClose, selectedBotName }) => {
 	}
 
 	return (
-		<div className="popup-box">
-			<div className='box'>
-				<button className="close-icon" onClick={() => handleClose()}>x</button>
-				<br />
-				<button className="btn btn-secondary element-wrapper mr-1" onClick={startIROnClick}>Read Value</button>
-				<ResponsiveContainer width="100%" height="100%">
-					<LineChart
-						data={sensordata}
-						margin={{
-							top: 5, right: 30, left: 20, bottom: 5,
-						}}
-					>
-						<CartesianGrid strokeDasharray="3 3" />
-						<XAxis dataKey="name" />
-						<YAxis />
-						<Tooltip />
-						<Legend />
-						<Line type="monotone" dataKey="value" stroke="#8884d8" activeDot={{ r: 8 }} />
+		// <div className="popup-box">
+		// 	<div className='box'>
+		// 		<button className="close-icon" onClick={() => handleClose()}>x</button>
+		// 		<br />
+		// 		<button className="btn btn-secondary element-wrapper mr-1" onClick={startIROnClick}>Read Value</button>
+		// 		<ResponsiveContainer width="100%" height="100%">
+		// 			<LineChart
+		// 				data={sensordata}
+		// 				margin={{
+		// 					top: 5, right: 30, left: 20, bottom: 5,
+		// 				}}
+		// 			>
+		// 				<CartesianGrid strokeDasharray="3 3" />
+		// 				<XAxis dataKey="name" />
+		// 				<YAxis />
+		// 				<Tooltip />
+		// 				<Legend />
+		// 				<Line type="monotone" dataKey="value" stroke="#8884d8" activeDot={{ r: 8 }} />
 
-					</LineChart>
-				</ResponsiveContainer>
-			</div>
-		</div >
+		// 			</LineChart>
+		// 		</ResponsiveContainer>
+		// 	</div>
+		// </div >
 
+		<div className='popup-box'>
+			<div className='box'></div>
+			<button className="close-icon" onClick={() => handleClose()}>x</button>
+			<br />
+			<div id="chart"></div>
+			<script>
+				 
+				Plotly.plot('chart',[{
+					y: [startIROnClick()],
+					type:'line'
+				}]);
+				
+				setInterval(function(){
+					Plotly.extendTraces('chart',{ y:[[startIROnClick()]]}, [-1]);
+				}, 200);
+			</script>
+		</div>
+	
 	)
 }
 
