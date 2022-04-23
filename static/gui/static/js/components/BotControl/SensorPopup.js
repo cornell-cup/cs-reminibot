@@ -4,7 +4,7 @@ import {
 	LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
 } from 'recharts';
 // // ES6 module
-import Plotly from 'plotly.js-dist-min'
+// import Plotly from 'plotly.js-dist-min'
 // var Plotly = require('plotly.js-dist-min')
 
 const SensorPopup = ({ handleClose, selectedBotName }) => {
@@ -42,7 +42,7 @@ const SensorPopup = ({ handleClose, selectedBotName }) => {
 				if (value != -1) {
 					sensordata.push({ name: (new Date().toLocaleTimeString()), value: value });
 					setData(sensordata);
-					document.getElementById("ir-value").textContent = sensordata;
+					document.getElementById("ir-value").innerHTML = sensordata;
 				}
 
 				console.log(sensordata);
@@ -109,6 +109,7 @@ const SensorPopup = ({ handleClose, selectedBotName }) => {
 			<div className='box'>
 				<button className="close-icon" onClick={() => handleClose()}>x</button>
 				<br />
+				<button className="btn btn-secondary element-wrapper mr-1" onClick={startIROnClick}>Read Value</button>
 				<label id='ir-value' className='ir-label'></label>
 			</div>
 		</div>

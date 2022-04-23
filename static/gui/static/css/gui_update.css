@@ -550,7 +550,7 @@ table {
 
 /* IR STUFF */
 .ir-label {
-  color: white;
+  color: black;
   font-size: 18px;
 }
 
@@ -588,8 +588,4 @@ table {
   display: inline-flex;
   justify-content: center;
   align-items: center;
-}
-
-.value {
-  
 }
