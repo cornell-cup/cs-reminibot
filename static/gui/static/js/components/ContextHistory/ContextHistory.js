@@ -12,7 +12,7 @@ function ContextHistory(props) {
 
   useEffect(() => {
     setID(0);
-    console.log("get context history")
+    // console.log("get context history")
     let contextArr = [];
     axios({
       method: 'POST',
@@ -27,11 +27,11 @@ function ContextHistory(props) {
       if (response.data) {
         let context = response.data['context'];
         if (!context) {
-          console.log("ContextHistory.js 29: not empty context")
+          // console.log("ContextHistory.js 29: not empty context")
           contextArr = context.split(".");
-          console.log("ContextHistory.js 31 contextarr: " + contextArr)
+          // console.log("ContextHistory.js 31 contextarr: " + contextArr)
         } else {
-          console.log("ContextHistory.js: empty context")
+          // console.log("ContextHistory.js: empty context")
           contextArr = [];
         }
       }
@@ -51,7 +51,8 @@ function ContextHistory(props) {
       })
     }).then(function (response) {
       if (response.data) {
-        console.log("successfully replaced context stack")
+        console.log("ContextHistory.js 54: successfully replaced context \
+        stack with", contextArr)
       }
     }).catch(function (error) {
       console.log("Chatbot", error);
@@ -67,11 +68,11 @@ function ContextHistory(props) {
 
   useEffect(() => {
     if (props.parentContext != "") {
-      console.log("new context is added")
+      // console.log("new context is added")
       let newContextHist = contextHistory.concat({ "id": id, "context": props.parentContext })
       setID(id + 1);
       setContextHistory(newContextHist);
-      console.log("ContextHistory.js FormatLoop: ", contextHistory);
+      // console.log("ContextHistory.js FormatLoop: ", contextHistory);
     }
   }, [props.parentContext])
 
