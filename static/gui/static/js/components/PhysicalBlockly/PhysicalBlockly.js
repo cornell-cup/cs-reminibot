@@ -8,12 +8,13 @@ require('codemirror/mode/python/python');
 export default class PhysicalBlockly extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = {text: ""}; 
+		this.state = {text: "", stage: 0//0 = show both buttons, 1 = show stop button 
+		}; 
         this.codeRef = React.createRef();
 		this.tempClick = this.tempClick.bind(this); 
-		this.stage = 0; //0 = show both buttons, 1 = show stop button 
+		
 	}
-
+//use state
 	componentDidMount() {
 		setInterval(this.tempClick, 1000); 
 	}
@@ -25,6 +26,8 @@ export default class PhysicalBlockly extends React.Component {
 		// setInterval(tempClick, 1000);
         const _this = this;
 		_this.codeRef["current"].getCodeMirror().setValue("");
+		this.setState({stage: 1});
+		console.log("YAYYAYAYAYAYYA");
         axios({
             method: 'POST',
             url: '/mode', //url to backend endpoint
@@ -44,7 +47,7 @@ export default class PhysicalBlockly extends React.Component {
     }
 
 	endProcess(){
-		this.stage = 0; 
+		this.setState({stage: 0});
 		//post request to basestation to stop the process
 	}
 
@@ -76,11 +79,11 @@ export default class PhysicalBlockly extends React.Component {
 			<div className="row">
 				<div className="col">
 					<p className="small-title"> Physical Blockly </p>
-                    {this.props.selectedBotName != '' && this.stage == 0 ? 
-                    <div><button className="btn btn-primary element-wrapper mr-1" onClick={() => this.physicalBlocklyClick()}>Start Camera Mode</button>
-					<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.physicalBlocklyClick()}>Start Real Time Mode</button> 
+                    {this.props.selectedBotName != '' && this.state.stage == 0 ? 
+                    <div><button className="btn btn-primary element-wrapper mr-1" onClick={() => this.physicalBlocklyClick(0)}>Start Camera Mode</button>
+					<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.physicalBlocklyClick(1)}>Start Real Time Mode</button> 
 					</div>: 
-					this.props.selectedBotName != '' && this.stage == 1 ? 
+					this.props.selectedBotName != '' && this.state.stage == 1 ? 
 					<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.endProcess()}>End Process</button> 
 					:
                     <p  className="white-label">Please return to Bot Control and connect to a minibot before proceeding.</p>
