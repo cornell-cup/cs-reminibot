@@ -56,9 +56,11 @@ export default class PhysicalBlockly extends React.Component {
         axios.get('/get-py-command')
             .then(function (response) {
 				//to do: fix this so it updates the python editor view
-				let nl = (response.data.length > 0) ? "\n": ""; 
-				_this.props.setPb(_this.props.pb + response.data.substring(3) + nl); 
-				_this.codeRef["current"].getCodeMirror().setValue(_this.props.pb);
+				// _this.setState({text: _this.state.text + response}); 
+				// console.log(_this.state.text); 
+				// _this.codeRef["current"].getCodeMirror().setValue(_this.state.text);
+				
+				// _this.props.setPb(_this.props.pb + response); 
             })
             .catch(function (error) {
                 console.log(error);
