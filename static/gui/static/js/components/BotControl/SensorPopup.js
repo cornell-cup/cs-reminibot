@@ -3,9 +3,9 @@ import axios from 'axios';
 import {
 	LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
 } from 'recharts';
-// ES6 module
+// // ES6 module
 import Plotly from 'plotly.js-dist-min'
-var Plotly = require('plotly.js-dist-min')
+// var Plotly = require('plotly.js-dist-min')
 
 const SensorPopup = ({ handleClose, selectedBotName }) => {
 	const [sensordata, setData] = useState([{ name: new Date().toLocaleTimeString(), value: 0 }]);
@@ -42,7 +42,7 @@ const SensorPopup = ({ handleClose, selectedBotName }) => {
 				if (value != -1) {
 					sensordata.push({ name: (new Date().toLocaleTimeString()), value: value });
 					setData(sensordata);
-					return value;
+					document.getElementById("ir-value").textContent = sensordata;
 				}
 
 				console.log(sensordata);
@@ -59,6 +59,16 @@ const SensorPopup = ({ handleClose, selectedBotName }) => {
 				console.log(err);
 			})
 		}, 500);
+	}
+
+	function showPlot() {
+		Plotly.plot('chart', [{
+			y: [startIROnClick()],
+			type: 'line'
+		}]);
+		setInterval(function () {
+			Plotly.extendTraces('chart', { y: [[startIROnClick()]] }, [-1]);
+		}, 200);
 	}
 
 	return (
@@ -86,24 +96,23 @@ const SensorPopup = ({ handleClose, selectedBotName }) => {
 		// 	</div>
 		// </div >
 
+		// <div className='popup-box'>
+		// 	<div className='box'></div>
+		// 	<button className="close-icon" onClick={() => handleClose()}>x</button>
+		// 	<br />
+		// 	<button className="btn btn-secondary element-wrapper mr-1" onClick={showPlot}>Read Value</button>
+		// 	<div id="chart"></div>
+
+		// </div>
+
 		<div className='popup-box'>
-			<div className='box'></div>
-			<button className="close-icon" onClick={() => handleClose()}>x</button>
-			<br />
-			<div id="chart"></div>
-			<script>
-				 
-				Plotly.plot('chart',[{
-					y: [startIROnClick()],
-					type:'line'
-				}]);
-				
-				setInterval(function(){
-					Plotly.extendTraces('chart',{ y:[[startIROnClick()]]}, [-1]);
-				}, 200);
-			</script>
+			<div className='box'>
+				<button className="close-icon" onClick={() => handleClose()}>x</button>
+				<br />
+				<label id='ir-value' className='ir-label'></label>
+			</div>
 		</div>
-	
+
 	)
 }
 

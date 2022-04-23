@@ -301,7 +301,7 @@ export default class AddBot extends React.Component {
                             <p className="small-title"> Sensor Data </p>
                             <div className="element-wrapper">
                                 <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.setState({ showSensorPopup: true })}>Start IR</button>
-                                <label id='ir-value' className='ir-label'></label>
+                                {/* <label id='ir-value' className='ir-label'></label> */}
                             </div>
                             {this.state.showSensorPopup ? <SensorPopup selectedBotName={_this.props.selectedBotName} handleClose={() => this.setState({ showSensorPopup: false })} /> : <div />}
                         </div>
