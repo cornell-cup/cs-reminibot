@@ -83,7 +83,7 @@ def worker():
         py_code = pythonCode[task[1]]
         print("pb:" + py_code + "\n")
         sys.stdout.flush()
-        if(mode == 1):
+        if(mode == '1'):
             send_request(task)
         sleep(1.0)
 

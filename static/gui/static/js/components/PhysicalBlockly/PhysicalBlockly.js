@@ -30,7 +30,7 @@ export default class PhysicalBlockly extends React.Component {
 		// setInterval(tempClick, 1000);
 		const _this = this;
 		_this.codeRef["current"].getCodeMirror().setValue("");
-		this.setState({ stage: 1 });
+		_this.setState({ stage: 1 });
 		axios({
 			method: 'POST',
 			url: '/mode', //url to backend endpoint
@@ -42,10 +42,10 @@ export default class PhysicalBlockly extends React.Component {
 				mode: mode == 0 ? "physical-blockly" : "physical-blockly-2",
 			})
 		}).catch(function (error) {
-			if (error.response.data.error_msg.length > 0)
-				window.alert(error.response.data.error_msg);
-			else
-				console.log(error);
+			// if (error.response.data.error_msg.length > 0)
+			// 	window.alert(error.response.data.error_msg);
+			// else
+			console.log(error.response.data);
 		});
 	}
 
@@ -64,6 +64,9 @@ export default class PhysicalBlockly extends React.Component {
 				_this.codeRef["current"].getCodeMirror().setValue(_this.props.pb);
 
 				let block = document.createElement("block");
+				if(response.data == ""){
+					return; 
+				}
 				if (response.data.substring(3) == "bot.move_forward(100)") {
 					block.setAttribute("type", "move_power");
 				} else if (response.data.substring(3) == "bot.stop()") {
@@ -81,7 +84,7 @@ export default class PhysicalBlockly extends React.Component {
 					dir_field.innerHTML = "left"
 					block.appendChild(dir_field);
 				}
-				Blockly.Xml.domToBlock(block, this.bWorkspace);
+				Blockly.Xml.domToBlock(block, _this.bWorkspace);
 			})
 			.catch(function (error) {
 				console.log(error);

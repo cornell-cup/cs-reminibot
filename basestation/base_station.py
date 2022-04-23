@@ -632,9 +632,12 @@ class BaseStation:
         bot = self.get_bot(bot_name)
         if(mode == "physical-blockly" or mode == "physical-blockly-2"):
             print("starting phys blockly subprocess")
-            
-            self.phys_blockly_py = subprocess.Popen(['python', 'pb.py', bot_name, 0], cwd = 'basestation/piVision', 
-                    stdout=subprocess.PIPE, bufsize=1) if (mode == "physical-blockly") else subprocess.Popen(['python', 'pb.py', bot_name, 1], cwd = 'basestation/piVision', 
+            self.phys_blockly_py = None 
+            if(mode == 'physical-blockly'):
+                self.phys_blockly_py = subprocess.Popen(['python', 'pb.py', bot_name, '0'], cwd = 'basestation/piVision', 
+                    stdout=subprocess.PIPE, bufsize=1)
+            else: 
+                self.phys_blockly_py = subprocess.Popen(['python', 'pb.py', bot_name, '1'], cwd = 'basestation/piVision', 
                     stdout=subprocess.PIPE, bufsize=1)
             while True:
                 output = self.phys_blockly_py.stdout.readline()
@@ -645,7 +648,7 @@ class BaseStation:
                     if(s[0:3] != "pb:"):
                         continue; 
                     self.py_commands.append(s)
-                rc = self.phys_blockly_py.poll()
+                self.phys_blockly_py.poll()
         bot.sendKV("MODE", mode)
         
     def end_physical_blockly(self): 
