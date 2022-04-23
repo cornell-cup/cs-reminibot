@@ -200,6 +200,11 @@ function Chatbot2({ setParentContext }) {
     setMic(!mic);
   }
 
+  const alertInfo = (e) => {
+    e.preventDefault();
+    alert("This the ultimate guide to Chatbot! Yeah!\n  - To send a message: hit enter or use the send button.\n  - To ask a question: hit the ~ key or use the question mark.\n  - To input a message via speech, use the microphone.\n  - There are 4 buttons next to this info key: for switching the side, toggling the size of the window, making the font smaller and bigger.");
+  }
+
   useEffect(() => {
     messagesEndRef.current.scrollTo(messages[messages.length - 1], {
       duration: 50,
@@ -224,7 +229,7 @@ function Chatbot2({ setParentContext }) {
             <FontAwesomeIcon icon={Icons.faEllipsisV} onClick={(e) => toggleChangeFont(e)} />
             <span class="popuptext" id="myPopup" style={ canChangeFont ? {visibility: 'visible'} : {visibility: 'hidden'}}>
               <button>
-                <FontAwesomeIcon icon={Icons.faInfo} />
+                <FontAwesomeIcon icon={Icons.faInfo} onClick={(e) => alertInfo(e)}/>
               </button>
               <button style={{transform: "scale(1.25,1)"}} onClick={(e) => switchSide(e)}>
                 <FontAwesomeIcon icon={right ? Icons.faAngleRight : Icons.faAngleLeft} />

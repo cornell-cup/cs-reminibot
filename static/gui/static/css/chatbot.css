@@ -35,8 +35,7 @@ body {
   background-attachment: fixed;
 }
 .floating-chat.enter:hover {
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
-  opacity: 0.75;
+  box-shadow: 0 10px 20px rgb(108, 117, 125, 0.2), 0 6px 6px rgb(108, 117, 125, 0.2);
 }
 .floating-chat.enter {
   transform: translateY(0);
@@ -54,6 +53,9 @@ body {
   opacity: 1;
   background-color: #212529;
   background-image: none;
+  border: rgb(255, 255, 255, 0.3);
+  border-style: solid;
+  border-width: 1.5px;
 }
 .floating-chat :focus {
   outline: 0;
