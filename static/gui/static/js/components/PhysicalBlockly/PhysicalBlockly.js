@@ -30,7 +30,7 @@ export default class PhysicalBlockly extends React.Component {
 		// setInterval(tempClick, 1000);
 		const _this = this;
 		_this.codeRef["current"].getCodeMirror().setValue("");
-		this.setState({ stage: 0 });
+		this.setState({ stage: 1 });
 		axios({
 			method: 'POST',
 			url: '/mode', //url to backend endpoint
