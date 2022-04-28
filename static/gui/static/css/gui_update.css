@@ -121,16 +121,25 @@
 
 /* The side navigation menu */
 .sidenav {
-  height: 100%; /* 100% Full-height */
-  width: 0; /* 0 width - change this with JavaScript */
-  position: fixed; /* Stay in place */
-  z-index: 1; /* Stay on top */
-  top: 0; /* Stay at the top */
-  left: 0;
-  background-color: #111; /* Black*/
-  overflow-x: hidden; /* Disable horizontal scroll */
-  padding-top: 60px; /* Place content 60px from the top */
-  transition: 0.25s; /* 0.5 second transition effect to slide in the sidenav */
+  height: 100%;
+  /* 100% Full-height */
+  width: 0;
+  /* 0 width - change this with JavaScript */
+  position: fixed;
+  /* Stay in place */
+  z-index: 1;
+  /* Stay on top */
+  top: 0;
+  /* Stay at the top */
+  right: 0;
+  background-color: #111;
+  /* Black*/
+  overflow-x: hidden;
+  /* Disable horizontal scroll */
+  padding-top: 60px;
+  /* Place content 60px from the top */
+  transition: 0.25s;
+  /* 0.5 second transition effect to slide in the sidenav */
 }
 
 /* The navigation menu links */
@@ -165,8 +174,13 @@
 
 /* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
 @media screen and (max-height: 450px) {
-  .sidenav {padding-top: 15px;}
-  .sidenav a {font-size: 18px;}
+  .sidenav {
+    padding-top: 15px;
+  }
+
+  .sidenav a {
+    font-size: 18px;
+  }
 }
 
 .logo {
@@ -293,6 +307,7 @@ table {
 .button-movement .row {
   margin: 4px 0;
 }
+
 .button-movement .movement {
   margin: 0 4px;
   line-height: 0;
@@ -304,7 +319,7 @@ table {
   padding: 0 15px;
 }
 
-#setup_control_tab > .row {
+#setup_control_tab>.row {
   margin: 0;
 }
 
@@ -363,7 +378,7 @@ table {
   position: absolute;
 }
 
-#main_nav li:hover > ul {
+#main_nav li:hover>ul {
   visibility: visible;
   opacity: 1;
 }
@@ -524,4 +539,3 @@ table {
   border-radius: 25px;
   padding: 5px 5px 5px 5px;
 }
-

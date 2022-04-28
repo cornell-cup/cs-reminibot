@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import Toggle from "../utils/Toggle.js";
 
 // TODO: add buttons to delete and edit context
 function ContextBox({ id, context }) {
@@ -62,6 +63,7 @@ function ContextBox({ id, context }) {
     return (
       <div className="contextBox" key={id}>
         <input type="checkbox" value={false} readOnly={false}></input>
+        <Toggle isChecked={editing} handleToggle={setEditing} size={"small"} />
         <input class="context-box" type="text" value={currContext} onChange={(e) => { changeCurrContext(e) }} />
         <button onClick={(e) => { editContext(e) }} >{editing ? "Save" : "Edit"}</button>
         <button onClick={(e) => { deleteContext(e) }}>Delete</button>

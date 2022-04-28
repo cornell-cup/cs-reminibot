@@ -5,6 +5,8 @@ import * as Icons from '@fortawesome/free-solid-svg-icons';
 
 import { X_BTN, MIC_BTN, MIC_BTNON } from "../utils/Constants.js";
 import SpeechRecognitionComp from "../utils/SpeechRecognitionComp.js";
+import Toggle from "../utils/Toggle.js";
+// import BotVoiceControl from "../BotControl/MovementControl/BotVoiceControl.js";
 
 // const SpeechRecognition = SpeechRecognition || webkitSpeechRecognition
 // const recognition = new SpeechRecognition()
@@ -45,6 +47,7 @@ function Chatbot2({ setParentContext }) {
   //right means it can move to the right
   const [right, setRight] = useState(false);
   const [fullSize, setFullSize] = useState(false);
+  const [contextMode, setContextMode] = useState(true);
 
   const styles = {
     leftWindow: {
@@ -187,6 +190,12 @@ function Chatbot2({ setParentContext }) {
     })
   }
 
+  const sendCommand = (e) => {
+    e.preventDefault();
+    console.log("send command in command mode");
+    // TODO
+  }
+
   const toggleMic = (e) => {
     e.preventDefault();
     console.log("toggle mic");
@@ -202,6 +211,11 @@ function Chatbot2({ setParentContext }) {
     });
   }
 
+  const toggleMode = (e) => {
+    console.log("toggle context mode", contextMode);
+    setContextMode(!contextMode);
+  };
+
   useEffect(() => {
     if (messages && messagesEndRef.current) {
       console.log("scroll");
@@ -210,12 +224,34 @@ function Chatbot2({ setParentContext }) {
     }
   }, [messages]);
 
+  var questionButton = contextMode ? <button onClick={(e) => { sendQuestion(e); }}><FontAwesomeIcon icon={Icons.faQuestion} />
+  </button> : <div></div>;
+
+  var textBox = contextMode ? <input class="text-box" id="textbox" onChange={changeInputText} value={inputText}
+    onKeyPress={(e) => {
+      if (e.key === 'Enter') { sendContext(e); }
+      if (e.key === '`') { sendQuestion(e); }
+    }}></input> : <div />
+  // : <div></div> ; // TODO add bot name for voice commands related to the bot
+
   return (
     <div class={"floating-chat enter " + expand} style={expand === "expand" ? (right ? styles.leftWindow : styles.rightWindow) : styles.empty}
       onClick={(e) => openChatbox(e)}> {/* add 'expand' to class for this to turn into a chat */}
       <i class="fa fa-comments" aria-hidden={true}></i>
       <div class={"chat " + enter}> {/* add 'enter' to class for the rest to display */}
         <div class="header">
+          {/* <Toggle
+            isChecked={contextMode}
+            handleToggle={toggleMode}
+            size={'small'} /> */}
+
+
+
+
+
+
+
+
           <button style={{ transform: "scale(1.25,1)" }} onClick={(e) => switchSide(e)}>
             <FontAwesomeIcon icon={right ? Icons.faAngleRight : Icons.faAngleLeft} />
           </button>
@@ -223,9 +259,16 @@ function Chatbot2({ setParentContext }) {
             <FontAwesomeIcon icon={!fullSize ? Icons.faExpand : Icons.faCompress} />
           </button>
           <button class="popup">
-            <FontAwesomeIcon icon={Icons.faEllipsisV} onClick={(e) => toggleChangeFont(e)} />
-            <span class="popuptext" id="myPopup" style={canChangeFont ? { visibility: 'visible' } : { visibility: 'hidden' }}>
-              <FontAwesomeIcon style={{ transform: "scale(0.75, 0.75)" }} onClick={(e) => changeFontSize(e, -1)} icon={Icons.faFont} />&nbsp;&nbsp;
+            <FontAwesomeIcon
+              icon={Icons.faEllipsisV}
+              onClick={(e) => toggleChangeFont(e)} />
+            <span class="popuptext"
+              id="myPopup"
+              style={canChangeFont ? { visibility: 'visible' } : { visibility: 'hidden' }}>
+              <FontAwesomeIcon
+                style={{ transform: "scale(0.75, 0.75)" }}
+                onClick={(e) => changeFontSize(e, -1)}
+                icon={Icons.faFont} />&nbsp;&nbsp;
               <FontAwesomeIcon onClick={(e) => changeFontSize(e, 1)} icon={Icons.faFont} />
             </span>
           </button>
@@ -247,13 +290,18 @@ function Chatbot2({ setParentContext }) {
           ))}
         </ul>
         <div class="footer">
+
           <input class="text-box" id="textbox" onChange={changeInputText} value={inputText}
             onKeyPress={(e) => {
-              if (e.key === 'Enter') { sendContext(e); }
-              if (e.key === '`') { sendQuestion(e); }
+              if (contextMode) {
+                if (e.key === 'Enter') { sendContext(e); }
+                if (e.key === '`') { sendQuestion(e); }
+              } else { /*voice control mode */
+                if (e.key === 'Enter') { sendCommand(e); }
+              }
             }}>
-
           </input>
+
           <div style={{ width: "50px", height: "50px", }}>
             <input type="image"
               src={mic ? MIC_BTNON : MIC_BTN}
@@ -275,12 +323,11 @@ function Chatbot2({ setParentContext }) {
             // }} 
             onClick={(e) => { sendContext(e); }}><FontAwesomeIcon icon={Icons.faPaperPlane} />
           </button>
-          <button onClick={(e) => { sendQuestion(e); }}><FontAwesomeIcon icon={Icons.faQuestion} />
-          </button>
+          {questionButton}
           <div ref={messagesEndRef} />
         </div>
       </div>
-    </div>
+    </div >
   );
 }
 
