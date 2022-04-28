@@ -19,6 +19,7 @@ FRAME_HEIGHT = 720
 # These are effectively constant after the argument parser has ran.
 TAG_SIZE = 6.5 # The length of one side of an apriltag, in inches
 SEND_DATA = True  # Sends data to URL if True. Set to False for debug
+MAX_LOCATION_HISTORY_LENGTH = 5
 
 
 BASE_STATION_DEVICE_ID = hash(platform_node()+str(randint(0,1000000))+environ["USER"]+str(randint(0,1000000))+str(DEVICE_ID)+str(time.time()))
@@ -85,6 +86,8 @@ def main():
     detections = []
     past_time = time.time()
     iteration_count = 0
+    location_history = []
+    discovered_ids = set()
     while True:
         if not camera.isOpened():
             print("Failed to open camera")
@@ -106,7 +109,6 @@ def main():
 
         
         data_for_BS = {"DEVICE_ID": str(BASE_STATION_DEVICE_ID), "TIMESTAMP": time.time(), "DEVICE_CENTER_X": FRAME_WIDTH/2, "DEVICE_CENTER_Y": FRAME_HEIGHT/2, "position_data" : []}
-
         for i, d in enumerate(detections):
             # TODO draw tag - might be better to generalize, because
             # locate_cameras does this too.
@@ -138,39 +140,63 @@ def main():
                 cv2.putText(undst, str(round(angle)),(int(ctr_x), int(ctr_y)+30), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 255, 255),1)
            
 
-            # prints DEVICE_ID tag id x y z angle
-            print("{}, {},{},{},{},{}".format(BASE_STATION_DEVICE_ID, d.tag_id, x, y, z, angle))
-            data_for_BS["position_data"].append({"id": str(d.tag_id), "image_x": ctr_x, "image_y": ctr_y,"x": x, "y": y, "orientation": angle})
+            # # prints DEVICE_ID tag id x y z angle
+            # print("{}, {},{},{},{},{}".format(BASE_STATION_DEVICE_ID, d.tag_id, x, y, z, angle))
+            location_history.append({"id": str(d.tag_id), "image_x": ctr_x, "image_y": ctr_y,"x": x, "y": y, "orientation": angle})
+            discovered_ids.add(str(d.tag_id))
 
-        data_for_BS["TIMESTAMP"] = time.time()
-        # Send the data to the URL specified.
-        # This is usually a URL to the base station.
-        if SEND_DATA:
-            payload = data_for_BS
-            r = requests.post(url, json=payload)
-            status_code = r.status_code
-            if status_code / 100 != 2:
-                # Status codes not starting in '2' are usually error codes.
-                print(
-                    "WARNING: Basestation returned status code {}".format(
-                        status_code
+        if iteration_count % MAX_LOCATION_HISTORY_LENGTH == 0 and iteration_count != 0:
+            average_locations = []
+            for id in discovered_ids:
+                locations_with_id = [location for location in location_history if location["id"] == id]
+                average_locations.append({
+                    "id": id, 
+                    "image_x": average_value_for_key(locations_with_id, "image_x"), 
+                    "image_y": average_value_for_key(locations_with_id, "image_y"),
+                    "x": average_value_for_key(locations_with_id, "x"),
+                    "y": average_value_for_key(locations_with_id, "y"), 
+                    "orientation": average_value_for_key(locations_with_id, "orientation")
+                })
+            # prints DEVICE_ID tag id x y z angle
+            print("id,actual_x,actual_y,actual_angle")
+            average_locations.sort(key=lambda entry : int(entry["id"]))     
+            [print("{},{},{},{}".format(location["id"], location["x"], location["y"], location["orientation"])) for location in average_locations]
+            location_history = [] 
+            discovered_ids = set() 
+
+            data_for_BS["position_data"] = average_locations
+            data_for_BS["TIMESTAMP"] = time.time()
+            # Send the data to the URL specified.
+            # This is usually a URL to the base station.
+            if SEND_DATA:
+                payload = data_for_BS
+                r = requests.post(url, json=payload)
+                status_code = r.status_code
+                if status_code / 100 != 2:
+                    # Status codes not starting in '2' are usually error codes.
+                    print(
+                        "WARNING: Basestation returned status code {}".format(
+                            status_code
+                        )
                     )
-                )
-            else:
-                print(r)
-                print("total seconds:",r.elapsed.total_seconds())
-                num_frames += 1
-                print(
-                    "Vision FPS (Vision System outflow): {}".format(
-                        num_frames / (time.time() - past_time)
+                else:
+                    print(r)
+                    print("total seconds:",r.elapsed.total_seconds())
+                    num_frames += 1
+                    print(
+                        "Vision FPS (Vision System outflow): {}".format(
+                            num_frames / (time.time() - past_time)
+                        )
                     )
-                )
         cv2.imshow("Tag Locations", undst)
         iteration_count+=1
         if cv2.waitKey(1) & 0xFF == ord(" "):
             break
         else:
             continue
+
+def average_value_for_key(locations_with_id, key):
+    return float(sum(d[key] for d in locations_with_id)) / len(locations_with_id)
         
     
 

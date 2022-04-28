@@ -30,7 +30,7 @@ from basestation.util.world import World
 
 MAX_VISION_LOG_LENGTH = 1000
 VISION_UPDATE_FREQUENCY = 30
-VISION_DATA_HOLD_THRESHOLD = 1
+VISION_DATA_HOLD_THRESHOLD = 2
 
 
 def make_thread_safe(func):
