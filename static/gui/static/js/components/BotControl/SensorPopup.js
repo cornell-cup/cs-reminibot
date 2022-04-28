@@ -8,7 +8,8 @@ import {
 // var Plotly = require('plotly.js-dist-min')
 
 const SensorPopup = ({ handleClose, selectedBotName }) => {
-	const [sensordata, setData] = useState([{ name: new Date().toLocaleTimeString(), value: 0 }]);
+	const [sensortime, setTime] = useState([new Date().toLocaleTimeString()]);
+	const [sensordata, setData] = useState([0]);
 
 
 	function startIROnClick() {
@@ -40,9 +41,14 @@ const SensorPopup = ({ handleClose, selectedBotName }) => {
 				}
 
 				if (value != -1) {
-					sensordata.push({ name: (new Date().toLocaleTimeString()), value: value });
+					sensortime.push(new Date().toLocaleTimeString());
+					sensordata.push(value);
+
+					setTime(sensortime);
 					setData(sensordata);
-					document.getElementById("ir-value").innerHTML = sensordata;
+
+					document.getElementById("ir-value").innerText = sensordata.join();
+					//document.getElementById("ir-value").innerText = value;
 				}
 
 				console.log(sensordata);
