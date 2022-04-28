@@ -8,13 +8,6 @@ import SpeechRecognitionComp from "../utils/SpeechRecognitionComp.js";
 import Toggle from "../utils/Toggle.js";
 // import BotVoiceControl from "../BotControl/MovementControl/BotVoiceControl.js";
 
-// const SpeechRecognition = SpeechRecognition || webkitSpeechRecognition
-// const recognition = new SpeechRecognition()
-
-// recognition.continous = true
-// recognition.interimResults = true
-// recognition.lang = 'en-US'
-
 //Chat messages
 let id = 2;
 const initialList = [
@@ -35,19 +28,21 @@ const defaultFontSize = {
     lineHeight: 12 * lineHeightMultiplier,
   }
 }
+const emptyStr = "";
 
 function Chatbot2({ setParentContext }) {
   const [open, setOpen] = useState(false);
   const [expand, setExpand] = useState("");
   const [enter, setEnter] = useState("");
   const [inputText, setInputText] = useState("");
-  const [messages, setMessages] = useState(initialList);
+  const [messages, setMessages] = useState([]);
   const messagesEndRef = useRef(null);
   const [mic, setMic] = useState(false);
   //right means it can move to the right
   const [right, setRight] = useState(false);
   const [fullSize, setFullSize] = useState(false);
   const [contextMode, setContextMode] = useState(true);
+  const [date, setDate] = useState("");
 
   const styles = {
     leftWindow: {
@@ -60,12 +55,11 @@ function Chatbot2({ setParentContext }) {
       height: fullSize ? "80%" : "60%",
       right: "10px",
     },
-    empty: {}
+    empty: {
+    }
   };
   const [fontSize, setFontSize] = useState(defaultFontSize);
   const [canChangeFont, setCanChangeFont] = useState(false);
-  const [scroll, setScroll] = useState(false);
-
 
   const changeInputText = (event) => {
     event.preventDefault();
@@ -79,6 +73,13 @@ function Chatbot2({ setParentContext }) {
       setOpen(true);
       setExpand("expand");
       setEnter("enter");
+      var options = {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      }
+      var dateFormat = new Intl.DateTimeFormat('en-US', options);
+      setDate(dateFormat.format(new Date()));
     }
   }
 
@@ -91,7 +92,9 @@ function Chatbot2({ setParentContext }) {
 
   const switchSide = (e) => {
     e.preventDefault();
-    setRight(!right);
+    if (expand == "expand") {
+      setRight(!right);
+    }
   }
 
   const toggleWindowSize = (e) => {
@@ -106,8 +109,7 @@ function Chatbot2({ setParentContext }) {
 
   const changeFontSize = (e, i) => {
     e.preventDefault();
-    if (!canChangeFont)
-      return;
+    if (!canChangeFont || (fontSize.body['fontSize'] <= 5 && i < 0) || (fontSize.body['fontSize'] >= 50 && i > 0)) return;
     const newFontSize = {
       header: {
         fontSize: fontSize.header['fontSize'] + i,
@@ -119,19 +121,26 @@ function Chatbot2({ setParentContext }) {
       }
     };
     setFontSize(newFontSize);
-    console.log(newFontSize);
+  }
+
+  const getTimeStamp = () => {
+    var options = {
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,
+    }
+    var time = new Intl.DateTimeFormat('en-US', options);
+    time = time.format(new Date());
+    return time;
   }
 
   const sendContext = (e) => {
     e.preventDefault();
+    if (inputText === emptyStr) return;
     id++;
-    var time = new Date().toLocaleString('en-GB');
-    time = time.substring(time.indexOf(',') + 2);
-    console.log(time);
-    const newList = messages.concat({ id: id, who: "self", message: inputText, timeStamp: time });
+    const newList = messages.concat({ id: id, who: "self", message: inputText, timeStamp: getTimeStamp() });
     setInputText("");
     setMessages(newList);
-    scrollToBottom();
     setParentContext(inputText);
     axios({
       method: 'POST',
@@ -157,12 +166,10 @@ function Chatbot2({ setParentContext }) {
 
   const sendQuestion = (e) => {
     e.preventDefault();
+    if (inputText === emptyStr) return;
     id++;
-    var time = new Date().toLocaleString('en-GB');
-    time = time.substring(time.indexOf(',') + 2);
-    let newList = messages.concat({ id: id, who: "self", message: inputText, timeStamp: time });
-    id++;
-    const newTempList = newList.concat({ id: id, who: "other", message: "..." })
+    let newList = messages.concat({ id: id, who: "self", message: inputText, timeStamp: getTimeStamp() });
+    const newTempList = newList.concat({ id: id, who: "other", message: "...", timeStamp: getTimeStamp() })
     setInputText("");
     setMessages(newTempList);
     console.log("send Context Bttn clicked")
@@ -179,7 +186,7 @@ function Chatbot2({ setParentContext }) {
       if (response.data) {
         const res = response.data;
         console.log(res);
-        newList = newList.concat({ id: id, who: "other", message: res });
+        newList = newList.concat({ id: id, who: "other", message: res, timeStamp: getTimeStamp() });
         setMessages(newList);
       }
     }).catch(function (error) {
@@ -202,13 +209,9 @@ function Chatbot2({ setParentContext }) {
     setMic(!mic);
   }
 
-  const scrollToBottom = () => {
-    messagesEndRef.current.scrollIntoView({
-      block: "nearest",
-      inline: "center",
-      behavior: "smooth",
-      alignToTop: false
-    });
+  const alertInfo = (e) => {
+    e.preventDefault();
+    alert("This the ultimate guide to Chatbot! Yeah!\n  - To send a message: hit enter or use the send button.\n  - To ask a question: hit the ~ key or use the question mark.\n  - To input a message via speech, use the microphone.\n  - There are 4 buttons next to this info key: for switching the side, toggling the size of the window, making the font smaller and bigger.");
   }
 
   const toggleMode = (e) => {
@@ -217,11 +220,13 @@ function Chatbot2({ setParentContext }) {
   };
 
   useEffect(() => {
-    if (messages && messagesEndRef.current) {
-      console.log("scroll");
-      scrollToBottom();
-      messagesEndRef.current.scrollIntoView({ block: 'center', inline: 'nearest' });
-    }
+    messagesEndRef.current.scrollTo(messages[messages.length - 1], {
+      duration: 50,
+      delay: 10,
+      smooth: false,
+      containerId: 'messages',
+      offset: 120,
+    })
   }, [messages]);
 
   var questionButton = contextMode ? <button onClick={(e) => { sendQuestion(e); }}><FontAwesomeIcon icon={Icons.faQuestion} />
@@ -234,42 +239,31 @@ function Chatbot2({ setParentContext }) {
     }}></input> : <div />
   // : <div></div> ; // TODO add bot name for voice commands related to the bot
 
+  useEffect(() => {
+    initialList[0].timeStamp = getTimeStamp();
+    setMessages(initialList);
+  }, []);
+
   return (
     <div class={"floating-chat enter " + expand} style={expand === "expand" ? (right ? styles.leftWindow : styles.rightWindow) : styles.empty}
       onClick={(e) => openChatbox(e)}> {/* add 'expand' to class for this to turn into a chat */}
       <i class="fa fa-comments" aria-hidden={true}></i>
       <div class={"chat " + enter}> {/* add 'enter' to class for the rest to display */}
         <div class="header">
-          {/* <Toggle
-            isChecked={contextMode}
-            handleToggle={toggleMode}
-            size={'small'} /> */}
-
-
-
-
-
-
-
-
-          <button style={{ transform: "scale(1.25,1)" }} onClick={(e) => switchSide(e)}>
-            <FontAwesomeIcon icon={right ? Icons.faAngleRight : Icons.faAngleLeft} />
-          </button>
-          <button onClick={(e) => toggleWindowSize(e)}>
-            <FontAwesomeIcon icon={!fullSize ? Icons.faExpand : Icons.faCompress} />
-          </button>
           <button class="popup">
-            <FontAwesomeIcon
-              icon={Icons.faEllipsisV}
-              onClick={(e) => toggleChangeFont(e)} />
-            <span class="popuptext"
-              id="myPopup"
-              style={canChangeFont ? { visibility: 'visible' } : { visibility: 'hidden' }}>
-              <FontAwesomeIcon
-                style={{ transform: "scale(0.75, 0.75)" }}
-                onClick={(e) => changeFontSize(e, -1)}
-                icon={Icons.faFont} />&nbsp;&nbsp;
-              <FontAwesomeIcon onClick={(e) => changeFontSize(e, 1)} icon={Icons.faFont} />
+            <FontAwesomeIcon icon={Icons.faEllipsisV} onClick={(e) => toggleChangeFont(e)} />
+            <span class="popuptext" id="myPopup" style={canChangeFont ? { visibility: 'visible' } : { visibility: 'hidden' }}>
+              <button>
+                <FontAwesomeIcon icon={Icons.faInfo} onClick={(e) => alertInfo(e)} />
+              </button>
+              <button style={{ transform: "scale(1.25,1)" }} onClick={(e) => switchSide(e)}>
+                <FontAwesomeIcon icon={right ? Icons.faAngleRight : Icons.faAngleLeft} />
+              </button>
+              <button onClick={(e) => toggleWindowSize(e)}>
+                <FontAwesomeIcon icon={!fullSize ? Icons.faExpand : Icons.faCompress} />
+              </button>
+              <button><FontAwesomeIcon style={{ transform: "scale(0.75, 0.75)" }} onClick={(e) => changeFontSize(e, -1)} icon={Icons.faFont} /></button>
+              <button><FontAwesomeIcon onClick={(e) => changeFontSize(e, 1)} icon={Icons.faFont} /></button>
             </span>
           </button>
           &nbsp;
@@ -284,24 +278,24 @@ function Chatbot2({ setParentContext }) {
               onClick={(e) => closeChatbox(e)} />
           </div>
         </div>
+
         <ul class="messages">
+          <div class="date" style={fontSize.body}>{date}</div>
+          <hr class="timeBreak" />
           {messages.map((item) => (
-            <li class={item.who} key={item.id} time={item.timeStamp} style={fontSize.body}>{item.message}<br /><br /><div id="msgTime">Me {item.timeStamp}</div></li>
+            <div>
+              <li class={item.who} key={item.id} time={item.timeStamp} style={fontSize.body}>{item.message}</li>
+              <li class={"timestamp " + item.who + "t"} style={fontSize.body}>{item.timeStamp}</li>
+            </div>
           ))}
         </ul>
         <div class="footer">
-
-          <input class="text-box" id="textbox" onChange={changeInputText} value={inputText}
+          <textarea rows="3" cols="70" class="text-box" id="textbox" onChange={changeInputText} value={inputText} placeholder="Enter a context/question"
             onKeyPress={(e) => {
-              if (contextMode) {
-                if (e.key === 'Enter') { sendContext(e); }
-                if (e.key === '`') { sendQuestion(e); }
-              } else { /*voice control mode */
-                if (e.key === 'Enter') { sendCommand(e); }
-              }
+              if (e.key === 'Enter') { sendContext(e); }
+              if (e.key === '`') { sendQuestion(e); }
             }}>
-          </input>
-
+          </textarea>
           <div style={{ width: "50px", height: "50px", }}>
             <input type="image"
               src={mic ? MIC_BTNON : MIC_BTN}
@@ -315,15 +309,8 @@ function Chatbot2({ setParentContext }) {
               }} />
           </div>
           <SpeechRecognitionComp setText={setInputText} mic={mic} />
-          <button
-            // style={{
-            //   width: "30%",
-            //   fontSize: "10px", //too slow if coded as window.screen.availWidth * 0.01
-            //   borderRadius: "20%",
-            // }} 
-            onClick={(e) => { sendContext(e); }}><FontAwesomeIcon icon={Icons.faPaperPlane} />
-          </button>
-          {questionButton}
+          <button style={{ marginLeft: "0px", marginRight: "5px", }} onClick={(e) => { sendContext(e); }}><FontAwesomeIcon icon={Icons.faPaperPlane} /></button>
+          <button onClick={(e) => { sendQuestion(e); }}><FontAwesomeIcon icon={Icons.faQuestion} /></button>
           <div ref={messagesEndRef} />
         </div>
       </div>

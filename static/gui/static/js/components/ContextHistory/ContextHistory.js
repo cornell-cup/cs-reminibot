@@ -78,6 +78,7 @@ function ContextHistory(props) {
 
   return (
     <div className="contextHistoryTab">
+      <h1>Context History</h1>
       <ul className="contextHistoryList">
         {contextHistory.map((item) => (
           <ContextBox key={item.id} id={item.id} context={item.context} />
