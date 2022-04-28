@@ -1,1 +1,910 @@
-{"camera_matrix": [[732.2571785815256, 0.0, 522.1508203978036], [0.0, 737.7560731970377, 373.6749111317318], [0.0, 0.0, 1.0]], "dist_coeffs": [[-0.2031108070520507, -0.012456246582053907, -0.004287176426785083, 0.016862138909831553, 0.06954564270813247]], "new_camera_matrix": [[633.8599243164062, 0.0, 566.0110366640183], [0.0, 608.1845703125, 367.19632236048346], [0.0, 0.0, 1.0]], "roi": {"x": 20, "y": 43, "w": 1241, "h": 627}, "transform_matrix": [[0.9809013426737195, 0.09288176660633898, -0.17089626494742546, -11.316740988096571], [0.08067443198246176, -0.9937576452023907, -0.07705438745526816, 28.216852503064786], [-0.17698641745965202, 0.061795793011215704, -0.9822713922337926, 77.45989562315506], [0.0, 0.0, 0.0, 1.0]], "overall_center_offset": {"x": -2.091500000000001, "y": 3.406374999999999, "angle": 95.04110186671461}, "scale_factors": {"x": 0.7899465463261778, "y": 0.9054395948040298}, "cell_center_offsets": [{"reference_point_x": 3.471, "reference_point_y": -7.779, "x_offset": -1.0897312606569616, "y_offset": 3.9591478082299716, "angle_offset": 358.47228541530956}, {"reference_point_x": -11.978, "reference_point_y": -7.431, "x_offset": -0.8858470664638407, "y_offset": 3.6440548292381694, "angle_offset": 0.549249507701461}, {"reference_point_x": -27.778, "reference_point_y": -7.604, "x_offset": -0.4046916345102325, "y_offset": 3.800695879139267, "angle_offset": 359.96551825419937}, {"reference_point_x": 35.304, "reference_point_y": 22.242, "x_offset": -2.236099669858177, "y_offset": 0.7769457326181914, "angle_offset": 359.7473070719543}, {"reference_point_x": 18.799, "reference_point_y": 22.939, "x_offset": -1.1980319227446152, "y_offset": 0.14585433503978606, "angle_offset": 0.9181058969585365}, {"reference_point_x": 2.565, "reference_point_y": 23.587, "x_offset": -0.3740396896854445, "y_offset": -0.44087052239322944, "angle_offset": 359.30038100845934}, {"reference_point_x": -12.525, "reference_point_y": 23.887, "x_offset": -0.45374630562342055, "y_offset": -0.7125024008344347, "angle_offset": 359.6809817898403}, {"reference_point_x": -27.126, "reference_point_y": 22.908, "x_offset": -0.9197367827148994, "y_offset": 0.1739229624787093, "angle_offset": 1.366171055577297}]}
+{
+  "camera_matrix": [
+    [732.2571785815256, 0.0, 522.1508203978036],
+    [0.0, 737.7560731970377, 373.6749111317318],
+    [0.0, 0.0, 1.0]
+  ],
+  "dist_coeffs": [
+    [
+      -0.2031108070520507, -0.012456246582053907, -0.004287176426785083,
+      0.016862138909831553, 0.06954564270813247
+    ]
+  ],
+  "new_camera_matrix": [
+    [633.8599243164062, 0.0, 566.0110366640183],
+    [0.0, 608.1845703125, 367.19632236048346],
+    [0.0, 0.0, 1.0]
+  ],
+  "roi": { "x": 20, "y": 43, "w": 1241, "h": 627 },
+  "transform_matrix": [
+    [
+      0.999492684280988, -0.010079796988348528, -0.030212112826784376,
+      -6.932838153263699
+    ],
+    [
+      -0.01001771231909298, -0.9999473889515782, 0.0022056220919794258,
+      -3.644398128413892
+    ],
+    [
+      -0.030232755558773694, -0.0019018468903712604, -0.9995410764294428,
+      71.67388384323787
+    ],
+    [0.0, 0.0, 0.0, 1.0]
+  ],
+  "overall_center_offset": {
+    "x": -0.8403951612903244,
+    "y": 0.06248387096774123,
+    "angle": 89.82257911708719
+  },
+  "scale_factors": { "x": 1.0051848659894032, "y": 1.0371675394527202 },
+  "cell_center_offsets": [
+    {
+      "reference_point_x": -56.101,
+      "reference_point_y": 24.485,
+      "x_offset": 0.9866286644512599,
+      "y_offset": 0.7901465537930505,
+      "angle_offset": 357.3964203465111
+    },
+    {
+      "reference_point_x": -47.482,
+      "reference_point_y": 23.849,
+      "x_offset": -0.177059695511403,
+      "y_offset": 1.4497851088849814,
+      "angle_offset": 359.5192310761207
+    },
+    {
+      "reference_point_x": -40.231,
+      "reference_point_y": 23.948,
+      "x_offset": 0.034344841199434484,
+      "y_offset": 1.3471055224791613,
+      "angle_offset": 359.13055200864864
+    },
+    {
+      "reference_point_x": -34.305,
+      "reference_point_y": 25.297,
+      "x_offset": 1.5776193253462338,
+      "y_offset": -0.05203348824255727,
+      "angle_offset": 358.49135792442485
+    },
+    {
+      "reference_point_x": -46.968,
+      "reference_point_y": 16.85,
+      "x_offset": -0.6937247166299514,
+      "y_offset": 1.2089207175145695,
+      "angle_offset": 0.09365401161545606
+    },
+    {
+      "reference_point_x": -40.388,
+      "reference_point_y": 17.289,
+      "x_offset": 0.19215886515976877,
+      "y_offset": 0.7536041676948244,
+      "angle_offset": 359.92786333451613
+    },
+    {
+      "reference_point_x": -34.128,
+      "reference_point_y": 18.134,
+      "x_offset": 1.3997016040661094,
+      "y_offset": -0.12280240314272461,
+      "angle_offset": 358.19190322943047
+    },
+    {
+      "reference_point_x": -53.48,
+      "reference_point_y": 9.826,
+      "x_offset": -1.6479608693069636,
+      "y_offset": 0.9939855146304772,
+      "angle_offset": 0.9611386061511098
+    },
+    {
+      "reference_point_x": -46.174,
+      "reference_point_y": 9.838,
+      "x_offset": -1.49184150022554,
+      "y_offset": 0.9815395041570465,
+      "angle_offset": 0.6561701650531973
+    },
+    {
+      "reference_point_x": -40.363,
+      "reference_point_y": 10.425,
+      "x_offset": 0.16702924351003645,
+      "y_offset": 0.3727221584982985,
+      "angle_offset": 359.85217212347817
+    },
+    {
+      "reference_point_x": -34.123,
+      "reference_point_y": 10.985,
+      "x_offset": 1.3946756797361601,
+      "y_offset": -0.20809166359522457,
+      "angle_offset": 0.09722602411073922
+    },
+    {
+      "reference_point_x": -53.658,
+      "reference_point_y": 3.216,
+      "x_offset": -1.4690379631608437,
+      "y_offset": 0.34966295041295803,
+      "angle_offset": 358.7714265237352
+    },
+    {
+      "reference_point_x": -46.609,
+      "reference_point_y": 3.268,
+      "x_offset": -1.0545860835201495,
+      "y_offset": 0.2957302383614171,
+      "angle_offset": 1.8589144999575922
+    },
+    {
+      "reference_point_x": -40.425,
+      "reference_point_y": 3.559,
+      "x_offset": 0.22935070520137657,
+      "y_offset": -0.0060855156193251325,
+      "angle_offset": 359.86180145611826
+    },
+    {
+      "reference_point_x": -34.001,
+      "reference_point_y": 3.782,
+      "x_offset": 1.2720431260854497,
+      "y_offset": -0.2373738769172813,
+      "angle_offset": 358.9809822872635
+    },
+    {
+      "reference_point_x": -52.125,
+      "reference_point_y": -3.638,
+      "x_offset": -3.0099863627226,
+      "y_offset": -0.041590734178097666,
+      "angle_offset": 0.24143434842085298
+    },
+    {
+      "reference_point_x": -39.97,
+      "reference_point_y": -3.56,
+      "x_offset": -0.22800840882379703,
+      "y_offset": -0.12248980225540951,
+      "angle_offset": 359.90834314343533
+    },
+    {
+      "reference_point_x": -33.758,
+      "reference_point_y": -3.564,
+      "x_offset": 1.0277832036500314,
+      "y_offset": -0.11834113209759867,
+      "angle_offset": 0.05287826333352541
+    },
+    {
+      "reference_point_x": -53.172,
+      "reference_point_y": -10.357,
+      "x_offset": -1.9575578080317015,
+      "y_offset": -0.5728620365952697,
+      "angle_offset": 358.7612176570022
+    },
+    {
+      "reference_point_x": -46.324,
+      "reference_point_y": -10.368,
+      "x_offset": -1.341063770327132,
+      "y_offset": -0.5614531936612899,
+      "angle_offset": 0.20127367187760115
+    },
+    {
+      "reference_point_x": -39.811,
+      "reference_point_y": -10.434,
+      "x_offset": -0.3878328025161153,
+      "y_offset": -0.493000136057411,
+      "angle_offset": 0.09226259245090773
+    },
+    {
+      "reference_point_x": -33.047,
+      "reference_point_y": -10.617,
+      "x_offset": 0.3130967639315614,
+      "y_offset": -0.3031984763375615,
+      "angle_offset": 358.43281792235246
+    },
+    {
+      "reference_point_x": -53.673,
+      "reference_point_y": -17.252,
+      "x_offset": -1.4539601901710029,
+      "y_offset": -0.9215918520687651,
+      "angle_offset": 359.44432881013284
+    },
+    {
+      "reference_point_x": -46.08,
+      "reference_point_y": -17.096,
+      "x_offset": -1.5863288776285458,
+      "y_offset": -1.0833899882233915,
+      "angle_offset": 1.5967371704982725
+    },
+    {
+      "reference_point_x": -40.006,
+      "reference_point_y": -17.504,
+      "x_offset": -0.19182175364817766,
+      "y_offset": -0.6602256321266786,
+      "angle_offset": 0.10917275745140387
+    },
+    {
+      "reference_point_x": -33.187,
+      "reference_point_y": -17.736,
+      "x_offset": 0.453822645170078,
+      "y_offset": -0.41960276297364985,
+      "angle_offset": 358.86899997280614
+    },
+    {
+      "reference_point_x": -53.57,
+      "reference_point_y": -23.897,
+      "x_offset": -1.5574942313679188,
+      "y_offset": -1.52961355240544,
+      "angle_offset": 358.668946393639
+    },
+    {
+      "reference_point_x": -45.846,
+      "reference_point_y": -23.611,
+      "x_offset": -1.8215421362700681,
+      "y_offset": -1.8262434686889186,
+      "angle_offset": 1.1860313576728458
+    },
+    {
+      "reference_point_x": -39.594,
+      "reference_point_y": -24.133,
+      "x_offset": -0.6059579184358128,
+      "y_offset": -1.2848420130946003,
+      "angle_offset": 0.0893788821071837
+    },
+    {
+      "reference_point_x": -32.987,
+      "reference_point_y": -24.647,
+      "x_offset": 0.25278567197219814,
+      "y_offset": -0.7517378978159002,
+      "angle_offset": 359.54942015939906
+    },
+    {
+      "reference_point_x": -26.087,
+      "reference_point_y": 24.533,
+      "x_offset": 0.8170100966453155,
+      "y_offset": 0.7403625118993169,
+      "angle_offset": 358.7824473686555
+    },
+    {
+      "reference_point_x": -18.872,
+      "reference_point_y": 24.867,
+      "x_offset": 1.0646012885317724,
+      "y_offset": 0.3939485537221117,
+      "angle_offset": 359.9657483611843
+    },
+    {
+      "reference_point_x": -11.485,
+      "reference_point_y": 25.115,
+      "x_offset": 1.1393006834680524,
+      "y_offset": 0.13673100393783955,
+      "angle_offset": 358.00885965330167
+    },
+    {
+      "reference_point_x": -4.013,
+      "reference_point_y": 25.168,
+      "x_offset": 1.1285593647952323,
+      "y_offset": 0.08176112434684413,
+      "angle_offset": 358.3635180402487
+    },
+    {
+      "reference_point_x": -26.031,
+      "reference_point_y": 17.531,
+      "x_offset": 0.7607197441499096,
+      "y_offset": 0.5026096231472685,
+      "angle_offset": 359.30458608825364
+    },
+    {
+      "reference_point_x": -18.752,
+      "reference_point_y": 17.777,
+      "x_offset": 0.9439791046130459,
+      "y_offset": 0.24746640844189827,
+      "angle_offset": 359.90019751003217
+    },
+    {
+      "reference_point_x": -11.362,
+      "reference_point_y": 17.901,
+      "x_offset": 1.015662944951357,
+      "y_offset": 0.1188576335497622,
+      "angle_offset": 359.9324567807414
+    },
+    {
+      "reference_point_x": -3.887,
+      "reference_point_y": 17.885,
+      "x_offset": 1.0019060716805681,
+      "y_offset": 0.135452314181002,
+      "angle_offset": 358.190886945913
+    },
+    {
+      "reference_point_x": -26.027,
+      "reference_point_y": 10.691,
+      "x_offset": 0.7566990046859559,
+      "y_offset": 0.09683559300387401,
+      "angle_offset": 358.65147124449766
+    },
+    {
+      "reference_point_x": -18.761,
+      "reference_point_y": 10.809,
+      "x_offset": 0.953025768406949,
+      "y_offset": -0.025550176651545797,
+      "angle_offset": 359.8030848964692
+    },
+    {
+      "reference_point_x": -11.287,
+      "reference_point_y": 10.69,
+      "x_offset": 0.9402740800021512,
+      "y_offset": 0.0978727605433285,
+      "angle_offset": 358.92326328862714
+    },
+    {
+      "reference_point_x": -3.86,
+      "reference_point_y": 10.743,
+      "x_offset": 0.9747660802988536,
+      "y_offset": 0.04290288095233308,
+      "angle_offset": 357.8309746946348
+    },
+    {
+      "reference_point_x": -26.09,
+      "reference_point_y": 3.674,
+      "x_offset": 0.8200256512432844,
+      "y_offset": -0.1253597826563877,
+      "angle_offset": 358.486904736148
+    },
+    {
+      "reference_point_x": -18.634,
+      "reference_point_y": 3.642,
+      "x_offset": 0.8253672904262963,
+      "y_offset": -0.09217042139390053,
+      "angle_offset": 1.3200524348105773
+    },
+    {
+      "reference_point_x": -11.196,
+      "reference_point_y": 3.683,
+      "x_offset": 0.8488022571971143,
+      "y_offset": -0.1346942905114621,
+      "angle_offset": 359.9127340285095
+    },
+    {
+      "reference_point_x": -3.736,
+      "reference_point_y": 3.673,
+      "x_offset": 0.850123156916168,
+      "y_offset": -0.12432261511693499,
+      "angle_offset": 358.2642243247378
+    },
+    {
+      "reference_point_x": -25.574,
+      "reference_point_y": -3.564,
+      "x_offset": 0.3013502603927556,
+      "y_offset": -0.11834113209759867,
+      "angle_offset": 0.015524670923696249
+    },
+    {
+      "reference_point_x": -18.445,
+      "reference_point_y": -3.581,
+      "x_offset": 0.6353873507543,
+      "y_offset": -0.10070928392690259,
+      "angle_offset": 0.7658503202736711
+    },
+    {
+      "reference_point_x": -10.897,
+      "reference_point_y": -3.585,
+      "x_offset": 0.548251982266283,
+      "y_offset": -0.09656061376909175,
+      "angle_offset": 359.98244259692785
+    },
+    {
+      "reference_point_x": -3.491,
+      "reference_point_y": -3.629,
+      "x_offset": 0.603852864748764,
+      "y_offset": -0.05092524203317206,
+      "angle_offset": 358.64050045404366
+    },
+    {
+      "reference_point_x": -25.896,
+      "reference_point_y": -10.668,
+      "x_offset": 0.6250197872413423,
+      "y_offset": -0.25030293182547503,
+      "angle_offset": 359.23764805211346
+    },
+    {
+      "reference_point_x": -18.316,
+      "reference_point_y": -10.639,
+      "x_offset": 0.5057185030416633,
+      "y_offset": -0.2803807904696036,
+      "angle_offset": 0.49834374068439047
+    },
+    {
+      "reference_point_x": -10.866,
+      "reference_point_y": -10.682,
+      "x_offset": 0.5170912514206112,
+      "y_offset": -0.2357825862731353,
+      "angle_offset": 359.8792675488875
+    },
+    {
+      "reference_point_x": -3.406,
+      "reference_point_y": -10.767,
+      "x_offset": 0.5184121511396649,
+      "y_offset": -0.14762334541965494,
+      "angle_offset": 358.47623383362725
+    },
+    {
+      "reference_point_x": -25.72,
+      "reference_point_y": -17.782,
+      "x_offset": 0.44810725082720637,
+      "y_offset": -0.3718930561588252,
+      "angle_offset": 359.3291443253898
+    },
+    {
+      "reference_point_x": -18.318,
+      "reference_point_y": -17.824,
+      "x_offset": 0.5077288727736473,
+      "y_offset": -0.3283320195018078,
+      "angle_offset": 0.3051342200751037
+    },
+    {
+      "reference_point_x": -10.847,
+      "reference_point_y": -17.719,
+      "x_offset": 0.49799273896681306,
+      "y_offset": -0.43723461114434414,
+      "angle_offset": 0.1234537398527209
+    },
+    {
+      "reference_point_x": -3.441,
+      "reference_point_y": -17.904,
+      "x_offset": 0.5535936214492931,
+      "y_offset": -0.24535861634559097,
+      "angle_offset": 359.0860361979587
+    },
+    {
+      "reference_point_x": -25.651,
+      "reference_point_y": -24.732,
+      "x_offset": 0.3787494950739365,
+      "y_offset": -0.663578656962418,
+      "angle_offset": 359.52277950354005
+    },
+    {
+      "reference_point_x": -18.326,
+      "reference_point_y": -24.9,
+      "x_offset": 0.5157703517015584,
+      "y_offset": -0.4893345103343627,
+      "angle_offset": 0.4410743889484934
+    },
+    {
+      "reference_point_x": -10.876,
+      "reference_point_y": -25.058,
+      "x_offset": 0.5271431000805062,
+      "y_offset": -0.32546203910083094,
+      "angle_offset": 0.31206380650826304
+    },
+    {
+      "reference_point_x": -3.375,
+      "reference_point_y": -25.113,
+      "x_offset": 0.48725142029399304,
+      "y_offset": -0.26841782443093365,
+      "angle_offset": 357.8875927183159
+    },
+    {
+      "reference_point_x": 3.542,
+      "reference_point_y": 25.186,
+      "x_offset": 1.0343877022452914,
+      "y_offset": 0.06309210863669534,
+      "angle_offset": 359.3863498127692
+    },
+    {
+      "reference_point_x": 10.948,
+      "reference_point_y": 25.098,
+      "x_offset": 1.089988584727772,
+      "y_offset": 0.15436285210853384,
+      "angle_offset": 0.3832418141994367
+    },
+    {
+      "reference_point_x": 18.474,
+      "reference_point_y": 25.152,
+      "x_offset": 1.0249672832915238,
+      "y_offset": 0.09835580497808394,
+      "angle_offset": 359.1994573184226
+    },
+    {
+      "reference_point_x": 26.155,
+      "reference_point_y": 25.338,
+      "x_offset": 0.8041423276269164,
+      "y_offset": -0.09455735736012016,
+      "angle_offset": 358.833094607888
+    },
+    {
+      "reference_point_x": 3.547,
+      "reference_point_y": 17.989,
+      "x_offset": 1.0293617779153448,
+      "y_offset": 0.027586890077920145,
+      "angle_offset": 359.61650816094163
+    },
+    {
+      "reference_point_x": 11.216,
+      "reference_point_y": 18.193,
+      "x_offset": 0.8205990406426125,
+      "y_offset": -0.1839952879704363,
+      "angle_offset": 0.6135859138871638
+    },
+    {
+      "reference_point_x": 18.578,
+      "reference_point_y": 17.999,
+      "x_offset": 0.9204280572286265,
+      "y_offset": 0.017215214683396596,
+      "angle_offset": 358.5743445986268
+    },
+    {
+      "reference_point_x": 26.377,
+      "reference_point_y": 18.15,
+      "x_offset": 0.5809912873772731,
+      "y_offset": -0.13939708377396443,
+      "angle_offset": 357.9053432152518
+    },
+    {
+      "reference_point_x": 3.644,
+      "reference_point_y": 10.73,
+      "x_offset": 0.931858845914372,
+      "y_offset": 0.05638605896521831,
+      "angle_offset": 358.0306708453638
+    },
+    {
+      "reference_point_x": 11.281,
+      "reference_point_y": 10.898,
+      "x_offset": 0.7552620243532999,
+      "y_offset": -0.11785808766283701,
+      "angle_offset": 1.1374039969273895
+    },
+    {
+      "reference_point_x": 18.577,
+      "reference_point_y": 10.741,
+      "x_offset": 0.921433242094615,
+      "y_offset": 0.0449772160312385,
+      "angle_offset": 359.6860297090092
+    },
+    {
+      "reference_point_x": 26.355,
+      "reference_point_y": 10.868,
+      "x_offset": 0.6031053544290366,
+      "y_offset": -0.08674306147925748,
+      "angle_offset": 357.4715472331498
+    },
+    {
+      "reference_point_x": 3.742,
+      "reference_point_y": 3.675,
+      "x_offset": 0.8333507290474107,
+      "y_offset": -0.12639695019583996,
+      "angle_offset": 359.9848476969522
+    },
+    {
+      "reference_point_x": 11.304,
+      "reference_point_y": 3.714,
+      "x_offset": 0.7321427724355445,
+      "y_offset": -0.16684648423449655,
+      "angle_offset": 1.0427316148364127
+    },
+    {
+      "reference_point_x": 18.835,
+      "reference_point_y": 3.675,
+      "x_offset": 0.6620955466693488,
+      "y_offset": -0.12639695019583996,
+      "angle_offset": 359.6706089917949
+    },
+    {
+      "reference_point_x": 26.341,
+      "reference_point_y": 3.614,
+      "x_offset": 0.6171779425528889,
+      "y_offset": -0.0631297302892242,
+      "angle_offset": 356.8625769338045
+    },
+    {
+      "reference_point_x": 4.052,
+      "reference_point_y": -3.682,
+      "x_offset": 0.5217434205906963,
+      "y_offset": 0.0040446375578224725,
+      "angle_offset": 359.9793807492693
+    },
+    {
+      "reference_point_x": 11.586,
+      "reference_point_y": -3.717,
+      "x_offset": 0.44868064022653265,
+      "y_offset": 0.040345501438667775,
+      "angle_offset": 1.6863310726278655
+    },
+    {
+      "reference_point_x": 19.326,
+      "reference_point_y": -3.781,
+      "x_offset": 0.16854977746855226,
+      "y_offset": 0.10672422396364167,
+      "angle_offset": 359.99420535597636
+    },
+    {
+      "reference_point_x": 26.592,
+      "reference_point_y": -3.826,
+      "x_offset": 0.36487654118954893,
+      "y_offset": 0.15339676323901408,
+      "angle_offset": 358.1399062111119
+    },
+    {
+      "reference_point_x": 4.177,
+      "reference_point_y": -10.949,
+      "x_offset": 0.396095312342021,
+      "y_offset": 0.0411411467607401,
+      "angle_offset": 359.95466276653235
+    },
+    {
+      "reference_point_x": 11.686,
+      "reference_point_y": -10.947,
+      "x_offset": 0.34816215362759273,
+      "y_offset": 0.03906681168183468,
+      "angle_offset": 1.9892368112271868
+    },
+    {
+      "reference_point_x": 19.049,
+      "reference_point_y": -10.939,
+      "x_offset": 0.4469859853476166,
+      "y_offset": 0.030769471366212997,
+      "angle_offset": 0.26711199542069153
+    },
+    {
+      "reference_point_x": 26.916,
+      "reference_point_y": -11.133,
+      "x_offset": 0.03919664460898176,
+      "y_offset": 0.23197997402004056,
+      "angle_offset": 357.4600892374867
+    },
+    {
+      "reference_point_x": 4.177,
+      "reference_point_y": -18.142,
+      "x_offset": 0.396095312342021,
+      "y_offset": 0.0014872580441540606,
+      "angle_offset": 359.91090188848256
+    },
+    {
+      "reference_point_x": 11.671,
+      "reference_point_y": -18.171,
+      "x_offset": 0.36323992661743354,
+      "y_offset": 0.031565116688284434,
+      "angle_offset": 1.1826768478634904
+    },
+    {
+      "reference_point_x": 19.125,
+      "reference_point_y": -18.195,
+      "x_offset": 0.37059193553242054,
+      "y_offset": 0.05645713763514948,
+      "angle_offset": 1.6301190359037605
+    },
+    {
+      "reference_point_x": 26.968,
+      "reference_point_y": -18.437,
+      "x_offset": -0.013072968422466857,
+      "y_offset": 0.3074516821827089,
+      "angle_offset": 358.4832160963008
+    },
+    {
+      "reference_point_x": 4.076,
+      "reference_point_y": -25.22,
+      "x_offset": 0.4976189838069507,
+      "y_offset": -0.15744089770949188,
+      "angle_offset": 359.2330798406822
+    },
+    {
+      "reference_point_x": 11.675,
+      "reference_point_y": -25.365,
+      "x_offset": 0.35921918715347445,
+      "y_offset": -0.0070516044888471185,
+      "angle_offset": 1.6595052814086273
+    },
+    {
+      "reference_point_x": 19.159,
+      "reference_point_y": -25.398,
+      "x_offset": 0.33641565008878516,
+      "y_offset": 0.027174924313094095,
+      "angle_offset": 0.1730893381230345
+    },
+    {
+      "reference_point_x": 27.211,
+      "reference_point_y": -25.85,
+      "x_offset": -0.2573328908578887,
+      "y_offset": 0.49597465214572267,
+      "angle_offset": 359.1406130654361
+    },
+    {
+      "reference_point_x": 34.063,
+      "reference_point_y": 25.565,
+      "x_offset": 0.3551404073827129,
+      "y_offset": -0.32999438881588716,
+      "angle_offset": 358.8764588146602
+    },
+    {
+      "reference_point_x": 41.899,
+      "reference_point_y": 25.729,
+      "x_offset": -0.0214882025102483,
+      "y_offset": -0.5000898652861316,
+      "angle_offset": 359.38369033348056
+    },
+    {
+      "reference_point_x": 49.48,
+      "reference_point_y": 25.799,
+      "x_offset": -0.14179467157590864,
+      "y_offset": -0.5726915930478249,
+      "angle_offset": 4.32075599339754
+    },
+    {
+      "reference_point_x": 57.038,
+      "reference_point_y": 25.927,
+      "x_offset": -0.23898188872381354,
+      "y_offset": -0.7054490380977718,
+      "angle_offset": 6.099753364028857
+    },
+    {
+      "reference_point_x": 34.193,
+      "reference_point_y": 18.318,
+      "x_offset": 0.22446637480409493,
+      "y_offset": -0.31364123040202685,
+      "angle_offset": 359.9772684486433
+    },
+    {
+      "reference_point_x": 42.22,
+      "reference_point_y": 18.519,
+      "x_offset": -0.34415254449284305,
+      "y_offset": -0.5221119058320198,
+      "angle_offset": 359.29325793683944
+    },
+    {
+      "reference_point_x": 49.818,
+      "reference_point_y": 18.514,
+      "x_offset": -0.4815471562803282,
+      "y_offset": -0.516926068134758,
+      "angle_offset": 2.592169728563249
+    },
+    {
+      "reference_point_x": 58.088,
+      "reference_point_y": 18.823,
+      "x_offset": -1.2944259980126915,
+      "y_offset": -0.8374108378256473,
+      "angle_offset": 4.944399132015008
+    },
+    {
+      "reference_point_x": 34.781,
+      "reference_point_y": 11.13,
+      "x_offset": -0.3665823263976691,
+      "y_offset": -0.35848095681586933,
+      "angle_offset": 358.7247174374717
+    },
+    {
+      "reference_point_x": 42.199,
+      "reference_point_y": 11.02,
+      "x_offset": -0.3230436623070645,
+      "y_offset": -0.24439252747606943,
+      "angle_offset": 359.7896851088367
+    },
+    {
+      "reference_point_x": 50.935,
+      "reference_point_y": 11.309,
+      "x_offset": -1.6043386515904956,
+      "y_offset": -0.5441339463779045,
+      "angle_offset": 359.37202659874305
+    },
+    {
+      "reference_point_x": 57.884,
+      "reference_point_y": 11.221,
+      "x_offset": -1.089368285350858,
+      "y_offset": -0.45286320290606596,
+      "angle_offset": 5.488079906837186
+    },
+    {
+      "reference_point_x": 34.227,
+      "reference_point_y": 3.624,
+      "x_offset": 0.19029008936045955,
+      "y_offset": -0.07350140568375174,
+      "angle_offset": 359.1998493045794
+    },
+    {
+      "reference_point_x": 43.124,
+      "reference_point_y": 3.812,
+      "x_offset": -1.2528396633472667,
+      "y_offset": -0.26848890310086304,
+      "angle_offset": 359.41777147908317
+    },
+    {
+      "reference_point_x": 34.923,
+      "reference_point_y": -3.931,
+      "x_offset": -0.5093185773681697,
+      "y_offset": 0.26229935488154954,
+      "angle_offset": 358.0463642172297
+    },
+    {
+      "reference_point_x": 42.989,
+      "reference_point_y": -4.029,
+      "x_offset": -1.1171397064386923,
+      "y_offset": 0.36394177374791603,
+      "angle_offset": 2.2527946279174103
+    },
+    {
+      "reference_point_x": 51.085,
+      "reference_point_y": -4.073,
+      "x_offset": -1.7551163814889037,
+      "y_offset": 0.40957714548383706,
+      "angle_offset": 358.9597864671473
+    },
+    {
+      "reference_point_x": 58.196,
+      "reference_point_y": -4.012,
+      "x_offset": -1.4029859635395496,
+      "y_offset": 0.34630992557721996,
+      "angle_offset": 7.558779324844693
+    },
+    {
+      "reference_point_x": 34.718,
+      "reference_point_y": -11.267,
+      "x_offset": -0.3032556798403476,
+      "y_offset": 0.3709604243067055,
+      "angle_offset": 0.081336933524085
+    },
+    {
+      "reference_point_x": 43.329,
+      "reference_point_y": -11.491,
+      "x_offset": -1.4589025608750958,
+      "y_offset": 0.6032859531441144,
+      "angle_offset": 359.84619295816253
+    },
+    {
+      "reference_point_x": 51.059,
+      "reference_point_y": -11.547,
+      "x_offset": -1.7289815749731758,
+      "y_offset": 0.6613673353534679,
+      "angle_offset": 357.66371921923667
+    },
+    {
+      "reference_point_x": 59.02,
+      "reference_point_y": -11.537,
+      "x_offset": -2.23125829311482,
+      "y_offset": 0.6509956599589408,
+      "angle_offset": 6.100719586430159
+    },
+    {
+      "reference_point_x": 34.832,
+      "reference_point_y": -18.624,
+      "x_offset": -0.41784675456313636,
+      "y_offset": 0.5014020120603639,
+      "angle_offset": 1.150189899084296
+    },
+    {
+      "reference_point_x": 43.416,
+      "reference_point_y": -19.026,
+      "x_offset": -1.5463536442161683,
+      "y_offset": 0.9183433629203606,
+      "angle_offset": 2.0656952275396634
+    },
+    {
+      "reference_point_x": 51.216,
+      "reference_point_y": -19.102,
+      "x_offset": -1.8867955989335172,
+      "y_offset": 0.9971680959187665,
+      "angle_offset": 357.07670865437024
+    },
+    {
+      "reference_point_x": 59.288,
+      "reference_point_y": -19.069,
+      "x_offset": -2.5006478371999705,
+      "y_offset": 0.9629415671168253,
+      "angle_offset": 9.7913551482699
+    },
+    {
+      "reference_point_x": 35.613,
+      "reference_point_y": -26.373,
+      "x_offset": -1.202896134900854,
+      "y_offset": 1.0384132752794955,
+      "angle_offset": 1.0186700937957767
+    },
+    {
+      "reference_point_x": 43.175,
+      "reference_point_y": -26.368,
+      "x_offset": -1.3041040915127198,
+      "y_offset": 1.0332274375822301,
+      "angle_offset": 0.2733359837687317
+    },
+    {
+      "reference_point_x": 51.15,
+      "reference_point_y": -26.498,
+      "x_offset": -1.8204533977782091,
+      "y_offset": 1.168059217711086,
+      "angle_offset": 352.9867158020821
+    },
+    {
+      "reference_point_x": 59.0,
+      "reference_point_y": -26.451,
+      "x_offset": -2.21115459579503,
+      "y_offset": 1.1193123433568068,
+      "angle_offset": 7.226726977189344
+    }
+  ]
+}

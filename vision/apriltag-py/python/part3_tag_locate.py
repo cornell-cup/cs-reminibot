@@ -84,6 +84,7 @@ def main():
     obj_points = np.ndarray((4, 3))  # 4 3D points
     detections = []
     past_time = time.time()
+    iteration_count = 0
     while True:
         if not camera.isOpened():
             print("Failed to open camera")
@@ -133,6 +134,8 @@ def main():
                 util.draw_square(undst,util.camera_matrix_to_camera_params(camera_matrix), TAG_SIZE, pose)
                 # displaying tag id
                 cv2.putText(undst, str(d.tag_id),(int(ctr_x), int(ctr_y)), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 0, 255),2)
+                cv2.putText(undst, str((round(x),round(y))),(int(ctr_x), int(ctr_y)+15), cv2.FONT_HERSHEY_SIMPLEX, .5,  (255, 0, 255),1)
+                cv2.putText(undst, str(round(angle)),(int(ctr_x), int(ctr_y)+30), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 255, 255),1)
            
 
             # prints DEVICE_ID tag id x y z angle
@@ -163,11 +166,13 @@ def main():
                     )
                 )
         cv2.imshow("Tag Locations", undst)
+        iteration_count+=1
         if cv2.waitKey(1) & 0xFF == ord(" "):
             break
         else:
             continue
-    pass
+        
+    
 
 
 def get_transform_matrix(file):
