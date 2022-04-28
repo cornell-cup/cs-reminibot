@@ -29,13 +29,13 @@ class InputWindow(Screen):
 
 		if isinstance(row, int) and isinstance(col, int):
 				if row > 2 and col > 2:
-					checkerboard.checkerboardTest(row, col)
+					# checkerboard.checkerboardTest(row, col)
 					#if calibFile or posFile is 0, then that means the default files should be used
-					calibFile = calibFile[0] if len(calibFile) != 0 else "calibration_test.json"
-					posFile = posFile[0] if len(posFile) != 0 else "corner_positions.json"
+					calibFile = calibFile[0] if len(calibFile) != 0 else "calibration.json"
+					posFile = posFile[0] if len(posFile) != 0 else "calibration_board_positions.json"
+					#
 
-					call(["python3", "part2_tag_calib.py", "-cf", calibFile, "-pf", posFile, "-b", "1.1811"])
-					call(["python3", "part3_tag_locate.py", "-f", calibFile, "-s", "1.1811", "-u", "http://localhost:8080/vision"])
+					call(f"python3 part2_tag_calib.py -cf {calibFile} -pf {posFile} -b 3.93701; python3 part3_tag_locate.py -f {calibFile} -s 3.93701 -u http://localhost:8080/vision", shell=True)
 		else:
 			# display error message
 			pass
