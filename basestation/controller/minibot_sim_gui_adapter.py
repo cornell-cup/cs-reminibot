@@ -5,8 +5,7 @@ from re import split
 
 RADIANS_TO_DEGREES_CONVERSION_FACTOR = (180/pi) 
 DEGREES_TO_RADIANS_CONVERSION_FACTOR = (pi/180) 
-METERS_TO_INCHES_CONVERSION_FACTOR = 39.3700787402
-INCHES_TO_METERS_CONVERSION_FACTOR = 0.0254
+
 
 
 def convert_and_extract_minibot_sim_data(xs, locs):
@@ -15,9 +14,9 @@ def convert_and_extract_minibot_sim_data(xs, locs):
     frame in radians
     
     locs: (locations numpy array) Column 1 has the x coordinate of the minibot in
-    meters. Column 2 has the y coordinate of the minibot in meters.
+    inches. Column 2 has the y coordinate of the minibot in inches.
 
-    Converts the x (meters) and y (meters) positions into inches and converts the 
+    Converts the x (inches) and y (inches) positions into inches and converts the 
     orientation into degrees (radians). Extracts the resulting x, y, and orientation 
     from the xs (state numpy array) and loc (locations numpy array). The extracted
     data is then put into a 2d numpy array Column 1 has the x coordinate of the minibot in
@@ -25,10 +24,9 @@ def convert_and_extract_minibot_sim_data(xs, locs):
     orientation of the minibot in the global frame in degrees
   """
   xs_in_degrees = RADIANS_TO_DEGREES_CONVERSION_FACTOR * xs
-  locs_in_inches = METERS_TO_INCHES_CONVERSION_FACTOR * locs
   
   orientations = np.delete(xs_in_degrees, 0, axis=1)
-  resulting_data = np.column_stack((locs_in_inches,orientations))
+  resulting_data = np.column_stack((locs,orientations))
   
   return resulting_data
 
@@ -41,7 +39,7 @@ def run_commands_for_gui_data(commands):
     inches. "y" has the y coordinate of the minibot in inches. "orientation" has 
     the orientation of the minibot in the global frame in degrees.
   """
-  #xs col 2 has orientation in radians, locs has x and y coordinates in meters
+  #xs col 2 has orientation in radians, locs has x and y coordinates in inches
   xs, _, locs = run_commands(commands)
   locations_and_orientations = convert_and_extract_minibot_sim_data(xs,locs)
   current_locations_and_orientations = np.r_[locations_and_orientations,[locations_and_orientations[-1]]]

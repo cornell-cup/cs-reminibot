@@ -23,6 +23,7 @@ import speech_recognition as sr
 from copy import deepcopy
 
 from basestation.util.units import AngleUnits, LengthUnits, convert_angle, convert_length
+from basestation.util.world import World
 
 
 
@@ -276,6 +277,11 @@ class BaseStation:
         """ Returns most recent vision data """
         return list(filter(lambda data_entry: self.matchesQuery(data_entry, query_params), self.get_estimated_positions(True, query_params["virtual_room_id"]))) 
 
+    def get_world(self, virtual_room_id, world_width=500, world_height=500, cell_size=1, excluded_ids=[]):
+        vision_data = self.get_vision_data({"virtual_room_id": virtual_room_id})
+        world = World.from_vision_data(vision_data, world_width, world_height, cell_size, excluded_ids)
+        print(world.cells)
+        return world
     def matchesQuery(self, data_entry, query_params):
         matches = True
         if query_params != None:
