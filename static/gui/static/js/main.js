@@ -8,14 +8,20 @@ import Chatbot from './components/Chatbot/chatbot2.js';
 
 function ClientGUI({ }) {
   const [chatbotContext, setChatbotContext] = useState("");
+  const [selectedBotName, setSelectedBotName] = useState("");
 
   return (
     <div className="main-body">
       <Navbar />
       <div className="container">
-        <Platform parentContext={chatbotContext} />
+        <Platform
+          parentContext={chatbotContext}
+          selectedBotName={selectedBotName}
+          setSelectedBotName={setSelectedBotName} />
       </div>
-      <Chatbot setParentContext={setChatbotContext} />
+      <Chatbot
+        setParentContext={setChatbotContext}
+        selectedBotName={selectedBotName} />
     </div>
   );
 }

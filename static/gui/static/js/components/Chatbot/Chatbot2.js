@@ -30,7 +30,7 @@ const defaultFontSize = {
 }
 const emptyStr = "";
 
-function Chatbot2({ setParentContext }) {
+function Chatbot2({ setParentContext, selectedBotName }) {
   const [open, setOpen] = useState(false);
   const [expand, setExpand] = useState("");
   const [enter, setEnter] = useState("");
@@ -229,14 +229,17 @@ function Chatbot2({ setParentContext }) {
     })
   }, [messages]);
 
-  var questionButton = contextMode ? <button onClick={(e) => { sendQuestion(e); }}><FontAwesomeIcon icon={Icons.faQuestion} />
-  </button> : <div></div>;
+  var questionButton = contextMode ?
+    <button onClick={(e) => { sendQuestion(e); }}>
+      <FontAwesomeIcon icon={Icons.faQuestion} />
+    </button> : <div></div>;
 
-  var textBox = contextMode ? <input class="text-box" id="textbox" onChange={changeInputText} value={inputText}
-    onKeyPress={(e) => {
-      if (e.key === 'Enter') { sendContext(e); }
-      if (e.key === '`') { sendQuestion(e); }
-    }}></input> : <div />
+  var textBox = contextMode ?
+    <input class="text-box" id="textbox" onChange={changeInputText} value={inputText}
+      onKeyPress={(e) => {
+        if (e.key === 'Enter') { sendContext(e); }
+        if (e.key === '`') { sendQuestion(e); }
+      }}></input> : <div />
   // : <div></div> ; // TODO add bot name for voice commands related to the bot
 
   useEffect(() => {
@@ -250,8 +253,9 @@ function Chatbot2({ setParentContext }) {
       <i class="fa fa-comments" aria-hidden={true}></i>
       <div class={"chat " + enter}> {/* add 'enter' to class for the rest to display */}
         <div class="header">
+          <button onClick={(e) => toggleMode(e)}> Context Mode {contextMode.toString()}</button>
           <button class="popup">
-            <FontAwesomeIcon icon={Icons.faEllipsisV} onClick={(e) => toggleChangeFont(e)} />
+            <span id="popupBut" onClick={(e) => toggleChangeFont(e)}><FontAwesomeIcon icon={Icons.faEllipsisV} /></span>
             <span class="popuptext" id="myPopup" style={canChangeFont ? { visibility: 'visible' } : { visibility: 'hidden' }}>
               <button>
                 <FontAwesomeIcon icon={Icons.faInfo} onClick={(e) => alertInfo(e)} />
@@ -268,7 +272,7 @@ function Chatbot2({ setParentContext }) {
           </button>
           &nbsp;
           <span class="title" style={fontSize.header}>
-            Chatbot uwu
+            {selectedBotName}
           </span>
           <div style={{ width: "10px", height: "10px", }}>
             <input type="image"
@@ -283,7 +287,7 @@ function Chatbot2({ setParentContext }) {
           <div class="date" style={fontSize.body}>{date}</div>
           <hr class="timeBreak" />
           {messages.map((item) => (
-            <div>
+            <div key={item.id}>
               <li class={item.who} key={item.id} time={item.timeStamp} style={fontSize.body}>{item.message}</li>
               <li class={"timestamp " + item.who + "t"} style={fontSize.body}>{item.timeStamp}</li>
             </div>

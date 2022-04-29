@@ -51,14 +51,14 @@ class Platform extends React.Component {
       // pythonCodeState == 1:  User has made changes to the Python code
       //    and has disallowed Blockly from overwriting these changes.
       pythonCodeState: -1,
-      selectedBotName: '',
+      // selectedBotName: '',
       selectedBotStyle: this.hiddenStyle,
     };
 
     this.setBlockly = this.setBlockly.bind(this);
     this.setPythonCode = this.setPythonCode.bind(this)
     this.redefineCustomBlockList = this.redefineCustomBlockList.bind(this);
-    this.setSelectedBotName = this.setSelectedBotName.bind(this);
+    // this.setSelectedBotName = this.setSelectedBotName.bind(this);
     this.setSelectedBotStyle = this.setSelectedBotStyle.bind(this);
 
   }
@@ -82,9 +82,9 @@ class Platform extends React.Component {
     this.setState({ customBlockList: newCustomBlockList });
   }
 
-  setSelectedBotName(text) {
-    this.setState({ selectedBotName: text });
-  }
+  // setSelectedBotName(text) {
+  //   this.setState({ selectedBotName: text });
+  // }
 
   setSelectedBotStyle(style) {
     const _this = this;
@@ -111,8 +111,8 @@ class Platform extends React.Component {
             // the keyboard event handler for arrow key movement */}
           <div id="setup_control_tab" tabIndex="-1" className="tab-pane active" role="tabpanel">
             <BotControl
-              selectedBotName={this.state.selectedBotName}
-              setSelectedBotName={this.setSelectedBotName}
+              selectedBotName={this.props.selectedBotName}
+              setSelectedBotName={this.props.setSelectedBotName}
               selectedBotStyle={this.state.selectedBotStyle}
               setSelectedBotStyle={this.setSelectedBotStyle}
             />
@@ -125,7 +125,7 @@ class Platform extends React.Component {
               pythonCode={this.state.pythonCode}
               pythonCodeState={this.state.pythonCodeState}
               setPythonCode={this.setPythonCode}
-              selectedBotName={this.state.selectedBotName}
+              selectedBotName={this.props.selectedBotName}
               customBlockList={this.state.customBlockList}
               redefineCustomBlockList={this.redefineCustomBlockList}
             />
