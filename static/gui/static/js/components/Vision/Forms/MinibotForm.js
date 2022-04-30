@@ -23,6 +23,8 @@ export default function MinibotForm(props) {
       name: name,
       type: "minibot",
       shape: "cube",
+      width: 5,
+      length: 5,
       color: color
     };
     handleAddObjectFormSubmit(registerPhysicalObject, object, virtualEnviroment, clearForm, x, y, orientation);

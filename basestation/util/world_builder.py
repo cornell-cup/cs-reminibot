@@ -1,22 +1,15 @@
 import math
 from basestation.util.helper_functions import isConvex
 
+
 from collision import *
+from basestation.util.tile import Tile
 
-class Cell:
-  
-  def __init__(self, x, y, row, column, size, is_empty):
-    self.x = x
-    self.y = y
-    self.row = row
-    self.column = column
-    self.size = size
-    self.is_empty = is_empty
+from basestation.util.tile_heap import TileHeap
 
-class World:
-  
-  def __init__(self, cells):
-    self.cells = cells
+
+
+class WorldBuilder:
 
   shape_types = {
     "quadrilaterals": ["cube", "rectangular-prism", "square", "rectangle"],
@@ -26,27 +19,32 @@ class World:
 
   @classmethod
   def from_vision_data(cls, vision_data, world_width, world_height, cell_size, excluded_ids):
+    tile_heap = TileHeap()
     vision_data_shapes = [cls.vision_data_object_to_shape(vision_object) for vision_object in vision_data if not(vision_object["id"] in excluded_ids)]
     cells = []
     row = 0
     col = 0
-    for top_left_corner_x in range(-world_width/2,world_width/2, cell_size):
-      for top_left_corner_y in range(world_height/2,-world_height/2, -cell_size):
+    top_left_corner_x = -world_width/2
+    while top_left_corner_x < world_width/2:
+      top_left_corner_y = world_height/2
+      while top_left_corner_y > -world_height/2:
         minX = top_left_corner_x
         maxX = top_left_corner_x+cell_size
         minY = top_left_corner_y-cell_size
         maxY = top_left_corner_y
         x = top_left_corner_x+cell_size/2
         y = top_left_corner_y-cell_size/2
-        cell_collision_polygon = Polygon(Vector(x,y), [Vector(minX, minY),Vector(maxX, minY),Vector(maxX, maxY),Vector(minX, maxY)], 0)
+        cell_collision_polygon = Poly(Vector(x,y), [Vector(minX, minY),Vector(maxX, minY),Vector(maxX, maxY),Vector(minX, maxY)], 0)
+        collided = False
         for vision_data_shape in vision_data_shapes:
-          if collide(vision_data_shape, cell_collision_polygon):
-            cells.append(Cell(x,y,row, col, cell_size, False))
-          else:
-            cells.append(Cell(x,y, row, col, cell_size, True))
+          collided |= collide(vision_data_shape, cell_collision_polygon)
+        tile_heap.push(Tile(x, y, row, col, collided), 0, 0)
+
         row += 1
+        top_left_corner_y += -cell_size
       col += 1
-    return World(cells)
+      top_left_corner_x += cell_size
+    return tile_heap
   @classmethod
   def vision_data_object_to_shape(cls, vision_data_object):
     shape = vision_data_object["shape"].strip().lower()
@@ -61,11 +59,12 @@ class World:
 
   @classmethod
   def quadrilateral_to_collision_polygon(cls, quadrilateral):
+    print(quadrilateral)
     minX = quadrilateral["x"]-quadrilateral["width"]/2
     maxX = quadrilateral["x"]+quadrilateral["width"]/2
     minY = quadrilateral["y"]-quadrilateral["length"]/2
     maxY = quadrilateral["y"]+quadrilateral["length"]/2
-    return Polygon(Vector(vision_data_object["x"],vision_data_object["y"]), [Vector(minX, minY),Vector(maxX, minY),Vector(maxX, maxY),Vector(minX, maxY)], math.radians(vision_data_object["orientation"]))
+    return Poly(Vector(quadrilateral["x"],quadrilateral["y"]), [Vector(minX, minY),Vector(maxX, minY),Vector(maxX, maxY),Vector(minX, maxY)], math.radians(quadrilateral["orientation"]))
 
   #switch out for this method for concave stuff or put in the work to figure with polygons are convex
   # @classmethod
@@ -93,6 +92,6 @@ class World:
       vertice_vectors.append(Vector(x, y))
 
     if isConvex(vertices_list):
-      return Polygon(Vector(vision_data_object["x"],vision_data_object["y"]), cls.polygon_to_vertices(vision_data_object), math.radians(vision_data_object["orientation"]))
+      return Poly(Vector(polygon["x"],polygon["y"]), cls.polygon_to_vertices(polygon), math.radians(polygon["orientation"]))
     else:
-      return Concave_Poly(Vector(vision_data_object["x"],vision_data_object["y"]), cls.polygon_to_vertices(vision_data_object), math.radians(vision_data_object["orientation"]))
+      return Concave_Poly(Vector(polygon["x"],polygon["y"]), cls.polygon_to_vertices(polygon), math.radians(polygon["orientation"]))
