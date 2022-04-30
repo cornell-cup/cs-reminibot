@@ -10,7 +10,7 @@ checkerboard calibration is performed.
 
 Instructions for use:
 1. Run this script with a checkerboard ready
-2. When you have the checkerboard in the desired posiiton, press ENTER.
+2. When you have the checkerboard in the desired positon, press space, q, then ENTER.
 3. The system will then show three images:
   - The first image is the raw output of the camera
   - The second image shows how the checkerboard was interpreted

@@ -1,5 +1,3 @@
-#:import checkerboard part1_checkerboard
-#:import tagcalib part2_tag_calib
 WindowManager:
 	FirstWindow:
 	InputWindow:
@@ -96,7 +94,7 @@ WindowManager:
 			font_size: 60
 			font_name: "RobotoMono-Regular"
 			color: (1, 1, 1, 1)
-			text: "[b]Number of Columns[/b]: "
+			text: "[b]Number of Columns[/b]:  "
 
 		TextInput:
 			id: columnsInput
@@ -133,9 +131,6 @@ WindowManager:
 			text: "Back"
 			on_release:
 				app.root.current = "first"
-
-				
-
 
 		RoundedButton:
 			id: calibrationChooser
