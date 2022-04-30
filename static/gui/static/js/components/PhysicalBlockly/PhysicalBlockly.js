@@ -1,10 +1,11 @@
-import React, { Component } from 'react';
-import { Button, LabeledTextBox } from '../utils/Util.js';
+import { Link } from 'react-router-dom';
+
+import React from 'react';
 import axios from 'axios';
+
 import CodeMirror from 'react-codemirror';
 require('codemirror/mode/python/python');
-// import { Modal } from 'react-responsive-modal';
-// import 'react-responsive-modal/styles.css';
+
 
 
 export default class PhysicalBlockly extends React.Component {
@@ -86,7 +87,7 @@ export default class PhysicalBlockly extends React.Component {
 				}
 				else{
 					for(let i =0; i< _this.state.tabs; i++){
-						n += "  "; 
+						n += "    "; 
 					}
 					n += response.data.substring(3) + "\n"; 
 					if(response.data.includes("range")){
@@ -129,6 +130,9 @@ export default class PhysicalBlockly extends React.Component {
 		var visStyle = {
 			position: "relative",
 			zIndex: 0,
+			padding: "20px", 
+			width: "900px", 
+			display: "inline-block"
 		}
 
 		let options = {
@@ -148,17 +152,23 @@ export default class PhysicalBlockly extends React.Component {
 							:
 							<p className="white-label">Please return to Bot Control and connect to a minibot before proceeding.</p>
 					}
+					<div className='row'>
+						<div style={visStyle}>
+							<CodeMirror
+								ref={this.codeRef}
+								options={options}
+								width="null"
+							/>
+						</div>
+						<div id="pbBlocklyDiv" style={{ height: "488px", width: "900px", padding: "20px", display: "inline-block" }}></div>
+					</div>
 				</div>
-				<div className="col col-offset-1" style={visStyle}>
-					<CodeMirror
-						ref={this.codeRef}
-						options={options}
-						width="null"
-					/>
-				</div>
-				<div className="col col-offset-2">
-					<div id="pbBlocklyDiv" style={{ height: "488px", width: "975px", padding: "40px" }}></div>
-				</div>
+
+				<Link to={{pathname: "/coding", state: {python: this.props.pb},}}>
+					<button className="btn btn-primary element-wrapper mr-1">
+						Export to Coding
+					</button> 
+				</Link>
 
 			</div>
 		);

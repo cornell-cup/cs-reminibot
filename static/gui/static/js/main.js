@@ -53,8 +53,6 @@ const Platform = withCookies((props) => {
   const [selectedBotStyle, setSelectedBotStyleState] = useState(hiddenStyle);
   const [loginEmail, setLoginEmail] = useState(props.cookies.get('current_user_email') || "");
 
-  const [pb, setPb] = useState(""); 
-
   useEffect(() => {
     setLoginEmail(props.cookies.get('current_user_email') || "");
   }, [document.cookie]);
@@ -63,8 +61,6 @@ const Platform = withCookies((props) => {
     props.cookies.set('virtual_room_id', props.cookies.get('virtual_room_id') || nanoid(), { path: '/' });
   }, []);
 
-  useEffect(() => {
-  }, [pb]); 
 
   function setSelectedBotStyle(style) {
     setSelectedBotStyleState(style === "hidden" ? hiddenStyle : visibleStyle);
@@ -121,8 +117,8 @@ const Platform = withCookies((props) => {
           <Route path="/physical-blockly">
               <PhysicalBlockly
                 selectedBotName = {selectedBotName}
-                pb = {pb}
-                setPb = {setPb}
+                pb = {pythonCode}
+                setPb = {setPythonCode}
               />
           </Route>
           <Route path="/vision-page">
