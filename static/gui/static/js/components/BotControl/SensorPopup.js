@@ -52,7 +52,7 @@ const SensorPopup = ({ handleClose, selectedBotName }) => {
 					var output = document.createElement("tr");
 					tableBody.appendChild(output);
 
-					for (index = 0; index < sensortime.length; index++) {
+					for (let index = 0; index < sensortime.length; index++) {
 						output.innerHTML += "<td>" + sensortime[index] + "</td>";
 						output.innerHTML += "<td>" + sensordata[index] + "</td>";
 					}
@@ -75,7 +75,7 @@ const SensorPopup = ({ handleClose, selectedBotName }) => {
 
 	useEffect(() => {
 		const interval = setInterval(
-			startIROnClick, 1000);
+			startIROnClick, 2000);
 		return () => clearInterval(interval);
 	}, []);
 
