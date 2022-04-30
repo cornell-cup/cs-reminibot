@@ -6,7 +6,7 @@ import * as Icons from '@fortawesome/free-solid-svg-icons';
 import { X_BTN, MIC_BTN, MIC_BTNON } from "../utils/Constants.js";
 import SpeechRecognitionComp from "../utils/SpeechRecognitionComp.js";
 import Toggle from "../utils/Toggle.js";
-// import BotVoiceControl from "../BotControl/MovementControl/BotVoiceControl.js";
+import BotVoiceControl from "../BotControl/MovementControl/BotVoiceControl.js";
 
 //Chat messages
 let id = 2;
@@ -136,7 +136,7 @@ function Chatbot2({ setParentContext, selectedBotName }) {
 
   const sendContext = (e) => {
     e.preventDefault();
-    if (inputText === emptyStr) return;
+    if (!contextMode || inputText === emptyStr) return;
     id++;
     const newList = messages.concat({ id: id, who: "self", message: inputText, timeStamp: getTimeStamp() });
     setInputText("");
@@ -166,13 +166,12 @@ function Chatbot2({ setParentContext, selectedBotName }) {
 
   const sendQuestion = (e) => {
     e.preventDefault();
-    if (inputText === emptyStr) return;
+    if (contextMode || inputText === emptyStr) return;
     id++;
     let newList = messages.concat({ id: id, who: "self", message: inputText, timeStamp: getTimeStamp() });
     const newTempList = newList.concat({ id: id, who: "other", message: "...", timeStamp: getTimeStamp() })
     setInputText("");
     setMessages(newTempList);
-    console.log("send Context Bttn clicked")
     axios({
       method: 'POST',
       url: '/chatbot-ask',
@@ -217,6 +216,8 @@ function Chatbot2({ setParentContext, selectedBotName }) {
   const toggleMode = (e) => {
     console.log("toggle context mode", contextMode);
     setContextMode(!contextMode);
+    setMic(False);
+    // turn off mic of BotVoiceControl 
   };
 
   useEffect(() => {
@@ -229,9 +230,36 @@ function Chatbot2({ setParentContext, selectedBotName }) {
     })
   }, [messages]);
 
+  var voiceControl = !contextMode ? 
+  <BotVoiceControl selectedBotName={selectedBotName} startLabel = "" stopLabel= ""/> :
+  <div></div>;
+
+  var contextMic = contextMode ?
+  <div>
+    <SpeechRecognitionComp setText={setInputText} mic={mic} />
+    <div style={{ width: "50px", height: "50px", }}>
+      <input type="image"
+        src={mic ? MIC_BTNON : MIC_BTN}
+        style={{
+          width: "75%",
+          height: "75%",
+          objectFit: "contain",
+        }}
+        onClick={(e) => {
+          toggleMic(e);
+        }} />
+    </div> 
+  </div>: <div></div>;
+  
+
   var questionButton = contextMode ?
     <button onClick={(e) => { sendQuestion(e); }}>
       <FontAwesomeIcon icon={Icons.faQuestion} />
+    </button> : <div></div>;
+
+  var contextButton = contextMode ? 
+    <button style={{ marginLeft: "0px", marginRight: "5px", }} onClick={(e) => { sendContext(e); }}>
+      <FontAwesomeIcon icon={Icons.faPaperPlane} />
     </button> : <div></div>;
 
   var textBox = contextMode ?
@@ -294,13 +322,14 @@ function Chatbot2({ setParentContext, selectedBotName }) {
           ))}
         </ul>
         <div class="footer">
-          <textarea rows="3" cols="70" class="text-box" id="textbox" onChange={changeInputText} value={inputText} placeholder="Enter a context/question"
+          {/* <textarea rows="3" cols="70" class="text-box" id="textbox" onChange={changeInputText} value={inputText} placeholder="Enter a context/question"
             onKeyPress={(e) => {
               if (e.key === 'Enter') { sendContext(e); }
               if (e.key === '`') { sendQuestion(e); }
             }}>
-          </textarea>
-          <div style={{ width: "50px", height: "50px", }}>
+          </textarea> */}
+          {textBox}
+          {/* <div style={{ width: "50px", height: "50px", }}>
             <input type="image"
               src={mic ? MIC_BTNON : MIC_BTN}
               style={{
@@ -311,10 +340,13 @@ function Chatbot2({ setParentContext, selectedBotName }) {
               onClick={(e) => {
                 toggleMic(e);
               }} />
-          </div>
-          <SpeechRecognitionComp setText={setInputText} mic={mic} />
-          <button style={{ marginLeft: "0px", marginRight: "5px", }} onClick={(e) => { sendContext(e); }}><FontAwesomeIcon icon={Icons.faPaperPlane} /></button>
-          <button onClick={(e) => { sendQuestion(e); }}><FontAwesomeIcon icon={Icons.faQuestion} /></button>
+          </div> */}
+          {contextMic}
+          {voiceControl}
+          {/* <button style={{ marginLeft: "0px", marginRight: "5px", }} onClick={(e) => { sendContext(e); }}><FontAwesomeIcon icon={Icons.faPaperPlane} /></button> */}
+          {/* <button onClick={(e) => { sendQuestion(e); }}><FontAwesomeIcon icon={Icons.faQuestion} /></button> */}
+          {contextButton}
+          {questionButton}
           <div ref={messagesEndRef} />
         </div>
       </div>

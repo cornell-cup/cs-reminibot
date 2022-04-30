@@ -98,8 +98,9 @@ export default class MovementControls extends React.Component {
                             step="5" onChange={evt => this.updatePowerValue(evt)} />
                     </div>
                     <div className="col-md align-self-center">
+                        Voice Control
                         {/* <SpeechRecognition selectedBotName={this.props.selectedBotName} /> */}
-                        <BotVoiceControl selectedBotName={this.props.selectedBotName} />
+                        <BotVoiceControl selectedBotName={this.props.selectedBotName} startLabel = "" stopLabel = "" />
                     </div>
                 </div>
             </div>

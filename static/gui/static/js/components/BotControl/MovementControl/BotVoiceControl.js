@@ -3,12 +3,18 @@ import axios from 'axios';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { commands } from '../../utils/Constants.js';
+import { MIC_BTN, MIC_BTNON } from "../../utils/Constants.js";
 
 import SpeechRecognitionComp from "../../utils/SpeechRecognitionComp.js";
 
 var lastLen = 0;
+const micStyle = {
+  width: "75%",
+  height: "75%",
+  objectFit: "contain",
+};
 
-function BotVoiceControl({ selectedBotName }) {
+function BotVoiceControl({ selectedBotName, startLabel, stopLabel }) {
   const [on, setOn] = useState(false);
   const [text, setText] = useState("");
   const [inputText, setInputText] = useState("");
@@ -59,17 +65,24 @@ function BotVoiceControl({ selectedBotName }) {
   return (
     <React.Fragment>
       <div id="speech-button" className="row">
+        <input class="text-box" id="textbox" onChange={setInputText} value={inputText}></input>
         <button className="btn btn-danger element-wrapper btn-speech"
           onClick={toggle}>
           <div className="row">
-            <span className="col-md-1 align-self-center"><FontAwesomeIcon icon='microphone' /></span>
-            <span className="col-md align-self-center">{on ? "Stop Speech Recognition" : "Start Speech Recognition"}</span>
+            <span className="col-md-1 align-self-center">
+              <div style={{ width: "50px", height: "50px", }}>
+                <input type="image"
+                  src={on ? MIC_BTNON : MIC_BTN}
+                  style={micStyle}
+                  onClick={(e) => {
+                    toggle(e);
+                  }} />
+              </div>
+            </span>
+            {/* <span className="col-md align-self-center">{on ? startLabel : stopLabel}</span> */}
           </div>
         </button>
         <SpeechRecognitionComp setText={setText} mic={on} />
-      </div>
-      <div className="row">
-        <input class="text-box" id="textbox" onChange={setInputText} value={inputText}></input>
       </div>
     </React.Fragment>
   )
