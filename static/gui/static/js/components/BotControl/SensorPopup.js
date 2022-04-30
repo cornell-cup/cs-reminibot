@@ -47,8 +47,17 @@ const SensorPopup = ({ handleClose, selectedBotName }) => {
 					setTime(sensortime);
 					setData(sensordata);
 
-					document.getElementById("ir-value").innerText = sensordata.join();
+					//document.getElementById("ir-value").innerText = sensordata.join();
 					//document.getElementById("ir-value").innerText = value;
+					var tableBody = document.getElementById("sensorTableBody");
+
+					var output = document.createElement("tr");
+					tableBody.appendChild(output);
+
+					for (index = 0; index < sensortime.length; index++) {
+						output.innerHTML += "<td>" + sensortime[index] + "</td>";
+						output.innerHTML += "<td>" + sensordata[index] + "</td>";
+					}
 				}
 
 				console.log(sensordata);
@@ -56,7 +65,6 @@ const SensorPopup = ({ handleClose, selectedBotName }) => {
 				// if the code is "" it means the result hasn't arrived yet, hence
 				// we shouldn't clear the interval and should continue polling
 				if (response.data["data"] != "") {
-					// document.getElementById("ir-value").value = response.data["data"];
 					clearInterval(interval);
 				}
 
@@ -67,15 +75,15 @@ const SensorPopup = ({ handleClose, selectedBotName }) => {
 		}, 500);
 	}
 
-	function showPlot() {
-		Plotly.plot('chart', [{
-			y: [startIROnClick()],
-			type: 'line'
-		}]);
-		setInterval(function () {
-			Plotly.extendTraces('chart', { y: [[startIROnClick()]] }, [-1]);
-		}, 200);
-	}
+	// function showPlot() {
+	// 	Plotly.plot('chart', [{
+	// 		y: [startIROnClick()],
+	// 		type: 'line'
+	// 	}]);
+	// 	setInterval(function () {
+	// 		Plotly.extendTraces('chart', { y: [[startIROnClick()]] }, [-1]);
+	// 	}, 200);
+	// }
 
 	return (
 		// <div className="popup-box">
@@ -117,14 +125,22 @@ const SensorPopup = ({ handleClose, selectedBotName }) => {
 				<br />
 				<button className="btn btn-secondary element-wrapper mr-1" onClick={startIROnClick}>Read Value</button>
 				<br />
-				<div className="row">
-					<div class="col">
-						test
-					</div>
-					<div class="col col-offset-2">
-						test
-					</div>
-				</div>
+				<br></br>
+				<br></br>
+				<table class="center">
+					<thead>
+						<tr>
+							<td>Time</td>
+							<td>Sensor Value</td>
+						</tr>
+					</thead>
+					<tbody id="sensorTableBody">
+						<tr>
+							<td>12/18/2002 12:38:00pm</td>
+							<td>1</td>
+						</tr>
+					</tbody>
+				</table>
 				<label id='ir-value' className='ir-label'></label>
 			</div>
 		</div>
