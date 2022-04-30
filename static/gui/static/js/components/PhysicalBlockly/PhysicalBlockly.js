@@ -3,19 +3,21 @@ import { Button, LabeledTextBox } from '../utils/Util.js';
 import axios from 'axios';
 import CodeMirror from 'react-codemirror';
 require('codemirror/mode/python/python');
+// import { Modal } from 'react-responsive-modal';
+// import 'react-responsive-modal/styles.css';
 
 
 export default class PhysicalBlockly extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = { text: "", stage: 0, tabs: 0 };
+		this.state = { stage: 0, tabs: 0, loopvar: 0};
 		this.codeRef = React.createRef();
-		this.tempClick = this.tempClick.bind(this);
+		this.pollForUpdates = this.pollForUpdates.bind(this);
 		this.bWorkspace = null;
 	}
 
 	componentDidMount() {
-		setInterval(this.tempClick, 1000);
+		setInterval(this.pollForUpdates, 1000);
 
 		this.bWorkspace = Blockly.inject('pbBlocklyDiv');
 		let emptyBlock = document.createElement("block");
@@ -30,7 +32,8 @@ export default class PhysicalBlockly extends React.Component {
 		// setInterval(tempClick, 1000);
 		const _this = this;
 		_this.codeRef["current"].getCodeMirror().setValue("");
-		_this.setState({ stage: 1 });
+		_this.setState({ stage: 1, tabs: 0, loopvar: 0}); //text: "", tabs: 0, loopvar: 0
+		_this.props.setPb(""); 
 		axios({
 			method: 'POST',
 			url: '/mode', //url to backend endpoint
@@ -51,13 +54,25 @@ export default class PhysicalBlockly extends React.Component {
 
 	endProcess() {
 		this.setState({ stage: 0 });
+		const _this = this; 
 		//post request to basestation to stop the process
+		axios.get('/end_physical_blockly')
+			.then(function (response){
+				let x = 0; 
+				while(x < _this.state.loopvar){
+					let repl = prompt("What number would you like to replace n" + x + " with?", "5"); 
+					let resp = parseInt(repl); 
+					if(isNaN(resp)){
+						resp = 5; 
+					}
+					_this.props.setPb(_this.props.pb.replace("n" + x, resp));
+					_this.codeRef["current"].getCodeMirror().setValue(_this.props.pb);
+					x++; 
+				}
+			})
+		}
 
-		//open modal for users to enter number 
-		// reference for react modals: https://blog.bitsrc.io/build-a-simple-modal-component-with-react-16decdc111a6
-	}
-
-	tempClick() {
+	pollForUpdates() {
 		const _this = this;
 		axios.get('/get-py-command')
 			.then(function (response) {
@@ -67,7 +82,7 @@ export default class PhysicalBlockly extends React.Component {
 				let n = ""; 			
 				if(response.data.substring(3) == "end"){
 					_this.setState({tabs: _this.state.tabs - 1}); 
-					n = ""; 
+					n = "#ended for loop\n"; 
 				}
 				else{
 					for(let i =0; i< _this.state.tabs; i++){
@@ -75,12 +90,13 @@ export default class PhysicalBlockly extends React.Component {
 					}
 					n += response.data.substring(3) + "\n"; 
 					if(response.data.includes("range")){
+						n = n.replace("(n)", "(n" + _this.state.loopvar + ")" ); 
 						_this.setState({tabs: _this.state.tabs + 1}); 
+						_this.setState({loopvar: _this.state.loopvar + 1}); 
 					}
 				}
 				_this.props.setPb(_this.props.pb + n);
 				_this.codeRef["current"].getCodeMirror().setValue(_this.props.pb);
-				
 
 				let block = document.createElement("block");
 
@@ -108,6 +124,7 @@ export default class PhysicalBlockly extends React.Component {
 			});
 	}
 
+
 	render() {
 		var visStyle = {
 			position: "relative",
@@ -131,12 +148,10 @@ export default class PhysicalBlockly extends React.Component {
 							:
 							<p className="white-label">Please return to Bot Control and connect to a minibot before proceeding.</p>
 					}
-					{/* <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.tempClick()}>Get command</button> */}
 				</div>
 				<div className="col col-offset-1" style={visStyle}>
 					<CodeMirror
 						ref={this.codeRef}
-						// value={this.state.text}
 						options={options}
 						width="null"
 					/>

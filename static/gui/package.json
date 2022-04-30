@@ -68,7 +68,7 @@
     "extends": "google",
     "rules": {}
   },
-  "browser":{
+  "browser": {
     "child_process": false
-  }  
+  }
 }
