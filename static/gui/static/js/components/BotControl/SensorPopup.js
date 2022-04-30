@@ -28,8 +28,6 @@ const SensorPopup = ({ handleClose, selectedBotName }) => {
 					bot_name: selectedBotName
 				}),
 			}).then((response) => {
-
-
 				var value = -1;
 				if (response.data['data'] == 'HIGH') {
 					value = 0;
@@ -74,6 +72,12 @@ const SensorPopup = ({ handleClose, selectedBotName }) => {
 			})
 		}, 500);
 	}
+
+	useEffect(() => {
+		const interval = setInterval(
+			startIROnClick, 1000);
+		return () => clearInterval(interval);
+	}, []);
 
 	// function showPlot() {
 	// 	Plotly.plot('chart', [{
