@@ -203,6 +203,10 @@ brew install portaudio
 [Continue with the remaining installation steps](#Continue)
 
 <a name="Windows"></a>
+
+## Windows 10 Native: Installing with installation file
+Follow the steps in the **Installation** section of the [https://docs.google.com/document/d/17iD53BYdfiRP9ht-XtAxGYFpu55B4e1CCysB0ldnopU/edit?usp=sharing](troubleshooting guide).
+
 ## Windows 10: Installing Initial Requirements
 
 #### Windows Subsystem for Linux Installation
