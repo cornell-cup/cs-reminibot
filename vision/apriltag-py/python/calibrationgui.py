@@ -19,6 +19,7 @@ class FirstWindow(Screen):
 class InputWindow(Screen):
 	showCalibrationChooser = BooleanProperty(False)
 	showPositionChooser = BooleanProperty(False)
+	showDirections = BooleanProperty(False)
 	def handle_input(self, row, col, calibFile, posFile):
 		try:
 			row = int(row)
@@ -41,7 +42,7 @@ class InputWindow(Screen):
 			pass
 
 
-class ProgressWindow(Screen):			
+class DirectionsWindow(Screen):			
 	pass
 
 class WindowManager(ScreenManager):
