@@ -200,6 +200,13 @@ These dependencies must be installed if you want to use the speech recognition f
 ```
 brew install portaudio
 ```
+
+#### CMake installation:
+In a terminal run:
+```
+brew install cmake
+```
+
 [Continue with the remaining installation steps](#Continue)
 
 <a name="Windows"></a>
