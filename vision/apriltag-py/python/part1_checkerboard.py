@@ -242,7 +242,6 @@ def get_args2():
     return args
 
 def checkerboardTest(rows, cols):
-
     # Get args
     args = get_args2()
 

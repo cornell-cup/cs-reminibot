@@ -13,6 +13,8 @@ Please install the following:
 * Git
 * Python3
 * pip3 (The package manager for python3)
+* [Anaconda](https://www.anaconda.com/)
+* [CMake](https://cmake.org/download/)
 * Node.js (The Javascript runtime library)
 * npm (The Javascript package manager) 
 
@@ -39,6 +41,14 @@ cd cs-reminibot/basestation
 pip3 install -r requirements.txt
 cd ..
 ```
+
+# Installing Vision System Python Dependencies
+Run the following commands to navigate to the python directory in vision/apriltag-py/python and install the Python3 dependencies.  On Windows open WSL (Windows Subsystem for Linux) and run the following commands.  On Linux or MacOS open terminal and run the commands. You should currently be in the cs-reminibot directory
+```
+cd vision/apriltag-py/python
+pip3 install -r requirements.txt
+cd ../../..
+```
  
 # Installing JavaScript Dependencies 
 Run the following commands to navigate to the gui directory in static/gui and install JavaScript dependencies.
@@ -47,6 +57,27 @@ You should currently be in the cs-reminibot directory
 ```
 cd static/gui
 npm install
+cd ../..
+```
+
+# Setting Up Vision System (Windows)
+See **Vision System Troubleshooting** section of this [troubleshooting guide](https://docs.google.com/document/d/17iD53BYdfiRP9ht-XtAxGYFpu55B4e1CCysB0ldnopU/edit?usp=sharing) for visual steps
+1. Open **cs-reminibot** directory in File Explorer.
+2. Navigate to the **installation_scripts** directory.
+3. Right click on the **Vision_system_install** file.
+4. Select the **Open with** option from the resulting drop down.
+5. Select the **Git for Windows** option from the resulting sub-drop down
+
+# Setting Up Vision System (MacOS/Linux)
+Run the following commands to navigate to the apriltag-py directory in vision/apriltag-py and install JavaScript dependencies.
+On Linux or MacOS open terminal and run the commands. You should currently be in the cs-reminibot directory
+```
+cd vision/apriltag-py
+mkdir build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make -j4
+sudo make install
 cd ../..
 ```
 
@@ -65,9 +96,25 @@ To run the BaseStation, run the following command.  You should currently be in t
 ./run_BS.sh
 ```
 
+
 Wait until you see the message *======= STARTING BASESTATION========* in your terminal.  Go to any browser on your computer and go to `localhost:8080/start` to see the GUI in action.
 If you are having trouble running the previous line, make sure that python3 is installed.
 You can check this by typing `python3` in your terminal.
+
+# Run the Vision System
+To run the Vision system, run the following command. You should currently be in the cs-reminibot directory.
+
+**On Windows**
+```
+./run_vision.sh
+```
+
+**On MacOS/Linux**
+```
+cd vision/apriltag-py/python
+python3 calibrationgui.py
+cd ../../..
+```
 
 # Operating System Specific Guides to Install Initial Requirements
 <a name="Ubuntu"></a>
@@ -153,9 +200,20 @@ These dependencies must be installed if you want to use the speech recognition f
 ```
 brew install portaudio
 ```
+
+#### CMake installation:
+In a terminal run:
+```
+brew install cmake
+```
+
 [Continue with the remaining installation steps](#Continue)
 
 <a name="Windows"></a>
+
+## Windows 10 Native: Installing with installation file
+Follow the steps in the **Installation** section of the [troubleshooting guide](https://docs.google.com/document/d/17iD53BYdfiRP9ht-XtAxGYFpu55B4e1CCysB0ldnopU/edit?usp=sharing).
+
 ## Windows 10: Installing Initial Requirements
 
 #### Windows Subsystem for Linux Installation

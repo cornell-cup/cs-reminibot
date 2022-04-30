@@ -229,7 +229,7 @@ var miniblocks = {
   },
   move_distance: {
     type: "move_distance",
-    message0: "move %1 %2 meters",
+    message0: "move %1 %2 inches",
     args0: [
       {
         type: "field_dropdown",
@@ -238,7 +238,7 @@ var miniblocks = {
       },
       {
         type: "field_number",
-        name: "meters",
+        name: "inches",
         value: 0
       }
     ],
@@ -250,16 +250,16 @@ var miniblocks = {
   },
   move_to_position: {
     type: "move_to_position",
-    message0: "move to (%1 meters,%2 meters)",
+    message0: "move to (%1 inches,%2 inches)",
     args0: [
       {
         type: "field_number",
-        name: "x_meters",
+        name: "x_inches",
         value: 0
       },
       {
         type: "field_number",
-        name: "y_meters",
+        name: "y_inches",
         value: 0
       }
     ],

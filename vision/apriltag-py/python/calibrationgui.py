@@ -12,7 +12,7 @@ import part1_checkerboard as checkerboard #importing the calibration function
 from subprocess import call #to call calibration functions
 from kivy.config import Config
 import subprocess
-import os
+
 Config.set('input', 'mouse', 'mouse,multitouch_on_demand')
 running = []
 
@@ -22,9 +22,6 @@ class FirstWindow(Screen):
 class InputWindow(Screen):
 	showCalibrationChooser = BooleanProperty(False)
 	showPositionChooser = BooleanProperty(False)
-
-		# run process, check for stop button press
-		# once stop button press handled, set it to false
 	def handle_input(self, row, col, calibFile, posFile):
 		try:
 			row = int(row)

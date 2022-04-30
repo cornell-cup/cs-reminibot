@@ -1,3 +1,5 @@
+#:import checkerboard part1_checkerboard
+#:import tagcalib part2_tag_calib
 WindowManager:
 	FirstWindow:
 	InputWindow:
@@ -94,7 +96,7 @@ WindowManager:
 			font_size: 60
 			font_name: "RobotoMono-Regular"
 			color: (1, 1, 1, 1)
-			text: "[b]Number of Columns[/b]:  "
+			text: "[b]Number of Columns[/b]: "
 
 		TextInput:
 			id: columnsInput
@@ -132,6 +134,9 @@ WindowManager:
 			on_release:
 				app.root.current = "first"
 
+				
+
+
 		RoundedButton:
 			id: calibrationChooser
 			canvas.before:
@@ -164,22 +169,7 @@ WindowManager:
 			text: "Select Position File"
 			on_press: root.showPositionChooser = not root.showPositionChooser
 			
-	
-		#FloatLayout:
-			#id: fileChooser
-			#size: (20, 20)
-			#canvas.before:
-				#Color:
-					#rgba: (1,0,0, 1)
-				#RoundedRectangle:
-					#size: self.size
-					#pos: self.pos
-					#radius: [15]
-				#Color:
-					#rgba: (253/255, 245/255, 230/255, 1)
-				#RoundedRectangle:
-					#size: self.width-10, self.height-10
-					#pos: self.x+5, self.y+5
+				
 
 	BoxLayout:
 		#layout for the FileChooser

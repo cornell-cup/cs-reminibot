@@ -535,6 +535,7 @@ const UltimateGridView = (props) => {
     const orientation_pos = parseFloat(detection["orientation"]);
     return renderShapeGroup(
       detection["shape"] ? detection : {
+        id: detection["id"],
         shape: "circle",
         x: x_pos,
         y: y_pos,
@@ -807,22 +808,22 @@ const UltimateGridView = (props) => {
       >
         {displayOn ? "Stop Displaying Field" : "Display Field"}
       </button>}
-      {props.experimentalFeaturesEnabled && 
+      {props.experimentalFeaturesEnabled &&
         <React.Fragment>
           <label htmlFor="minibotId">Virtual Minibot ID</label>
-      <input type="text" className="form-control mb-2 mr-sm-2" id="minibotId" placeholder="Object ID" value={minibotId} onChange={(e) => { setMinibotId(e.target.value) }} />
-      <button
-        onClick={runCode}
-        className="btn btn-success ml-1"
-      >
-        Run Code
-      </button>
-      <button
-        onClick={() => { setResetRequested({ value: true }) }}
-        className="btn btn-secondary ml-1"
-      >
-        Reset
-      </button>
+          <input type="text" className="form-control mb-2 mr-sm-2" id="minibotId" placeholder="Object ID" value={minibotId} onChange={(e) => { setMinibotId(e.target.value) }} />
+          <button
+            onClick={runCode}
+            className="btn btn-success ml-1"
+          >
+            Run Code
+          </button>
+          <button
+            onClick={() => { setResetRequested({ value: true }) }}
+            className="btn btn-secondary ml-1"
+          >
+            Reset
+          </button>
         </React.Fragment>}
       <br />
       <TransformWrapper

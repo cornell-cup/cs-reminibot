@@ -24,13 +24,17 @@ import speech_recognition as sr
 from copy import deepcopy
 
 from basestation.util.units import AngleUnits, LengthUnits, convert_angle, convert_length
+<<<<<<< HEAD
+=======
+from basestation.util.world_builder import WorldBuilder
+>>>>>>> 09e78cdbb87ad314bc55de3042976f6749793be8
 
 
 
 
 MAX_VISION_LOG_LENGTH = 1000
 VISION_UPDATE_FREQUENCY = 30
-VISION_DATA_HOLD_THRESHOLD = 1
+VISION_DATA_HOLD_THRESHOLD = 2
 
 
 def make_thread_safe(func):
@@ -149,6 +153,10 @@ class BaseStation:
                 self.remove_from_virtual_objects(update["virtual_object"])
         else:
             print("The vision virtual object list was not given a valid update in update_virtual_objects")
+<<<<<<< HEAD
+=======
+        self.get_world(update["virtual_objects"][0]["virtual_room_id"] if "virtual_objects" in update else update["virtual_object"]["virtual_room_id"], world_width=60, world_height=60, cell_size=5, excluded_ids=[])
+>>>>>>> 09e78cdbb87ad314bc55de3042976f6749793be8
             
 
     def add_to_virtual_objects(self, virtual_object):
@@ -277,6 +285,14 @@ class BaseStation:
         """ Returns most recent vision data """
         return list(filter(lambda data_entry: self.matchesQuery(data_entry, query_params), self.get_estimated_positions(True, query_params["virtual_room_id"]))) 
 
+<<<<<<< HEAD
+=======
+    def get_world(self, virtual_room_id, world_width=60, world_height=60, cell_size=5, excluded_ids=[]):
+        vision_data = self.get_vision_data({"virtual_room_id": virtual_room_id})
+        world = WorldBuilder.from_vision_data(vision_data, world_width, world_height, cell_size, excluded_ids)
+        print(world)
+        return world
+>>>>>>> 09e78cdbb87ad314bc55de3042976f6749793be8
     def matchesQuery(self, data_entry, query_params):
         matches = True
         if query_params != None:
