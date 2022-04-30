@@ -11,7 +11,10 @@ from kivy.properties import BooleanProperty
 import part1_checkerboard as checkerboard #importing the calibration function
 from subprocess import call #to call calibration functions
 from kivy.config import Config
+import subprocess
+
 Config.set('input', 'mouse', 'mouse,multitouch_on_demand')
+running = []
 
 class FirstWindow(Screen):
 	pass
@@ -19,6 +22,7 @@ class FirstWindow(Screen):
 class InputWindow(Screen):
 	showCalibrationChooser = BooleanProperty(False)
 	showPositionChooser = BooleanProperty(False)
+	showDirections = BooleanProperty(False)
 	def handle_input(self, row, col, calibFile, posFile):
 		try:
 			row = int(row)
@@ -29,19 +33,24 @@ class InputWindow(Screen):
 
 		if isinstance(row, int) and isinstance(col, int):
 				if row > 2 and col > 2:
-					checkerboard.checkerboardTest(row, col)
+					# checkerboard.checkerboardTest(row, col)	
 					#if calibFile or posFile is 0, then that means the default files should be used
 					calibFile = calibFile[0] if len(calibFile) != 0 else "calibration.json"
-					posFile = posFile[0] if len(posFile) != 0 else "calibration_board_positions.json"
-					
-
-					call(f"python3 part2_tag_calib.py -cf {calibFile} -pf {posFile} -b 3.93701; python3 part3_tag_locate.py -f {calibFile} -s 3.93701 -u http://localhost:8080/vision", shell=True)
+					posFile = posFile[0] if len(posFile) != 0 else "corner_positions.json"
+					part1 = ["python3", "part1_checkerboard.py", "-r", str(row),"-c", str(col),"-o",calibFile]
+					part2 = ["python3", "part2_tag_calib.py", "-cf", calibFile, "-pf", posFile, "-b", "1.1811"]
+					part3 = ["python3", "part3_tag_locate.py", "-f", calibFile, "-s", "1.1811", "-u", "http://localhost:8080/vision"]
+					for part in [part1, part2, part3]:
+						proc = subprocess.Popen('exec ' + ' '.join(part), shell=True)
+						running.append(proc)
+						while proc.poll() != None:
+							proc.wait()
 		else:
 			# display error message
 			pass
 
 
-class ProgressWindow(Screen):			
+class DirectionsWindow(Screen):			
 	pass
 
 class WindowManager(ScreenManager):
@@ -49,7 +58,6 @@ class WindowManager(ScreenManager):
 
 kv = Builder.load_file('boxlayout.kv')
 #everytime in kivy, want to import something!
-
 
 
 class CalibrationApp(App):
@@ -62,3 +70,6 @@ class CalibrationApp(App):
 
 if __name__ == '__main__':
 	CalibrationApp().run()
+	for proc in running:
+		proc.kill()
+

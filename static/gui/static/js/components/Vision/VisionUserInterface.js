@@ -39,7 +39,7 @@ const VisionUserInterface = (props) => {
           className="btn btn-danger mb-2 mr-sm-2"
           onClick={() => { setFormId(1) }}
         >
-          Add Square&nbsp;
+          Add Rectangle&nbsp;
           <FontAwesomeIcon icon={Icons.faSquare} />
         </button>
         <button

@@ -71,8 +71,8 @@ const Navbar = (props) => {
 
   return (
     <div>
-      <div id="mySidenav" class="sidenav">
-        <button class="closebtn" onClick={closeNav}>&times;</button>
+      <div id="mySidenav" className="sidenav">
+        <button className="closebtn" onClick={closeNav}>&times;</button>
         {isLoggedIn && <a className="nav-link"><FontAwesomeIcon icon={Icons.faUser} /> &nbsp; {loginEmail.substring(0, loginEmail.indexOf('@'))}</a>}
         <Link id="setup-control-link" to="/start" className={`nav-link ${activeIndex === 0 ? "active" : ""}`} onClick={(e) => { setActiveIndex(0) }}><FontAwesomeIcon icon="cogs" /> Setup/Movement</Link>
         <Link id="coding-link" to="/coding" className={`nav-link ${activeIndex === 1 ? "active" : ""}`} onClick={(e) => { setActiveIndex(1) }}><FontAwesomeIcon icon="code" /> Coding</Link>
@@ -95,7 +95,7 @@ const Navbar = (props) => {
               Minibot
             </a>
             <button className="" type="button" onClick={toggleNav} data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-              <span class="navbar-toggler-icon"></span>
+              <span className="navbar-toggler-icon"></span>
             </button>
           </div>
         </nav>

@@ -135,7 +135,7 @@ export default class RequestButton extends React.Component {
   makeArgFields(obj, isRequired) {
     return Object.entries(obj).map(([k, v]) => {
       return (
-        <div class="arg-group">
+        <div className="arg-group">
           <p>{k} ({isRequired ? "required" : "optional"}):</p>
           <input type="text" name={v} onChange={(e) => {
             var copy = JSON.parse(JSON.stringify(this.state.args));
@@ -163,7 +163,7 @@ export default class RequestButton extends React.Component {
         </button>
         {this.state.menuVisible && (
           // TODO refactor style attr into CSS
-          <div class="arg-menu" style={{ "backgroundColor": "orange" }}>
+          <div className="arg-menu" style={{ "backgroundColor": "orange" }}>
             {this.makeArgFields(this.props.args.required, true)}
             {this.makeArgFields(this.props.args.optional, false)}
             <button onClick={((e) => this.clicked(e))}>

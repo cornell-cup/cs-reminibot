@@ -2,6 +2,7 @@
 Base Station for the MiniBot.
 """
 
+import math
 from basestation.bot import Bot
 from basestation.controller.minibot_sim_gui_adapter import run_program_string_for_gui_data
 from basestation.user_database import Submission, User
@@ -149,7 +150,9 @@ class BaseStation:
                 self.remove_from_virtual_objects(update["virtual_object"])
         else:
             print("The vision virtual object list was not given a valid update in update_virtual_objects")
+
         self.get_world(update["virtual_objects"][0]["virtual_room_id"] if "virtual_objects" in update else update["virtual_object"]["virtual_room_id"], world_width=60, world_height=60, cell_size=5, excluded_ids=[])
+
             
 
     def add_to_virtual_objects(self, virtual_object):
@@ -532,7 +535,7 @@ class BaseStation:
         bot = self.get_bot(bot_name)
         direction = direction.lower()
         bot.sendKV("WHEELS", direction)
-
+        
     def set_bot_mode(self, bot_name: str, mode: str):
         """ Set the bot to either line follow or object detection mode """
         bot = self.get_bot(bot_name)
