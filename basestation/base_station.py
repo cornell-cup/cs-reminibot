@@ -150,7 +150,9 @@ class BaseStation:
                 self.remove_from_virtual_objects(update["virtual_object"])
         else:
             print("The vision virtual object list was not given a valid update in update_virtual_objects")
+
         self.get_world(update["virtual_objects"][0]["virtual_room_id"] if "virtual_objects" in update else update["virtual_object"]["virtual_room_id"], world_width=60, world_height=60, cell_size=5, excluded_ids=[])
+
             
 
     def add_to_virtual_objects(self, virtual_object):
