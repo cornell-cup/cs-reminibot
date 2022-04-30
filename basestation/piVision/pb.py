@@ -49,6 +49,10 @@ def classify(command, commands):
         return ["fake_bot", "forwards"]
     elif command in commands["commands"]["stop"]:
         return ["fake_bot", "stop"]
+    elif command in commands["commands"]["repeat"]:
+        return ["fake_bot", "repeat"]
+    elif command in commands["commands"]["end"]:
+        return ["fake_bot", "end"]
     else:
         return ["fake_bot", "stop"] #do nothing if invalid command received 
 
@@ -68,7 +72,9 @@ pythonCode = {
     "forwards" : "bot.move_forward(100)",
     "stop" : "bot.stop()",
     "right" : "bot.turn_clockwise(100)",
-    "left" : "bot.turn_counter_clockwise(100)"
+    "left" : "bot.turn_counter_clockwise(100)", 
+    "repeat": "for i in range(n):", 
+    "end": "end"
 }
 
 start = commands["tagRangeStart"]
@@ -83,7 +89,7 @@ def worker():
         py_code = pythonCode[task[1]]
         print("pb:" + py_code + "\n")
         sys.stdout.flush()
-        if(mode == '1'):
+        if(mode == '1' and task[0,3] == "bot"):
             send_request(task)
         sleep(1.0)
 

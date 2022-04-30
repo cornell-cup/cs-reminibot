@@ -8,7 +8,7 @@ require('codemirror/mode/python/python');
 export default class PhysicalBlockly extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = { text: "", stage: 0, lastBlock: null };
+		this.state = { text: "", stage: 0, tabs: 0 };
 		this.codeRef = React.createRef();
 		this.tempClick = this.tempClick.bind(this);
 		this.bWorkspace = null;
@@ -18,6 +18,9 @@ export default class PhysicalBlockly extends React.Component {
 		setInterval(this.tempClick, 1000);
 
 		this.bWorkspace = Blockly.inject('pbBlocklyDiv');
+		let emptyBlock = document.createElement("block");
+		emptyBlock.setAttribute("type", "move_power");
+		let move_block = Blockly.Xml.domToBlock(emptyBlock, this.bWorkspace);
 	}
 
 	//mode = 1 -> real time mode
@@ -49,51 +52,56 @@ export default class PhysicalBlockly extends React.Component {
 	endProcess() {
 		this.setState({ stage: 0 });
 		//post request to basestation to stop the process
+
+		//open modal for users to enter number 
+		// reference for react modals: https://blog.bitsrc.io/build-a-simple-modal-component-with-react-16decdc111a6
 	}
 
 	tempClick() {
 		const _this = this;
 		axios.get('/get-py-command')
 			.then(function (response) {
-				//Update python editor code
-				let nl = (response.data.length > 0) ? "\n" : "";
-				_this.props.setPb(_this.props.pb + response.data.substring(3) + nl);
-				_this.codeRef["current"].getCodeMirror().setValue(_this.props.pb);
-
-				if (response.data != "") {
-					let block = document.createElement("block");
-					if (response.data.substring(3) == "bot.move_forward(100)") {
-						block.setAttribute("type", "move_power");
-					} else if (response.data.substring(3) == "bot.stop()") {
-						block.setAttribute("type", "stop_moving");
-					} else if (response.data.substring(3) == "bot.turn_clockwise(100)") {
-						block.setAttribute("type", "turn_power")
-						let dir_field = document.createElement("field");
-						dir_field.setAttribute("name", "direction");
-						dir_field.innerHTML = "right"
-						block.appendChild(dir_field);
-					} else if (response.data.substring(3) == "bot.turn_counter_clockwise(100)") {
-						block.setAttribute("type", "turn_power")
-						let dir_field = document.createElement("field");
-						dir_field.setAttribute("name", "direction");
-						dir_field.innerHTML = "left"
-						block.appendChild(dir_field);
+				if(response.data == ""){
+					return; 
+				}
+				let n = ""; 			
+				if(response.data.substring(3) == "end"){
+					_this.setState({tabs: _this.state.tabs - 1}); 
+					n = ""; 
+				}
+				else{
+					for(let i =0; i< _this.state.tabs; i++){
+						n += "  "; 
 					}
-					if (block.getAttribute("type") != null) {
-						console.log("hello i got here");
-						let placedBlock = Blockly.Xml.domToBlock(block, _this.bWorkspace);
-						// console.log(placedBlock.getConnections_());
-						if (_this.state.lastBlock != null) {
-							let parentConnection = _this.state.lastBlock.nextConnection;
-							let childConnection = placedBlock.previousConnection;
-							parentConnection.connect(childConnection);
-							_this.setState({ lastBlock: placedBlock });
-						}
-						_this.setState({ lastBlock: placedBlock });
-						console.log(_this.state.lastBlock);
+					n += response.data.substring(3) + "\n"; 
+					if(response.data.includes("range")){
+						_this.setState({tabs: _this.state.tabs + 1}); 
 					}
 				}
+				_this.props.setPb(_this.props.pb + n);
+				_this.codeRef["current"].getCodeMirror().setValue(_this.props.pb);
+				
 
+				let block = document.createElement("block");
+
+				if (response.data.substring(3) == "bot.move_forward(100)") {
+					block.setAttribute("type", "move_power");
+				} else if (response.data.substring(3) == "bot.stop()") {
+					block.setAttribute("type", "stop_moving");
+				} else if (response.data.substring(3) == "bot.turn_clockwise(100)") {
+					block.setAttribute("type", "turn_power")
+					let dir_field = document.createElement("field");
+					dir_field.setAttribute("name", "direction");
+					dir_field.innerHTML = "right"
+					block.appendChild(dir_field);
+				} else if (response.data.substring(3) == "bot.turn_counter_clockwise(100)") {
+					block.setAttribute("type", "turn_power")
+					let dir_field = document.createElement("field");
+					dir_field.setAttribute("name", "direction");
+					dir_field.innerHTML = "left"
+					block.appendChild(dir_field);
+				}
+				Blockly.Xml.domToBlock(block, _this.bWorkspace);
 			})
 			.catch(function (error) {
 				console.log(error);
