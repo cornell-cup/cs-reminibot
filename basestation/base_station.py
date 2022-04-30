@@ -281,7 +281,7 @@ class BaseStation:
     def get_world(self, virtual_room_id, world_width=60, world_height=60, cell_size=5, excluded_ids=[]):
         vision_data = self.get_vision_data({"virtual_room_id": virtual_room_id})
         world = WorldBuilder.from_vision_data(vision_data, world_width, world_height, cell_size, excluded_ids)
-        print(world)
+        print(world.grid)
         return world
     def matchesQuery(self, data_entry, query_params):
         matches = True

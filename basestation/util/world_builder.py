@@ -1,4 +1,5 @@
 import math
+from basestation.util.grid import Grid
 from basestation.util.helper_functions import isConvex
 
 
@@ -19,15 +20,17 @@ class WorldBuilder:
 
   @classmethod
   def from_vision_data(cls, vision_data, world_width, world_height, cell_size, excluded_ids):
-    tile_heap = TileHeap()
+    grid = []
     vision_data_shapes = [cls.vision_data_object_to_shape(vision_object) for vision_object in vision_data if not(vision_object["id"] in excluded_ids)]
     cells = []
     row = 0
     col = 0
-    top_left_corner_x = -world_width/2
-    while top_left_corner_x < world_width/2:
-      top_left_corner_y = world_height/2
-      while top_left_corner_y > -world_height/2:
+    top_left_corner_y = world_height/2
+    while top_left_corner_y > -world_height/2:
+      grid.append([])
+      top_left_corner_x = -world_width/2
+      while top_left_corner_x < world_width/2:
+      
         minX = top_left_corner_x
         maxX = top_left_corner_x+cell_size
         minY = top_left_corner_y-cell_size
@@ -38,13 +41,13 @@ class WorldBuilder:
         collided = False
         for vision_data_shape in vision_data_shapes:
           collided |= collide(vision_data_shape, cell_collision_polygon)
-        tile_heap.push(Tile(x, y, row, col, collided), 0, 0)
-
-        row += 1
-        top_left_corner_y += -cell_size
-      col += 1
-      top_left_corner_x += cell_size
-    return tile_heap
+        grid[row].append(Tile(x, y, row, col, collided))
+        col += 1
+        top_left_corner_x += cell_size
+      row += 1
+      top_left_corner_y += -cell_size
+      
+    return Grid(grid,col,row,cell_size)
   @classmethod
   def vision_data_object_to_shape(cls, vision_data_object):
     shape = vision_data_object["shape"].strip().lower()
