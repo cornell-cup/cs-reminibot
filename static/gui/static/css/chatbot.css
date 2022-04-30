@@ -130,6 +130,15 @@ body {
   border-radius: 85%;
 }
 
+.floating-chat .chat .header #contextLabel {
+  border-radius: 15%;
+  background-color: #212529;
+  border: #6c757d 2.5px solid;
+  font: 10px/14px "Noto Sans", sans-serif;
+  text-align: center;
+  width: 25%;
+}
+
 .floating-chat .chat .messages {
   padding: 10px;
   margin: 0;
@@ -269,7 +278,7 @@ body {
   border-radius: 3px;
   background: #212529;
   min-height: 80%;
-  width: 100%;
+  width: 80%;
   color: white;
   overflow-y: auto;
   padding: 2px 5px;
@@ -295,6 +304,14 @@ body {
 
 .floating-chat .chat .footer button {
   width: 10%;
+  align-items: center;
+}
+
+.floating-chat .chat .footer button .FontAwesomeIcon {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  overflow: hidden;
 }
 
 @keyframes show-chat-even {

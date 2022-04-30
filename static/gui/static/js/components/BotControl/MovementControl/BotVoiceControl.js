@@ -3,7 +3,8 @@ import axios from 'axios';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { commands } from '../../utils/Constants.js';
-import { MIC_BTN, MIC_BTNON } from "../../utils/Constants.js";
+import { MIC_BTN, MIC_BTNON, 
+  ACT_MIC_CHATBOT, ACT_MIC_COMMAND} from "../../utils/Constants.js";
 
 import SpeechRecognitionComp from "../../utils/SpeechRecognitionComp.js";
 
@@ -14,7 +15,7 @@ const micStyle = {
   objectFit: "contain",
 };
 
-function BotVoiceControl({ selectedBotName, startLabel, stopLabel }) {
+function BotVoiceControl({ selectedBotName, startLabel, stopLabel, activeMicComponent, setActiveMicComponent }) {
   const [on, setOn] = useState(false);
   const [text, setText] = useState("");
   const [inputText, setInputText] = useState("");
@@ -22,9 +23,17 @@ function BotVoiceControl({ selectedBotName, startLabel, stopLabel }) {
 
   const toggle = (e) => {
     e.preventDefault();
-    setOn(!on);
-    lastLen = 0; // correctly reset queue length if the button is toggled
+    if (activeMicComponent == ACT_MIC_COMMAND || !activeMicComponent) {
+      setOn(!on);
+      lastLen = 0; // correctly reset queue length if the button is toggled
+    }
   }
+  // TODO useEffect to turn off the mic if activeMicComponent changes
+  useEffect(() => {
+    if (activeMicComponent != ACT_MIC_COMMAND){
+      setOn(false)
+    }
+  }, [activeMicComponent])
 
   useEffect(() => {
     console.log(lastLen);

@@ -7,7 +7,7 @@ import GridView from './gridview.js';
 
 
 
-function BotControl({ selectedBotName, setSelectedBotName, selectedBotStyle, setSelectedBotStyle }) {
+function BotControl({ selectedBotName, setSelectedBotName, selectedBotStyle, setSelectedBotStyle, activeMicComponent, setActiveMicComponent}) {
   return (
     <div className="row">
       <div className="col-md">
@@ -28,6 +28,10 @@ function BotControl({ selectedBotName, setSelectedBotName, selectedBotStyle, set
             setSelectedBotName={setSelectedBotName}
             selectedBotStyle={selectedBotStyle}
             setSelectedBotStyle={setSelectedBotStyle}
+            setActiveMicComponent={setActiveMicComponent}
+            activeMicComponent={activeMicComponent}
+            // botVoiceControlMic={botVoiceControlMic}
+            // setBotVoiceControlMic={setBotVoiceControlMic}
           />
         </div>
         <br />

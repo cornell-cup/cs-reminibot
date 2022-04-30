@@ -3,13 +3,15 @@ import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as Icons from '@fortawesome/free-solid-svg-icons';
 
-import { X_BTN, MIC_BTN, MIC_BTNON } from "../utils/Constants.js";
+import { X_BTN, MIC_BTN, MIC_BTNON, 
+  ACT_MIC_CHATBOT, ACT_MIC_COMMAND } from "../utils/Constants.js";
 import SpeechRecognitionComp from "../utils/SpeechRecognitionComp.js";
-import Toggle from "../utils/Toggle.js";
 import BotVoiceControl from "../BotControl/MovementControl/BotVoiceControl.js";
+import { commands } from '../utils/Constants.js';
 
+//Voice Control 
+var lastLen = 0;
 //Chat messages
-let id = 2;
 const initialList = [
   {
     id: 1,
@@ -30,10 +32,12 @@ const defaultFontSize = {
 }
 const emptyStr = "";
 
-function Chatbot2({ setParentContext, selectedBotName }) {
+function Chatbot2({ setParentContext, selectedBotName, setActiveMicComponent, activeMicComponent}) {
   const [open, setOpen] = useState(false);
   const [expand, setExpand] = useState("");
   const [enter, setEnter] = useState("");
+  const [id, setId] = useState(2);
+  
   const [inputText, setInputText] = useState("");
   const [messages, setMessages] = useState([]);
   const messagesEndRef = useRef(null);
@@ -43,6 +47,8 @@ function Chatbot2({ setParentContext, selectedBotName }) {
   const [fullSize, setFullSize] = useState(false);
   const [contextMode, setContextMode] = useState(true);
   const [date, setDate] = useState("");
+
+  const [tempCommands, setTempCommands] = useState("");
 
   const styles = {
     leftWindow: {
@@ -63,6 +69,7 @@ function Chatbot2({ setParentContext, selectedBotName }) {
 
   const changeInputText = (event) => {
     event.preventDefault();
+    if(!contextMode) return;
     const input = event.currentTarget.value;
     setInputText(input);
   }
@@ -136,12 +143,14 @@ function Chatbot2({ setParentContext, selectedBotName }) {
 
   const sendContext = (e) => {
     e.preventDefault();
-    if (!contextMode || inputText === emptyStr) return;
-    id++;
-    const newList = messages.concat({ id: id, who: "self", message: inputText, timeStamp: getTimeStamp() });
+    if (inputText === emptyStr) return;
+    var temp_id = id + 1;
+    setId(temp_id);
+    const newList = messages.concat({ id: temp_id, who: "self", message: inputText, timeStamp: getTimeStamp() });
     setInputText("");
     setMessages(newList);
     setParentContext(inputText);
+    console.log("151 id context" + temp_id);
     axios({
       method: 'POST',
       url: '/chatbot-context',
@@ -166,12 +175,15 @@ function Chatbot2({ setParentContext, selectedBotName }) {
 
   const sendQuestion = (e) => {
     e.preventDefault();
-    if (contextMode || inputText === emptyStr) return;
-    id++;
-    let newList = messages.concat({ id: id, who: "self", message: inputText, timeStamp: getTimeStamp() });
-    const newTempList = newList.concat({ id: id, who: "other", message: "...", timeStamp: getTimeStamp() })
+    if (inputText === emptyStr) return;
+    var temp_id = id + 1;
+    let newList = messages.concat({ id: temp_id, who: "self", message: inputText, timeStamp: getTimeStamp() });
+    temp_id += 1;
+    const newTempList = newList.concat({ id: temp_id, who: "other", message: "...", timeStamp: getTimeStamp() })
+    setId(temp_id);
     setInputText("");
     setMessages(newTempList);
+    console.log("181 id question " + temp_id);
     axios({
       method: 'POST',
       url: '/chatbot-ask',
@@ -185,7 +197,7 @@ function Chatbot2({ setParentContext, selectedBotName }) {
       if (response.data) {
         const res = response.data;
         console.log(res);
-        newList = newList.concat({ id: id, who: "other", message: res, timeStamp: getTimeStamp() });
+        newList = newList.concat({ id: temp_id, who: "other", message: res, timeStamp: getTimeStamp() });
         setMessages(newList);
       }
     }).catch(function (error) {
@@ -204,9 +216,24 @@ function Chatbot2({ setParentContext, selectedBotName }) {
 
   const toggleMic = (e) => {
     e.preventDefault();
-    console.log("toggle mic");
-    setMic(!mic);
+    if (contextMode || selectedBotName) {
+      console.log("toggle mic");
+      temp = !mic;
+      setMic(temp);
+      setInputText("");
+      // set active mic to chatbot only if not already set to ACT_MIC_CHATBOT
+      if (temp && activeMicComponent!=ACT_MIC_CHATBOT) {
+        setActiveMicComponent(ACT_MIC_CHATBOT)
+      }
+    }
   }
+
+  useEffect(() => {
+    if (activeMicComponent != ACT_MIC_CHATBOT){
+      setMic(false)
+    }
+  }, [activeMicComponent])
+
 
   const alertInfo = (e) => {
     e.preventDefault();
@@ -216,7 +243,7 @@ function Chatbot2({ setParentContext, selectedBotName }) {
   const toggleMode = (e) => {
     console.log("toggle context mode", contextMode);
     setContextMode(!contextMode);
-    setMic(False);
+    setMic(false);
     // turn off mic of BotVoiceControl 
   };
 
@@ -230,37 +257,52 @@ function Chatbot2({ setParentContext, selectedBotName }) {
     })
   }, [messages]);
 
-  var voiceControl = !contextMode ? 
-  <BotVoiceControl selectedBotName={selectedBotName} startLabel = "" stopLabel= ""/> :
-  <div></div>;
+  useEffect(() => {
+    initialList[0].timeStamp = getTimeStamp();
+    setMessages(initialList);
+  }, []);
 
-  var contextMic = contextMode ?
-  <div>
-    <SpeechRecognitionComp setText={setInputText} mic={mic} />
-    <div style={{ width: "50px", height: "50px", }}>
-      <input type="image"
-        src={mic ? MIC_BTNON : MIC_BTN}
-        style={{
-          width: "75%",
-          height: "75%",
-          objectFit: "contain",
-        }}
-        onClick={(e) => {
-          toggleMic(e);
-        }} />
-    </div> 
-  </div>: <div></div>;
+  /***********************************Voice Control ***************************/
+  useEffect(() => {
+    if (!contextMode) {
+      console.log(lastLen);
+      let queue = tempCommands.split(" ");
+      // setPrevLast(queue[0]);
+      console.log(queue);
+      if (queue.length > lastLen) { // only read the lastest word 
+                                    //in the queue (last item is always '')
+        if (commands.hasOwnProperty(queue[queue.length - 2])) {
+          setInputText(queue[queue.length - 2] + ": " +
+                      commands[queue[queue.length - 2]]);
+
+          // send command to backend
+          axios({
+            method: 'POST',
+            url: '/speech_recognition',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            data: JSON.stringify({
+              bot_name: selectedBotName,
+              command: queue[queue.length - 2]
+            })
+          }).then(function (response) {
+            // insert response code here?
+          }).catch(function (error) {
+            // tell user to connect to bot in the text box
+            // setInputText("Please connect to a Minibot!")
+            if (error.response.data.error_msg.length > 0)
+              window.alert(error.response.data.error_msg);
+            else
+              console.log("Speech recognition", error);
+          })
+        }
+      }
+      lastLen = queue.length;
+    }
+    // setText("");
+  }, [tempCommands, contextMode]);
   
-
-  var questionButton = contextMode ?
-    <button onClick={(e) => { sendQuestion(e); }}>
-      <FontAwesomeIcon icon={Icons.faQuestion} />
-    </button> : <div></div>;
-
-  var contextButton = contextMode ? 
-    <button style={{ marginLeft: "0px", marginRight: "5px", }} onClick={(e) => { sendContext(e); }}>
-      <FontAwesomeIcon icon={Icons.faPaperPlane} />
-    </button> : <div></div>;
 
   var textBox = contextMode ?
     <input class="text-box" id="textbox" onChange={changeInputText} value={inputText}
@@ -270,10 +312,7 @@ function Chatbot2({ setParentContext, selectedBotName }) {
       }}></input> : <div />
   // : <div></div> ; // TODO add bot name for voice commands related to the bot
 
-  useEffect(() => {
-    initialList[0].timeStamp = getTimeStamp();
-    setMessages(initialList);
-  }, []);
+ 
 
   return (
     <div class={"floating-chat enter " + expand} style={expand === "expand" ? (right ? styles.leftWindow : styles.rightWindow) : styles.empty}
@@ -281,9 +320,8 @@ function Chatbot2({ setParentContext, selectedBotName }) {
       <i class="fa fa-comments" aria-hidden={true}></i>
       <div class={"chat " + enter}> {/* add 'enter' to class for the rest to display */}
         <div class="header">
-          <button onClick={(e) => toggleMode(e)}> Context Mode {contextMode.toString()}</button>
-          <button class="popup">
-            <span id="popupBut" onClick={(e) => toggleChangeFont(e)}><FontAwesomeIcon icon={Icons.faEllipsisV} /></span>
+          <div class="popup">
+            <button id="popupBut" onClick={(e) => toggleChangeFont(e)}><FontAwesomeIcon icon={Icons.faEllipsisV} /></button>
             <span class="popuptext" id="myPopup" style={canChangeFont ? { visibility: 'visible' } : { visibility: 'hidden' }}>
               <button>
                 <FontAwesomeIcon icon={Icons.faInfo} onClick={(e) => alertInfo(e)} />
@@ -297,6 +335,10 @@ function Chatbot2({ setParentContext, selectedBotName }) {
               <button><FontAwesomeIcon style={{ transform: "scale(0.75, 0.75)" }} onClick={(e) => changeFontSize(e, -1)} icon={Icons.faFont} /></button>
               <button><FontAwesomeIcon onClick={(e) => changeFontSize(e, 1)} icon={Icons.faFont} /></button>
             </span>
+          </div>
+          <button id="contextLabel" onClick={(e) => toggleMode(e)}> {contextMode? "Q&A Mode" : "Command Mode"}
+            {/* <FontAwesomeIcon icon={contextMode ? Icons.faCheck : Icons.faBan} /> */}
+            {/* {contextMode.toString()} */}
           </button>
           &nbsp;
           <span class="title" style={fontSize.header}>
@@ -316,20 +358,28 @@ function Chatbot2({ setParentContext, selectedBotName }) {
           <hr class="timeBreak" />
           {messages.map((item) => (
             <div key={item.id}>
-              <li class={item.who} key={item.id} time={item.timeStamp} style={fontSize.body}>{item.message}</li>
+              <li class={item.who} time={item.timeStamp} style={fontSize.body}>{item.message}</li>
               <li class={"timestamp " + item.who + "t"} style={fontSize.body}>{item.timeStamp}</li>
             </div>
           ))}
         </ul>
         <div class="footer">
-          {/* <textarea rows="3" cols="70" class="text-box" id="textbox" onChange={changeInputText} value={inputText} placeholder="Enter a context/question"
-            onKeyPress={(e) => {
-              if (e.key === 'Enter') { sendContext(e); }
-              if (e.key === '`') { sendQuestion(e); }
-            }}>
-          </textarea> */}
-          {textBox}
-          {/* <div style={{ width: "50px", height: "50px", }}>
+          <textarea rows="3" cols="70" class="text-box" id="textbox" 
+                    onChange={changeInputText} value={inputText} 
+                    placeholder={contextMode ? "Enter a context/question" : selectedBotName != "" ? 
+                                              "Click the microphone to send a command" : "Please connect to a Minibot!"}
+                    onKeyPress={(e) => { 
+                      if (contextMode) {
+                        if (e.key === 'Enter') { sendContext(e); }
+                        if (e.key === '`') { sendQuestion(e); } 
+                      }
+                    }}>
+          </textarea>
+          {contextMode ? 
+            <SpeechRecognitionComp setText={setInputText} mic={mic} /> :
+           <SpeechRecognitionComp setText={setTempCommands} mic={mic} />
+          }
+          <div style={{ width: "50px", height: "50px", }}>
             <input type="image"
               src={mic ? MIC_BTNON : MIC_BTN}
               style={{
@@ -340,13 +390,23 @@ function Chatbot2({ setParentContext, selectedBotName }) {
               onClick={(e) => {
                 toggleMic(e);
               }} />
-          </div> */}
-          {contextMic}
-          {voiceControl}
-          {/* <button style={{ marginLeft: "0px", marginRight: "5px", }} onClick={(e) => { sendContext(e); }}><FontAwesomeIcon icon={Icons.faPaperPlane} /></button> */}
-          {/* <button onClick={(e) => { sendQuestion(e); }}><FontAwesomeIcon icon={Icons.faQuestion} /></button> */}
-          {contextButton}
-          {questionButton}
+           </div> 
+          {contextMode ? 
+          <div>
+            <span>
+            <button style={{ marginRight: "5px"}} onClick={(e) => { sendContext(e); }}>
+              <FontAwesomeIcon icon={Icons.faPaperPlane} />
+            </button>  
+            </span>
+            <span>
+            <button style={{ marginLeft: "5px" }} onClick={(e) => { sendQuestion(e); }}>
+              <FontAwesomeIcon icon={Icons.faQuestion} />
+            </button> 
+            </span>
+          </div> 
+
+          : <div></div>
+          }
           <div ref={messagesEndRef} />
         </div>
       </div>

@@ -17,6 +17,9 @@ export const INFO_ICON = "./static/img/info_icon.png";
 export const X_BTN = "./static/img/close_btn.png";
 export const MIC_BTN = "./static/img/microphone-white.png";
 export const MIC_BTNON = "./static/img/microphone-green.png";
+export const ACT_MIC_CHATBOT = "cb_mic";
+export const ACT_MIC_COMMAND = "bvc_mic";
+
 export const commands = {
   "forward": "Minibot moves forward",
   "backward": "Minibot moves backwards",

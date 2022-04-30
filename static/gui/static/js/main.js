@@ -10,6 +10,25 @@ function ClientGUI({ }) {
   const [chatbotContext, setChatbotContext] = useState("");
   const [selectedBotName, setSelectedBotName] = useState("");
 
+  // Mic manager
+  const [activeMicComponent, setActiveMicComponent] = useState("");
+  // //Components that use mic 
+  // const [botVoiceControlMic, setBotVoiceControlMic] = useState(false);
+  // const [chatbotMic, setChatbotMic] = useState(false);
+  
+  
+  /********* Actually, we need main.js to manage mic switching **********/
+
+  // useEffect (() => {
+  //   if (activeMicComponent == CHATBOT){
+  //     setBotVoiceControlMic(false);
+  //     setChatbotMic(true);
+  //   } else if (activeMicComponent == BOTVOICECONTROL) {
+  //     setChatbotMic(false);
+  //     setBotVoiceControlMic(true);
+  //   }
+  // },  [activeMicComponent]);
+
   return (
     <div className="main-body">
       <Navbar />
@@ -17,11 +36,21 @@ function ClientGUI({ }) {
         <Platform
           parentContext={chatbotContext}
           selectedBotName={selectedBotName}
-          setSelectedBotName={setSelectedBotName} />
+          setSelectedBotName={setSelectedBotName}
+          setActiveMicComponent={setActiveMicComponent}
+          activeMicComponent={activeMicComponent}
+          // botVoiceControlMic={botVoiceControlMic}
+          // setBotVoiceControlMic={setBotVoiceControlMic}
+           />
       </div>
       <Chatbot
         setParentContext={setChatbotContext}
-        selectedBotName={selectedBotName} />
+        selectedBotName={selectedBotName}
+        activeMicComponent={activeMicComponent}
+        setActiveMicComponent={setActiveMicComponent}
+        // mic = {chatbotMic}
+        // setMic = {setChatbotMic} 
+        />
     </div>
   );
 }
