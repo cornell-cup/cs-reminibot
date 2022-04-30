@@ -13,8 +13,8 @@ Please install the following:
 * Git
 * Python3
 * pip3 (The package manager for python3)
-* [https://www.anaconda.com/](Anaconda)
-* [https://cmake.org/download/](CMake)
+* [Anaconda](https://www.anaconda.com/)
+* [CMake](https://cmake.org/download/)
 * Node.js (The Javascript runtime library)
 * npm (The Javascript package manager) 
 
@@ -61,7 +61,7 @@ cd ../..
 ```
 
 # Setting Up Vision System (Windows)
-See **Vision System Troubleshooting** section of this [https://docs.google.com/document/d/17iD53BYdfiRP9ht-XtAxGYFpu55B4e1CCysB0ldnopU/edit?usp=sharing](troubleshooting guide) for visual steps
+See **Vision System Troubleshooting** section of this [troubleshooting guide](https://docs.google.com/document/d/17iD53BYdfiRP9ht-XtAxGYFpu55B4e1CCysB0ldnopU/edit?usp=sharing) for visual steps
 1. Open **cs-reminibot** directory in File Explorer.
 2. Navigate to the **installation_scripts** directory.
 3. Right click on the **Vision_system_install** file.
@@ -205,7 +205,7 @@ brew install portaudio
 <a name="Windows"></a>
 
 ## Windows 10 Native: Installing with installation file
-Follow the steps in the **Installation** section of the [https://docs.google.com/document/d/17iD53BYdfiRP9ht-XtAxGYFpu55B4e1CCysB0ldnopU/edit?usp=sharing](troubleshooting guide).
+Follow the steps in the **Installation** section of the [troubleshooting guide](https://docs.google.com/document/d/17iD53BYdfiRP9ht-XtAxGYFpu55B4e1CCysB0ldnopU/edit?usp=sharing).
 
 ## Windows 10: Installing Initial Requirements
 
