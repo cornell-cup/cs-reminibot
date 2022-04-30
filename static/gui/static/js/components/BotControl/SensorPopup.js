@@ -8,8 +8,8 @@ import {
 // var Plotly = require('plotly.js-dist-min')
 
 const SensorPopup = ({ handleClose, selectedBotName }) => {
-	const [sensortime, setTime] = useState([new Date().toLocaleTimeString()]);
-	const [sensordata, setData] = useState([0]);
+	const [sensortime, setTime] = useState([]);
+	const [sensordata, setData] = useState([]);
 
 
 	function startIROnClick() {
@@ -116,6 +116,15 @@ const SensorPopup = ({ handleClose, selectedBotName }) => {
 				<button className="close-icon" onClick={() => handleClose()}>x</button>
 				<br />
 				<button className="btn btn-secondary element-wrapper mr-1" onClick={startIROnClick}>Read Value</button>
+				<br />
+				<div className="row">
+					<div class="col">
+						test
+					</div>
+					<div class="col col-offset-2">
+						test
+					</div>
+				</div>
 				<label id='ir-value' className='ir-label'></label>
 			</div>
 		</div>
