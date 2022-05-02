@@ -7,6 +7,7 @@ from basestation.bot import Bot
 from basestation.controller.minibot_sim_gui_adapter import run_program_string_for_gui_data
 from basestation.user_database import Submission, User
 from basestation import db
+from basestation.util.path_planning import PathPlanner
 from basestation.util.stoppable_thread import StoppableThread, ThreadSafeVariable
 from basestation.util.helper_functions import distance
 
@@ -151,7 +152,8 @@ class BaseStation:
         else:
             print("The vision virtual object list was not given a valid update in update_virtual_objects")
 
-        self.get_world(update["virtual_objects"][0]["virtual_room_id"] if "virtual_objects" in update else update["virtual_object"]["virtual_room_id"], world_width=60, world_height=60, cell_size=5, excluded_ids=[])
+        world = self.get_world(update["virtual_objects"][0]["virtual_room_id"] if "virtual_objects" in update else update["virtual_object"]["virtual_room_id"], world_width=60, world_height=60, cell_size=5, excluded_ids=[])
+        self.get_path(world, (-5,-5), (5,5))
 
             
 
@@ -281,11 +283,16 @@ class BaseStation:
         """ Returns most recent vision data """
         return list(filter(lambda data_entry: self.matchesQuery(data_entry, query_params), self.get_estimated_positions(True, query_params["virtual_room_id"]))) 
 
-    def get_world(self, virtual_room_id, world_width=60, world_height=60, cell_size=5, excluded_ids=[]):
+    def get_world(self, virtual_room_id, world_width, world_height, cell_size, excluded_ids):
         vision_data = self.get_vision_data({"virtual_room_id": virtual_room_id})
         world = WorldBuilder.from_vision_data(vision_data, world_width, world_height, cell_size, excluded_ids)
-        print(world.grid)
         return world
+
+    def get_path(self, world, start_x_y, end_x_y):
+        path = PathPlanner.find_path(world, start_x_y, end_x_y)
+        print(path)
+        return path
+
     def matchesQuery(self, data_entry, query_params):
         matches = True
         if query_params != None:

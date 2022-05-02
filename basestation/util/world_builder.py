@@ -1,5 +1,5 @@
 import math
-from basestation.util.grid import Grid
+from basestation.util.coordinate_grid import CoordinateGrid
 from basestation.util.helper_functions import isConvex
 
 
@@ -20,14 +20,13 @@ class WorldBuilder:
 
   @classmethod
   def from_vision_data(cls, vision_data, world_width, world_height, cell_size, excluded_ids):
-    grid = []
+    tile_grid = []
     vision_data_shapes = [cls.vision_data_object_to_shape(vision_object) for vision_object in vision_data if not(vision_object["id"] in excluded_ids)]
-    cells = []
     row = 0
-    col = 0
     top_left_corner_y = world_height/2
     while top_left_corner_y > -world_height/2:
-      grid.append([])
+      tile_grid.append([])
+      col = 0
       top_left_corner_x = -world_width/2
       while top_left_corner_x < world_width/2:
       
@@ -41,13 +40,14 @@ class WorldBuilder:
         collided = False
         for vision_data_shape in vision_data_shapes:
           collided |= collide(vision_data_shape, cell_collision_polygon)
-        grid[row].append(Tile(x, y, row, col, collided))
+        tile_grid[row].append(Tile(x, y, row, col, collided))
         col += 1
         top_left_corner_x += cell_size
       row += 1
       top_left_corner_y += -cell_size
       
-    return Grid(grid,col,row,cell_size)
+    return CoordinateGrid(tile_grid)
+
   @classmethod
   def vision_data_object_to_shape(cls, vision_data_object):
     shape = vision_data_object["shape"].strip().lower()

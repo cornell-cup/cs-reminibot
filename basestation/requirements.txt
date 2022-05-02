@@ -17,3 +17,4 @@ pyaudio==0.2.11
 SpeechRecognition==3.8.1
 pint
 control
+pathfinding
