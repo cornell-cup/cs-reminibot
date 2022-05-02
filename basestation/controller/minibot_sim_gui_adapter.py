@@ -5,8 +5,6 @@ from re import split
 
 RADIANS_TO_DEGREES_CONVERSION_FACTOR = (180/pi) 
 DEGREES_TO_RADIANS_CONVERSION_FACTOR = (pi/180) 
-METERS_TO_INCHES_CONVERSION_FACTOR = 39.3700787402
-INCHES_TO_METERS_CONVERSION_FACTOR = 0.0254
 
 
 
@@ -16,21 +14,9 @@ def convert_and_extract_minibot_sim_data(xs, locs):
     frame in radians
     
     locs: (locations numpy array) Column 1 has the x coordinate of the minibot in
-<<<<<<< HEAD
     inches. Column 2 has the y coordinate of the minibot in inches.
 
     Converts the x (inches) and y (inches) positions into inches and converts the 
-=======
-<<<<<<< HEAD
-    meters. Column 2 has the y coordinate of the minibot in meters.
-
-    Converts the x (meters) and y (meters) positions into inches and converts the 
-=======
-    inches. Column 2 has the y coordinate of the minibot in inches.
-
-    Converts the x (inches) and y (inches) positions into inches and converts the 
->>>>>>> 09e78cdbb87ad314bc55de3042976f6749793be8
->>>>>>> 134c0e64ae42d45ba4b7ee8b393dc1aaac060ae3
     orientation into degrees (radians). Extracts the resulting x, y, and orientation 
     from the xs (state numpy array) and loc (locations numpy array). The extracted
     data is then put into a 2d numpy array Column 1 has the x coordinate of the minibot in
@@ -38,10 +24,6 @@ def convert_and_extract_minibot_sim_data(xs, locs):
     orientation of the minibot in the global frame in degrees
   """
   xs_in_degrees = RADIANS_TO_DEGREES_CONVERSION_FACTOR * xs
-  locs_in_inches = METERS_TO_INCHES_CONVERSION_FACTOR * locs
-  
-  orientations = np.delete(xs_in_degrees, 0, axis=1)
-  resulting_data = np.column_stack((locs_in_inches,orientations))
   
   orientations = np.delete(xs_in_degrees, 0, axis=1)
   resulting_data = np.column_stack((locs,orientations))
