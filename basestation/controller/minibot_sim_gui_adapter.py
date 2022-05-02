@@ -1,7 +1,9 @@
 import numpy as np
-from basestation.controller.minibot_sim import minibot_hit, minibot_straight, minibot_turn, run_commands, dt
+from basestation.controller.minibot_sim import minibot_hit, minibot_straight, minibot_turn, path_to_commands, run_commands, dt
 from math import pi
 from re import split
+
+from basestation.util.path_planning import PathPlanner
 
 RADIANS_TO_DEGREES_CONVERSION_FACTOR = (180/pi) 
 DEGREES_TO_RADIANS_CONVERSION_FACTOR = (pi/180) 
@@ -60,8 +62,8 @@ def run_commands_for_gui_data(commands):
   return {"positions": formatted_positions, "velocities": formatted_velocities}
 
 
-def run_program_string_for_gui_data(program_string):
-  commands = parse_program_string_to_commands(program_string)
+def run_program_string_for_gui_data(program_string, start, world):
+  commands = parse_program_string_to_commands(program_string, start, world)
   print("commands:",commands)
   gui_data = run_commands_for_gui_data(commands)
   return gui_data
@@ -76,40 +78,44 @@ def run_program_string_for_gui_data(program_string):
 
 
 
-def get_command_from_function_and_arguments(function_and_arguments):
+def get_commands_from_function_and_arguments(function_and_arguments, start, world):
   given_function = function_and_arguments[0]
   print(given_function)
   if given_function == "fwd_dst":
     argument1 = float(function_and_arguments[1])
-    return (minibot_straight, argument1)
+    return [(minibot_straight, argument1)]
   elif given_function == "back_dst":
     argument1 = float(function_and_arguments[1])
-    return (minibot_straight, -argument1)
+    return [(minibot_straight, -argument1)]
   elif given_function == "move_to":
     argument1 = float(function_and_arguments[1])
     argument2 = float(function_and_arguments[2])
-    return (minibot_hit, argument1, argument2)
+    return [(minibot_hit, argument1, argument2)]
+  elif given_function == "path_plan_to":
+    argument1 = float(function_and_arguments[1])
+    argument2 = float(function_and_arguments[2])
+    path = PathPlanner.find_path(world, start, (argument1,argument2))
+    return path_to_commands(path)
   elif given_function == "left_angle":
-    pass
+    return []
   elif given_function == "right_angle":
-    pass
+    return []
   elif given_function == "turn_to":
     argument1 = float(function_and_arguments[1])
-    return (minibot_turn, DEGREES_TO_RADIANS_CONVERSION_FACTOR * argument1)
+    return [(minibot_turn, DEGREES_TO_RADIANS_CONVERSION_FACTOR * argument1)]
 
 
 
 
 def remove_empty_entries(lst):
   return [entry for entry in lst if entry]
-def parse_program_string_to_commands(program_string):
+def parse_program_string_to_commands(program_string, start, world):
   program_lines = remove_empty_entries(program_string.replace(" ", "").split("\n"))
   commands = []
   for program_line in program_lines:
     function_and_arguments = remove_empty_entries(split('\(|,|\)',program_line))
-    command = get_command_from_function_and_arguments(function_and_arguments)
-    if command:
-      commands.append(command)
+    new_commands = get_commands_from_function_and_arguments(function_and_arguments, start, world)
+    commands += new_commands
   #converts list to tuple in order to match minibot_sim input
   return (*commands, )
     

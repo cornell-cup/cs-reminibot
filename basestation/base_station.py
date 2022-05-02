@@ -13,7 +13,7 @@ from basestation.util.helper_functions import distance
 
 from random import choice, randint
 from string import digits, ascii_lowercase, ascii_uppercase
-from typing import Dict, List, Tuple, Optional
+from typing import Any, Dict, List, Tuple, Optional
 import os
 import re
 import socket
@@ -152,8 +152,6 @@ class BaseStation:
         else:
             print("The vision virtual object list was not given a valid update in update_virtual_objects")
 
-        world = self.get_world(update["virtual_objects"][0]["virtual_room_id"] if "virtual_objects" in update else update["virtual_object"]["virtual_room_id"], world_width=60, world_height=60, cell_size=5, excluded_ids=[])
-        self.get_path(world, (-5,-5), (5,5))
 
             
 
@@ -305,9 +303,10 @@ class BaseStation:
             
 
     # to be used for simulation
-    def get_vision_data_by_id(self, id):
+    def get_vision_data_by_id(self, query_params):
         """ Returns position data of an object given its id """
-        allVisionData = self.get_vision_data()
+        id = query_params["id"]
+        allVisionData = self.get_vision_data(query_params)
         for object in allVisionData:
             if object["id"] == id:
                 return object
@@ -557,9 +556,19 @@ class BaseStation:
         # Now actually send to the bot
         bot.sendKV("SCRIPTS", parsed_program_string)
 
-    def get_virtual_program_execution_data(self, script: str) -> Dict[str, List[Dict]]:
+    def get_virtual_program_execution_data(self, query_params: Dict[str, Any]) -> Dict[str, List[Dict]]:
+        script = query_params['script_code']
+        virtual_room_id = query_params['virtual_room_id']
+        minibot_id = query_params['minibot_id']  
+        world_width = query_params['world_width']
+        world_height = query_params['world_height']
+        cell_size = query_params['cell_size']
+        query_params['id'] = query_params['minibot_id']  
         parsed_program_string = self.parse_program(script)
-        return run_program_string_for_gui_data(parsed_program_string)
+        world = self.get_world(virtual_room_id, world_width, world_height, cell_size, [minibot_id])
+        minibot_location = self.get_vision_data_by_id(query_params)
+        start = (minibot_location['x'],minibot_location['y'])
+        return run_program_string_for_gui_data(parsed_program_string, start, world)
 
     def parse_program(self, script: str) -> str:
         # Regex is for bot-specific functions (move forward, stop, etc)

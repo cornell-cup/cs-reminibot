@@ -7,6 +7,7 @@ from collision import *
 from basestation.util.tile import Tile
 
 from basestation.util.tile_heap import TileHeap
+from copy import deepcopy
 
 
 
@@ -17,6 +18,8 @@ class WorldBuilder:
     "circles": ["sphere", "cylinder", "circle"],
     "polygons": ["regular_polygon", "polygon"]
   }
+
+  default_size = 4
 
   @classmethod
   def from_vision_data(cls, vision_data, world_width, world_height, cell_size, excluded_ids):
@@ -58,7 +61,10 @@ class WorldBuilder:
     elif shape in cls.shape_types["polygons"]:
       return cls.polygon_to_collision_polygon(vision_data_object)
     else:
-      raise Exception("Invalid shape given in vision_data_object_to_shape method")
+      vision_data_object_copy = deepcopy(vision_data_object)
+      vision_data_object_copy["width"] = cls.default_size
+      vision_data_object_copy["length"] = cls.default_size
+      return cls.quadrilateral_to_collision_polygon(vision_data_object_copy)
 
   @classmethod
   def quadrilateral_to_collision_polygon(cls, quadrilateral):

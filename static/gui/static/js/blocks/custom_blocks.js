@@ -169,7 +169,6 @@ Blockly.Blocks['move_distance'] = {
 
 Blockly.Python['move_distance'] = function (block) {
   var dropdown_direction = block.getFieldValue('direction');
-  var number_meters = block.getFieldValue('meters');
   var number_inches = block.getFieldValue('inches');
 
   var fcn = {
@@ -177,7 +176,6 @@ Blockly.Python['move_distance'] = function (block) {
     bk_dst: "move_backward_distance("
   }[dropdown_direction];
 
-  return BOT_HEADER + fcn + number_meters + ")\n";
   return BOT_HEADER + fcn + number_inches + ")\n";
 };
 
@@ -188,14 +186,6 @@ Blockly.Blocks['move_to_position'] = {
 };
 
 Blockly.Python['move_to_position'] = function (block) {
-
-  var x_meters = block.getFieldValue('x_meters');
-  var y_meters = block.getFieldValue('y_meters');
-
-  var fcn = "move_to("
-
-  return BOT_HEADER + fcn + x_meters + "," + y_meters + ")\n";
-
   var x_inches = block.getFieldValue('x_inches');
   var y_inches = block.getFieldValue('y_inches');
 
@@ -203,6 +193,22 @@ Blockly.Python['move_to_position'] = function (block) {
 
   return BOT_HEADER + fcn + x_inches + "," + y_inches + ")\n";
 };
+
+Blockly.Blocks['path_plan_to_position'] = {
+  init: function () {
+    this.jsonInit(miniblocks.path_plan_to_position);
+  }
+};
+
+Blockly.Python['path_plan_to_position'] = function (block) {
+  var x_inches = block.getFieldValue('x_inches');
+  var y_inches = block.getFieldValue('y_inches');
+
+  var fcn = "path_plan_to("
+
+  return BOT_HEADER + fcn + x_inches + "," + y_inches + ")\n";
+};
+
 
 
 Blockly.Blocks['stop_moving'] = {

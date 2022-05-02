@@ -269,6 +269,27 @@ var miniblocks = {
     tooltip: "",
     helpUrl: ""
   },
+  path_plan_to_position: {
+    type: "path_plan_to_position",
+    message0: "path plan to (%1 inches,%2 inches)",
+    args0: [
+      {
+        type: "field_number",
+        name: "x_inches",
+        value: 0
+      },
+      {
+        type: "field_number",
+        name: "y_inches",
+        value: 0
+      }
+    ],
+    previousStatement: null,
+    nextStatement: null,
+    colour: 230,
+    tooltip: "",
+    helpUrl: ""
+  },
   stop_moving: {
     type: "stop_moving",
     message0: "stop moving",
