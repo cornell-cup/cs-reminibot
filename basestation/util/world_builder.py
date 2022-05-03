@@ -22,11 +22,11 @@ class WorldBuilder:
   default_size = 4
 
   @classmethod
-  def from_vision_data_all(cls, vision_data, world_width, world_height, cell_size, excluded_ids, offset_step = .1):
+  def from_vision_data_all(cls, vision_data, world_width, world_height, cell_size, excluded_ids, offset_step = 1):
     worlds = []
-    offset_y = 0
     offset_x = 0
     while offset_x <= cell_size:
+      offset_y = 0
       while offset_y <= cell_size:
         worlds.append(cls.from_vision_data_offset(vision_data, world_width, world_height, cell_size, excluded_ids, offset_x, offset_y))
         offset_y += offset_step
@@ -35,35 +35,39 @@ class WorldBuilder:
 
   @classmethod
   def from_vision_data_offset(cls, vision_data, world_width, world_height, cell_size, excluded_ids, offset_x, offset_y):
-      tile_grid = []
-      vision_data_shapes = [cls.vision_data_object_to_shape(vision_object) for vision_object in vision_data if not(vision_object["id"] in excluded_ids)]
-      row = 0
-      top_left_corner_y = world_height/2
-      while top_left_corner_y > -world_height/2:
-        cell_height = offset_y if row == 0 and offset_y != 0 else cell_size
-        tile_grid.append([])
-        col = 0
-        top_left_corner_x = -world_width/2
-        while top_left_corner_x < world_width/2:
-          cell_width = offset_x if col == 0 and offset_x != 0 else cell_size
-          minX = -cell_width/2
-          maxX = cell_width/2
-          minY = -cell_height/2
-          maxY = cell_height/2
-          x = top_left_corner_x+cell_width/2
-          y = top_left_corner_y-cell_height/2
-          cell_collision_polygon = Poly(Vector(x,y), [Vector(minX, minY),Vector(maxX, minY),Vector(maxX, maxY),Vector(minX, maxY)], 0)
-          collided = False
-          for vision_data_shape in vision_data_shapes:
-            collided |= collide(vision_data_shape, cell_collision_polygon)
-          tile_grid[row].append(Tile(x, y, row, col, collided))
-          top_left_corner_x += offset_x if col == 0 and offset_x != 0 else cell_size
-          col += 1
-        top_left_corner_y -= offset_y if row == 0 and offset_y != 0 else cell_size
-        row += 1
+    tile_grid = []
+    vision_data_shapes = [cls.vision_data_object_to_shape(vision_object) for vision_object in vision_data if not(vision_object["id"] in excluded_ids)]
+    row = 0
+    top_left_corner_y = world_height/2
+    while top_left_corner_y > -world_height/2:
+      cell_height = offset_y if row == 0 and offset_y != 0 else cell_size
+      tile_grid.append([])
+      col = 0
+      top_left_corner_x = -world_width/2
+      while top_left_corner_x < world_width/2:
+        cell_width = offset_x if col == 0 and offset_x != 0 else cell_size
+        minX = -cell_width/2
+        maxX = cell_width/2
+        minY = -cell_height/2
+        maxY = cell_height/2
+        x = top_left_corner_x+cell_width/2
+        y = top_left_corner_y-cell_height/2
+        cell_collision_polygon = Poly(Vector(x,y), [Vector(minX, minY),Vector(maxX, minY),Vector(maxX, maxY),Vector(minX, maxY)], 0)
         
+
+        collided = False
+        for vision_data_shape in vision_data_shapes:
+          collided |= collide(vision_data_shape, cell_collision_polygon)
+        tile_grid[row].append(Tile(x, y, row, col, collided))
+        top_left_corner_x += offset_x if col == 0 and offset_x != 0 else cell_size
+        col += 1
+      top_left_corner_y -= offset_y if row == 0 and offset_y != 0 else cell_size
+      row += 1
+        
+
+
       
-      return CoordinateGrid(tile_grid)
+    return CoordinateGrid(tile_grid)
 
   @classmethod
   def vision_data_object_to_shape(cls, vision_data_object):

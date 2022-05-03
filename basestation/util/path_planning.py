@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Tuple, Union
 from pathfinding.core.diagonal_movement import DiagonalMovement
 from pathfinding.core.grid import Grid
 from pathfinding.finder.a_star import AStarFinder
@@ -26,6 +26,8 @@ class PathPlanner:
     shortest_path = None
     for world in worlds:
       path = cls.find_path_single_world(world, start_x_y, end_x_y)
+      if path == None:
+        continue
       dist = cls.distance_traveled(start_x_y, end_x_y, path)
       if shortest_dist > dist:
         shortest_dist = dist
@@ -33,10 +35,10 @@ class PathPlanner:
     shortest_path = remove_collinear_pts(shortest_path)
     for coord in shortest_path:
       print(coord)
-    return shortest_path
+    return shortest_path if shortest_path != None else [end_x_y]
 
   @classmethod
-  def find_path_single_world(cls, world: CoordinateGrid, start_x_y: Tuple[float, float], end_x_y: Tuple[float, float]) -> List[Tuple[float, float]]:
+  def find_path_single_world(cls, world: CoordinateGrid, start_x_y: Tuple[float, float], end_x_y: Tuple[float, float]) -> Union[List[Tuple[float, float]], None]:
       """
       world: the world split up in a grid with open cells and obstacle cells
       start: the (x, y) coordinates of the starting point in inches (IMPORTANT: Not row and column)
@@ -49,5 +51,6 @@ class PathPlanner:
       path, runs = finder.find_path(start, end, world)
       if len(path) == 0:
         print("Warning unable to find PATH!!!!")
+        return None
       return world.col_row_to_x_y_coordinates(path)[1:]+[end_x_y]
     

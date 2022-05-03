@@ -143,7 +143,7 @@ const UltimateGridView = (props) => {
         minibot_id: minibotId,
         world_width: 200,
         world_height: 200,
-        cell_size: 7
+        cell_size: 7.1
       }),
     }).then(function (response) {
       setProgramData(response.data);
