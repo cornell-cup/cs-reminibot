@@ -25,6 +25,8 @@ class WorldBuilder:
   def from_vision_data(cls, vision_data, world_width, world_height, cell_size, excluded_ids):
     tile_grid = []
     vision_data_shapes = [cls.vision_data_object_to_shape(vision_object) for vision_object in vision_data if not(vision_object["id"] in excluded_ids)]
+    print(vision_data)
+    print(vision_data_shapes)
     row = 0
     top_left_corner_y = world_height/2
     while top_left_corner_y > -world_height/2:
@@ -33,10 +35,10 @@ class WorldBuilder:
       top_left_corner_x = -world_width/2
       while top_left_corner_x < world_width/2:
       
-        minX = top_left_corner_x
-        maxX = top_left_corner_x+cell_size
-        minY = top_left_corner_y-cell_size
-        maxY = top_left_corner_y
+        minX = -cell_size/2
+        maxX = cell_size/2
+        minY = -cell_size/2
+        maxY = cell_size/2
         x = top_left_corner_x+cell_size/2
         y = top_left_corner_y-cell_size/2
         cell_collision_polygon = Poly(Vector(x,y), [Vector(minX, minY),Vector(maxX, minY),Vector(maxX, maxY),Vector(minX, maxY)], 0)
@@ -53,6 +55,7 @@ class WorldBuilder:
 
   @classmethod
   def vision_data_object_to_shape(cls, vision_data_object):
+
     shape = vision_data_object["shape"].strip().lower()
     if shape in cls.shape_types["circles"]:
       return Circle(Vector(vision_data_object["x"],vision_data_object["y"]), vision_data_object["radius"])
@@ -68,19 +71,20 @@ class WorldBuilder:
 
   @classmethod
   def quadrilateral_to_collision_polygon(cls, quadrilateral):
-    print(quadrilateral)
-    minX = quadrilateral["x"]-quadrilateral["width"]/2
-    maxX = quadrilateral["x"]+quadrilateral["width"]/2
-    minY = quadrilateral["y"]-quadrilateral["length"]/2
-    maxY = quadrilateral["y"]+quadrilateral["length"]/2
+    minX = -quadrilateral["width"]/2
+    maxX = quadrilateral["width"]/2
+    minY = -quadrilateral["length"]/2
+    maxY = quadrilateral["length"]/2
+    print("minX",minX)
+    print("maxX",maxX)
+    print("minY",minY)
+    print("maxX",maxX)
     return Poly(Vector(quadrilateral["x"],quadrilateral["y"]), [Vector(minX, minY),Vector(maxX, minY),Vector(maxX, maxY),Vector(minX, maxY)], math.radians(quadrilateral["orientation"]))
 
 
   @classmethod
-  def polygon_to_vertices(cls, polygon):
-    anchor_x = polygon["x"]
-    anchor_y = polygon["y"]
-    return [Vector(anchor_x+delta['x'], anchor_y+delta['y']) for delta in polygon["deltas_to_vertices"]]
+  def polygon_to_deltas(cls, polygon):
+    return [Vector(delta['x'], delta['y']) for delta in polygon["deltas_to_vertices"]]
 
   @classmethod
   def polygon_to_collision_polygon(cls, polygon):
@@ -93,6 +97,6 @@ class WorldBuilder:
       vertice_vectors.append(Vector(x, y))
 
     if isConvex(vertices_list):
-      return Poly(Vector(polygon["x"],polygon["y"]), cls.polygon_to_vertices(polygon), math.radians(polygon["orientation"]))
+      return Poly(Vector(polygon["x"],polygon["y"]), cls.polygon_to_deltas(polygon), math.radians(polygon["orientation"]))
     else:
-      return Concave_Poly(Vector(polygon["x"],polygon["y"]), cls.polygon_to_vertices(polygon), math.radians(polygon["orientation"]))
+      return Concave_Poly(Vector(polygon["x"],polygon["y"]), cls.polygon_to_deltas(polygon), math.radians(polygon["orientation"]))
