@@ -26,8 +26,6 @@ class CoordinateGrid(Grid):
         if closest_tile == None:
             raise Exception("Unable to get nearest tile")
         else:
-            print("col:",closest_tile.col)
-            print("row:",closest_tile.row)
             return self.node(closest_tile.col, closest_tile.row)
 
     def get_tile(self, coordinate_col_row: Tuple[float, float]) -> Tile:

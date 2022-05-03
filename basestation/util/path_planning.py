@@ -18,5 +18,5 @@ class PathPlanner:
 
     finder = AStarFinder(diagonal_movement=DiagonalMovement.only_when_no_obstacle)
     path, runs = finder.find_path(start, end, world)
-    return world.col_row_to_x_y_coordinates(path)+[end_x_y]
+    return world.col_row_to_x_y_coordinates(path)[1:]+[end_x_y]
     

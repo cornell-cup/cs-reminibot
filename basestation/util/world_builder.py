@@ -75,20 +75,12 @@ class WorldBuilder:
     maxY = quadrilateral["y"]+quadrilateral["length"]/2
     return Poly(Vector(quadrilateral["x"],quadrilateral["y"]), [Vector(minX, minY),Vector(maxX, minY),Vector(maxX, maxY),Vector(minX, maxY)], math.radians(quadrilateral["orientation"]))
 
-  #switch out for this method for concave stuff or put in the work to figure with polygons are convex
-  # @classmethod
-  # def polygon_to_vertices(cls, polygon):
-  #   minX = float("inf")
-  #   maxX = float("-inf")
-  #   minY = float("inf")
-  #   maxY = float("-inf")
-  #   for delta in polygon["deltas_to_vertices"]:
-  #     minX = min(delta['x'], minX)
-  #     maxX = max(delta['x'], maxX)
-  #     minY = min(delta['y'], minY)
-  #     maxY = max(delta['y'], maxY)
 
-  #   return [Vector(minX, minY),Vector(maxX, minY),Vector(maxX, maxY),Vector(minX, maxY)]
+  @classmethod
+  def polygon_to_vertices(cls, polygon):
+    anchor_x = polygon["x"]
+    anchor_y = polygon["y"]
+    return [Vector(anchor_x+delta['x'], anchor_y+delta['y']) for delta in polygon["deltas_to_vertices"]]
 
   @classmethod
   def polygon_to_collision_polygon(cls, polygon):

@@ -141,9 +141,9 @@ const UltimateGridView = (props) => {
         script_code: pythonCode,
         virtual_room_id: virtualRoomId,
         minibot_id: minibotId,
-        world_width: 60,
-        world_height: 60,
-        cell_size: 5
+        world_width: 120,
+        world_height: 120,
+        cell_size: 7.1
       }),
     }).then(function (response) {
       setProgramData(response.data);
