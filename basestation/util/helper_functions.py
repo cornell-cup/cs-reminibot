@@ -69,3 +69,17 @@ def isConvex(points):
                 prev = curr
  
     return True
+
+def is_collinear(p0, p1, p2, eps = 1e-12):
+    x1, y1 = p1[0] - p0[0], p1[1] - p0[1]
+    x2, y2 = p2[0] - p0[0], p2[1] - p0[1]
+    return abs(x1 * y2 - x2 * y1) < eps
+
+def remove_collinear_pts(pts):
+    i = 1
+    while i < len(pts)-1:
+        if is_collinear(pts[i-1],pts[i],pts[i+1]):
+            pts.pop(i)
+        else:
+            i += 1
+    return pts

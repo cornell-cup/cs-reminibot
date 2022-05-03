@@ -62,8 +62,8 @@ def run_commands_for_gui_data(commands):
   return {"positions": formatted_positions, "velocities": formatted_velocities}
 
 
-def run_program_string_for_gui_data(program_string, start, world):
-  commands = parse_program_string_to_commands(program_string, start, world)
+def run_program_string_for_gui_data(program_string, start, worlds):
+  commands = parse_program_string_to_commands(program_string, start, worlds)
   print("commands:",commands)
   gui_data = run_commands_for_gui_data(commands)
   return gui_data
@@ -78,7 +78,7 @@ def run_program_string_for_gui_data(program_string, start, world):
 
 
 
-def get_commands_from_function_and_arguments(function_and_arguments, start, world):
+def get_commands_from_function_and_arguments(function_and_arguments, start, worlds):
   given_function = function_and_arguments[0]
   print(given_function)
   if given_function == "fwd_dst":
@@ -94,7 +94,7 @@ def get_commands_from_function_and_arguments(function_and_arguments, start, worl
   elif given_function == "path_plan_to":
     argument1 = float(function_and_arguments[1])
     argument2 = float(function_and_arguments[2])
-    path = PathPlanner.find_path(world, start, (argument1,argument2))
+    path = PathPlanner.find_path_multiple_worlds(worlds, start, (argument1,argument2))
     return path_to_commands(path)
   elif given_function == "left_angle":
     return []
@@ -109,12 +109,12 @@ def get_commands_from_function_and_arguments(function_and_arguments, start, worl
 
 def remove_empty_entries(lst):
   return [entry for entry in lst if entry]
-def parse_program_string_to_commands(program_string, start, world):
+def parse_program_string_to_commands(program_string, start, worlds):
   program_lines = remove_empty_entries(program_string.replace(" ", "").split("\n"))
   commands = []
   for program_line in program_lines:
     function_and_arguments = remove_empty_entries(split('\(|,|\)',program_line))
-    new_commands = get_commands_from_function_and_arguments(function_and_arguments, start, world)
+    new_commands = get_commands_from_function_and_arguments(function_and_arguments, start, worlds)
     commands += new_commands
   #converts list to tuple in order to match minibot_sim input
   return (*commands, )

@@ -9,7 +9,6 @@ from basestation.util.tile import Tile
 class CoordinateGrid(Grid):
     def __init__(self, tile_grid: List[List[Tile]]):
         matrix = [[(0 if tile.is_obstacle else 1) for tile in row] for row in tile_grid]
-        print(matrix)
         super().__init__(matrix=matrix)
         self.tile_grid = tile_grid
 

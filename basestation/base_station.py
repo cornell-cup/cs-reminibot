@@ -281,15 +281,10 @@ class BaseStation:
         """ Returns most recent vision data """
         return list(filter(lambda data_entry: self.matchesQuery(data_entry, query_params), self.get_estimated_positions(True, query_params["virtual_room_id"]))) 
 
-    def get_world(self, virtual_room_id, world_width, world_height, cell_size, excluded_ids):
+    def get_worlds(self, virtual_room_id, world_width, world_height, cell_size, excluded_ids):
         vision_data = self.get_vision_data({"virtual_room_id": virtual_room_id})
-        world = WorldBuilder.from_vision_data(vision_data, world_width, world_height, cell_size, excluded_ids)
-        return world
-
-    def get_path(self, world, start_x_y, end_x_y):
-        path = PathPlanner.find_path(world, start_x_y, end_x_y)
-        print(path)
-        return path
+        worlds = WorldBuilder.from_vision_data_all(vision_data, world_width, world_height, cell_size, excluded_ids)
+        return worlds
 
     def matchesQuery(self, data_entry, query_params):
         matches = True
@@ -565,10 +560,10 @@ class BaseStation:
         cell_size = query_params['cell_size']
         query_params['id'] = query_params['minibot_id']  
         parsed_program_string = self.parse_program(script)
-        world = self.get_world(virtual_room_id, world_width, world_height, cell_size, [minibot_id])
+        worlds = self.get_worlds(virtual_room_id, world_width, world_height, cell_size, [minibot_id])
         minibot_location = self.get_vision_data_by_id(query_params)
         start = (minibot_location['x'],minibot_location['y'])
-        return run_program_string_for_gui_data(parsed_program_string, start, world)
+        return run_program_string_for_gui_data(parsed_program_string, start, worlds)
 
     def parse_program(self, script: str) -> str:
         # Regex is for bot-specific functions (move forward, stop, etc)
