@@ -72,7 +72,7 @@ class WorldBuilder:
   @classmethod
   def vision_data_object_to_shape(cls, vision_data_object):
 
-    shape = vision_data_object["shape"].strip().lower()
+    shape = vision_data_object["shape"].strip().lower() if "shape" in vision_data_object else ""
     if shape in cls.shape_types["circles"]:
       return Circle(Vector(vision_data_object["x"],vision_data_object["y"]), vision_data_object["radius"])
     elif shape in cls.shape_types["quadrilaterals"]:
