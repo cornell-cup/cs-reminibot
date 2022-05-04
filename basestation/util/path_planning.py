@@ -32,7 +32,11 @@ class PathPlanner:
       if shortest_dist > dist:
         shortest_dist = dist
         shortest_path = path
-    shortest_path = remove_collinear_pts(shortest_path)
+    # with current controller implementation the Bot does not turn and then
+    # travel in straight lines when going from one point to the next.
+    # If the bot controller is change to only travel in straight lines
+    # add this optimization back in.
+    # shortest_path = remove_collinear_pts(shortest_path)
     for coord in shortest_path:
       print(coord)
     return shortest_path if shortest_path != None else [end_x_y]
