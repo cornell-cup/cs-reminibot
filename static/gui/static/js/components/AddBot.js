@@ -574,7 +574,6 @@ export default class AddBot extends React.Component {
                         <div className="col horizontalDivCenter">
                           <p className="small-title"> Custom Modes </p>
                           <button className="btn btn-success element-wrapper mr-1" onClick={() => this.setModeOnClick("object_detection")}>Object Detection</button>
-                          <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.setModeOnClick("line_follow")}>Line Follow</button>
                           <button className="btn btn-success element-wrapper mr-1" onClick={() => this.setModeOnClick("color_detection")}>Color Detection</button>
                         </div>
                     </div>

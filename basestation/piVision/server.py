@@ -229,7 +229,7 @@ if v == 1:
   # do a bit of cleanup
   cv2.destroyAllWindows()
 
-if v == 2:
+elif v == 2:
   # initialize the ImageHub object
   imageHub = imagezmq.ImageHub()
 

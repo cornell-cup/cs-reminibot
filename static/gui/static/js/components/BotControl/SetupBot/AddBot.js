@@ -201,29 +201,9 @@ export default class AddBot extends React.Component {
 
     }
 
-    lineFollowOnClick() {
-        const _this = this;
-        axios({
-            method: 'POST',
-            url: '/mode', //url to backend endpoint
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            data: JSON.stringify({
-                bot_name: _this.props.selectedBotName,
-                mode: "line_follow",
-            })
-        }).catch(function (error) {
-            if (error.response.data.error_msg.length > 0)
-                window.alert(error.response.data.error_msg);
-            else
-                console.log(error);
-        });
-    }
 
-    objectDetectionOnClick() {
+    setModeOnClick(mode) {
         const _this = this;
-        console.log("Object Detection")
         axios({
             method: 'POST',
             url: '/mode', //url to backend endpoint
@@ -232,14 +212,13 @@ export default class AddBot extends React.Component {
             },
             data: JSON.stringify({
                 bot_name: _this.props.selectedBotName,
-                mode: "object_detection",
+                mode: mode,
             })
         }).catch(function (error) {
             if (error.response.data.error_msg.length > 0)
                 window.alert(error.response.data.error_msg);
             else
                 console.log(error);
-            //handle errors
         });
     }
 
@@ -295,8 +274,8 @@ export default class AddBot extends React.Component {
                     <div className="row">
                         <div className="col horizontalDivCenter">
                             <p className="small-title"> Custom Modes </p>
-                            <button className="btn btn-success element-wrapper mr-1" onClick={() => this.objectDetectionOnClick()}>Object Detection</button>
-                            <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.lineFollowOnClick()}>Line Follow</button>
+                            <button className="btn btn-success element-wrapper mr-1" onClick={() => this.setModeOnClick("object_detection")}>Object Detection</button>
+                          <button className="btn btn-success element-wrapper mr-1" onClick={() => this.setModeOnClick("color_detection")}>Color Detection</button>
                         </div>
                     </div>
                     <br />
