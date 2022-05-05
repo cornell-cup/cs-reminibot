@@ -218,21 +218,21 @@ function Chatbot2({ setParentContext, selectedBotName, setActiveMicComponent, ac
     e.preventDefault();
     if (contextMode || selectedBotName) {
       console.log("toggle mic");
-      temp = !mic;
+      var temp = !mic;
       setMic(temp);
-      setInputText("");
+      // setInputText("");
       // set active mic to chatbot only if not already set to ACT_MIC_CHATBOT
-      if (temp && activeMicComponent!=ACT_MIC_CHATBOT) {
-        setActiveMicComponent(ACT_MIC_CHATBOT)
-      }
+      // if (temp && activeMicComponent!=ACT_MIC_CHATBOT) {
+        // setActiveMicComponent(ACT_MIC_CHATBOT)
+      // }
     }
   }
 
-  useEffect(() => {
-    if (activeMicComponent != ACT_MIC_CHATBOT){
-      setMic(false)
-    }
-  }, [activeMicComponent])
+  // useEffect(() => {
+  //   if (activeMicComponent != ACT_MIC_CHATBOT){
+  //     setMic(false)
+  //   }
+  // }, [activeMicComponent])
 
 
   const alertInfo = (e) => {

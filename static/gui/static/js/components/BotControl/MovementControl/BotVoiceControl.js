@@ -23,17 +23,18 @@ function BotVoiceControl({ selectedBotName, startLabel, stopLabel, activeMicComp
 
   const toggle = (e) => {
     e.preventDefault();
-    if (activeMicComponent == ACT_MIC_COMMAND || !activeMicComponent) {
+  //   if (activeMicComponent == ACT_MIC_COMMAND || !activeMicComponent) {
       setOn(!on);
       lastLen = 0; // correctly reset queue length if the button is toggled
+      console.log("mic on " + on);
     }
-  }
+  // }
   // TODO useEffect to turn off the mic if activeMicComponent changes
-  useEffect(() => {
-    if (activeMicComponent != ACT_MIC_COMMAND){
-      setOn(false)
-    }
-  }, [activeMicComponent])
+  // useEffect(() => {
+  //   if (activeMicComponent != ACT_MIC_COMMAND){
+  //     setOn(false)
+  //   }
+  // }, [activeMicComponent])
 
   useEffect(() => {
     console.log(lastLen);
