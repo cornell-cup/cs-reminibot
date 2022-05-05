@@ -3,8 +3,10 @@ import axios from 'axios';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { commands } from '../../utils/Constants.js';
-import { MIC_BTN, MIC_BTNON, 
-  ACT_MIC_CHATBOT, ACT_MIC_COMMAND} from "../../utils/Constants.js";
+import {
+  MIC_BTN, MIC_BTNON,
+  ACT_MIC_CHATBOT, ACT_MIC_COMMAND
+} from "../../utils/Constants.js";
 
 import SpeechRecognitionComp from "../../utils/SpeechRecognitionComp.js";
 
@@ -15,19 +17,29 @@ const micStyle = {
   objectFit: "contain",
 };
 
-function BotVoiceControl({ selectedBotName, startLabel, stopLabel, activeMicComponent, setActiveMicComponent }) {
-  const [on, setOn] = useState(false);
+function BotVoiceControl({
+  selectedBotName,
+  startLabel,
+  stopLabel,
+  activeMicComponent,
+  setActiveMicComponent,
+  botVoiceControlMic, setBotVoiceControlMic }) {
+  // const [on, setOn] = useState(false);
   const [text, setText] = useState("");
   const [inputText, setInputText] = useState("");
   // const [prevLast, setPrevLast] = useState("");
 
   const toggle = (e) => {
     e.preventDefault();
-  //   if (activeMicComponent == ACT_MIC_COMMAND || !activeMicComponent) {
-      setOn(!on);
+    if (activeMicComponent == ACT_MIC_COMMAND) {
+      setBotVoiceControlMic(!botVoiceControlMic);
       lastLen = 0; // correctly reset queue length if the button is toggled
-      console.log("mic on " + on);
+      // console.log("mic on " + on);
     }
+    else {
+      setActiveMicComponent(ACT_MIC_COMMAND)
+    }
+  }
   // }
   // TODO useEffect to turn off the mic if activeMicComponent changes
   // useEffect(() => {
@@ -82,7 +94,7 @@ function BotVoiceControl({ selectedBotName, startLabel, stopLabel, activeMicComp
             <span className="col-md-1 align-self-center">
               <div style={{ width: "50px", height: "50px", }}>
                 <input type="image"
-                  src={on ? MIC_BTNON : MIC_BTN}
+                  src={botVoiceControlMic ? MIC_BTNON : MIC_BTN}
                   style={micStyle}
                   onClick={(e) => {
                     toggle(e);
@@ -92,7 +104,7 @@ function BotVoiceControl({ selectedBotName, startLabel, stopLabel, activeMicComp
             {/* <span className="col-md align-self-center">{on ? startLabel : stopLabel}</span> */}
           </div>
         </button>
-        <SpeechRecognitionComp setText={setText} mic={on} />
+        <SpeechRecognitionComp setText={setText} mic={botVoiceControlMic} />
       </div>
     </React.Fragment>
   )

@@ -117,8 +117,8 @@ class Platform extends React.Component {
               setSelectedBotStyle={this.setSelectedBotStyle}
               setActiveMicComponent={this.props.setActiveMicComponent}
               activeMicComponent={this.props.activeMicComponent}
-              // botVoiceControlMic={this.botVoiceControlMic}
-              // setBotVoiceControlMic={this.setBotVoiceControlMic}
+              botVoiceControlMic={this.props.botVoiceControlMic}
+              setBotVoiceControlMic={this.props.setBotVoiceControlMic}
             />
           </div>
 

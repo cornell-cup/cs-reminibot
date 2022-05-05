@@ -3,11 +3,14 @@ import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as Icons from '@fortawesome/free-solid-svg-icons';
 
-import { X_BTN, MIC_BTN, MIC_BTNON, 
-  ACT_MIC_CHATBOT, ACT_MIC_COMMAND } from "../utils/Constants.js";
+import {
+  commands,
+  X_BTN, MIC_BTN, MIC_BTNON,
+  ACT_MIC_CHATBOT, ACT_MIC_COMMAND
+} from "../utils/Constants.js";
 import SpeechRecognitionComp from "../utils/SpeechRecognitionComp.js";
 import BotVoiceControl from "../BotControl/MovementControl/BotVoiceControl.js";
-import { commands } from '../utils/Constants.js';
+
 
 //Voice Control 
 var lastLen = 0;
@@ -32,16 +35,24 @@ const defaultFontSize = {
 }
 const emptyStr = "";
 
-function Chatbot2({ setParentContext, selectedBotName, setActiveMicComponent, activeMicComponent}) {
+function Chatbot2({
+  setParentContext,
+  selectedBotName,
+  setActiveMicComponent,
+  activeMicComponent,
+  mic,
+  setMic }) {
   const [open, setOpen] = useState(false);
   const [expand, setExpand] = useState("");
   const [enter, setEnter] = useState("");
   const [id, setId] = useState(2);
-  
+
   const [inputText, setInputText] = useState("");
   const [messages, setMessages] = useState([]);
   const messagesEndRef = useRef(null);
-  const [mic, setMic] = useState(false);
+
+  // const [mic, setMic] = useState(false);
+
   //right means it can move to the right
   const [right, setRight] = useState(false);
   const [fullSize, setFullSize] = useState(false);
@@ -69,7 +80,7 @@ function Chatbot2({ setParentContext, selectedBotName, setActiveMicComponent, ac
 
   const changeInputText = (event) => {
     event.preventDefault();
-    if(!contextMode) return;
+    if (!contextMode) return;
     const input = event.currentTarget.value;
     setInputText(input);
   }
@@ -218,12 +229,17 @@ function Chatbot2({ setParentContext, selectedBotName, setActiveMicComponent, ac
     e.preventDefault();
     if (contextMode || selectedBotName) {
       console.log("toggle mic");
-      var temp = !mic;
-      setMic(temp);
+      if (activeMicComponent == ACT_MIC_CHATBOT) {
+        var temp = !mic;
+        setMic(temp);
+      }
+      else {
+        setActiveMicComponent(ACT_MIC_CHATBOT);
+      }
       // setInputText("");
       // set active mic to chatbot only if not already set to ACT_MIC_CHATBOT
       // if (temp && activeMicComponent!=ACT_MIC_CHATBOT) {
-        // setActiveMicComponent(ACT_MIC_CHATBOT)
+      // setActiveMicComponent(ACT_MIC_CHATBOT)
       // }
     }
   }
@@ -244,6 +260,7 @@ function Chatbot2({ setParentContext, selectedBotName, setActiveMicComponent, ac
     console.log("toggle context mode", contextMode);
     setContextMode(!contextMode);
     setMic(false);
+    setInputText("");
     // turn off mic of BotVoiceControl 
   };
 
@@ -270,10 +287,10 @@ function Chatbot2({ setParentContext, selectedBotName, setActiveMicComponent, ac
       // setPrevLast(queue[0]);
       console.log(queue);
       if (queue.length > lastLen) { // only read the lastest word 
-                                    //in the queue (last item is always '')
+        //in the queue (last item is always '')
         if (commands.hasOwnProperty(queue[queue.length - 2])) {
           setInputText(queue[queue.length - 2] + ": " +
-                      commands[queue[queue.length - 2]]);
+            commands[queue[queue.length - 2]]);
 
           // send command to backend
           axios({
@@ -302,7 +319,7 @@ function Chatbot2({ setParentContext, selectedBotName, setActiveMicComponent, ac
     }
     // setText("");
   }, [tempCommands, contextMode]);
-  
+
 
   var textBox = contextMode ?
     <input class="text-box" id="textbox" onChange={changeInputText} value={inputText}
@@ -312,7 +329,7 @@ function Chatbot2({ setParentContext, selectedBotName, setActiveMicComponent, ac
       }}></input> : <div />
   // : <div></div> ; // TODO add bot name for voice commands related to the bot
 
- 
+
 
   return (
     <div class={"floating-chat enter " + expand} style={expand === "expand" ? (right ? styles.leftWindow : styles.rightWindow) : styles.empty}
@@ -336,7 +353,7 @@ function Chatbot2({ setParentContext, selectedBotName, setActiveMicComponent, ac
               <button><FontAwesomeIcon onClick={(e) => changeFontSize(e, 1)} icon={Icons.faFont} /></button>
             </span>
           </div>
-          <button id="contextLabel" onClick={(e) => toggleMode(e)}> {contextMode? "Q&A Mode" : "Command Mode"}
+          <button id="contextLabel" onClick={(e) => toggleMode(e)}> {contextMode ? "Q&A Mode" : "Command Mode"}
             {/* <FontAwesomeIcon icon={contextMode ? Icons.faCheck : Icons.faBan} /> */}
             {/* {contextMode.toString()} */}
           </button>
@@ -364,20 +381,20 @@ function Chatbot2({ setParentContext, selectedBotName, setActiveMicComponent, ac
           ))}
         </ul>
         <div class="footer">
-          <textarea rows="3" cols="70" class="text-box" id="textbox" 
-                    onChange={changeInputText} value={inputText} 
-                    placeholder={contextMode ? "Enter a context/question" : selectedBotName != "" ? 
-                                              "Click the microphone to send a command" : "Please connect to a Minibot!"}
-                    onKeyPress={(e) => { 
-                      if (contextMode) {
-                        if (e.key === 'Enter') { sendContext(e); }
-                        if (e.key === '`') { sendQuestion(e); } 
-                      }
-                    }}>
+          <textarea rows="3" cols="70" class="text-box" id="textbox"
+            onChange={changeInputText} value={inputText}
+            placeholder={contextMode ? "Enter a context/question" : selectedBotName != "" ?
+              "Click the microphone to send a command" : "Please connect to a Minibot!"}
+            onKeyPress={(e) => {
+              if (contextMode) {
+                if (e.key === 'Enter') { sendContext(e); }
+                if (e.key === '`') { sendQuestion(e); }
+              }
+            }}>
           </textarea>
-          {contextMode ? 
+          {contextMode ?
             <SpeechRecognitionComp setText={setInputText} mic={mic} /> :
-           <SpeechRecognitionComp setText={setTempCommands} mic={mic} />
+            <SpeechRecognitionComp setText={setTempCommands} mic={mic} />
           }
           <div style={{ width: "50px", height: "50px", }}>
             <input type="image"
@@ -390,22 +407,17 @@ function Chatbot2({ setParentContext, selectedBotName, setActiveMicComponent, ac
               onClick={(e) => {
                 toggleMic(e);
               }} />
-           </div> 
-          {contextMode ? 
-          <div>
+          </div>
+          {contextMode ?
             <span>
-            <button style={{ marginRight: "5px"}} onClick={(e) => { sendContext(e); }}>
-              <FontAwesomeIcon icon={Icons.faPaperPlane} />
-            </button>  
+              <button style={{ marginRight: "5px", display: "inline-block", backgroundColor: "#2c3137", width: "20%" }} onClick={(e) => { sendContext(e); }}>
+                <FontAwesomeIcon icon={Icons.faPaperPlane} />
+              </button>
+              <button style={{ marginLeft: "5px", display: "inline-block", backgroundColor: "#2c3137", width: "20%" }} onClick={(e) => { sendQuestion(e); }}>
+                <FontAwesomeIcon icon={Icons.faQuestion} />
+              </button>
             </span>
-            <span>
-            <button style={{ marginLeft: "5px" }} onClick={(e) => { sendQuestion(e); }}>
-              <FontAwesomeIcon icon={Icons.faQuestion} />
-            </button> 
-            </span>
-          </div> 
-
-          : <div></div>
+            : <div></div>
           }
           <div ref={messagesEndRef} />
         </div>

@@ -5,6 +5,7 @@ import { CookiesProvider } from 'react-cookie';
 import Navbar from './components/Navbar.js';
 import Platform from './components/Platform.js';
 import Chatbot from './components/Chatbot/chatbot2.js';
+import { ACT_MIC_CHATBOT, ACT_MIC_COMMAND } from './components/utils/Constants.js';
 
 function ClientGUI({ }) {
   const [chatbotContext, setChatbotContext] = useState("");
@@ -13,21 +14,23 @@ function ClientGUI({ }) {
   // Mic manager
   const [activeMicComponent, setActiveMicComponent] = useState("");
   // //Components that use mic 
-  // const [botVoiceControlMic, setBotVoiceControlMic] = useState(false);
-  // const [chatbotMic, setChatbotMic] = useState(false);
-  
-  
+  const [botVoiceControlMic, setBotVoiceControlMic] = useState(false);
+  const [chatbotMic, setChatbotMic] = useState(false);
+
+
   /********* Actually, we need main.js to manage mic switching **********/
 
-  // useEffect (() => {
-  //   if (activeMicComponent == CHATBOT){
-  //     setBotVoiceControlMic(false);
-  //     setChatbotMic(true);
-  //   } else if (activeMicComponent == BOTVOICECONTROL) {
-  //     setChatbotMic(false);
-  //     setBotVoiceControlMic(true);
-  //   }
-  // },  [activeMicComponent]);
+  useEffect(() => {
+    if (activeMicComponent == ACT_MIC_CHATBOT) {
+      console.log("switch to chatbot mic")
+      setBotVoiceControlMic(false);
+      setChatbotMic(true);
+    } else if (activeMicComponent == ACT_MIC_COMMAND) {
+      console.log("switch to bot vc mic.")
+      setChatbotMic(false);
+      setBotVoiceControlMic(true);
+    }
+  }, [activeMicComponent]);
 
   return (
     <div className="main-body">
@@ -39,18 +42,18 @@ function ClientGUI({ }) {
           setSelectedBotName={setSelectedBotName}
           setActiveMicComponent={setActiveMicComponent}
           activeMicComponent={activeMicComponent}
-          // botVoiceControlMic={botVoiceControlMic}
-          // setBotVoiceControlMic={setBotVoiceControlMic}
-           />
+          botVoiceControlMic={botVoiceControlMic}
+          setBotVoiceControlMic={setBotVoiceControlMic}
+        />
       </div>
       <Chatbot
         setParentContext={setChatbotContext}
         selectedBotName={selectedBotName}
         activeMicComponent={activeMicComponent}
         setActiveMicComponent={setActiveMicComponent}
-        // mic = {chatbotMic}
-        // setMic = {setChatbotMic} 
-        />
+        mic={chatbotMic}
+        setMic={setChatbotMic}
+      />
     </div>
   );
 }

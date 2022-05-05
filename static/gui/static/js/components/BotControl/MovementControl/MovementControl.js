@@ -100,14 +100,14 @@ export default class MovementControls extends React.Component {
                     <div className="col-md align-self-center">
                         Voice Control
                         {/* <SpeechRecognition selectedBotName={this.props.selectedBotName} /> */}
-                        <BotVoiceControl 
-                        selectedBotName={this.props.selectedBotName} 
-                        startLabel = "" 
-                        stopLabel = "" 
-                        setActiveMicComponent={this.props.setActiveMicComponent}
-                        activeMicComponent={this.props.activeMicComponent}
-                        // botVoiceControlMic={this.props.botVoiceControlMic}
-                        // setBotVoiceControlMic={this.props.setBotVoiceControlMic}
+                        <BotVoiceControl
+                            selectedBotName={this.props.selectedBotName}
+                            startLabel=""
+                            stopLabel=""
+                            setActiveMicComponent={this.props.setActiveMicComponent}
+                            activeMicComponent={this.props.activeMicComponent}
+                            botVoiceControlMic={this.props.botVoiceControlMic}
+                            setBotVoiceControlMic={this.props.setBotVoiceControlMic}
                         />
                     </div>
                 </div>
