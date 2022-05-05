@@ -18,3 +18,4 @@ SpeechRecognition==3.8.1
 pint
 control
 pathfinding
+collision
