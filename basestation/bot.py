@@ -37,7 +37,6 @@ class Bot:
 
     def try_receive_data(self, peek: bool = False) -> Optional[str]:
         """ Tries to receive data from the Minibot. 
-
         Arguments:
             peek:  Whether to empty the socket buffer.  If False empty buffer,
                 if True, do not. 
