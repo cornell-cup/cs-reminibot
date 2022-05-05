@@ -87,10 +87,13 @@ def worker():
     while True:
         task = q.get()
         py_code = pythonCode[task[1]]
-        print("pb:" + py_code + "\n")
+        if(mode == '1'): 
+            if(py_code[0:3] == "bot"):
+                send_request(task)
+                print("pb:" + py_code + "\n")
+        else: 
+            print("pb:" + py_code + "\n")
         sys.stdout.flush()
-        if(mode == '1' and task[0,3] == "bot"):
-            send_request(task)
         sleep(1.0)
 
 threading.Thread(target=worker, daemon=True).start()
