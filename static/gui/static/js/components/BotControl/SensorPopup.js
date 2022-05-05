@@ -3,14 +3,9 @@ import axios from 'axios';
 import {
 	LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
 } from 'recharts';
-// // ES6 module
-// import Plotly from 'plotly.js-dist-min'
-// var Plotly = require('plotly.js-dist-min')
 
 const SensorPopup = ({ handleClose, selectedBotName }) => {
-	const [sensortime, setTime] = useState([]);
-	const [sensordata, setData] = useState([]);
-
+	const [sensordata, setData] = useState([{ time: '1', data: 1 }, { time: '1', data: 1 }]);
 
 	function startIROnClick() {
 		/*
@@ -31,32 +26,27 @@ const SensorPopup = ({ handleClose, selectedBotName }) => {
 				var value = -1;
 				if (response.data['data'] == 'HIGH') {
 					value = 0;
-					console.log(value);
 				}
 				else if (response.data['data'] == 'LOW') {
 					value = 1;
-					console.log(value);
 				}
 
 				if (value != -1) {
-					var time = new Date().toLocaleTimeString()
+					var timeValue = new Date().toLocaleTimeString()
 
-					sensortime.push(time);
-					sensordata.push(value);
+					sensordata.push({ time: timeValue, data: value });
 
-					setTime(sensortime);
 					setData(sensordata);
 
-					var tableBody = document.getElementById("sensorTableBody");
+					console.log(sensordata)
+					// var tableBody = document.getElementById("sensorTableBody");
 
-					var output = document.createElement("tr");
-					tableBody.appendChild(output);
+					// var output = document.createElement("tr");
+					// tableBody.appendChild(output);
 
-					output.innerHTML += "<td>" + time + "</td>";
-					output.innerHTML += "<td>" + value + "</td>";
+					// output.innerHTML += "<td>" + time + "</td>";
+					// output.innerHTML += "<td>" + value + "</td>";
 				}
-
-				console.log(sensordata);
 
 				// if the code is "" it means the result hasn't arrived yet, hence
 				// we shouldn't clear the interval and should continue polling
@@ -77,27 +67,58 @@ const SensorPopup = ({ handleClose, selectedBotName }) => {
 		return () => clearInterval(interval);
 	}, []);
 
+	function combineData() {
+		var result = [{ time: '1', data: 1 }];
+		for (let index = 0; index < sensortime.length; i++) {
+			result.append({ time: sensortime[index], data: sensordata[index] })
+		}
+		console.log(result)
+		return result;
+	}
+
 	return (
 
 		<div className='popup-box'>
 			<div className='box'>
 				<button className="close-icon" onClick={() => handleClose()}>x</button>
+
 				<br />
 				<button className="btn btn-secondary element-wrapper mr-1" onClick={startIROnClick}>Read Value</button>
 				<br />
 				<br></br>
 				<br></br>
-				<table class="center">
-					<thead>
-						<tr>
-							<td>Time</td>
-							<td>Sensor Value</td>
-						</tr>
-					</thead>
-					<tbody id="sensorTableBody">
-					</tbody>
-				</table>
-				<label id='ir-value' className='ir-label'></label>
+				{/* <div className='ir-table'>
+					<table class="center">
+						<thead>
+							<tr>
+								<td>Time</td>
+								<td>Sensor Value</td>
+							</tr>
+						</thead>
+						<tbody id="sensorTableBody">
+						</tbody>
+					</table>
+				</div> */}
+				<div className='ir-graph'>
+					<ResponsiveContainer width={300} height={300}>
+						<LineChart
+							data={sensordata}
+							margin={{
+								top: 5, right: 30, left: 20, bottom: 5,
+							}}
+							onInitialized={(figure) => this.setState(figure)}
+							onUpdate={(figure) => this.setState(figure)}
+						>
+							<CartesianGrid strokeDasharray="3 3" />
+							<XAxis dataKey="time" />
+							<YAxis />
+							<Tooltip />
+							<Legend />
+							<Line type="monotone" dataKey="data" stroke="#8884d8" activeDot={{ r: 8 }} />
+
+						</LineChart>
+					</ResponsiveContainer>
+				</div>
 			</div>
 		</div>
 
