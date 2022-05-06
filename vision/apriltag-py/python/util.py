@@ -1,3 +1,4 @@
+from statistics import mode
 from cv2 import *
 import cv2
 import numpy as np
@@ -440,3 +441,43 @@ def get_predictors_with_calibration_file(calibration_file_name):
         "y_offsets_predictor": Predictor(models["y_offsets_model"]),
         "angle_offsets_predictor": Predictor(models["angle_offsets_model"])
     }
+
+def compliment_of_list(full_list, partial_list):
+    return [entry for entry in full_list if not (entry in partial_list)]
+
+def weighted_average(values, weights):
+    if len(values) != len(weights):
+        raise Exception("unequal lengths of values and weights")
+    sum = 0
+    weights_sum = 0
+    for i in range(len(values)):
+        sum += (values[i])*(weights[i])
+        weights_sum += weights[i]
+    if weights_sum == 0:
+        raise Exception("weights sum is 0")
+    return sum/weights_sum
+
+def get_property_or_default(object, property, default=None):
+    return object[property] if object != None and property in object else default
+
+def reject_outliers(data):
+    data = np.array(data)
+    u = np.mean(data)
+    s = np.std(data)
+    filtered = [e for e in data if (u - 2 * s < e < u + 2 * s)]
+    return filtered
+    
+def to_dict(self):
+    return json.loads(json.dumps(self, default=lambda o: o.__dict__))
+
+def average_value_for_key(list_of_dicts, key):
+    values = [d[key] for d in list_of_dicts]
+    values_without_outliers = reject_outliers(values)
+    values = values if len(values_without_outliers) == 0 else values_without_outliers
+    return float(sum(values)) / len(values)
+
+def mode_value_for_key(list_of_dicts, key):
+    rounded_values = [round(d[key]) for d in list_of_dicts]
+    rounded_values_without_outliers = reject_outliers(rounded_values)
+    rounded_values = rounded_values if len(rounded_values_without_outliers) == 0 else rounded_values_without_outliers
+    return float(mode(rounded_values))

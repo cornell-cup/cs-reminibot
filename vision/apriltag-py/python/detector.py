@@ -30,7 +30,7 @@ class Detector:
                 data.append(
                     Detection(ids[i], centers[i], corners_list, util.compute_angle(corners_list)))
         else:
-            data = self.detector.detect(image, False)
+            data = [Detection(detection.tag_id, detection.center, detection.corners, util.compute_angle(detection.corners)) for detection in self.detector.detect(image, False)]
         data.sort(key=lambda entry: entry.tag_id)
         if return_image:
             return data, image

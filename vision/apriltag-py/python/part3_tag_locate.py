@@ -1,3 +1,4 @@
+from statistics import mode
 import cv2
 import argparse
 import numpy as np
@@ -120,20 +121,18 @@ def main():
             # Scale the coordinates, and print for debugging
             # prints Device ID :: tag id :: x y z angle
             # TODO debug offset method - is better, but not perfect.
-            center_cell_offset = get_closest_reference_point_offset(detected_x,detected_y,center_cell_offsets)
-
-            x = x_scale_factor * (detected_x + overall_center_x_offset) + predict_x_offset((detected_x,detected_y))
-            y = y_scale_factor * (detected_y + overall_center_y_offset) + predict_y_offset((detected_x,detected_y))
+            #center_cell_offset = get_closest_reference_point_offset(detected_x,detected_y,center_cell_offsets)
+            x_offset, y_offset = get_x_y_angle_offsets(detected_x, detected_y, center_cell_offsets)
+            x = x_scale_factor * (detected_x + overall_center_x_offset) + x_offset
+            y = y_scale_factor * (detected_y + overall_center_y_offset) + y_offset
             z = detected_z
-            angle = ((detected_angle + overall_angle_offset)%360 + predict_y_offset((detected_x,detected_y)))%360
+            angle = ((detected_angle + overall_angle_offset)%360 )%360
             (ctr_x, ctr_y) = d.center
             
             # displaying tag id
             # cv2.putText(undst, str(round(angle,2)),(int(ctr_x), int(ctr_y)), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 0, 255),2)
 
             if detector.detector != None:
-                pose, e0, e1 = detector.detector.detection_pose(d, util.camera_matrix_to_camera_params(camera_matrix), TAG_SIZE)
-                util.draw_square(undst,util.camera_matrix_to_camera_params(camera_matrix), TAG_SIZE, pose)
                 # displaying tag id
                 cv2.putText(undst, str(d.tag_id),(int(ctr_x), int(ctr_y)), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 0, 255),2)
                 cv2.putText(undst, str((round(x),round(y))),(int(ctr_x), int(ctr_y)+15), cv2.FONT_HERSHEY_SIMPLEX, .5,  (255, 0, 255),1)
@@ -151,11 +150,11 @@ def main():
                 locations_with_id = [location for location in location_history if location["id"] == id]
                 average_locations.append({
                     "id": id, 
-                    "image_x": average_value_for_key(locations_with_id, "image_x"), 
-                    "image_y": average_value_for_key(locations_with_id, "image_y"),
-                    "x": average_value_for_key(locations_with_id, "x"),
-                    "y": average_value_for_key(locations_with_id, "y"), 
-                    "orientation": average_value_for_key(locations_with_id, "orientation")
+                    "image_x": util.average_value_for_key(locations_with_id, "image_x"), 
+                    "image_y": util.average_value_for_key(locations_with_id, "image_y"),
+                    "x": util.average_value_for_key(locations_with_id, "x"),
+                    "y": util.average_value_for_key(locations_with_id, "y"), 
+                    "orientation": util.mode_value_for_key(locations_with_id, "orientation")%360
                 })
             # prints DEVICE_ID tag id x y z angle
             print("id,actual_x,actual_y,actual_angle")
@@ -195,8 +194,7 @@ def main():
         else:
             continue
 
-def average_value_for_key(locations_with_id, key):
-    return float(sum(d[key] for d in locations_with_id)) / len(locations_with_id)
+
         
     
 
@@ -263,7 +261,123 @@ def get_args():
 
 def get_closest_reference_point_offset(x, y, center_cell_offsets):
     """ gets the reference point and its corresponding offsets that are closest to the detected point """
-    return min(center_cell_offsets, key=lambda item: util.distance(x, y, item["reference_point_x"],item["reference_point_y"]))
+    try:
+        return min(center_cell_offsets, key=lambda item: util.distance(x, y, item["reference_point_x"],item["reference_point_y"]))
+    except:
+        return None
+
+def get_two_point_line_equation(x1, y1, x2, y2):
+    try:
+        m = (y2-y1)/(x2-x1)
+        b = m*(-x2)+y2
+    except:
+        print("here")
+        m = 0
+        b = (y1+y2)/2
+    return lambda x: m*x + b
+
+
+def linear_interpolation_with_2_ref_points(x1, y1, x2, y2, x):
+    linear_model = get_two_point_line_equation(x1, y1, x2, y2)
+    return linear_model(x)
+
+def get_x_y_angle_offsets(x, y, center_cell_offsets):
+
+    closest_offsets = []
+    remaining_offsets = center_cell_offsets[:]
+    for i in range(4):
+        closest_offsets.append(get_closest_reference_point_offset(x,y,remaining_offsets))
+        remaining_offsets.pop(remaining_offsets.index(closest_offsets[i])) 
+    
+    right_offset = None
+    left_offset = None
+    closest_offset = closest_offsets[0]
+    left_most_offset = min(closest_offsets[1:4], key=lambda offset: offset["reference_point_x"])
+    left_most_offset_delta = abs(closest_offset["reference_point_x"]-left_most_offset["reference_point_x"])
+    right_most_offset = max(closest_offsets[1:4], key=lambda offset: offset["reference_point_x"])
+    right_most_offset_delta = abs(right_most_offset["reference_point_x"]-closest_offset["reference_point_x"])
+    other_offset = util.compliment_of_list(closest_offsets, [left_most_offset, closest_offset, right_most_offset])[0]
+    if left_most_offset_delta > right_most_offset_delta:
+        right_offset = closest_offset
+        go_with_other = abs(left_most_offset["reference_point_y"]-y) > abs(other_offset["reference_point_y"]-y) and other_offset["reference_point_x"] < closest_offset["reference_point_x"]
+        left_offset =  other_offset if go_with_other else left_most_offset
+    else:
+        left_offset = closest_offset
+        go_with_other = abs(right_most_offset["reference_point_y"]-y) > abs(other_offset["reference_point_y"]-y) and other_offset["reference_point_x"] > closest_offset["reference_point_x"]
+        right_offset = other_offset if go_with_other else right_most_offset
+
+    x_offset = linear_interpolation_with_2_ref_data_points(x, "reference_point_x", "x_offset", left_offset, right_offset)
+    x_offset = 0 if x_offset == None else x_offset
+
+    
+    top_offset = max(center_cell_offsets, key=lambda offset: offset["reference_point_y"])
+    bottom_offset = min(center_cell_offsets, key=lambda offset: abs(offset["reference_point_y"] - y))
+    
+    
+    bottom_offset = None
+    top_offset = None
+    closest_offset = closest_offsets[0]
+    bottom_most_offset = min(closest_offsets[1:4], key=lambda offset: offset["reference_point_y"])
+    bottom_most_offset_delta = abs(closest_offset["reference_point_y"]-bottom_most_offset["reference_point_y"])
+    top_most_offset = max(closest_offsets[1:4], key=lambda offset: offset["reference_point_y"])
+    top_most_offset_delta = abs(top_most_offset["reference_point_y"]-closest_offset["reference_point_y"])
+    other_offset = util.compliment_of_list(closest_offsets, [bottom_most_offset, closest_offset, top_most_offset])[0]
+    if bottom_most_offset_delta > top_most_offset_delta:
+        top_offset = closest_offset
+        go_with_other = abs(bottom_most_offset["reference_point_x"]-x) > abs(other_offset["reference_point_x"]-x) and other_offset["reference_point_y"] < closest_offset["reference_point_y"] 
+        bottom_offset = other_offset if go_with_other else bottom_most_offset
+    else:
+        bottom_offset = closest_offset
+        go_with_other = abs(top_most_offset["reference_point_x"]-x) > abs(other_offset["reference_point_x"]-x) and other_offset["reference_point_y"] > closest_offset["reference_point_y"] 
+        top_offset = other_offset if go_with_other else top_most_offset
+
+    
+    y_offset = linear_interpolation_with_2_ref_data_points(y, "reference_point_y", "y_offset", bottom_offset, top_offset)
+    y_offset = 0 if y_offset == None else y_offset
+
+
+
+    return (x_offset, y_offset)
+
+def linear_interpolation_with_2_ref_data_points(independent_variable_input, independent_variable_property, dependent_property, reference_point_1, reference_point_2):
+    result = None
+    x1 = util.get_property_or_default(reference_point_1,independent_variable_property)
+    y1 = util.get_property_or_default(reference_point_1,dependent_property)
+    x2 = util.get_property_or_default(reference_point_2,independent_variable_property)
+    y2 = util.get_property_or_default(reference_point_2,dependent_property)
+    point1_exists = x1 != None and y1 != None
+    point2_exists = x2 != None and y2 != None
+    if point1_exists and point2_exists:
+        result = linear_interpolation_with_2_ref_points(x1, y1, x2, y2, independent_variable_input)
+    elif point1_exists:
+        result = y1
+    elif point2_exists:
+        result = y2
+    else:
+        # print("neither point exists")
+        pass
+        
+    return result
+
+def distance_from_2_ref_data_points(independent_variable_input, dependent_variable_input, independent_variable_property, dependent_property, reference_point_1, reference_point_2):
+    result = None
+    x1 = util.get_property_or_default(reference_point_1,independent_variable_property)
+    y1 = util.get_property_or_default(reference_point_1,dependent_property)
+    x2 = util.get_property_or_default(reference_point_2,independent_variable_property)
+    y2 = util.get_property_or_default(reference_point_2,dependent_property)
+    point1_exists = x1 != None and y1 != None
+    point2_exists = x2 != None and y2 != None
+    if point1_exists and point2_exists:
+        result = util.distance(independent_variable_input,dependent_variable_input,x1,y1)+util.distance(independent_variable_input,dependent_variable_input,x2,y2)
+    else:
+        # print("a point doesn't exist")
+        pass
+        
+    return result
+
+
+
+
 
 if __name__ == "__main__":
     main()
