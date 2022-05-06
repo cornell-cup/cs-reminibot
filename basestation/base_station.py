@@ -86,7 +86,7 @@ class BaseStation:
         # if app_debug and os.environ["WERKZEUG_RUN_MAIN"] == "true":
         #     self.sock.bind(server_address)
         # else:
-        # self.sock.bind(server_address)
+        self.sock.bind(server_address)
 
         self._login_email = None
         self.speech_recog_thread = None

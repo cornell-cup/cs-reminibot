@@ -23,10 +23,12 @@ index_bp = Blueprint('index',
                      __name__,
                      url_prefix='/')
 
+
 @index_bp.route('/start', methods=['GET'])
 def start():
     """ Display the WebGUI """
     return render_template('index.html')
+
 
 @index_bp.route('/ping', methods=['GET'])
 def ping_pong():
@@ -35,6 +37,7 @@ def ping_pong():
         'status': 'Epic success',
         'message': 'pong!'
     })
+
 
 @index_bp.route('/discover-bots', methods=['GET'])
 def discover_bots():
@@ -167,7 +170,7 @@ def register_account():
 
     # response_status = status.HTTP_200_OK
     # return json.dumps(response_dict), response_status
-    
+
     login_status = base_station.register(email, password)
     if login_status == -2:
         response_dict["error_msg"] = "Email already exists"
@@ -218,11 +221,10 @@ def speech_recognition():
         if not bot_name:
             # error_json = {"error_msg": NO_BOT_ERROR_MSG}
             # return json.dumps(error_json), status.HTTP_400_BAD_REQUEST
-            print( data["command"])
+            print(data["command"])
         command = data["command"]
-        # print(command)
+        print("sent command: " + command)
         base_station.send_command(bot_name, command)
         return json.dumps(True), status.HTTP_200_OK
     else:
         return json.dumps(), status.HTTP_200_OK
-

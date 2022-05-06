@@ -303,7 +303,7 @@ body {
 }
 
 .floating-chat .chat .footer button {
-  width: 10%;
+  /* width: 10%; */
   align-items: center;
 }
 
