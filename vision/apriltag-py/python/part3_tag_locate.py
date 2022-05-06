@@ -20,7 +20,7 @@ FRAME_HEIGHT = 720
 # These are effectively constant after the argument parser has ran.
 TAG_SIZE = 6.5 # The length of one side of an apriltag, in inches
 SEND_DATA = True  # Sends data to URL if True. Set to False for debug
-MAX_LOCATION_HISTORY_LENGTH = 5
+MAX_LOCATION_HISTORY_LENGTH = 7
 MODE_THRESHOLD = 1
 
 
@@ -123,11 +123,11 @@ def main():
             # prints Device ID :: tag id :: x y z angle
             # TODO debug offset method - is better, but not perfect.
             #center_cell_offset = get_closest_reference_point_offset(detected_x,detected_y,center_cell_offsets)
-            x_offset, y_offset = get_x_y_angle_offsets(detected_x, detected_y, center_cell_offsets)
+            x_offset, y_offset, angle_offset = get_x_y_angle_offsets(detected_x, detected_y, center_cell_offsets)
             x = x_scale_factor * (detected_x + overall_center_x_offset) + x_offset
             y = y_scale_factor * (detected_y + overall_center_y_offset) + y_offset
             z = detected_z
-            angle = ((detected_angle + overall_angle_offset)%360 )%360
+            angle = ((detected_angle + overall_angle_offset)%360 + angle_offset)%360
             (ctr_x, ctr_y) = d.center
             
             # displaying tag id
@@ -337,8 +337,25 @@ def get_x_y_angle_offsets(x, y, center_cell_offsets):
     y_offset = 0 if y_offset == None else y_offset
 
 
+    angle_offset_x = linear_interpolation_with_2_ref_data_points(x, "reference_point_x", "angle_offset", left_offset, right_offset)
+    angle_offset_x = 0 if angle_offset_x == None else angle_offset_x
 
-    return (x_offset, y_offset)
+    angle_offset_y = linear_interpolation_with_2_ref_data_points(y, "reference_point_y", "angle_offset", bottom_offset, top_offset)
+    angle_offset_y = 0 if angle_offset_y == None else angle_offset_y
+
+    x_offsets_distance = distance_from_2_ref_data_points(x,y,"reference_point_x","reference_point_y", left_offset, right_offset)
+    y_offsets_distance = distance_from_2_ref_data_points(x,y,"reference_point_x","reference_point_y", bottom_offset, top_offset)
+
+    angle_offset = 0
+    if x_offsets_distance != None and y_offsets_distance != None:
+        angle_offset = util.weighted_average([angle_offset_x,angle_offset_y],[y_offsets_distance,x_offsets_distance])
+    elif x_offsets_distance != None:
+        angle_offset = angle_offset_x
+    elif y_offsets_distance != None:
+        angle_offset = angle_offset_y
+    
+
+    return (x_offset, y_offset, angle_offset)
 
 def linear_interpolation_with_2_ref_data_points(independent_variable_input, independent_variable_property, dependent_property, reference_point_1, reference_point_2):
     result = None
