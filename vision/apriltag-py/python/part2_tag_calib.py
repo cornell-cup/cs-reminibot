@@ -141,17 +141,17 @@ def main():
         detections_with_id = [detection for detection in iteration_detections_history if detection["id"] == id]
         detections.append(Detection.from_dict({
                 "id": id, 
-                "center_x": util.average_value_for_key(detections_with_id, "center_x"),
-                "center_y": util.average_value_for_key(detections_with_id, "center_y"),
-                "corner_0_x": util.average_value_for_key(detections_with_id, "corner_0_x"), 
-                "corner_0_y": util.average_value_for_key(detections_with_id, "corner_0_y"), 
-                "corner_1_x": util.average_value_for_key(detections_with_id, "corner_1_x"), 
-                "corner_1_y": util.average_value_for_key(detections_with_id, "corner_1_y"), 
-                "corner_2_x": util.average_value_for_key(detections_with_id, "corner_2_x"), 
-                "corner_2_y": util.average_value_for_key(detections_with_id, "corner_2_y"), 
-                "corner_3_x": util.average_value_for_key(detections_with_id, "corner_3_x"), 
-                "corner_3_y": util.average_value_for_key(detections_with_id, "corner_3_y"), 
-                "angle": util.mode_value_for_key(detections_with_id, "angle")%360
+                "center_x": util.average_value_for_key(detections_with_id, "center_x",True,1),
+                "center_y": util.average_value_for_key(detections_with_id, "center_y",True,1),
+                "corner_0_x": util.average_value_for_key(detections_with_id, "corner_0_x",True,1), 
+                "corner_0_y": util.average_value_for_key(detections_with_id, "corner_0_y",True,1), 
+                "corner_1_x": util.average_value_for_key(detections_with_id, "corner_1_x",True,1), 
+                "corner_1_y": util.average_value_for_key(detections_with_id, "corner_1_y",True,1), 
+                "corner_2_x": util.average_value_for_key(detections_with_id, "corner_2_x",True,1), 
+                "corner_2_y": util.average_value_for_key(detections_with_id, "corner_2_y",True,1), 
+                "corner_3_x": util.average_value_for_key(detections_with_id, "corner_3_x",True,1), 
+                "corner_3_y": util.average_value_for_key(detections_with_id, "corner_3_y",True,1), 
+                "angle": util.average_value_for_key(detections_with_id, "angle",True,1)%360
         }))
 
 

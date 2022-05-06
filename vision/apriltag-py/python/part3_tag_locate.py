@@ -21,6 +21,7 @@ FRAME_HEIGHT = 720
 TAG_SIZE = 6.5 # The length of one side of an apriltag, in inches
 SEND_DATA = True  # Sends data to URL if True. Set to False for debug
 MAX_LOCATION_HISTORY_LENGTH = 5
+MODE_THRESHOLD = 1
 
 
 BASE_STATION_DEVICE_ID = hash(platform_node()+str(randint(0,1000000))+environ["USER"]+str(randint(0,1000000))+str(DEVICE_ID)+str(time.time()))
@@ -150,11 +151,11 @@ def main():
                 locations_with_id = [location for location in location_history if location["id"] == id]
                 average_locations.append({
                     "id": id, 
-                    "image_x": util.average_value_for_key(locations_with_id, "image_x"), 
-                    "image_y": util.average_value_for_key(locations_with_id, "image_y"),
-                    "x": util.average_value_for_key(locations_with_id, "x"),
-                    "y": util.average_value_for_key(locations_with_id, "y"), 
-                    "orientation": util.mode_value_for_key(locations_with_id, "orientation")%360
+                    "image_x": util.average_value_for_key(locations_with_id, "image_x",True,1), 
+                    "image_y": util.average_value_for_key(locations_with_id, "image_y",True,1),
+                    "x": util.average_value_for_key(locations_with_id, "x",True,1),
+                    "y": util.average_value_for_key(locations_with_id, "y",True,1), 
+                    "orientation": util.average_value_for_key(locations_with_id, "orientation",True,1)%360
                 })
             # prints DEVICE_ID tag id x y z angle
             print("id,actual_x,actual_y,actual_angle")

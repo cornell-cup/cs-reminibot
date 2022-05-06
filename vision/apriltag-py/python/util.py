@@ -470,10 +470,15 @@ def reject_outliers(data):
 def to_dict(self):
     return json.loads(json.dumps(self, default=lambda o: o.__dict__))
 
-def average_value_for_key(list_of_dicts, key):
+def average_value_for_key(list_of_dicts, key, remove_outliers=False, threshold=None):
     values = [d[key] for d in list_of_dicts]
-    values_without_outliers = reject_outliers(values)
-    values = values if len(values_without_outliers) == 0 else values_without_outliers
+    if remove_outliers and threshold == None:
+        values_without_outliers = reject_outliers(values)
+        values = values if len(values_without_outliers) == 0 else values_without_outliers
+    elif remove_outliers:
+        mode = mode_value_for_key(list_of_dicts, key)
+        values_without_outliers = [value for value in values if abs(value-mode) <= threshold]
+        values = values if len(values_without_outliers) == 0 else values_without_outliers
     return float(sum(values)) / len(values)
 
 def mode_value_for_key(list_of_dicts, key):
