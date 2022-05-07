@@ -96,7 +96,7 @@ const SensorPopup = ({ handleClose, selectedBotName, sensordata }) => {
 					</table>
 				</div> */}
 				<div className='ir-graph'>
-					<ResponsiveContainer width={300} height={300}>
+					<ResponsiveContainer width={700} height={350}>
 						<LineChart
 							data={sensordata}
 							margin={{
