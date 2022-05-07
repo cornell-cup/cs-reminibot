@@ -11,7 +11,7 @@ require('codemirror/mode/python/python');
 export default class PhysicalBlockly extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = { stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [] };
+		this.state = { stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [] };
 		this.codeRef = React.createRef();
 		this.pollForUpdates = this.pollForUpdates.bind(this);
 		this.bWorkspace = null;
@@ -66,8 +66,12 @@ export default class PhysicalBlockly extends React.Component {
 					if (isNaN(resp)) {
 						resp = 5;
 					}
+					//Replacing loop value in python
 					_this.props.setPb(_this.props.pb.replace("n" + x, resp));
 					_this.codeRef["current"].getCodeMirror().setValue(_this.props.pb);
+
+					//Replacing in blockly
+					_this.state.loopList[x].getChildren(false)[0].setFieldValue(resp, "NUM");
 					x++;
 				}
 			})
@@ -77,8 +81,8 @@ export default class PhysicalBlockly extends React.Component {
 		const _this = this;
 		axios.get('/get-py-command')
 			.then(function (response) {
-				let isLoop = false; 
-				let isEnd = false; 
+				let isLoop = false;
+				let isEnd = false;
 				if (response.data == "") {
 					return;
 				}
@@ -89,7 +93,7 @@ export default class PhysicalBlockly extends React.Component {
 						n += "    ";
 					}
 					n += "#ended for loop\n";
-					isEnd = true; 
+					isEnd = true;
 				}
 				else {
 					for (let i = 0; i < _this.state.tabs; i++) {
@@ -107,7 +111,7 @@ export default class PhysicalBlockly extends React.Component {
 
 				let block = document.createElement("block");
 				if (response.data.substring(3) == "for i in range(n):") {
-					isLoop = true; 
+					isLoop = true;
 					block.setAttribute("type", "controls_repeat_ext");
 					let value = document.createElement("value");
 					value.setAttribute("name", "TIMES");
@@ -121,7 +125,7 @@ export default class PhysicalBlockly extends React.Component {
 					value.appendChild(shadow);
 					block.appendChild(value);
 				} else if (response.data.substring(3) == "end") {
-					isEnd = true; 
+					isEnd = true;
 				} else if (response.data.substring(3) == "bot.move_forward(100)") {
 					block.setAttribute("type", "move_power");
 				} else if (response.data.substring(3) == "bot.stop()") {
@@ -142,23 +146,26 @@ export default class PhysicalBlockly extends React.Component {
 				if (block.getAttribute("type") != null) {
 					let placedBlock = Blockly.Xml.domToBlock(block, _this.bWorkspace);
 					let childConnection = placedBlock.previousConnection;
-					if(_this.state.lastBlock != null){
+					if (_this.state.lastBlock != null) {
 						_this.state.lastBlock.connect(childConnection);
 					}
-					if(isLoop){
-						_this.setState({lastBlock: placedBlock.getInput("DO").connection}); 
+					if (isLoop) {
+						_this.setState({ lastBlock: placedBlock.getInput("DO").connection });
 						let tempStack = _this.state.blockStack;
 						tempStack.push(placedBlock);
-						_this.setState({ blockStack: tempStack });
+						let tempList = _this.state.loopList;
+						tempList.push(placedBlock);
+						_this.setState({ blockStack: tempStack, loopList: tempList });
+
 					}
-					else{
-						_this.setState({lastBlock: placedBlock.nextConnection}); 
+					else {
+						_this.setState({ lastBlock: placedBlock.nextConnection });
 					}
 				}
-				else{
+				else {
 					let lastLoop = _this.state.blockStack.pop();
-					_this.setState({ blockStack: _this.state.blockStack}); 
-					_this.setState({lastBlock: lastLoop.nextConnection }); 
+					_this.setState({ blockStack: _this.state.blockStack });
+					_this.setState({ lastBlock: lastLoop.nextConnection });
 				}
 			})
 			.catch(function (error) {
