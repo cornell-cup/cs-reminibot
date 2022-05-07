@@ -25,6 +25,7 @@ export default class AddBot extends React.Component {
             power: 50,
             showPorts: false,
             showSensorPopup: false,
+            sensordata: [{ time: '1', data: 1 }, { time: '1', data: 1 }],
         };
 
         // Needed to use a ref for react
@@ -303,7 +304,7 @@ export default class AddBot extends React.Component {
                                 <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.setState({ showSensorPopup: true })}>Start IR</button>
                                 {/* <label id='ir-value' className='ir-label'></label> */}
                             </div>
-                            {this.state.showSensorPopup ? <SensorPopup selectedBotName={_this.props.selectedBotName} handleClose={() => this.setState({ showSensorPopup: false })} /> : <div />}
+                            {this.state.showSensorPopup ? <SensorPopup selectedBotName={_this.props.selectedBotName} handleClose={() => this.setState({ showSensorPopup: false })} sensordata={this.state.sensordata} /> : <div />}
                         </div>
                     </div>
                     <br />

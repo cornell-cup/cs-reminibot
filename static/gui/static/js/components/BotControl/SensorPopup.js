@@ -4,8 +4,12 @@ import {
 	LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
 } from 'recharts';
 
-const SensorPopup = ({ handleClose, selectedBotName }) => {
-	const [sensordata, setData] = useState([{ time: '1', data: 1 }, { time: '1', data: 1 }]);
+const SensorPopup = ({ handleClose, selectedBotName, sensordata }) => {
+
+	// function testOnClick() {
+	// 	console.log(sensordata);
+	// 	sensordata.push({ time: new Date().toLocaleTimeString(), data: 2 });
+	// }
 
 	function startIROnClick() {
 		/*
@@ -36,16 +40,7 @@ const SensorPopup = ({ handleClose, selectedBotName }) => {
 
 					sensordata.push({ time: timeValue, data: value });
 
-					setData(sensordata);
-
 					console.log(sensordata)
-					// var tableBody = document.getElementById("sensorTableBody");
-
-					// var output = document.createElement("tr");
-					// tableBody.appendChild(output);
-
-					// output.innerHTML += "<td>" + time + "</td>";
-					// output.innerHTML += "<td>" + value + "</td>";
 				}
 
 				// if the code is "" it means the result hasn't arrived yet, hence
@@ -85,6 +80,7 @@ const SensorPopup = ({ handleClose, selectedBotName }) => {
 				<br />
 				<button className="btn btn-secondary element-wrapper mr-1" onClick={startIROnClick}>Read Value</button>
 				<br />
+
 				<br></br>
 				<br></br>
 				{/* <div className='ir-table'>
