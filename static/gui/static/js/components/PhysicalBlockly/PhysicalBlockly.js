@@ -188,7 +188,6 @@ export default class PhysicalBlockly extends React.Component {
 		}
 
 		var linkStyle={
-			width: "0px", 
 			height:"0px"
 		}
 
