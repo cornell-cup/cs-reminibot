@@ -9,21 +9,32 @@ from flask import Flask
 
 db = SQLAlchemy()
 
-class Program(db.Model):
-    __tablename__ = 'program'
+class Submission(db.Model):
+    __tablename__ = 'submission'
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String, nullable=False)
-    time = db.Column(db.Integer, nullable=False)
-    email = db.Column(db.String, nullable=False)
-    duration = db.Column(db.String, nullable=False)
+    time = db.Column(db.String, nullable=False)
+    duration = db.Column(db.Integer, nullable=False)
+    result = db.Column(db.String, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+    
+    def __init__(self, code, time, duration, user_id, result='Not completed'):
+        self.code = code
+        self.time = time
+        self.duration = duration
+        self.result = result
+        self.user_id = user_id
+
 
     def serialize(self):
         return {
             'id': self.id,
             'code': self.code,
             'time': self.time,
-            'email': self.email,
-            'duration': self.duration
+            'duration': self.duration,
+            'result': self.result,
+            'user_id': self.user_id
         }
 
 
@@ -43,6 +54,8 @@ class User(db.Model):
     # Custom Functions
     custom_function = db.Column(db.String, nullable=False)
 
+    submissions = db.relationship('Submission')
+
     def __init__(self, email: str, password: str):
         self.email = email
         self.password_digest = (
@@ -55,10 +68,11 @@ class User(db.Model):
         return bcrypt.checkpw(password.encode('utf8'), self.password_digest)
 
     def serialize(self) -> dict:
-        return{
+        return {
             'id': self.id,
             'email': self.email,
-            'custom_function': self.custom_function
+            'custom_function': self.custom_function,
+            'submissions': [submission.serialize() for submission in self.submissions]
         }
 
 

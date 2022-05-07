@@ -5,37 +5,13 @@ import CodeMirror from 'react-codemirror';
 require('codemirror/mode/python/python');
 
 
-function UserAccountModal(props) {
-    const s = props.modalType;
-    const modalId = s + "Modal2";
-    const formId = s + "Form";
-    const closeId = s + "Close";
-    // Make first letter of s uppercase
-    const sUpperCased = s.charAt(0).toUpperCase() + s.slice(1)
-    const title = sUpperCased + " Window";
-    return (
-        <div id={modalId} className="modal2">
-            <span id={closeId} className="close">&times;</span>
-            <p>{title}</p>
-            <form id={formId}>
-                <input type="text" placeholder="Email" name="email" ></input>
-                <input type="password" placeholder="Password" name="password" ></input>
-                <input className="button-login" type="button" value={sUpperCased} onClick={props.handleEvent}></input>
-                <label style={{ color: 'green' }}> {props.successLabel} </label>
-                <br />
-                <label style={{ color: 'red' }}> {props.errorLabel} </label>
-            </form>
-        </div>
-    )
-}
-
 class PythonEditor extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             filename: "FileName.py",
             functionName: "default_function",
-            codingStart: -1
+            codingStart: -1,
         }
 
         this.downloadPython = this.downloadPython.bind(this);
@@ -134,6 +110,8 @@ class PythonEditor extends React.Component {
             this.setState({ codingStart: -1 })
         }
 
+        console.log(this.props.loginEmail);
+
         axios({
             method: 'POST',
             url: '/script',
@@ -142,7 +120,8 @@ class PythonEditor extends React.Component {
             },
             data: JSON.stringify({
                 bot_name: this.props.selectedBotName,
-                script_code: this.props.pythonCode
+                script_code: this.props.pythonCode,
+                login_email: this.props.loginEmail
             }),
         }).then(function (response) {
             console.log('sent script');
@@ -200,7 +179,7 @@ class PythonEditor extends React.Component {
             mode: 'python'
         };
         return (
-            <div id="Python" className="col">
+            <div id="Python" className="col" style={{ paddingLeft: "40px", marginLeft: "10px" }}>
                 <div className="row">
                     <div className="col text-center">
                         <p className="small-title"> Python </p>
@@ -211,8 +190,8 @@ class PythonEditor extends React.Component {
                         style={{
                             "minWidth": '480px',
                             "minHeight": '400px',
-                            "marginRight": "5px",
-                            "padding": "20px",
+                            "maxWidth": '950px',
+                            "padding": '10px',
                         }}
                     >
                         <CodeMirror
@@ -310,7 +289,7 @@ export default class MinibotBlockly extends React.Component {
             blocklyFilename: 'FileName.xml',
             pyblock: "",
             showPopup: false,
-            loginEmail: "",
+            loginEmail: props.loginEmail,
             loginErrorLabel: "",
             loginSuccessLabel: "",
             registerErrorLabel: "",
@@ -318,10 +297,6 @@ export default class MinibotBlockly extends React.Component {
             functionName: "default_function",
             codingStart: -1,
             isLoggedIn: false,
-            loginErrorLabel: "",
-            loginSuccessLabel: "",
-            registerErrorLabel: "",
-            registerSuccessLabel: "",
             emptyFunctionName: "Create Custom Block",
             workspace: null,
         };
@@ -596,13 +571,11 @@ export default class MinibotBlockly extends React.Component {
             },
             data: JSON.stringify({
                 bot_name: _this.props.selectedBotName,
-                script_code: _this.props.pythonCode
+                script_code: _this.props.pythonCode,
+                login_email: this.props.loginEmail
             }),
         }).catch(function (error) {
-            if (error.response.data.error_msg.length > 0)
-                window.alert(error.response.data.error_msg);
-            else
-                console.log(error);
+            console.log(error);
         });
     }
 
@@ -745,26 +718,6 @@ export default class MinibotBlockly extends React.Component {
     render() {
         return (
             <div className="">
-                <div className="row">
-                    <div id="loginandregister" className="horizontalDiv" style={{ marginLeft: "40px" }}>
-                        {!this.state.isLoggedIn ? <Button id="register" name="Register" onClick={this.register} /> : null}
-                        {!this.state.isLoggedIn ? <Button id="login" name="Login" onClick={this.login} /> : null}
-                        {this.state.isLoggedIn ? <label className="white-label"> Logged in as: {this.state.loginEmail} &nbsp; </label> : null}
-                        {this.state.isLoggedIn ? <Button id="logout" name="Logout" onClick={this.logout} /> : null}
-                        <UserAccountModal
-                            modalType="register"
-                            handleEvent={this.handleRegister}
-                            successLabel={this.state.registerSuccessLabel}
-                            errorLabel={this.state.registerErrorLabel}
-                        />
-                        <UserAccountModal
-                            modalType="login"
-                            handleEvent={this.handleLogin}
-                            successLabel={this.state.loginSuccessLabel}
-                            errorLabel={this.state.loginErrorLabel}
-                        />
-                    </div>
-                </div>
                 <div className="container-coding">
                     <div className="row">
                         <div className="col">
@@ -775,12 +728,12 @@ export default class MinibotBlockly extends React.Component {
                             </div>
                             <div className="row">
                                 <div className="col">
-                                    <div id="blocklyDiv" style={{ height: "488px", width: "540px", padding: "10px" }}></div>
+                                    <div id="blocklyDiv" style={{ height: "488px", width: "975px", padding: "40px" }}></div>
                                 </div>
                             </div>
                             <div className="row">
                                 <div className="col horizontalDiv">
-                                    <form style={{ color: "white", paddingLeft: "20px" }}>
+                                    <form style={{ color: "white", paddingLeft: "40px" }}>
                                         <input
                                             type="file"
                                             id="blockUpload"
@@ -793,7 +746,7 @@ export default class MinibotBlockly extends React.Component {
                             </div>
                             <div className="row">
                                 <div className="col horizontalDiv">
-                                    <div className="element-wrapper" style={{ paddingLeft: "20px" }}><input
+                                    <div className="element-wrapper" style={{ paddingLeft: "40px" }}><input
                                         type="text"
                                         name="blockly_filename"
                                         placeholder="FileName.xml"
@@ -804,7 +757,7 @@ export default class MinibotBlockly extends React.Component {
                             </div>
                             <div className="row">
                                 <div className="col horizontalDiv">
-                                    <div className="element-wrapper" style={{ paddingLeft: "20px" }}>
+                                    <div className="element-wrapper" style={{ paddingLeft: "40px" }}>
                                         <Button id="blocklyRun" name="Run" onClick={this.runBlockly} />
                                         <Button id="blocklyStop" name="Stop" onClick={this.stopBlockly} />
                                     </div>
@@ -821,6 +774,7 @@ export default class MinibotBlockly extends React.Component {
                             pythonCodeState={this.props.pythonCodeState}
                             setPythonCode={this.props.setPythonCode}
                             stopBlockly={this.stopBlockly}
+                            loginEmail={this.props.loginEmail}
                         />
                     </div>
 

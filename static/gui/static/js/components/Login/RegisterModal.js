@@ -1,15 +1,12 @@
 import React from 'react';
 import axios from 'axios';
 import { withCookies, Cookies } from 'react-cookie';
-// import { Form, Button, Card } from 'react-bootstrap';
 
 class RegisterModal extends React.Component {
 
     constructor(props) {
-        // super();
         super(props);
         this.state = {
-            // showModal: false,
             email: "",
             email_confirmation: "",
             password: "",
@@ -18,10 +15,8 @@ class RegisterModal extends React.Component {
             current_user_email: props.cookies.get('current_user_email') || ""
         };
 
-        // this.register = this.register.bind(this);
         this.handleRegister = this.handleRegister.bind(this);
         this.handleChange = this.handleChange.bind(this);
-        // this.handleCloseModal = this.handleCloseModal.bind(this);
     }
 
     handleChange(event) {
@@ -31,13 +26,8 @@ class RegisterModal extends React.Component {
         })
     }
 
-    // handleCloseModal () {
-    // 	$('#registerForm').modal("hide")
-    // }
-
     handleRegister(event) {
         console.log("handle register");
-        // event.preventDefault();
         let formData = new FormData(document.getElementById("registerForm"));
         if (formData.get('email') == formData.get('email_confirmation')
             && formData.get('password') == formData.get('password_confirmation')) {
@@ -45,10 +35,6 @@ class RegisterModal extends React.Component {
                 method: 'POST',
                 url: '/register',
                 data: formData,
-                // data: {
-                //     email: this.state.email,
-                //     password: this.state.password
-                // },
                 headers: { 'Content-Type': 'multipart/form-data' },
             },
                 { withCredentials: true }
@@ -58,7 +44,6 @@ class RegisterModal extends React.Component {
 
                 this.props.cookies.set('current_user_email', formData.get('email'), { path: '/' });
                 this.setState({ current_user_email: formData.get('email') });
-                // this.handleCloseModal();
             })
                 .catch((error) => {
                     console.log("fail");

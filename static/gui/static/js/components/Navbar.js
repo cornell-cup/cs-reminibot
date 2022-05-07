@@ -4,6 +4,17 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as Icons from '@fortawesome/free-solid-svg-icons';
 import LoginModal from './Login/LoginModal.js';
 import RegisterModal from './Login/RegisterModal.js';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+  useLocation
+} from "react-router-dom";
+
+const allRoutes = ['/start', '/coding', '/user-analytics', '/history', '/context-history']
+const authorizationRestrictedRoutes = ['/user-analytics', '/history', '/context-history'];
+
 /**
  * New component for the Navbar on top
  * This switches pages and renders login info
@@ -11,10 +22,11 @@ import RegisterModal from './Login/RegisterModal.js';
 const SETUP = 0;
 const CODING = 1;
 const ANALYTICS = 2;
-const CONTEXTHIST = 3;
+const HIST = 3
+const CONTEXTHIST = 4;
 const Navbar = (props) => {
   const [loginEmail, setLoginEmail] = useState(props.cookies.get('current_user_email') || "");
-  const [isLoggedIn, setIsLoggedIn] = useState(props.cookies.get(isLoggedIn !== ""));
+  const [isLoggedIn, setIsLoggedIn] = useState(loginEmail !== "");
   const [isSideNavOpen, setIsSideNavOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(SETUP);
 
@@ -26,15 +38,21 @@ const Navbar = (props) => {
 
   }, [document.cookie]);
 
+  useEffect(() => {
+    setActiveIndex(allRoutes.indexOf(location.pathname))
+
+  }, []);
+
 
   function handleLogout(e) {
     console.log("logout")
-    if (activeIndex === ANALYTICS || activeIndex === CONTEXTHIST) {
-      document.querySelector("#analytics-tab").classList.remove("active");
-      document.querySelector("#setup_control_tab").classList.add("active");
-      setActiveIndex(SETUP);
-    }
-    const current_user_email = props.cookies.remove('current_user_email');
+    // if (activeIndex === ANALYTICS || activeIndex === CONTEXTHIST) {
+    //   document.querySelector("#analytics-tab").classList.remove("active");
+    //   document.querySelector("#setup_control_tab").classList.add("active");
+    //   setActiveIndex(SETUP);
+    // }
+    // const current_user_email = props.cookies.remove('current_user_email');
+    props.cookies.remove('current_user_email');
     setIsLoggedIn(false);
     setLoginEmail("");
   }
@@ -59,30 +77,33 @@ const Navbar = (props) => {
     }
   }
 
+  const location = useLocation();
+  const pathname = location.pathname;
+
   return (
     <div>
       <div id="mySidenav" class="sidenav">
-        <a href="#" class="closebtn" onClick={closeNav}>&times;</a>
+        <button class="closebtn" onClick={closeNav}>&times;</button>
         {isLoggedIn && <a className="nav-link"><FontAwesomeIcon icon={Icons.faUser} /> &nbsp; {loginEmail.substring(0, loginEmail.indexOf('@'))}</a>}
-        <a id="setup-control-link" data-toggle="tab" href="#setup_control_tab" className={`nav-link ${activeIndex === SETUP ? "active" : ""}`} onClick={(e) => { setActiveIndex(SETUP) }}><FontAwesomeIcon icon="cogs" /> Setup/Movement</a>
-        <a id="coding-link" data-toggle="tab" href="#coding-tab" className={`nav-link ${activeIndex === CODING ? "active" : ""}`} onClick={(e) => { setActiveIndex(CODING) }}><FontAwesomeIcon icon="code" /> Coding</a>
+        <Link id="setup-control-link" to="/start" className={`nav-link ${activeIndex === SETUP ? "active" : ""}`} onClick={(e) => { setActiveIndex(SETUP) }}><FontAwesomeIcon icon="cogs" /> Setup/Movement</Link>
+        <Link id="coding-link" to="/coding" className={`nav-link ${activeIndex === CODING ? "active" : ""}`} onClick={(e) => { setActiveIndex(CODING) }}><FontAwesomeIcon icon="code" /> Coding</Link>
         {isLoggedIn &&
-          /**TODO: fix the icon for analytics to be something more suited for analytics*/
-          <a id="analytics-link" data-toggle="tab" href="#analytics-tab" className={`nav-link ${activeIndex === ANALYTICS ? "active" : ""}`} onClick={(e) => { setActiveIndex(ANALYTICS) }}><FontAwesomeIcon icon={Icons.faChartBar} /> Analytics</a>
+          <Link id="analytics-link" to="/user-analytics" className={`nav-link ${activeIndex === ANALYTICS ? "active" : ""}`} onClick={(e) => { setActiveIndex(ANALYTICS) }}><FontAwesomeIcon icon={Icons.faChartBar} /> Analytics</Link>
         }
         {isLoggedIn &&
-          /**TODO: fix the icon for analytics to be something more suited for analytics*/
-          <a id="context-history-link" data-toggle="tab" href="#context-history-tab" className={`nav-link ${activeIndex === CONTEXTHIST ? "active" : ""}`} onClick={(e) => { setActiveIndex(CONTEXTHIST) }}><FontAwesomeIcon icon={Icons.faChartBar} /> Context History</a>
+          <Link id="history-link" to="/history" className={`nav-link ${activeIndex === HIST ? "active" : ""}`} onClick={(e) => { setActiveIndex(HIST) }}><FontAwesomeIcon icon={Icons.faChartBar} /> History</Link>
         }
-        {isLoggedIn ? <a className="nav-link" onClick={handleLogout}><FontAwesomeIcon icon={Icons.faSignOutAlt} /> Logout</a> : <a className="nav-link" data-toggle="modal" data-target="#loginModal"><FontAwesomeIcon icon={Icons.faSignInAlt} /> Login</a>}
+        {isLoggedIn &&
+          <a id="context-history-link" to="/context-history" className={`nav-link ${activeIndex === CONTEXTHIST ? "active" : ""}`} onClick={(e) => { setActiveIndex(CONTEXTHIST) }}><FontAwesomeIcon icon={Icons.faChartBar} /> Context History</a>
+        }
+        {isLoggedIn ? (authorizationRestrictedRoutes.includes(pathname) ? <Link className="nav-link" to="/start" onClick={() => { handleLogout(); setActiveIndex(0) }}><FontAwesomeIcon icon={Icons.faSignOutAlt} /> Logout</Link> : <a className="nav-link" onClick={handleLogout}><FontAwesomeIcon icon={Icons.faSignOutAlt} /> Logout</a>) : <a className="nav-link" data-toggle="modal" data-target="#loginModal"><FontAwesomeIcon icon={Icons.faSignInAlt} /> Login</a>}
         {!isLoggedIn && <a className="nav-link" data-toggle="modal" data-target="#registerModal"><FontAwesomeIcon icon={Icons.faUserPlus} /> Signup</a>}
-
-      </div>
+      </div >
 
       <div id="top-nav" className="mb-4">
         <nav className="navbar navbar-dark bg-dark">
           <div className="container">
-            <a className="navbar-brand" href="#">
+            <a className="navbar-brand" href="/start">
               <img src="./static/img/logo.png" width="50" height="50" className="d-inline-block align-top" alt="" />
               Minibot
             </a>
@@ -94,7 +115,7 @@ const Navbar = (props) => {
         <LoginModal />
         <RegisterModal />
       </div>
-    </div>
+    </div >
   )
 }
 

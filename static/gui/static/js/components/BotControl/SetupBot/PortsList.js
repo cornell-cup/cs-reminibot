@@ -34,9 +34,6 @@ export default function PortsList({ motorPorts }) {
   let allListElements = [];
 
   for (let i = 0; i < ports.length; i++) {
-    // let link = <a>{portLabels[i]} &#8250;</a>
-    // let ports = <Ports portName={portNames[i]} motorPorts={props.motorPorts} />
-    // let listElement = <li key={i}> {link} {ports} </li>
     let element = (
       <div key={i} className="form-group row">
         <label htmlFor={ports[i]} className="col-md-4 d-flex justify-content-center">Port {ports[i]}:</label>

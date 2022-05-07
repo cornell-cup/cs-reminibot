@@ -3,8 +3,13 @@ Base Station for the MiniBot.
 """
 
 from basestation.bot import Bot
+<<<<<<< HEAD
 from basestation.databases.user_database import Program, User, Chatbot as ChatbotTable
 from basestation.databases.user_database import db
+=======
+from basestation.user_database import Submission, User
+from basestation import db
+>>>>>>> db19b685aae5f101df2a2151a140526e76fc69d0
 from basestation.util.stoppable_thread import StoppableThread, ThreadSafeVariable
 
 from random import choice
@@ -87,11 +92,19 @@ class BaseStation:
         # only bind in debug mode if you are the debug server, if you are the
         # monitoring program which restarts the debug server, do not bind,
         # otherwise the debug server won't be able to bind
+<<<<<<< HEAD
 
         # if app_debug and os.environ["WERKZEUG_RUN_MAIN"] == "true":
         #     self.sock.bind(server_address)
         # else:
         self.sock.bind(server_address)
+=======
+        if app_debug and os.environ["WERKZEUG_RUN_MAIN"] == "true":
+            self.sock.bind(server_address)
+        else:
+            # since we are running in debug mode, always bind
+            self.sock.bind(server_address)
+>>>>>>> db19b685aae5f101df2a2151a140526e76fc69d0
 
         self._login_email = None
         self.speech_recog_thread = None
@@ -241,7 +254,10 @@ class BaseStation:
         for line in program_lines:
             match = regex.match(line)
             if match:
-                func = self.blockly_function_map[match.group(2)]
+                if match.group(2) in self.blockly_function_map:
+                    func = self.blockly_function_map[match.group(2)]
+                else:
+                    func = match.group(2)
                 args = match.group(3)
                 whitespace = match.group(1)
                 if not whitespace:
@@ -254,7 +270,6 @@ class BaseStation:
                 parsed_program.append(parsed_line)
             else:
                 parsed_program.append(line + '\n')  # "normal" Python
-
         parsed_program_string = "".join(parsed_program)
 
         # Now actually send to the bot
@@ -350,6 +365,7 @@ class BaseStation:
         """ Computes answer for [question].
         Returns: <answer> : string
         """
+<<<<<<< HEAD
         return self.chatbot.compute_answer(question)
 
     def update_chatbot_context(self, context: str) -> None:
@@ -431,6 +447,47 @@ class BaseStation:
         """ Edits the local context based on input.
         """
         return self.chatbot.edit_context_by_id(idx, context)
+=======
+        RECORDING_TIME_LIMIT = 5
+        # dictionary of commmands
+        commands = {
+            "forward": "Minibot moves forward",
+            "backward": "Minibot moves backwards",
+            "left": "Minibot moves left",
+            "right": "Minibot moves right",
+            "stop": "Minibot stops",
+        }
+        # open the Microphone as variable microphone
+        with sr.Microphone() as microphone:
+            recognizer = sr.Recognizer()
+            while thread_safe_condition.get_val():
+                thread_safe_message_queue.push("Say something!")
+                try:
+                    recognizer.adjust_for_ambient_noise(microphone)
+                    # listen for 5 seconds
+                    audio = recognizer.listen(microphone, RECORDING_TIME_LIMIT)
+                    thread_safe_message_queue.push(
+                        "Converting from speech to text")
+
+                    # convert speech to text
+                    words = recognizer.recognize_google(audio)
+
+                    # remove non-alphanumeric characters
+                    regex = re.compile('[^a-zA-Z]')  # removing punctuation
+                    regex.sub('', words)
+                    thread_safe_message_queue.push(f"You said: {words}")
+
+                    # check if the command is valid
+                    if words in commands:
+                        thread_safe_message_queue.push(commands[words])
+                        self.move_bot_wheels(bot_name, words, 100)
+                    else:
+                        thread_safe_message_queue.push("Invalid command!")
+                except sr.WaitTimeoutError:
+                    thread_safe_message_queue.push("Timed out!")
+                except sr.UnknownValueError:
+                    thread_safe_message_queue.push("Words not recognized!")
+>>>>>>> db19b685aae5f101df2a2151a140526e76fc69d0
 
     # ==================== GETTERS and SETTERS ====================
     @property
@@ -442,3 +499,32 @@ class BaseStation:
     def login_email(self, email: str):
         """Sets the login email property"""
         self._login_email = email
+
+    # data analytics
+
+    def get_user(self, email: str) -> User:
+        user = User.query.filter_by(email=email).first()
+        return user
+
+    def save_submission(self, code: str, email: str) -> Submission:
+        submission = Submission(
+            code=code,
+            time=time.strftime("%Y/%b/%d %H:%M:%S", time.localtime()),
+            duration=-1,
+            user_id=self.get_user(email).id
+        )
+        db.session.add(submission)
+        db.session.commit()
+        return submission
+
+    def update_result(self, result: str, submission_id: int):
+        if submission_id is None:
+            return
+        submission = Submission.query.filter_by(id=submission_id).first()
+        submission.result = result
+        db.session.commit()
+
+    def get_all_submissions(self, user: User) -> []:
+        submissions = []
+        submissions = Submission.query.filter_by(user_id=User.id)
+        return submissions
