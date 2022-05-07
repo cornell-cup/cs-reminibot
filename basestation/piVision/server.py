@@ -16,23 +16,24 @@ from queue import Queue
 #flag for debugging: version 0 = raw camera stream 
                     #version 1 = object detection 
                     #version 2 = messing around with color
-version = 2 
-
-if version == 1:
   # construct the argument parser and parse the arguments
-  ap = argparse.ArgumentParser()
-  ap.add_argument("-p", "--prototxt", default='piVision/MobileNetSSD_deploy.prototxt',
-                  help="path to Caffe 'deploy' prototxt file")
-  ap.add_argument("-m", "--model", default='piVision/MobileNetSSD_deploy.caffemodel',
-                  help="path to Caffe pre-trained model")
-  ap.add_argument("-c", "--confidence", type=float, default=0.2,
-                  help="minimum probability to filter weak detections")
-  ap.add_argument("-mW", "--montageW", type=int, default=2,
-                  help="montage frame width")
-  ap.add_argument("-mH", "--montageH", type=int, default=2,
-                  help="montage frame height")
-  args = vars(ap.parse_args())
+ap = argparse.ArgumentParser()
+ap.add_argument("-p", "--prototxt", default='piVision/MobileNetSSD_deploy.prototxt',
+                help="path to Caffe 'deploy' prototxt file")
+ap.add_argument("-m", "--model", default='piVision/MobileNetSSD_deploy.caffemodel',
+                help="path to Caffe pre-trained model")
+ap.add_argument("-c", "--confidence", type=float, default=0.2,
+                help="minimum probability to filter weak detections")
+ap.add_argument("-mW", "--montageW", type=int, default=2,
+                help="montage frame width")
+ap.add_argument("-mH", "--montageH", type=int, default=2,
+                help="montage frame height")
+ap.add_argument("-v", "--version", type=int, default=1,
+                help="kind of detection running")
+args = vars(ap.parse_args())
+v = args["version"]
 
+if v == 1:
   # initialize the ImageHub object
   imageHub = imagezmq.ImageHub()
 
@@ -225,7 +226,7 @@ if version == 1:
   # do a bit of cleanup
   cv2.destroyAllWindows()
 
-if version == 2:
+if v == 2:
   # initialize the ImageHub object
   imageHub = imagezmq.ImageHub()
 

@@ -455,7 +455,27 @@ export default class AddBot extends React.Component {
 
     }
 
-    setModeOnClick(mode) {
+    setObjectOnClick(mode) {
+        const _this = this;
+        axios({
+            method: 'POST',
+            url: '/mode', //url to backend endpoint
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: JSON.stringify({
+                bot_name: _this.props.selectedBotName,
+                mode: mode,
+            })
+        }).catch(function (error) {
+            if (error.response.data.error_msg.length > 0)
+                window.alert(error.response.data.error_msg);
+            else
+                console.log(error);
+        });
+    }
+
+    setColorOnClick(mode) {
         const _this = this;
         axios({
             method: 'POST',
@@ -573,8 +593,8 @@ export default class AddBot extends React.Component {
                     <div className="row">
                         <div className="col horizontalDivCenter">
                           <p className="small-title"> Custom Modes </p>
-                          <button className="btn btn-success element-wrapper mr-1" onClick={() => this.setModeOnClick("object_detection")}>Object Detection</button>
-                          <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.setModeOnClick("line_follow")}>Line Follow</button>
+                          <button className="btn btn-success element-wrapper mr-1" onClick={() => this.setObjectOnClick("object_detection")}>Object Detection</button>
+                          <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.setColorOnClick("color_detection")}>Color Detection</button>
                         </div>
                     </div>
                     <br />

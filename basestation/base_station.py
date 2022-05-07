@@ -214,7 +214,11 @@ class BaseStation:
         if mode == "object_detection":
             self.bot_vision_server = subprocess.Popen(
                 ['python', './basestation/piVision/server.py', '-p MobileNetSSD_deploy.prototxt', 
-                '-m', 'MobileNetSSD_deploy.caffemodel', '-mW', '2', '-mH', '2'])
+                '-m', 'MobileNetSSD_deploy.caffemodel', '-mW', '2', '-mH', '2', '-v', '1'])
+        elif mode == "color_detection":
+            self.bot_vision_server = subprocess.Popen(
+                ['python', './basestation/piVision/server.py', '-p MobileNetSSD_deploy.prototxt', 
+                '-m', 'MobileNetSSD_deploy.caffemodel', '-mW', '2', '-mH', '2', '-v', '2'])
         else:
             if self.bot_vision_server:
                 self.bot_vision_server.kill()
