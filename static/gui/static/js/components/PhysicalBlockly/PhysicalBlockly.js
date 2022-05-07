@@ -11,7 +11,7 @@ require('codemirror/mode/python/python');
 export default class PhysicalBlockly extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = { stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], endLast: false };
+		this.state = { stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [] };
 		this.codeRef = React.createRef();
 		this.pollForUpdates = this.pollForUpdates.bind(this);
 		this.bWorkspace = null;
@@ -74,13 +74,19 @@ export default class PhysicalBlockly extends React.Component {
 		const _this = this;
 		axios.get('/get-py-command')
 			.then(function (response) {
+				let isLoop = false; 
+				let isEnd = false; 
 				if (response.data == "") {
 					return;
 				}
 				let n = "";
 				if (response.data.substring(3) == "end") {
 					_this.setState({ tabs: _this.state.tabs - 1 });
-					n = "#ended for loop\n";
+					for (let i = 0; i < _this.state.tabs; i++) {
+						n += "    ";
+					}
+					n += "#ended for loop\n";
+					isEnd = true; 
 				}
 				else {
 					for (let i = 0; i < _this.state.tabs; i++) {
@@ -98,6 +104,7 @@ export default class PhysicalBlockly extends React.Component {
 
 				let block = document.createElement("block");
 				if (response.data.substring(3) == "for i in range(n):") {
+					isLoop = true; 
 					block.setAttribute("type", "controls_repeat_ext");
 					let value = document.createElement("value");
 					value.setAttribute("name", "TIMES");
@@ -111,9 +118,7 @@ export default class PhysicalBlockly extends React.Component {
 					value.appendChild(shadow);
 					block.appendChild(value);
 				} else if (response.data.substring(3) == "end") {
-					_this.setState({ endLast: true })
-					// _this.setState({ blockStack: blockStack.splice(blockStack.length - 1, 1) })
-					console.log("end block")
+					isEnd = true; 
 				} else if (response.data.substring(3) == "bot.move_forward(100)") {
 					block.setAttribute("type", "move_power");
 				} else if (response.data.substring(3) == "bot.stop()") {
@@ -133,36 +138,24 @@ export default class PhysicalBlockly extends React.Component {
 				}
 				if (block.getAttribute("type") != null) {
 					let placedBlock = Blockly.Xml.domToBlock(block, _this.bWorkspace);
-					if (_this.state.lastBlock != null) {
-						let childConnection = placedBlock.previousConnection;
-						if (_this.state.blockStack != null && _this.state.blockStack.length != 0) {
-							let input = _this.state.lastBlock.getInput("DO")
-							if (_this.state.endLast) {
-								_this.setState({ endLast: false })
-								let lastLoop = _this.state.blockStack.pop();
-								_this.setState({ blockStack: blockStack.splice(blockStack.length - 1, 1) })
-								let parentConnection = _this.state.lastLoop.nextConnection;
-								parentConnection.connect(childConnection);
-							} else if (input != null) {
-								input.connection.connect(childConnection);
-							} else {
-								let parentConnection = _this.state.lastBlock.nextConnection;
-								parentConnection.connect(childConnection);
-							}
-						} else {
-							let parentConnection = _this.state.lastBlock.nextConnection;
-							parentConnection.connect(childConnection);
-						}
-						console.log(parentConnection);
-						console.log(childConnection);
+					let childConnection = placedBlock.previousConnection;
+					if(_this.state.lastBlock != null){
+						_this.state.lastBlock.connect(childConnection);
 					}
-					if (block.getAttribute("type") == "controls_repeat_ext") {
-						let tempStack = this.state.blockStack;
+					if(isLoop){
+						_this.setState({lastBlock: placedBlock.getInput("DO").connection}); 
+						let tempStack = _this.state.blockStack;
 						tempStack.push(placedBlock);
 						_this.setState({ blockStack: tempStack });
 					}
-
-					_this.setState({ lastBlock: placedBlock });
+					else{
+						_this.setState({lastBlock: placedBlock.nextConnection}); 
+					}
+				}
+				else{
+					let lastLoop = _this.state.blockStack.pop();
+					_this.setState({ blockStack: _this.state.blockStack}); 
+					_this.setState({lastBlock: lastLoop.nextConnection }); 
 				}
 			})
 			.catch(function (error) {
