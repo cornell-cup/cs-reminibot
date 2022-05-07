@@ -19,7 +19,6 @@ export default class PhysicalBlockly extends React.Component {
 
 	componentDidMount() {
 		setInterval(this.pollForUpdates, 1000);
-
 		this.bWorkspace = Blockly.inject('pbBlocklyDiv');
 	}
 
