@@ -232,8 +232,7 @@ function Chatbot2({
       if (activeMicComponent == ACT_MIC_CHATBOT) {
         var temp = !mic;
         setMic(temp);
-      }
-      else {
+      } else {
         setActiveMicComponent(ACT_MIC_CHATBOT);
       }
       // setInputText("");
@@ -400,8 +399,8 @@ function Chatbot2({
             <input type="image"
               src={mic ? MIC_BTNON : MIC_BTN}
               style={{
-                width: "75%",
-                height: "75%",
+                width: "50%",
+                height: "50%",
                 objectFit: "contain",
               }}
               onClick={(e) => {
@@ -409,14 +408,18 @@ function Chatbot2({
               }} />
           </div>
           {contextMode ?
-            <span>
-              <button style={{ marginRight: "5px", display: "inline-block", backgroundColor: "#2c3137", width: "20%" }} onClick={(e) => { sendContext(e); }}>
+            <div>
+              <span>
+              <button style={{ marginRight: "5px", backgroundColor: "transparent", borderColor: "transparent" }} onClick={(e) => { sendContext(e); }}>
                 <FontAwesomeIcon icon={Icons.faPaperPlane} />
               </button>
-              <button style={{ marginLeft: "5px", display: "inline-block", backgroundColor: "#2c3137", width: "20%" }} onClick={(e) => { sendQuestion(e); }}>
+              </span>
+              <span>
+              <button style={{ marginLeft: "5px", backgroundColor: "transparent", borderColor: "transparent" }} onClick={(e) => { sendQuestion(e); }}>
                 <FontAwesomeIcon icon={Icons.faQuestion} />
               </button>
-            </span>
+              </span>
+            </div>
             : <div></div>
           }
           <div ref={messagesEndRef} />

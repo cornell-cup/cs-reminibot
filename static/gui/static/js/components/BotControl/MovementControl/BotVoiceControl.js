@@ -19,8 +19,7 @@ const micStyle = {
 
 function BotVoiceControl({
   selectedBotName,
-  startLabel,
-  stopLabel,
+  startLabel, stopLabel,
   activeMicComponent,
   setActiveMicComponent,
   botVoiceControlMic, setBotVoiceControlMic }) {
@@ -31,13 +30,18 @@ function BotVoiceControl({
 
   const toggle = (e) => {
     e.preventDefault();
-    if (activeMicComponent == ACT_MIC_COMMAND) {
-      setBotVoiceControlMic(!botVoiceControlMic);
-      lastLen = 0; // correctly reset queue length if the button is toggled
-      // console.log("mic on " + on);
-    }
-    else {
-      setActiveMicComponent(ACT_MIC_COMMAND)
+    if (selectedBotName) {
+      if (activeMicComponent == ACT_MIC_COMMAND) {
+        setBotVoiceControlMic(!botVoiceControlMic);
+        lastLen = 0; // correctly reset queue length if the button is toggled
+        setInputText("Speak to send a command")
+        // console.log("mic on " + on);
+      }
+      else {
+        setActiveMicComponent(ACT_MIC_COMMAND)
+      }
+    } else {
+      setInputText("Please connect to a Minibot!")
     }
   }
   // }
@@ -87,7 +91,10 @@ function BotVoiceControl({
   return (
     <React.Fragment>
       <div id="speech-button" className="row">
-        <input class="text-box" id="textbox" onChange={setInputText} value={inputText}></input>
+        <input class="text-box" id="textbox" onChange={setInputText} 
+          value={ selectedBotName != "" ? inputText : "Please conntect to a Minibot!"}>
+
+        </input>
         <button className="btn btn-danger element-wrapper btn-speech"
           onClick={toggle}>
           <div className="row">
