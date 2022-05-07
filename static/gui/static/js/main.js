@@ -6,6 +6,7 @@ import Navbar from './components/Navbar.js';
 import Platform from './components/Platform.js';
 import Chatbot from './components/Chatbot/chatbot2.js';
 import { ACT_MIC_CHATBOT, ACT_MIC_COMMAND } from './components/utils/Constants.js';
+import BotVoiceControl from './components/BotControl/MovementControl/BotVoiceControl.js';
 
 let date = new Date()
 function ClientGUI({ }) {
@@ -17,47 +18,37 @@ function ClientGUI({ }) {
   // //Components that use mic 
   const [botVoiceControlMic, setBotVoiceControlMic] = useState(false);
   const [chatbotMic, setChatbotMic] = useState(false);
+  const [changedMic, setChangedMic] = useState(false);
 
 
   /********* Actually, we need main.js to manage mic switching **********/
 
   useEffect(() => {
     if (activeMicComponent == ACT_MIC_CHATBOT) {
-      console.log("switch to chatbot mic")
+      console.log("turn off bot voice control mic.")
       setBotVoiceControlMic(false);
-      let temp = botVoiceControlMic;
-      let startTime = date.getTime();
-      while (temp) { 
-        temp = botVoiceControlMic; 
-        console.log("temp ", temp);
-        console.log("botvoice ", botVoiceControlMic);
-        if (date.getTime() - startTime >= 5000) break };
-      setChatbotMic(true);
-      // setTimeout(function () { 
-      //   console.log("bot voice control mic" , botVoiceControlMic);
-      //   setChatbotMic(true);
-      // }, 5000);
-      
-      
+      setChangedMic(true);
     } else if (activeMicComponent == ACT_MIC_COMMAND) {
-      console.log("switch to bot vc mic.")
+      console.log("turn off chatbot mic.")
       setChatbotMic(false);
-      let temp = chatbotMic;
-      let startTime = date.getTime();
-      while(temp) { 
-        temp = chatbotMic; 
-        console.log("temp ", temp);
-        console.log("chatbot mic ", chatbotMic);
-        if (date.getTime() - startTime >= 5000) break };
-      setBotVoiceControlMic(true);
-      // setTimeout( 
-      //   function() {
-      //   console.log("chatbot mic", chatbotMic);
-      //   setBotVoiceControlMic(true);
-      // }, 5000);
-     
+      setChangedMic(true);
     }
   }, [activeMicComponent]);
+
+  useEffect(() => {
+    if (activeMicComponent == ACT_MIC_CHATBOT && changedMic && !botVoiceControlMic) {
+      setChangedMic(false);
+      setTimeout(function () {
+        setChatbotMic(true)
+      }, 500); //need to wait for 0.5 second to prevent race condition with mic
+    }
+    else if (activeMicComponent == ACT_MIC_COMMAND && changedMic && !chatbotMic) {
+      setChangedMic(false);
+      setTimeout(function () {
+        setBotVoiceControlMic(true)
+      }, 500); //need to wait for 0.5 second to prevent race condition with mic 
+    }
+  }, [botVoiceControlMic, chatbotMic, changedMic])
 
   return (
     <div className="main-body">

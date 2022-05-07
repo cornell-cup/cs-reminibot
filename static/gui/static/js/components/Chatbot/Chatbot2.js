@@ -395,33 +395,48 @@ function Chatbot2({
             <SpeechRecognitionComp setText={setInputText} mic={mic} /> :
             <SpeechRecognitionComp setText={setTempCommands} mic={mic} />
           }
-          <div style={{ width: "50px", height: "50px", }}>
-            <input type="image"
-              src={mic ? MIC_BTNON : MIC_BTN}
-              style={{
-                width: "50%",
-                height: "50%",
-                objectFit: "contain",
-              }}
-              onClick={(e) => {
-                toggleMic(e);
-              }} />
+          <div style={{ height: "50px", }}>
+            <span>
+              {contextMode ?
+                <input type="image"
+                  src={mic ? MIC_BTNON : MIC_BTN}
+                  style={{
+                    width: "30%",
+                    height: "50%",
+                    objectFit: "contain",
+                  }}
+                  onClick={(e) => {
+                    toggleMic(e);
+                  }} />
+                :
+                <input type="image"
+                  src={mic ? MIC_BTNON : MIC_BTN}
+                  style={{
+                    width: "75%",
+                    height: "75%",
+                    objectFit: "contain",
+                  }}
+                  onClick={(e) => {
+                    toggleMic(e);
+                  }} />
+              }
+            </span>
+            {contextMode ?
+              <span>
+                <span>
+                  <button style={{ marginLeft: "2px", objectFit: "inline", width: "30%" }} onClick={(e) => { sendContext(e); }}>
+                    <FontAwesomeIcon icon={Icons.faPaperPlane} />
+                  </button>
+                </span>
+                <span>
+                  <button style={{ marginLeft: "2px", objectFit: "inline" }} onClick={(e) => { sendQuestion(e); }}>
+                    <FontAwesomeIcon icon={Icons.faQuestion} />
+                  </button>
+                </span>
+              </span>
+              : <div></div>
+            }
           </div>
-          {contextMode ?
-            <div>
-              <span>
-              <button style={{ marginRight: "5px", backgroundColor: "transparent", borderColor: "transparent" }} onClick={(e) => { sendContext(e); }}>
-                <FontAwesomeIcon icon={Icons.faPaperPlane} />
-              </button>
-              </span>
-              <span>
-              <button style={{ marginLeft: "5px", backgroundColor: "transparent", borderColor: "transparent" }} onClick={(e) => { sendQuestion(e); }}>
-                <FontAwesomeIcon icon={Icons.faQuestion} />
-              </button>
-              </span>
-            </div>
-            : <div></div>
-          }
           <div ref={messagesEndRef} />
         </div>
       </div>
