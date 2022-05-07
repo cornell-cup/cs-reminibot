@@ -69,7 +69,10 @@ class BaseStation:
         # The Minibot broadcast will allow us to learn the Minibot's ipaddress
         # so that we can connect to the Minibot
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        # self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+        #someone on apple support suggested I could use SO_REUSEPORT and it's working???
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
         # an arbitrarily small time
         self.sock.settimeout(0.01)
 
@@ -86,7 +89,7 @@ class BaseStation:
         # if app_debug and os.environ["WERKZEUG_RUN_MAIN"] == "true":
         #     self.sock.bind(server_address)
         # else:
-        # self.sock.bind(server_address)
+        self.sock.bind(server_address)
 
         self._login_email = None
         self.speech_recog_thread = None
