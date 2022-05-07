@@ -321,7 +321,7 @@ export default class MinibotBlockly extends React.Component {
         this.manageDefaultCustomBlocklyFunction = this.manageDefaultCustomBlocklyFunction.bind(this)
     }
 
-    componentDidMount () {
+    componentDidMount() {
     }
 
     /* Populates the customBlocklyList with a default function if addOrDelete == true
@@ -486,8 +486,7 @@ export default class MinibotBlockly extends React.Component {
 
         /* Loads blockly state from parent component */
         if (this.props.blocklyXml) {
-            let xml = Blockly.Xml.textToDom(this.props.blocklyXml);
-            Blockly.Xml.domToWorkspace(xml, _this.workspace);
+            Blockly.Xml.domToWorkspace(this.props.blocklyXml, _this.workspace);
         }
 
         /* Realtime code generation

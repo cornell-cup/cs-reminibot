@@ -24,7 +24,7 @@ export default class PhysicalBlockly extends React.Component {
 	}
 
 	componentWillUnmount() {
-		this.endProcess(); 
+		this.endProcess();
 	}
 
 	//mode = 1 -> real time mode
@@ -174,9 +174,10 @@ export default class PhysicalBlockly extends React.Component {
 			});
 	}
 
-	export(){
-		this.endProcess(); 
-		this.props.setPythonCode(this.props.pb); 
+	export() {
+		this.endProcess();
+		this.props.setPythonCode(this.props.pb);
+		this.props.setBlocklyXml(Blockly.Xml.workspaceToDom(Blockly.getMainWorkspace()))
 	}
 
 	render() {
@@ -188,9 +189,9 @@ export default class PhysicalBlockly extends React.Component {
 			display: "inline-block"
 		}
 
-		var linkStyle={
-			width: "0px", 
-			height:"0px"
+		var linkStyle = {
+			width: "0px",
+			height: "0px"
 		}
 
 		let options = {
