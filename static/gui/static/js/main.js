@@ -53,6 +53,8 @@ const Platform = withCookies((props) => {
   const [selectedBotStyle, setSelectedBotStyleState] = useState(hiddenStyle);
   const [loginEmail, setLoginEmail] = useState(props.cookies.get('current_user_email') || "");
 
+  const[pb, setPb] = useState(""); 
+
   useEffect(() => {
     setLoginEmail(props.cookies.get('current_user_email') || "");
   }, [document.cookie]);
@@ -117,8 +119,9 @@ const Platform = withCookies((props) => {
           <Route path="/physical-blockly">
               <PhysicalBlockly
                 selectedBotName = {selectedBotName}
-                pb = {pythonCode}
-                setPb = {setPythonCode}
+                pb = {pb}
+                setPb = {setPb}
+                setPythonCode = {setPythonCode}
               />
           </Route>
           <Route path="/vision-page">

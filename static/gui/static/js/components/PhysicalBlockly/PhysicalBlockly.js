@@ -23,6 +23,10 @@ export default class PhysicalBlockly extends React.Component {
 		this.bWorkspace = Blockly.inject('pbBlocklyDiv');
 	}
 
+	componentWillUnmount() {
+		this.endProcess(); 
+	}
+
 	//mode = 1 -> real time mode
 	//mode = 0 -> camera mode 
 
@@ -51,7 +55,7 @@ export default class PhysicalBlockly extends React.Component {
 	}
 
 	endProcess() {
-		this.setState({ stage: 0 });
+		this.setState({ stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [] });
 		const _this = this;
 		//post request to basestation to stop the process
 		axios.get('/end_physical_blockly')
@@ -170,6 +174,10 @@ export default class PhysicalBlockly extends React.Component {
 			});
 	}
 
+	export(){
+		this.endProcess(); 
+		this.props.setPythonCode(this.props.pb); 
+	}
 
 	render() {
 		var visStyle = {
@@ -178,6 +186,11 @@ export default class PhysicalBlockly extends React.Component {
 			padding: "20px",
 			width: "900px",
 			display: "inline-block"
+		}
+
+		var linkStyle={
+			width: "0px", 
+			height:"0px"
 		}
 
 		let options = {
@@ -209,8 +222,8 @@ export default class PhysicalBlockly extends React.Component {
 					</div>
 				</div>
 
-				<Link to={{ pathname: "/coding", state: { python: this.props.pb }, }}>
-					<button className="btn btn-primary element-wrapper mr-1">
+				<Link style={linkStyle} to={{ pathname: "/coding", state: { python: this.props.pb }, }}>
+					<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.export()}>
 						Export to Coding
 					</button>
 				</Link>
