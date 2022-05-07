@@ -20,7 +20,6 @@ chatbot_bp = Blueprint('chatbot',
 @chatbot_bp.route('/chatbot-context', methods=['POST', 'GET'])
 def chatbot_context():
     if request.method == 'POST':
-        print("route to chatbot context")
         data = request.get_json()
         command = data['command']
         if command == 'update':
@@ -30,7 +29,6 @@ def chatbot_context():
         
         elif command == "replace-context-stack":
             context_stack = data['contextStack']
-            print(context_stack)
             base_station.replace_context_stack(context_stack)
             return json.dumps(True), status.HTTP_200_OK
         
@@ -50,7 +48,6 @@ def chatbot_context():
                 return json.dumps({'error': 'Not logged in'}), status.HTTP_401_UNAUTHORIZED
         
         elif command == 'get-all-db-context':
-            # TODO properly deal with guest users?
             user = base_station.login_email
             if user != "":
                 answer = base_station.chatbot_get_context()

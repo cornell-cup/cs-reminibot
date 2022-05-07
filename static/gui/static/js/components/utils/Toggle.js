@@ -1,13 +1,9 @@
-
 import React from "react";
 
 
 const Toggle = ({ isChecked, handleToggle, size }) => {
-
   return (
     <div className={`toggle tg-${size}`}>
-      {/* <h1>toggle</h1> */}
-
       <label className={`switch tg-lab-${size}`}>
         <input
           type="checkbox"
@@ -20,6 +16,5 @@ const Toggle = ({ isChecked, handleToggle, size }) => {
     </div>
   );
 };
-
 
 export default Toggle;

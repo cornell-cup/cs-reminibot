@@ -1,18 +1,21 @@
+/*
+A tab that displays all previously entered contexts to chatbot
+when user logs in. User can edit and delete context from this page. */
+
 import React, { useState, useEffect } from 'react';
-import { withCookies, Cookies } from 'react-cookie';
-import axios from 'axios';
+import { withCookies } from 'react-cookie';
 import ContextBox from './ContextBox.js';
 
 const initialHistory = []
-
 
 function ContextHistory(props) {
   const [contextHistory, setContextHistory] = useState(initialHistory);
   const [id, setID] = useState(0);
 
   useEffect(() => {
+    /* Fetches contexts and displays them on page 
+    from database when user logs in. */
     setID(0);
-    // console.log("get context history")
     let contextArr = [];
     axios({
       method: 'POST',
@@ -27,11 +30,8 @@ function ContextHistory(props) {
       if (response.data) {
         let context = response.data['context'];
         if (!context) {
-          // console.log("ContextHistory.js 29: not empty context")
           contextArr = context.split(".");
-          // console.log("ContextHistory.js 31 contextarr: " + contextArr)
         } else {
-          // console.log("ContextHistory.js: empty context")
           contextArr = [];
         }
       }
@@ -66,13 +66,14 @@ function ContextHistory(props) {
     setContextHistory(contextHistoryTemp);
   }, [props.cookies.get('current_user_email')])
 
+
   useEffect(() => {
+    /* When user enters new context in chatbot, fetches the context - 
+    <parentContext> - from parent component and displays it on page. */
     if (props.parentContext != "") {
-      // console.log("new context is added")
       let newContextHist = contextHistory.concat({ "id": id, "context": props.parentContext })
       setID(id + 1);
       setContextHistory(newContextHist);
-      // console.log("ContextHistory.js FormatLoop: ", contextHistory);
     }
   }, [props.parentContext])
 

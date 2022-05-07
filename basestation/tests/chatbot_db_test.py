@@ -34,14 +34,8 @@ def app():
     app.config.update({
     "TESTING": True,
     })
-
-    # other setup can go here
-
     yield app
 
-    # clean up / reset resources here
-
-    # from basestation.user_database import Program, User
 
 
 @pytest.fixture()
@@ -141,6 +135,8 @@ def test_get_db_context(client):
 
 
 def test_clear_local_context(client):
+    """d
+taabase    """
     # send the clear command
     response = client.post(
         '/chatbot-context',
@@ -248,5 +244,4 @@ def test_clear_local_context_guest(client):
 
 
 if __name__ == "__main__":
-    # pytest.main(["-s", "."])
     pytest.main([])

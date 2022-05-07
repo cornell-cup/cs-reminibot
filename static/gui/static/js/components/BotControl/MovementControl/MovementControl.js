@@ -102,8 +102,6 @@ export default class MovementControls extends React.Component {
                         {/* <SpeechRecognition selectedBotName={this.props.selectedBotName} /> */}
                         <BotVoiceControl
                             selectedBotName={this.props.selectedBotName}
-                            startLabel=""
-                            stopLabel=""
                             setActiveMicComponent={this.props.setActiveMicComponent}
                             activeMicComponent={this.props.activeMicComponent}
                             botVoiceControlMic={this.props.botVoiceControlMic}

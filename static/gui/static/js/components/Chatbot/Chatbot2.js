@@ -2,15 +2,12 @@ import React, { useRef, useState, useEffect } from 'react';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as Icons from '@fortawesome/free-solid-svg-icons';
-
 import {
   commands,
   X_BTN, MIC_BTN, MIC_BTNON,
-  ACT_MIC_CHATBOT, ACT_MIC_COMMAND
+  ACT_MIC_CHATBOT
 } from "../utils/Constants.js";
 import SpeechRecognitionComp from "../utils/SpeechRecognitionComp.js";
-import BotVoiceControl from "../BotControl/MovementControl/BotVoiceControl.js";
-
 
 //Voice Control 
 var lastLen = 0;
@@ -22,6 +19,7 @@ const initialList = [
     message: "Hello, I am Chatbot. How are you today?",
   }
 ];
+//Font size style
 let lineHeightMultiplier = 0.10;
 const defaultFontSize = {
   header: {
@@ -42,25 +40,24 @@ function Chatbot2({
   activeMicComponent,
   mic,
   setMic }) {
+  // use states for chatbot window appearance
+  const [enter, setEnter] = useState("");
   const [open, setOpen] = useState(false);
   const [expand, setExpand] = useState("");
-  const [enter, setEnter] = useState("");
-  const [id, setId] = useState(2);
+  const [right, setRight] = useState(false); // state right means that you can move to the right
+  const [fullSize, setFullSize] = useState(false);
+  const [fontSize, setFontSize] = useState(defaultFontSize);
+  const [canChangeFont, setCanChangeFont] = useState(false);
 
+  const [id, setId] = useState(2);
   const [inputText, setInputText] = useState("");
   const [messages, setMessages] = useState([]);
   const messagesEndRef = useRef(null);
-
-  // const [mic, setMic] = useState(false);
-
-  //right means it can move to the right
-  const [right, setRight] = useState(false);
-  const [fullSize, setFullSize] = useState(false);
   const [contextMode, setContextMode] = useState(true);
   const [date, setDate] = useState("");
-
   const [tempCommands, setTempCommands] = useState("");
 
+  // style for the overall chatbot window
   const styles = {
     leftWindow: {
       width: fullSize ? "50%" : "25%",
@@ -72,12 +69,10 @@ function Chatbot2({
       height: fullSize ? "80%" : "60%",
       right: "10px",
     },
-    empty: {
-    }
-  };
-  const [fontSize, setFontSize] = useState(defaultFontSize);
-  const [canChangeFont, setCanChangeFont] = useState(false);
+    empty: {}
+  }
 
+  // functions responding to commands changing the appearance of the chatbot windows
   const changeInputText = (event) => {
     event.preventDefault();
     if (!contextMode) return;
@@ -152,6 +147,7 @@ function Chatbot2({
     return time;
   }
 
+  // functions processing commands: sending context, question, toggling mics
   const sendContext = (e) => {
     e.preventDefault();
     if (inputText === emptyStr) return;
@@ -219,12 +215,6 @@ function Chatbot2({
     })
   }
 
-  const sendCommand = (e) => {
-    e.preventDefault();
-    console.log("send command in command mode");
-    // TODO
-  }
-
   const toggleMic = (e) => {
     e.preventDefault();
     if (contextMode || selectedBotName) {
@@ -232,23 +222,10 @@ function Chatbot2({
       if (activeMicComponent == ACT_MIC_CHATBOT) {
         var temp = !mic;
         setMic(temp);
-      } else {
+      } else
         setActiveMicComponent(ACT_MIC_CHATBOT);
-      }
-      // setInputText("");
-      // set active mic to chatbot only if not already set to ACT_MIC_CHATBOT
-      // if (temp && activeMicComponent!=ACT_MIC_CHATBOT) {
-      // setActiveMicComponent(ACT_MIC_CHATBOT)
-      // }
     }
   }
-
-  // useEffect(() => {
-  //   if (activeMicComponent != ACT_MIC_CHATBOT){
-  //     setMic(false)
-  //   }
-  // }, [activeMicComponent])
-
 
   const alertInfo = (e) => {
     e.preventDefault();
@@ -260,9 +237,9 @@ function Chatbot2({
     setContextMode(!contextMode);
     setMic(false);
     setInputText("");
-    // turn off mic of BotVoiceControl 
   };
 
+  // useEffects taking care of scrolling and generating timestamp on first render
   useEffect(() => {
     messagesEndRef.current.scrollTo(messages[messages.length - 1], {
       duration: 50,
@@ -278,19 +255,18 @@ function Chatbot2({
     setMessages(initialList);
   }, []);
 
-  /***********************************Voice Control ***************************/
+  /***************************** Bot Voice Control ***************************/
   useEffect(() => {
     if (!contextMode) {
       console.log(lastLen);
       let queue = tempCommands.split(" ");
-      // setPrevLast(queue[0]);
       console.log(queue);
-      if (queue.length > lastLen) { // only read the lastest word 
-        //in the queue (last item is always '')
+      // Run this code if a new word has been spoken.
+      if (queue.length > lastLen) {
+        // only read the lastest word in the queue (last item is always '')
         if (commands.hasOwnProperty(queue[queue.length - 2])) {
           setInputText(queue[queue.length - 2] + ": " +
             commands[queue[queue.length - 2]]);
-
           // send command to backend
           axios({
             method: 'POST',
@@ -303,10 +279,7 @@ function Chatbot2({
               command: queue[queue.length - 2]
             })
           }).then(function (response) {
-            // insert response code here?
           }).catch(function (error) {
-            // tell user to connect to bot in the text box
-            // setInputText("Please connect to a Minibot!")
             if (error.response.data.error_msg.length > 0)
               window.alert(error.response.data.error_msg);
             else
@@ -316,26 +289,16 @@ function Chatbot2({
       }
       lastLen = queue.length;
     }
-    // setText("");
   }, [tempCommands, contextMode]);
 
-
-  var textBox = contextMode ?
-    <input class="text-box" id="textbox" onChange={changeInputText} value={inputText}
-      onKeyPress={(e) => {
-        if (e.key === 'Enter') { sendContext(e); }
-        if (e.key === '`') { sendQuestion(e); }
-      }}></input> : <div />
-  // : <div></div> ; // TODO add bot name for voice commands related to the bot
-
-
-
+  // rendering front end HTML elements
   return (
     <div class={"floating-chat enter " + expand} style={expand === "expand" ? (right ? styles.leftWindow : styles.rightWindow) : styles.empty}
       onClick={(e) => openChatbox(e)}> {/* add 'expand' to class for this to turn into a chat */}
       <i class="fa fa-comments" aria-hidden={true}></i>
       <div class={"chat " + enter}> {/* add 'enter' to class for the rest to display */}
         <div class="header">
+          {/* buttons in the header used for changing appearance of the window */}
           <div class="popup">
             <button id="popupBut" onClick={(e) => toggleChangeFont(e)}><FontAwesomeIcon icon={Icons.faEllipsisV} /></button>
             <span class="popuptext" id="myPopup" style={canChangeFont ? { visibility: 'visible' } : { visibility: 'hidden' }}>
@@ -352,14 +315,12 @@ function Chatbot2({
               <button><FontAwesomeIcon onClick={(e) => changeFontSize(e, 1)} icon={Icons.faFont} /></button>
             </span>
           </div>
-          <button id="contextLabel" onClick={(e) => toggleMode(e)}> {contextMode ? "Q&A Mode" : "Command Mode"}
-            {/* <FontAwesomeIcon icon={contextMode ? Icons.faCheck : Icons.faBan} /> */}
-            {/* {contextMode.toString()} */}
-          </button>
+          <button id="contextLabel" onClick={(e) => toggleMode(e)}> {contextMode ? "Q&A Mode" : "Command Mode"}</button>
           &nbsp;
           <span class="title" style={fontSize.header}>
             {selectedBotName}
           </span>
+          {/* close button in the header */}
           <div style={{ width: "10px", height: "10px", }}>
             <input type="image"
               id='closeButton'
@@ -369,6 +330,7 @@ function Chatbot2({
           </div>
         </div>
 
+        {/* messages sent by both the chatbot and user, timestamp below */}
         <ul class="messages">
           <div class="date" style={fontSize.body}>{date}</div>
           <hr class="timeBreak" />
@@ -380,6 +342,7 @@ function Chatbot2({
           ))}
         </ul>
         <div class="footer">
+          {/* textbox for the user to enter text messages */}
           <textarea rows="3" cols="70" class="text-box" id="textbox"
             onChange={changeInputText} value={inputText}
             placeholder={contextMode ? "Enter a context/question" : selectedBotName != "" ?
@@ -391,36 +354,26 @@ function Chatbot2({
               }
             }}>
           </textarea>
+          {/* mic backend objects built using SpeechRecognitionComp */}
           {contextMode ?
             <SpeechRecognitionComp setText={setInputText} mic={mic} /> :
             <SpeechRecognitionComp setText={setTempCommands} mic={mic} />
           }
+          {/* front-end component for mics */}
           <div style={{ height: "50px", }}>
             <span>
               {contextMode ?
                 <input type="image"
                   src={mic ? MIC_BTNON : MIC_BTN}
-                  style={{
-                    width: "30%",
-                    height: "50%",
-                    objectFit: "contain",
-                  }}
-                  onClick={(e) => {
-                    toggleMic(e);
-                  }} />
+                  style={{ width: "30%", height: "50%", objectFit: "contain", }}
+                  onClick={(e) => { toggleMic(e); }} />
                 :
                 <input type="image"
                   src={mic ? MIC_BTNON : MIC_BTN}
-                  style={{
-                    width: "75%",
-                    height: "75%",
-                    objectFit: "contain",
-                  }}
-                  onClick={(e) => {
-                    toggleMic(e);
-                  }} />
-              }
+                  style={{ width: "75%", height: "75%", objectFit: "contain", }}
+                  onClick={(e) => { toggleMic(e); }} />}
             </span>
+            {/* selectively rendering send context and question buttons based on contextMode */}
             {contextMode ?
               <span>
                 <span>

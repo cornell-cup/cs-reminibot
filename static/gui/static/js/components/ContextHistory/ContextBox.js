@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
-import Toggle from "../utils/Toggle.js";
 
 const editStyle = {
   backgroundColor: "#212529"
@@ -9,7 +8,6 @@ const defaultStyle = {
   backgroundColor: "#2c3137"
 }
 
-// TODO: add buttons to delete and edit context
 function ContextBox({ id, context }) {
   const [currContext, setCurrContext] = useState(context);
   const [editing, setEditing] = useState(false);
@@ -46,7 +44,16 @@ function ContextBox({ id, context }) {
   }
 
   const deleteContext = (e) => {
-    console.log("ContextBox.js Delete: ", id, " Context: ", currContext);
+    /**  READ: ********************
+    *
+    How it works: When user deletes context, it does not actually remove the 
+    context from the contextHistory list. Instead, it empties the string in both
+    front and backend. This context is then not rendered on the frontend. 
+
+    Reason: We do not want to readjust the indices and the context list 
+    for both front and backend every time the user makes an edit to the context 
+    history in one session. 
+    ******************************/
     e.preventDefault();
     axios({
       method: 'POST',
@@ -65,7 +72,7 @@ function ContextBox({ id, context }) {
     })
   }
 
-
+  // returns a contextbox only if currContext is not an empty string
   if (currContext) {
     return (
       <div className="contextBox" key={id}>

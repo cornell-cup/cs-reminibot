@@ -1,13 +1,20 @@
 import React, { useEffect } from 'react';
 
 
-/* This component has no UI.
+/**************************** READ: *******************************
+This component has no UI.
 
 setText is the function that changes the text in parent component.
 mic is the variable that toggles between true and false from parent component to
-trigger speech recognition. */
+trigger speech recognition. 
 
-//speech recognition
+**************************** WARNING: ****************************
+Since this component shares a single SpeechRecognition object, 
+there can only be one mic active at any time. If you want to 
+use <SpeechRecognitionComp> for your component, you might want
+to study the Mic Management code in <main.js>
+*/
+
 const SpeechRecognition = SpeechRecognition || webkitSpeechRecognition
 const recognition = new SpeechRecognition()
 
@@ -30,15 +37,10 @@ function SpeechRecognitionComp({ setText, mic }) {
     }
     let finalTranscript = ''
     recognition.onresult = event => {
-      // let interimTranscript = ''
-
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const transcript = event.results[i][0].transcript;
         if (event.results[i].isFinal) finalTranscript += transcript + ' ';
-        // else interimTranscript += transcript;
       }
-      // document.getElementById('interim').innerHTML = interimTranscript
-      // setText(interimTranscript);
       setText(finalTranscript);
     }
   }

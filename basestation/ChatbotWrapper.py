@@ -18,9 +18,6 @@ default_context = "The sky is blue."
 SUCCESS = 200
 FAILURE = 400
 
-# TODO:
-# 1. Replace context stack with new context stack
-
 
 class ChatbotWrapper:
 
@@ -28,9 +25,15 @@ class ChatbotWrapper:
         self.context_stack = [context]  # context
 
     def replace_context_stack(self, context_stack):
+        '''Replaces the self.context_stack with <context_stack>.
+        '''
         self.context_stack = context_stack
 
     def update_context(self, context):
+        '''Appends context to <self.context_stack>. If the context does not
+        end with a period, adds a period to the end of the context and appends
+        it to <self.context_stack>.
+        '''
         if context != "":
             if context[-1] == ".":
                 self.context_stack.append(context)
@@ -38,16 +41,23 @@ class ChatbotWrapper:
                 self.context_stack.append(context + ".")
 
     def get_latest_context(self):
+        '''Returns the last entry on the context_stack.
+        '''
         return self.context_stack[-1]
 
     def get_all_context(self):
-        '''Returns all local context as a list.'''
+        '''Returns all local context as a list.
+        '''
         return self.context_stack
 
     def reset_context(self):
+        '''Replaces self.context_stack with the default context.
+        '''
         self.context_stack = [default_context]
 
     def undo_context(self):
+        '''Removes the last item from self.context_stack.
+        '''
         if len(self.context_stack) > 1:
             self.context_stack.pop()
             return SUCCESS
@@ -55,6 +65,8 @@ class ChatbotWrapper:
             return FAILURE
 
     def delete_context_by_id(self, id):
+        '''Replaces self.context_stack[id] with an empty string.
+        '''
         if len(self.context_stack) > id:
             self.context_stack[id] = ""
             return SUCCESS
@@ -62,6 +74,8 @@ class ChatbotWrapper:
             return FAILURE
 
     def edit_context_by_id(self, id, context):
+        '''Replaces the <self.context_stack[<id>]> with <context>.
+        '''
         if len(self.context_stack) > id:
             if context[-1] == ".":
                 self.context_stack[id] = context
@@ -72,9 +86,11 @@ class ChatbotWrapper:
             return FAILURE
 
     def compute_answer(self, input_question):
-        # self.context_stack = ['. '.join(self.context_stack)]
+        """ Sends question with context to our QA-server.
+        Returns:
+        <answer> - str 
+        """
         url = "http://3.135.244.37:8000/qa"
-        # TODO set this using startup parameters
         if ' '.join(self.context_stack) == "":
             return "Tell me something first!"
         else:

@@ -4,7 +4,10 @@
   box-sizing: border-box;
 }
 
-
+/* chatbot window overall apperance 
+  .floating-chat.enter is when the chatbot window is still in icon mode
+  .floating-chat.expand is when the window is opened up fully
+*/
 .close_btn {
   background-image: url('../img/close_btn.png');
   width: 20px;
@@ -85,6 +88,8 @@ body {
   color: #2c3137;
 }
 
+
+/* .chat signifies that the chatbot window is open */
 .floating-chat .chat {
   display: flex;
   flex-direction: column;
@@ -135,8 +140,10 @@ body {
   background-color: #212529;
   border: #6c757d 2.5px solid;
   font: 10px/14px "Noto Sans", sans-serif;
-  text-align: center;
-  width: 25%;
+
+
+  /* chatbot messages */
+  /* chatbot messages */
 }
 
 .floating-chat .chat .messages {
@@ -262,8 +269,10 @@ body {
   display: flex;
   justify-content: center;
   color: #6c757d;
-  padding-bottom: 2px;
-  margin-bottom: 0px;
+
+
+  /* chatbot window footer */
+  /* chatbot window footer */
 }
 
 .floating-chat .chat .footer {
@@ -409,7 +418,10 @@ body {
 .popup .show {
   visibility: visible;
   -webkit-animation: fadeIn 1s;
+
+  /* timestamp label at the top, displayed on first render */
   animation: fadeIn 1s;
+
 }
 
 .timeBreak {

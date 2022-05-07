@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { commands } from '../../utils/Constants.js';
 import {
   MIC_BTN, MIC_BTNON,
-  ACT_MIC_CHATBOT, ACT_MIC_COMMAND
+  ACT_MIC_COMMAND
 } from "../../utils/Constants.js";
 
 import SpeechRecognitionComp from "../../utils/SpeechRecognitionComp.js";
@@ -19,39 +19,26 @@ const micStyle = {
 
 function BotVoiceControl({
   selectedBotName,
-  startLabel, stopLabel,
   activeMicComponent,
   setActiveMicComponent,
   botVoiceControlMic, setBotVoiceControlMic }) {
-  // const [on, setOn] = useState(false);
   const [text, setText] = useState("");
   const [inputText, setInputText] = useState("");
-  // const [prevLast, setPrevLast] = useState("");
 
   const toggle = (e) => {
     e.preventDefault();
-    // if (selectedBotName) {
-    if (activeMicComponent == ACT_MIC_COMMAND) {
-      setBotVoiceControlMic(!botVoiceControlMic);
-      lastLen = 0; // correctly reset queue length if the button is toggled
-      console.log("Turn on bot voice control mic")
-      setInputText("Speak to send a command")
-      // console.log("mic on " + on);
+    if (selectedBotName) {
+      if (activeMicComponent == ACT_MIC_COMMAND) {
+        setBotVoiceControlMic(!botVoiceControlMic);
+        lastLen = 0; // correctly reset queue length if the button is toggled
+        setInputText("Speak to send a command")
+      } else {
+        setActiveMicComponent(ACT_MIC_COMMAND)
+      }
+    } else {
+      setInputText("Please connect to a Minibot!")
     }
-    else {
-      setActiveMicComponent(ACT_MIC_COMMAND)
-    }
-    // } else {
-    // setInputText("Please connect to a Minibot!")
-    // }
   }
-  // }
-  // TODO useEffect to turn off the mic if activeMicComponent changes
-  // useEffect(() => {
-  //   if (activeMicComponent != ACT_MIC_COMMAND){
-  //     setOn(false)
-  //   }
-  // }, [activeMicComponent])
 
   useEffect(() => {
     console.log(lastLen);
@@ -93,7 +80,7 @@ function BotVoiceControl({
     <React.Fragment>
       <div id="speech-button" className="row">
         <input class="text-box" id="textbox" onChange={setInputText}
-          value={selectedBotName != "" ? inputText : "Please conntect to a Minibot!"}>
+          value={selectedBotName != "" ? inputText : "Please connect to a Minibot!"}>
 
         </input>
         <button className="btn btn-danger element-wrapper btn-speech"
@@ -109,7 +96,6 @@ function BotVoiceControl({
                   }} />
               </div>
             </span>
-            {/* <span className="col-md align-self-center">{on ? startLabel : stopLabel}</span> */}
           </div>
         </button>
         <SpeechRecognitionComp setText={setText} mic={botVoiceControlMic} />
