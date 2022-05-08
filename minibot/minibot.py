@@ -138,7 +138,7 @@ class Minibot:
         """
         print("Broadcasting message to basestation.", flush=True)
         # try connecting to the basestation every 2 sec until connection is made
-        self.broadcast_sock.settimeout(2.0)
+        self.broadcast_sock.settimeout(0.2)
         data = ""
         # broadcast message to basestation
         msg_byte_str = f"{Minibot.MINIBOT_MESSAGE} {self.port_number}".encode()

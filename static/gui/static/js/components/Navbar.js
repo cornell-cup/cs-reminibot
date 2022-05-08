@@ -8,8 +8,12 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Link
+  Link,
+  useLocation
 } from "react-router-dom";
+
+const allRoutes = ['/start','/coding','/user-analytics','/history']
+const authorizationRestrictedRoutes = ['/user-analytics','/history'];
 
 /**
  * New component for the Navbar on top
@@ -29,15 +33,15 @@ const Navbar = (props) => {
 
   }, [document.cookie]);
 
+  useEffect(() => {
+    setActiveIndex(allRoutes.indexOf(location.pathname))
+
+  }, []);
+
 
   function handleLogout(e) {
     console.log("logout")
-    if (activeIndex === 2) {
-      document.querySelector("#analytics-link").classList.remove("active");
-      document.querySelector("#setup-control-link").classList.add("active");
-      setActiveIndex(0);
-    }
-    const current_user_email = props.cookies.remove('current_user_email');
+    props.cookies.remove('current_user_email');
     setIsLoggedIn(false);
     setLoginEmail("");
   }
@@ -61,6 +65,10 @@ const Navbar = (props) => {
       openNav();
     }
   }
+
+  const location = useLocation();
+  const pathname = location.pathname;
+
   return (
     <div>
       <div id="mySidenav" class="sidenav">
@@ -69,12 +77,12 @@ const Navbar = (props) => {
         <Link id="setup-control-link" to="/start" className={`nav-link ${activeIndex === 0 ? "active" : ""}`} onClick={(e) => { setActiveIndex(0) }}><FontAwesomeIcon icon="cogs" /> Setup/Movement</Link>
         <Link id="coding-link" to="/coding" className={`nav-link ${activeIndex === 1 ? "active" : ""}`} onClick={(e) => { setActiveIndex(1) }}><FontAwesomeIcon icon="code" /> Coding</Link>
         {isLoggedIn &&
-          <Link id="analytics-link" to="/analytics" className={`nav-link ${activeIndex === 2 ? "active" : ""}`} onClick={(e) => { setActiveIndex(2) }}><FontAwesomeIcon icon={Icons.faChartBar} /> Analytics</Link>
+          <Link id="analytics-link" to="/user-analytics" className={`nav-link ${activeIndex === 2 ? "active" : ""}`} onClick={(e) => { setActiveIndex(2) }}><FontAwesomeIcon icon={Icons.faChartBar} /> Analytics</Link>
         }
         {isLoggedIn &&
           <Link id="history-link" to="/history" className={`nav-link ${activeIndex === 3 ? "active" : ""}`} onClick={(e) => { setActiveIndex(3) }}><FontAwesomeIcon icon={Icons.faChartBar} /> History</Link>
         }
-        {isLoggedIn ? <a className="nav-link" onClick={handleLogout}><FontAwesomeIcon icon={Icons.faSignOutAlt} /> Logout</a> : <a className="nav-link" data-toggle="modal" data-target="#loginModal"><FontAwesomeIcon icon={Icons.faSignInAlt} /> Login</a>}
+        {isLoggedIn ? ( authorizationRestrictedRoutes.includes(pathname) ? <Link className="nav-link" to="/start" onClick={() => {handleLogout(); setActiveIndex(0)}}><FontAwesomeIcon icon={Icons.faSignOutAlt} /> Logout</Link> : <a className="nav-link" onClick={handleLogout}><FontAwesomeIcon icon={Icons.faSignOutAlt} /> Logout</a> ): <a className="nav-link" data-toggle="modal" data-target="#loginModal"><FontAwesomeIcon icon={Icons.faSignInAlt} /> Login</a>}
         {!isLoggedIn && <a className="nav-link" data-toggle="modal" data-target="#registerModal"><FontAwesomeIcon icon={Icons.faUserPlus} /> Signup</a>}
       </div>
 
