@@ -55,7 +55,7 @@ export default class PhysicalBlockly extends React.Component {
 	}
 
 	endProcess() {
-		this.setState({ stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [] });
+		// this.setState({ stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [] });
 		const _this = this;
 		//post request to basestation to stop the process
 		axios.get('/end_physical_blockly')
