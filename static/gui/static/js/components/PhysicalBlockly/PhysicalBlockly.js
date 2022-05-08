@@ -33,8 +33,9 @@ export default class PhysicalBlockly extends React.Component {
 		// setInterval(tempClick, 1000);
 		const _this = this;
 		_this.codeRef["current"].getCodeMirror().setValue("");
-		_this.setState({ stage: 1, tabs: 0, loopvar: 0 }); //text: "", tabs: 0, loopvar: 0
+		_this.setState({ stage: 1, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [] }); //text: "", tabs: 0, loopvar: 0
 		_this.props.setPb("");
+		_this.bWorkspace.clear();
 		axios({
 			method: 'POST',
 			url: '/mode', //url to backend endpoint
@@ -54,7 +55,7 @@ export default class PhysicalBlockly extends React.Component {
 	}
 
 	endProcess() {
-		this.setState({ stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [] });
+		this.setState({ stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [] });
 		const _this = this;
 		//post request to basestation to stop the process
 		axios.get('/end_physical_blockly')
