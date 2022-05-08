@@ -135,13 +135,13 @@ export default class PhysicalBlockly extends React.Component {
 					block.setAttribute("type", "turn_power")
 					let dir_field = document.createElement("field");
 					dir_field.setAttribute("name", "direction");
-					dir_field.innerHTML = "left"
+					dir_field.innerHTML = "right"
 					block.appendChild(dir_field);
 				} else if (response.data.substring(3) == "bot.turn_counter_clockwise(100)") {
 					block.setAttribute("type", "turn_power")
 					let dir_field = document.createElement("field");
 					dir_field.setAttribute("name", "direction");
-					dir_field.innerHTML = "right"
+					dir_field.innerHTML = "left"
 					block.appendChild(dir_field);
 				}
 				if (block.getAttribute("type") != null) {
@@ -175,9 +175,10 @@ export default class PhysicalBlockly extends React.Component {
 	}
 
 	export() {
-		this.endProcess();
-		this.props.setPythonCode(this.props.pb);
-		this.props.setBlocklyXml(Blockly.Xml.workspaceToDom(Blockly.getMainWorkspace()))
+		this.props.setPythonCodeState(1); 
+		this.props.setPythonCode(this.props.pb, 1); 
+		this.props.setBlocklyXml(Blockly.Xml.workspaceToDom(Blockly.getMainWorkspace())); 
+		this.endProcess(); 
 	}
 
 	render() {
@@ -222,7 +223,7 @@ export default class PhysicalBlockly extends React.Component {
 					</div>
 				</div>
 
-				<Link style={linkStyle} to={{ pathname: "/coding", state: { python: this.props.pb }, }}>
+				<Link style={linkStyle} to={{ pathname: "/coding" }}>
 					<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.export()}>
 						Export to Coding
 					</button>

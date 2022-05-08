@@ -123,6 +123,7 @@ const Platform = withCookies((props) => {
               setPb={setPb}
               setPythonCode={setPythonCode}
               setBlocklyXml={setBlocklyXml}
+              setPythonCodeState = {setPythonCodeState}
             />
           </Route>
           <Route path="/vision-page">
