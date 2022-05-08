@@ -75,7 +75,9 @@ export default class PhysicalBlockly extends React.Component {
 					_this.state.loopList[x].getChildren(false)[0].setFieldValue(resp, "NUM");
 					x++;
 				}
+				_this.setState({ stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [] });
 			})
+		// this.setState({ stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [] });
 	}
 
 	pollForUpdates() {
