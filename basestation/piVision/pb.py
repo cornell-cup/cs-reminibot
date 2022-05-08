@@ -46,7 +46,7 @@ def classify(command, commands):
     elif command in commands["commands"]["turn right"]:
         return ["fake_bot", "right"]
     elif command in commands["commands"]["go forwards"]:
-        return ["fake_bot", "forwards"]
+        return ["fake_bot", "forward"]
     elif command in commands["commands"]["stop"]:
         return ["fake_bot", "stop"]
     elif command in commands["commands"]["repeat"]:
@@ -69,7 +69,7 @@ q2 = queue.Queue()
 
 seen = {}
 pythonCode = {
-    "forwards" : "bot.move_forward(100)",
+    "forward" : "bot.move_forward(100)",
     "stop" : "bot.stop()",
     "right" : "bot.turn_clockwise(100)",
     "left" : "bot.turn_counter_clockwise(100)", 
