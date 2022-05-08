@@ -315,7 +315,7 @@ class Minibot:
             script_exec_result = self.blockly_python_proc.get_exec_result()
             self.sendKV(sock, key, script_exec_result)
         elif key == "MODE":
-            if value == "object_detection":
+            if value == "object_detection" or value == "color_detection":
                 # Thread(target=ece.object_detection).start()
                 server_ip = self.base_station_addr[0]
                 print("On bot vision w/ server ip: " + server_ip)
