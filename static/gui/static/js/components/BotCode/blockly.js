@@ -485,8 +485,10 @@ export default class MinibotBlockly extends React.Component {
         });
 
         /* Loads blockly state from parent component */
+        /* this.props.blocklyXml is poorly named. It's text not Xml*/
         if (this.props.blocklyXml) {
-            Blockly.Xml.domToWorkspace(this.props.blocklyXml, _this.workspace);
+            let xml = Blockly.Xml.textToDom(this.props.blocklyXml);
+            Blockly.Xml.domToWorkspace(xml, _this.workspace);
         }
 
         /* Realtime code generation

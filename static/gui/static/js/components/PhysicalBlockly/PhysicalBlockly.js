@@ -185,7 +185,7 @@ export default class PhysicalBlockly extends React.Component {
 		this.props.setPythonCodeState(1);
 		// this.props.setPythonCode(this.props.pb, 1); 
 		this.props.setPythonCode(this.state.code, 1);
-		this.props.setBlocklyXml(Blockly.Xml.workspaceToDom(Blockly.getMainWorkspace()));
+		this.props.setBlocklyXml(Blockly.Xml.domToText(Blockly.Xml.workspaceToDom(Blockly.getMainWorkspace())));
 		this.endProcess();
 	}
 
