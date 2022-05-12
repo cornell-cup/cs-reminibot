@@ -141,7 +141,8 @@ class Minibot:
         self.broadcast_sock.settimeout(0.2)
         data = ""
         # broadcast message to basestation
-        msg_byte_str = f"{Minibot.MINIBOT_MESSAGE} {self.port_number}".encode()
+        msg_byte_str = "{} {}".format(
+            Minibot.MINIBOT_MESSAGE, self.port_number).encode()
         try:
             # use sendto() instead of send() for UDP
             self.broadcast_sock.sendto(msg_byte_str, Minibot.BROADCAST_ADDRESS)
@@ -179,7 +180,8 @@ class Minibot:
             if sock is self.listener_sock:
                 connection, base_station_addr = sock.accept()
                 print(
-                    f"Connected to base station with address {base_station_addr}",
+                    "Connected to base station with address {}".format(
+                        base_station_addr),
                     flush=True
                 )
                 # set to non-blocking reads (when we call connection.recv,
@@ -234,7 +236,7 @@ class Minibot:
             errored_out_socks: All sockets that have errored out
         """
         for sock in errored_out_socks:
-            print(f"Socket errored out!!!! {sock}", flush=True)
+            print("Socket errored out!!!! {}".format(sock), flush=True)
             # TODO handle more conditions instead of just
             # closing the socket
             self.close_sock(sock)
@@ -369,7 +371,7 @@ class Minibot:
         # we want to write to the socket we received data on, so add
         # it to the writable socks
         self.writable_socks.add(sock)
-        message = f"<<<<{key},{value}>>>>"
+        message = "<<<<{},{}>>>>".format(key, value)
         if sock in self.writable_sock_message_queue_map:
             self.writable_sock_message_queue_map[sock].append(message)
         else:
