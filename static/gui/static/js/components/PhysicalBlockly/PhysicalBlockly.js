@@ -20,7 +20,7 @@ export default class PhysicalBlockly extends React.Component {
 	componentDidMount() {
 		setInterval(this.pollForUpdates, 1000);
 		this.bWorkspace = Blockly.inject('pbBlocklyDiv');
-		this.setState({code: ""}); 
+		this.setState({ code: "" });
 	}
 
 	componentWillUnmount() {
@@ -69,7 +69,7 @@ export default class PhysicalBlockly extends React.Component {
 						resp = 5;
 					}
 					//Replacing loop value in python
-					_this.setState({code: _this.state.code.replace("n" + x, resp)}); 
+					_this.setState({ code: _this.state.code.replace("n" + x, resp) });
 					// _this.props.setPb(_this.props.pb.replace("n" + x, resp));
 					// _this.codeRef["current"].getCodeMirror().setValue(_this.props.pb);
 					_this.codeRef["current"].getCodeMirror().setValue(_this.state.code);
@@ -78,7 +78,7 @@ export default class PhysicalBlockly extends React.Component {
 					_this.state.loopList[x].getChildren(false)[0].setFieldValue(resp, "NUM");
 					x++;
 				}
-				_this.setState({ stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: []});
+				_this.setState({ stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [] });
 			})
 		// this.setState({ stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [] });
 	}
@@ -112,7 +112,7 @@ export default class PhysicalBlockly extends React.Component {
 						_this.setState({ loopvar: _this.state.loopvar + 1 });
 					}
 				}
-				_this.setState({code: _this.state.code + n}); 
+				_this.setState({ code: _this.state.code + n });
 				// _this.props.setPb(_this.props.pb + n);
 				// _this.codeRef["current"].getCodeMirror().setValue(_this.props.pb);
 				_this.codeRef["current"].getCodeMirror().setValue(_this.state.code);
@@ -182,11 +182,11 @@ export default class PhysicalBlockly extends React.Component {
 	}
 
 	export() {
-		this.props.setPythonCodeState(1); 
+		this.props.setPythonCodeState(1);
 		// this.props.setPythonCode(this.props.pb, 1); 
-		this.props.setPythonCode(this.state.code, 1); 
-		this.props.setBlocklyXml(Blockly.Xml.workspaceToDom(Blockly.getMainWorkspace())); 
-		this.endProcess(); 
+		this.props.setPythonCode(this.state.code, 1);
+		this.props.setBlocklyXml(Blockly.Xml.workspaceToDom(Blockly.getMainWorkspace()));
+		this.endProcess();
 	}
 
 	render() {
