@@ -11,7 +11,7 @@ require('codemirror/mode/python/python');
 export default class PhysicalBlockly extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = { stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [] };
+		this.state = { stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "" };
 		this.codeRef = React.createRef();
 		this.pollForUpdates = this.pollForUpdates.bind(this);
 		this.bWorkspace = null;
@@ -20,6 +20,7 @@ export default class PhysicalBlockly extends React.Component {
 	componentDidMount() {
 		setInterval(this.pollForUpdates, 1000);
 		this.bWorkspace = Blockly.inject('pbBlocklyDiv');
+		this.setState({code: ""}); 
 	}
 
 	componentWillUnmount() {
@@ -33,8 +34,8 @@ export default class PhysicalBlockly extends React.Component {
 		// setInterval(tempClick, 1000);
 		const _this = this;
 		_this.codeRef["current"].getCodeMirror().setValue("");
-		_this.setState({ stage: 1, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [] }); //text: "", tabs: 0, loopvar: 0
-		_this.props.setPb("");
+		_this.setState({ stage: 1, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "" }); //text: "", tabs: 0, loopvar: 0
+		// _this.props.setPb("");
 		_this.bWorkspace.clear();
 		axios({
 			method: 'POST',
@@ -68,14 +69,16 @@ export default class PhysicalBlockly extends React.Component {
 						resp = 5;
 					}
 					//Replacing loop value in python
-					_this.props.setPb(_this.props.pb.replace("n" + x, resp));
-					_this.codeRef["current"].getCodeMirror().setValue(_this.props.pb);
+					_this.setState({code: _this.state.code.replace("n" + x, resp)}); 
+					// _this.props.setPb(_this.props.pb.replace("n" + x, resp));
+					// _this.codeRef["current"].getCodeMirror().setValue(_this.props.pb);
+					_this.codeRef["current"].getCodeMirror().setValue(_this.state.code);
 
 					//Replacing in blockly
 					_this.state.loopList[x].getChildren(false)[0].setFieldValue(resp, "NUM");
 					x++;
 				}
-				_this.setState({ stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [] });
+				_this.setState({ stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: []});
 			})
 		// this.setState({ stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [] });
 	}
@@ -109,8 +112,10 @@ export default class PhysicalBlockly extends React.Component {
 						_this.setState({ loopvar: _this.state.loopvar + 1 });
 					}
 				}
-				_this.props.setPb(_this.props.pb + n);
-				_this.codeRef["current"].getCodeMirror().setValue(_this.props.pb);
+				_this.setState({code: _this.state.code + n}); 
+				// _this.props.setPb(_this.props.pb + n);
+				// _this.codeRef["current"].getCodeMirror().setValue(_this.props.pb);
+				_this.codeRef["current"].getCodeMirror().setValue(_this.state.code);
 
 				let block = document.createElement("block");
 				if (response.data.substring(3) == "for i in range(n):") {
@@ -178,7 +183,8 @@ export default class PhysicalBlockly extends React.Component {
 
 	export() {
 		this.props.setPythonCodeState(1); 
-		this.props.setPythonCode(this.props.pb, 1); 
+		// this.props.setPythonCode(this.props.pb, 1); 
+		this.props.setPythonCode(this.state.code, 1); 
 		this.props.setBlocklyXml(Blockly.Xml.workspaceToDom(Blockly.getMainWorkspace())); 
 		this.endProcess(); 
 	}
