@@ -17,7 +17,7 @@ from flask import current_app
 # base_station = BaseStation(False)
 
 # Error messages
-NO_BOT_ERROR_MSG = "Please connect to a Minibot!"
+NO_BOT_ERROR_MSG = "Please connect to a bot!"
 
 index_bp = Blueprint('index',
                      __name__,

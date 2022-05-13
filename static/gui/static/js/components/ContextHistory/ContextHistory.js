@@ -1,7 +1,7 @@
 /*
 A tab that displays all previously entered contexts to chatbot
 when user logs in. User can edit and delete context from this page. */
-
+import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { withCookies } from 'react-cookie';
 import ContextBox from './ContextBox.js';
