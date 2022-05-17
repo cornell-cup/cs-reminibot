@@ -1,4 +1,4 @@
-from statistics import mode
+from statistics import multimode
 from cv2 import *
 import cv2
 import numpy as np
@@ -485,4 +485,4 @@ def mode_value_for_key(list_of_dicts, key):
     rounded_values = [round(d[key]) for d in list_of_dicts]
     rounded_values_without_outliers = reject_outliers(rounded_values)
     rounded_values = rounded_values if len(rounded_values_without_outliers) == 0 else rounded_values_without_outliers
-    return float(mode(rounded_values))
+    return float(multimode(rounded_values)[0])
