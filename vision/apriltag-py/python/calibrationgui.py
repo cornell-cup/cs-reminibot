@@ -38,12 +38,21 @@ class InputWindow(Screen):
 					calibFile = calibFile[0] if len(calibFile) != 0 else "calibration.json"
 					posFile = posFile[0] if len(posFile) != 0 else "calibration_board_positions.json"
 					part1 = ["python3", "part1_checkerboard.py", "-r", str(row),"-c", str(col),"-o",calibFile]
-					part2 = ["python3", "part2_tag_calib.py", "-cf", calibFile, "-pf", posFile, "-b", "3.93701"]
-					part3 = ["python3", "part3_tag_locate.py", "-f", calibFile, "-s", "3.93701", "-u", "http://localhost:8080/vision"]
+					part1_win = ["python", "part1_checkerboard.py", "-r", str(row),"-c", str(col),"-o",calibFile]
+					part2 = ["python3", "part2_tag_calib.py", "-cf", calibFile, "-pf", posFile, "-b", "4"]
+					part2_win = ["python", "part2_tag_calib.py", "-cf", calibFile, "-pf", posFile, "-b", "4"]
+					part3 = ["python3", "part3_tag_locate.py", "-f", calibFile, "-s", "4", "-u", "http://localhost:8080/vision"]
+					part3_win = ["python", "part3_tag_locate.py", "-f", calibFile, "-s", "4", "-u", "http://localhost:8080/vision"]
 
-					call(part1)
-					call(part2)
-					call(part3)
+					try:
+						call(part1_win)
+						call(part2_win)
+						call(part3_win)
+					except:
+						call(part1)
+						call(part2)
+						call(part3)
+						
 
 		else:
 			# display error message

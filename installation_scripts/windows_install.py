@@ -119,6 +119,8 @@ def select_folder():
             pip install SpeechRecognition==3.8.1
             pip install pint
             pip install control
+            pip install pathfinding
+            pip install collision
 
             #Attempting manual basestation dependencies installation with any versions.
             Write-Output "Attempting manual basestation dependencies installation with any versions."
@@ -141,6 +143,8 @@ def select_folder():
             pip install SpeechRecognition
             pip install pint
             pip install control
+            pip install pathfinding
+            pip install collision
 
             #Attempting to install pyaudio with pipwin
             pip install pipwin

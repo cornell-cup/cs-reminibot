@@ -11,6 +11,8 @@ echo "Attempting to install Vision dependencies."
 pip install -r requirements.txt
 echo "Attempting to install Vision dependencies individually."
 pip install numpy
+pip install opencv-contrib-python
+pip install opencv-python
 pip install scikit-learn
 pip install requests
 pip install kivy

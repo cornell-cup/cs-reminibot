@@ -20,7 +20,7 @@ FRAME_HEIGHT = 720
 # These are effectively constant after the argument parser has ran.
 TAG_SIZE = 6.5 # The length of one side of an apriltag, in inches
 SEND_DATA = True  # Sends data to URL if True. Set to False for debug
-MAX_LOCATION_HISTORY_LENGTH = 7
+MAX_LOCATION_HISTORY_LENGTH = 20
 MODE_THRESHOLD = 1
 
 
@@ -87,7 +87,6 @@ def main():
     obj_points = np.ndarray((4, 3))  # 4 3D points
     detections = []
     past_time = time.time()
-    iteration_count = 0
     location_history = []
     discovered_ids = set()
     while True:
@@ -111,6 +110,7 @@ def main():
 
         
         data_for_BS = {"DEVICE_ID": str(BASE_STATION_DEVICE_ID), "TIMESTAMP": time.time(), "DEVICE_CENTER_X": FRAME_WIDTH/2, "DEVICE_CENTER_Y": FRAME_HEIGHT/2, "position_data" : []}
+        snapshot_locations = []
         for i, d in enumerate(detections):
             # TODO draw tag - might be better to generalize, because
             # locate_cameras does this too.
@@ -123,11 +123,14 @@ def main():
             # prints Device ID :: tag id :: x y z angle
             # TODO debug offset method - is better, but not perfect.
             #center_cell_offset = get_closest_reference_point_offset(detected_x,detected_y,center_cell_offsets)
-            x_offset, y_offset, angle_offset = get_x_y_angle_offsets(detected_x, detected_y, center_cell_offsets)
+            x_offset, y_offset, _ = get_x_y_angle_offsets(detected_x, detected_y, center_cell_offsets)
             x = x_scale_factor * (detected_x + overall_center_x_offset) + x_offset
             y = y_scale_factor * (detected_y + overall_center_y_offset) + y_offset
             z = detected_z
-            angle = ((detected_angle + overall_angle_offset)%360 + angle_offset)%360
+            # angle fudge factor interpolation still needs work,
+            # it may be possible but angle errors are not as predictable
+            # as distance errors
+            angle = ((detected_angle + overall_angle_offset)%360)%360
             (ctr_x, ctr_y) = d.center
             
             # displaying tag id
@@ -136,33 +139,38 @@ def main():
             if detector.detector != None:
                 # displaying tag id
                 cv2.putText(undst, str(d.tag_id),(int(ctr_x), int(ctr_y)), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 0, 255),2)
-                cv2.putText(undst, str((round(x),round(y))),(int(ctr_x), int(ctr_y)+15), cv2.FONT_HERSHEY_SIMPLEX, .5,  (255, 0, 255),1)
-                cv2.putText(undst, str(round(angle)),(int(ctr_x), int(ctr_y)+30), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 255, 255),1)
+                cv2.putText(undst, str((round(x),round(y))),(int(ctr_x), int(ctr_y)+15), cv2.FONT_HERSHEY_SIMPLEX, .5,  (255, 0, 255),2)
+                cv2.putText(undst, str(round(angle)),(int(ctr_x), int(ctr_y)+30), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 255, 255),2)
            
 
             # # prints DEVICE_ID tag id x y z angle
             # print("{}, {},{},{},{},{}".format(BASE_STATION_DEVICE_ID, d.tag_id, x, y, z, angle))
-            location_history.append({"id": str(d.tag_id), "image_x": ctr_x, "image_y": ctr_y,"x": x, "y": y, "orientation": angle})
+            snapshot_locations.append({"id": str(d.tag_id), "image_x": ctr_x, "image_y": ctr_y,"x": x, "y": y, "orientation": angle})
             discovered_ids.add(str(d.tag_id))
+        location_history.append(snapshot_locations)
 
-        if iteration_count % MAX_LOCATION_HISTORY_LENGTH == 0 and iteration_count != 0:
+        if len(location_history) >= MAX_LOCATION_HISTORY_LENGTH:
             average_locations = []
-            for id in discovered_ids:
-                locations_with_id = [location for location in location_history if location["id"] == id]
-                average_locations.append({
-                    "id": id, 
-                    "image_x": util.average_value_for_key(locations_with_id, "image_x",True,1), 
-                    "image_y": util.average_value_for_key(locations_with_id, "image_y",True,1),
-                    "x": util.average_value_for_key(locations_with_id, "x",True,1),
-                    "y": util.average_value_for_key(locations_with_id, "y",True,1), 
-                    "orientation": util.average_value_for_key(locations_with_id, "orientation",True,1)%360
-                })
+            for id in list(discovered_ids):
+                locations_with_id = [location for snapshot_locations in location_history for location in snapshot_locations if location["id"] == id]
+                if len(locations_with_id) > 0:
+                    average_locations.append({
+                        "id": id, 
+                        "image_x": util.average_value_for_key(locations_with_id, "image_x",True,1), 
+                        "image_y": util.average_value_for_key(locations_with_id, "image_y",True,1),
+                        "x": util.average_value_for_key(locations_with_id, "x",True,1),
+                        "y": util.average_value_for_key(locations_with_id, "y",True,1), 
+                        "orientation": util.average_value_for_key(locations_with_id, "orientation",True,1)%360
+                    })
+                else:
+                    discovered_ids.remove(id)
+            
             # prints DEVICE_ID tag id x y z angle
             print("id,actual_x,actual_y,actual_angle")
             average_locations.sort(key=lambda entry : int(entry["id"]))     
             [print("{},{},{},{}".format(location["id"], location["x"], location["y"], location["orientation"])) for location in average_locations]
-            location_history = [] 
-            discovered_ids = set() 
+            while len(location_history) >= MAX_LOCATION_HISTORY_LENGTH:
+                location_history.pop(0)
 
             data_for_BS["position_data"] = average_locations
             data_for_BS["TIMESTAMP"] = time.time()
@@ -189,7 +197,6 @@ def main():
                         )
                     )
         cv2.imshow("Tag Locations", undst)
-        iteration_count+=1
         if cv2.waitKey(1) & 0xFF == ord(" "):
             break
         else:
