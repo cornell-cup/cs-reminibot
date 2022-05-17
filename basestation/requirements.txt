@@ -19,3 +19,6 @@ pint
 control
 pathfinding
 collision
+imutils==0.5.4
+opencv-python==4.5.5.62
+imagezmq==1.1.1
