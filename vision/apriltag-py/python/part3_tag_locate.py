@@ -136,11 +136,11 @@ def main():
             # displaying tag id
             # cv2.putText(undst, str(round(angle,2)),(int(ctr_x), int(ctr_y)), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 0, 255),2)
 
-            if detector.detector != None:
-                # displaying tag id
-                cv2.putText(undst, str(d.tag_id),(int(ctr_x), int(ctr_y)), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 0, 255),2)
-                cv2.putText(undst, str((round(x),round(y))),(int(ctr_x), int(ctr_y)+15), cv2.FONT_HERSHEY_SIMPLEX, .5,  (255, 0, 255),2)
-                cv2.putText(undst, str(round(angle)),(int(ctr_x), int(ctr_y)+30), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 255, 255),2)
+
+            # displaying tag id
+            cv2.putText(undst, str(d.tag_id),(int(ctr_x), int(ctr_y)), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 0, 255),2)
+            cv2.putText(undst, str((round(x),round(y))),(int(ctr_x), int(ctr_y)+15), cv2.FONT_HERSHEY_SIMPLEX, .5,  (255, 0, 255),2)
+            cv2.putText(undst, str(round(angle)),(int(ctr_x), int(ctr_y)+30), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 255, 255),2)
            
 
             # # prints DEVICE_ID tag id x y z angle
