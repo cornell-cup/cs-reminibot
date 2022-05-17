@@ -24,7 +24,7 @@ MAX_LOCATION_HISTORY_LENGTH = 20
 MODE_THRESHOLD = 1
 
 
-BASE_STATION_DEVICE_ID = hash(platform_node()+str(randint(0,1000000))+environ["USER"]+str(randint(0,1000000))+str(DEVICE_ID)+str(time.time()))
+BASE_STATION_DEVICE_ID = hash(platform_node()+str(randint(0,1000000))+str(randint(0,1000000))+str(DEVICE_ID)+str(time.time()))
 
 def main():
     # DEBUGGING AND TIMING VARIABLES
