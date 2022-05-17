@@ -1,4 +1,4 @@
-from statistics import multimode
+from collections import Counter
 from cv2 import *
 import cv2
 import numpy as np
@@ -481,8 +481,14 @@ def average_value_for_key(list_of_dicts, key, remove_outliers=False, threshold=N
         values = values if len(values_without_outliers) == 0 else values_without_outliers
     return float(sum(values)) / len(values)
 
+
+
+def mode(sample):
+    c = Counter(sample)
+    return [k for k, v in c.items() if v == c.most_common(1)[0][1]]
+
 def mode_value_for_key(list_of_dicts, key):
     rounded_values = [round(d[key]) for d in list_of_dicts]
     rounded_values_without_outliers = reject_outliers(rounded_values)
     rounded_values = rounded_values if len(rounded_values_without_outliers) == 0 else rounded_values_without_outliers
-    return float(multimode(rounded_values)[0])
+    return float(mode(rounded_values)[0])
