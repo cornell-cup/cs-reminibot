@@ -286,7 +286,7 @@ export default class AddBot extends React.Component {
         super(props);
         this.state = {
             bot_name: "",
-            available_bots: [], // bots connected to Base Station but not GUI
+            availableBots: [], // bots connected to Base Station but not GUI
             // bot_list: [],
             botList: [],
             // selected_bot: "",
