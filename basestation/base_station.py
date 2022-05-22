@@ -17,6 +17,7 @@ import sys
 import time
 import threading
 from .ChatbotWrapper import ChatbotWrapper
+import subprocess
 
 MAX_VISION_LOG_LENGTH = 1000
 
@@ -24,11 +25,11 @@ MAX_VISION_LOG_LENGTH = 1000
 def make_thread_safe(func):
     """ Decorator which wraps the specified function with a lock.  This makes
     sure that there aren't concurrent calls to the basestation functions.  The
-    reason we need this is because both SpeechRecognition and the regular 
+    reason we need this is because both SpeechRecognition and the regular
     movement buttons call basestation functions to make the Minibot move.  The
-    SpeechRecognition function runs in its own background thread.  We 
+    SpeechRecognition function runs in its own background thread.  We
     do not want the SpeechRecognition function calling the basestation functions
-    while the movement button requests are calling them.  Hence we protect 
+    while the movement button requests are calling them.  Hence we protect
     the necessary basestation functions with a lock that is owned by the basestation
     Arguments:
          func: The function that will become thread safe
@@ -70,10 +71,10 @@ class BaseStation:
         # so that we can connect to the Minibot
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        # self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         # if the above line runs into a socket error then comment it out
         # and uncomment the one below.
-        # self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
 
         # an arbitrarily small time
         self.sock.settimeout(0.01)
@@ -87,11 +88,12 @@ class BaseStation:
         # only bind in debug mode if you are the debug server, if you are the
         # monitoring program which restarts the debug server, do not bind,
         # otherwise the debug server won't be able to bind
-
-        # if app_debug and os.environ["WERKZEUG_RUN_MAIN"] == "true":
-        #     self.sock.bind(server_address)
-        # else:
-        self.sock.bind(server_address)
+        #### READ: if sock.bind fails, read comment starting line 75#####
+        if app_debug and os.environ["WERKZEUG_RUN_MAIN"] == "true":
+             self.sock.bind(server_address)
+        else:
+            # since we are running in debug mode, always bind
+            self.sock.bind(server_address)
 
         self._login_email = None
         self.speech_recog_thread = None
@@ -104,6 +106,9 @@ class BaseStation:
             "right": "Minibot moves right",
             "stop": "Minibot stops",
         }
+
+        # Subprocess for object detection
+        self.bot_vision_server = None
 
     # ==================== VISION ====================
 
@@ -132,7 +137,7 @@ class BaseStation:
         return list(self.active_bots.keys())
 
     def listen_for_minibot_broadcast(self):
-        """ Listens for the Minibot to broadcast a message to figure out the 
+        """ Listens for the Minibot to broadcast a message to figure out the
         Minibot's ip address. Code taken from link below:
             https://github.com/jholtmann/ip_discovery
         """
@@ -177,7 +182,7 @@ class BaseStation:
         self.active_bots[bot_name] = Bot(bot_name, ip_address, port)
 
     def get_active_bots(self):
-        """ Get the names of all the Minibots that are currently connected to 
+        """ Get the names of all the Minibots that are currently connected to
         Basestation
         """
         for bot_name in self.get_bot_names():
@@ -188,7 +193,7 @@ class BaseStation:
         return self.get_bot_names()
 
     def get_bot_status(self, bot_name: str) -> str:
-        """ Gets whether the Minibot is currently connected or has been 
+        """ Gets whether the Minibot is currently connected or has been
         disconnected.
         1. Send Minibot BOTSTATUS
         2. read from Minibot whatever Minibot has sent us.
@@ -222,6 +227,19 @@ class BaseStation:
     def set_bot_mode(self, bot_name: str, mode: str):
         """ Set the bot to either line follow or object detection mode """
         bot = self.get_bot(bot_name)
+
+        if mode == "object_detection":
+            self.bot_vision_server = subprocess.Popen(
+                ['python', './basestation/piVision/server.py', '-p MobileNetSSD_deploy.prototxt', 
+                '-m', 'MobileNetSSD_deploy.caffemodel', '-mW', '2', '-mH', '2', '-v', '1'])
+        elif mode == "color_detection":
+            self.bot_vision_server = subprocess.Popen(
+                ['python', './basestation/piVision/server.py', '-p MobileNetSSD_deploy.prototxt', 
+                '-m', 'MobileNetSSD_deploy.caffemodel', '-mW', '2', '-mH', '2', '-v', '2'])
+        else:
+            if self.bot_vision_server:
+                self.bot_vision_server.kill()
+
         bot.sendKV("MODE", mode)
 
     def send_bot_script(self, bot_name: str, script: str):
@@ -299,7 +317,7 @@ class BaseStation:
         return 1, user.custom_function
 
     def register(self, email: str, password: str) -> int:
-        """Registers a new user if the email and password are not null and 
+        """Registers a new user if the email and password are not null and
         there is no account associated wth the email yet"""
         print("registering new account")
         if not email:
@@ -327,7 +345,7 @@ class BaseStation:
         return user.id
 
     def update_custom_function(self, custom_function: str) -> bool:
-        """Adds custom function(s) for the logged in user if there is a user 
+        """Adds custom function(s) for the logged in user if there is a user
         logged in
         """
         if not self.login_email:
