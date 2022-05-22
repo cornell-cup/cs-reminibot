@@ -16,3 +16,6 @@ Werkzeug==1.0.0
 pyaudio==0.2.11
 SpeechRecognition==3.8.1
 pint
+imutils==0.5.4
+opencv-python==4.5.5.62
+imagezmq==1.1.1

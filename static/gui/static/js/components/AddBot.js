@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+import { Button } from './Util.js'
 
 /*
  *  A RefreshingList is a list designed to refresh when its update()
@@ -9,40 +10,274 @@ class RefreshingList extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            available_bots: [],
-            current_bot: ""
+            availableBots: [],
+            currentBot: ""
         }
 
         this.update = this.update.bind(this);
         this.updateCurrentBot = this.updateCurrentBot.bind(this);
     }
 
+    /**
+     * This function is called when the user presses on the Available Bots List
+     * This function simply tells the backend to listen for incoming Minibot
+     * broadcasts and update its internal list of active Minibots.  This
+     * function doesn't update the WebGUI at all.  Instead, the refreshAvailableBots
+     * function, which runs continuously, fetches the updated active Minibots list
+     * from the backend.  refreshAvailableBots must run continuously to update the
+     * Available Bots List in case a previously active Minibot disconnects.
+     * The reason we have a separate discoverBots function and a separate
+     * refreshAvailableBots function is because fetching the active Minibots
+     * is inexpensive, so its okay if refreshAvailableBots runs continuously.
+     * However, making the Basestation listen for all active Minibots can be
+     * relatively expensive, so we want to make the Basestation perform this
+     * not too frequently.  Hence, with this implementation, the Basestation will
+     * only need to perform this operation when the Available Bots List is clicked.
+     */
+    discoverBots(event) {
+        console.log("Discovering new Minibot");
+        axios({
+            method: 'GET',
+            url: '/discover-bots',
+        });
+    }
+
     update(newbots) {
-        this.state.available_bots = newbots;
-        // console.log("Current bot: " + this.state.current_bot)
+        this.state.availableBots = newbots;
+        // current bot will automatically be updated when the component
+        // renders (see render function)
+        if (!newbots.includes(this.state.currentBot)) {
+            this.state.currentBot = "";
+        }
         this.setState({ state: this.state }) // forces re-render
     }
 
     updateCurrentBot(event) {
         const _this = this;
         let newBotName = event.target.value;
-        this.state.current_bot = newBotName;
+        this.state.currentBot = newBotName;
+
+        console.log("Refreshing list updated current bot ", newBotName);
+        this.setState({ state: this.state })
     }
 
     render() {
         const _this = this;
-        if (_this.state.available_bots.length === 0) {
-            _this.state.current_bot = "";
-            return <select><option>No bots available</option></select>
+        if (_this.state.availableBots.length === 0) {
+            _this.state.currentBot = "";
+            return <select className="available-bots" onClick={this.discoverBots}>
+                <option>Click to search for available bots</option>
+            </select>
         }
-        if (_this.state.current_bot === "") {
-            _this.state.current_bot = _this.state.available_bots[0]
+        if (_this.state.currentBot === "") {
+            _this.state.currentBot = _this.state.availableBots[0]
         }
 
-        return <select onChange={(e) => this.updateCurrentBot(e)}>
-            {_this.state.available_bots.map(
-                (name, idx) => <option key={idx}> {name} </option>)}
-        </select>
+        return (
+            <select
+                className="available-bots"
+                onChange={(e) => this.updateCurrentBot(e)}
+                onClick={this.discoverBots}
+            >
+                {_this.state.availableBots.map(
+                    (name, idx) => <option key={idx}> {name} </option>)}
+            </select>
+        );
+    }
+}
+
+function Ports(props) {
+    const ports = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"];
+    let buttonList = [];
+
+    for (let i = 0; i < ports.length; i++) {
+        buttonList.push(
+            <li key={i}>
+                <button
+                    className="btn_ports"
+                    onClick={() => props.motorPorts(props.portName, ports[i])}>
+                    {ports[i]}
+                </button>
+            </li>
+        );
+    }
+    return (<ul> {buttonList} </ul>);
+};
+
+function PortsList(props) {
+    const portNames = [
+        "LMOTOR", "RMOTOR", "MOTOR3", "LINE", "INFRARED", "RFID", "ULTRASONIC"
+    ]
+
+    const portLabels = [
+        "Left Motor", "Right Motor", "Motor 3", "Line Follower",
+        "Infrared", "RFID", "Ultrasonic"
+    ]
+
+    console.assert(portNames.length == portLabels.length);
+    let allListElements = [];
+
+    for (let i = 0; i < portNames.length; i++) {
+        let link = <a>{portLabels[i]} &#8250;</a>
+        let ports = <Ports portName={portNames[i]} motorPorts={props.motorPorts} />
+        let listElement = <li key={i}> {link} {ports} </li>
+        allListElements.push(listElement);
+    }
+
+    return (
+        <nav id="main_nav">
+            <ul>
+                <li>
+                    <a>Motor Ports &#187;</a>
+                    <ul> {allListElements} </ul>
+                </li>
+            </ul>
+        </nav>
+    );
+}
+
+class SpeechRecognition extends React.Component {
+    /** Implements the SpeechRecognition Toggle button */
+    constructor(props) {
+        super();
+        this.state = {
+            on: false // Indicates if button is on or off
+        }
+        this.getSpeechRecognitionData = this.getSpeechRecognitionData.bind(this);
+        this.toggle = this.toggle.bind(this);
+        // Number of messages to display in GUI
+        this.maxMessages = 4;
+        // Used to alternate the colors between odd and even messages.  This is
+        // so that when the messages are scrolling, the messages retain the
+        // same color.  For example, let's say we have the messages ["a", b",
+        // "c", "d"] and "a" and "c" are blue and "b" and "d" are black.  Hence,
+        // the odd-index messages are blue and the even-index are black. When we
+        // add "e" to the queue and pop "a", the queue will look like ["b", "c",
+        // "d", "e"].  We still want "b" and "d" to be black and "c" to be blue.
+        // Hence now we must make the even-index messages blue and the odd-index
+        // messages black.
+        this.queueColorIndex = 0;
+        this.queue = [""];
+        // Interval function to poll server backend
+        // TODO: Replace polling with WebSockets at some point
+        this.speechRecognitionInterval = null;
+
+        // colors for the messages in the feedback box
+        this.colors = ["#660000", "black"]
+    }
+
+    /** Turns the button on or off */
+    toggle() {
+        const _this = this;
+        // If button was previously off, turn_on should be True.
+        let turnOn = !this.state.on;
+
+        // If we are turning the speech recognition service on,
+        // start polling the backend server for status messages to be
+        // displayed on the GUI
+        if (turnOn) {
+            this.speechRecognitionInterval = setInterval(
+                this.getSpeechRecognitionData.bind(this), 500
+            );
+        }
+        // If we are turning the speech recognition service off, stop polling
+        // the backend
+        else {
+            clearInterval(this.speechRecognitionInterval);
+            let feedbackBox = document.getElementById(
+                'speech_recognition_feedback_box'
+            );
+            feedbackBox.innerHTML = "";
+            this.queue = [""];
+        }
+
+        // Tell the backend server to start / stop the speech recognition service
+        axios({
+            method: 'POST',
+            url: '/speech_recognition',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: JSON.stringify({
+                bot_name: _this.props.selectedBotName,
+                command: turnOn ? "START" : "STOP"
+            })
+        }).then(function (response) {
+            if (response.data) {
+                console.log("Speech Recognition", response.data);
+            }
+        }).catch(function (error) {
+            if (error.response.data.error_msg.length > 0)
+                window.alert(error.response.data.error_msg);
+            else
+                console.log("Speech Recognition", error);
+        })
+
+        this.setState({ on: turnOn });
+    }
+
+    /** Get the messages from the speech recognition service from the
+     * backend server.
+     */
+    getSpeechRecognitionData() {
+        const _this = this;
+        axios.get('/speech_recognition')
+            .then(function (response) {
+                // only add to the message queue if the message is a new message
+                // and is not an empty string
+                if (_this.queue[_this.queue.length - 1] !== response.data &&
+                    response.data !== "") {
+                    // keep the message a fixed length
+                    if (_this.queue.length == _this.maxMessages) {
+                        _this.queue.shift();
+                    }
+                    _this.queue.push(response.data);
+                    // flips the value of the index from 0 to 1 and vice-versa
+                    // to alternate the colors (see constructor for more
+                    // detailed documentation)
+                    _this.queueColorIndex = 1 - _this.queueColorIndex;
+                }
+                let feedbackBox = document.getElementById(
+                    'speech_recognition_feedback_box'
+                );
+                feedbackBox.innerHTML = "";
+
+                // Iterate through the queue, adding each message to the
+                // feedback box as a separate html paragraph (so that we can
+                // style each message differently).  Iterate through the queue
+                // backwards so that the most recent messages show up first
+                for (let i = _this.queue.length - 1; i >= 0; i--) {
+                    // make the first message bold
+                    let bold = "font-weight: bold;";
+                    // make new messages alternate colors
+                    let color = (i % 2 == _this.queueColorIndex) ?
+                        _this.colors[0] : _this.colors[1];
+
+                    // pargraph style
+                    let pFontWeight = (i == _this.queue.length - 1) ? bold : "";
+                    let pColor = "color: " + color + ";";
+                    let pMargin = "margin: 0;";
+                    let pStyle = pFontWeight + pMargin + pColor;
+                    let pStart = "<p style=\"" + pStyle + "\">";
+                    let pEnd = "</p>";
+                    let paragraph = pStart + _this.queue[i] + pEnd;
+                    feedbackBox.innerHTML += paragraph;
+                }
+            }).catch(function (error) {
+                console.log("Speech Recognition", error);
+            });
+    }
+
+    render() {
+        let x = (this.state.on) ?
+            "Stop Speech Recognition" : "Start Speech Recognition";
+        return (
+            <div>
+                <button className="btn btn-danger element-wrapper"
+                    onClick={this.toggle}>{x}</button>
+            </div>
+
+        );
     }
 }
 
@@ -53,7 +288,7 @@ export default class AddBot extends React.Component {
             bot_name: "",
             available_bots: [], // bots connected to Base Station but not GUI
             // bot_list: [],
-            available_bots: [],
+            botList: [],
             // selected_bot: "",
             power: 50,
             input_ip: "192.168.4.65"
@@ -62,17 +297,16 @@ export default class AddBot extends React.Component {
         // Needed to use a ref for react
         // see https://reactjs.org/docs/refs-and-the-dom.html
         this.refreshingBotListRef = React.createRef();
-
-        this.updateInputValue = this.updateInputValue.bind(this);
         this.addBotListener = this.addBotListener.bind(this);
-        this.selectBotListener = this.selectBotListener.bind(this);
         this.buttonMapListener = this.buttonMapListener.bind(this);
+        this.handleArrowKeyDown = this.handleArrowKeyDown.bind(this);
+        this.motorPorts = this.motorPorts.bind(this);
     }
 
     componentDidMount() {
-        setInterval(this.getBotStatus.bind(this), 500);
-        setInterval(this.refreshAvailableBots.bind(this), 2000);
-        setInterval(this.pulseHeartBeat.bind(this), 500);
+        setInterval(this.refreshAvailableBots.bind(this), 500);
+        document.getElementById("setup_control_tab").addEventListener(
+            "keydown", this.handleArrowKeyDown);
     }
 
     /*
@@ -83,47 +317,34 @@ export default class AddBot extends React.Component {
     refreshAvailableBots() {
         const _this = this;
         axios({
-            method: 'POST',
-            url: '/start',
-            data: JSON.stringify({
-                key: "DISCOVERBOTS"
-            })
-        })
-            .then(function (response) {
-                // console.log(response.data);
-                _this.state.available_bots = response.data
-                let refreshingBotList = _this.refreshingBotListRef.current
-                if (refreshingBotList !== null) {
-                    _this.refreshingBotListRef.current.update(response.data)
-                }
+            method: 'GET',
+            url: '/active-bots',
+        }).then(function (response) {
+            _this.state.availableBots = response.data;
+            // If the Selected Bot (the currently connected bot)
+            // is no longer active, remove it from the Selected Bot label (the
+            // currently connected bot label)
+            if (!(_this.props.selectedBotName === "") &&
+                !_this.state.availableBots.includes(_this.props.selectedBotName)
+            ) {
+                _this.props.setSelectedBotName("");
+                _this.props.setSelectedBotStyle("hidden");
+            }
 
-            })
-            .catch(function (error) {
-                console.log(error);
-            })
+            let refreshingBotList = _this.refreshingBotListRef.current;
+            if (refreshingBotList !== null) {
+                _this.refreshingBotListRef.current.update(response.data);
+            }
+        }).catch(function (error) {
+            console.log(error);
+        })
     }
 
-    /*print statement for when active bots are discovered*/
-    updateInputValue(event) {
-        this.props.setSelectedBot(event.target.value)
-        // this.state.selected_bot = event.target.value;
-        console.log("target")
-        console.log(event.target);
-        const _this = this;
-        axios({
-            method: 'POST',
-            url: '/start',
-            data: JSON.stringify({
-                key: "DISCOVERBOTS"
-            })
-        })
-            .then(function (response) {
-                console.log(response.data);
-            })
-            .catch(function (error) {
-                console.log(error);
-            })
-
+    getSelectedBotText() {
+        if (this.props.selectedBotName !== "") {
+            return this.props.selectedBotName;
+        }
+        return "";
     }
 
     /*update power value when bot moves*/
@@ -131,68 +352,22 @@ export default class AddBot extends React.Component {
         this.state.power = event.target.value;
     }
 
-    pulseHeartBeat() {
-        const _this = this;
-        axios.get('/heartbeat')
-            .then(function (response) {
-                // TODO uncomment heartbeat print
-                // console.log(response.data);
-                if (response.data["is_heartbeat"]) {
-                    document.getElementById('led-red').style.animation = "blinkRed 2s 1";
-                    var delayInMilliseconds = 2000; //1 second
-
-                    setTimeout(function () {
-                        document.getElementById('led-red').style.animation = "none";
-                    }, delayInMilliseconds);
-                }
-            })
-            .catch(function (error) {
-                // console.log(error);
-            });
-    }
-
     /*adds bot name to list*/
     addBotListener(event) {
-        // let li = this.state.bot_list;
-        let li = this.props.bot_list;
-        let bot_name = (this.refreshingBotListRef.current == null) ?
-            "" : this.refreshingBotListRef.current.state.current_bot;
-        this.props.setSelectedBot(bot_name);
-        // this.state.selected_bot = bot_name; // TODO check
-        const _this = this;
-        axios({
-            method: 'POST',
-            url: '/start',
-            data: JSON.stringify({
-                key: "CONNECTBOT",
-                bot_name: _this.props.selected_bot
-            })
-        })
-            .then(function (response) {
-                console.log("Trying to add bot to list")
-                console.log(response.data)
-                if (response.data && !li.includes(bot_name)) {
-                    console.log("Bot" + bot_name + " added successfully")
-                    li.push(bot_name);
-                    _this.props.updateBotName(bot_name);
-                    // _this.setState({ bot_list: li, selected_bot: bot_name });
-                    _this.props.setBotList(li);
-                    _this.props.setSelectedBot(bot_name)
-                    // _this.setState({ selected_bot: bot_name });
-                } else {
-                    console.log("Failed to add " + bot_name)
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
-            })
-    }
+        let li = this.state.availableBots;
+        let botName = (this.refreshingBotListRef.current == null) ?
+            "" : this.refreshingBotListRef.current.state.currentBot;
+        console.log("Add bot Ref currentBot ", this.refreshingBotListRef.current.state);
+        console.log("Updating setSelectedBotName to ", botName);
+        this.props.setSelectedBotName(botName);
 
-    /*listener for dropdown menu*/
-    selectBotListener(event) {
-        let bot_name = event.target.value;
-        this.props.setSelectedBot(bot_name)
-        // this.setState({ selected_bot: bot_name });
+        if (li.length != 0) {
+            this.props.setSelectedBotStyle("visible");
+        }
+        else {
+            this.props.setSelectedBotStyle("hidden");
+        }
+        console.log("Bot" + botName + " added successfully")
     }
 
     /*listener for direction buttons*/
@@ -200,69 +375,71 @@ export default class AddBot extends React.Component {
         const _this = this;
         axios({
             method: 'POST',
-            url: '/start',
+            url: '/wheels',
+            headers: {
+                'Content-Type': 'application/json'
+            },
             data: JSON.stringify({
-                key: "WHEELS",
-                bot_name: _this.props.selected_bot,
+                bot_name: _this.props.selectedBotName,
                 direction: value,
                 power: _this.state.power,
             })
-        })
-            .then(function (response) {
-            })
-            .catch(function (error) {
+        }).catch(function (error) {
+            if (error.response.data.error_msg.length > 0)
+                window.alert(error.response.data.error_msg);
+            else
                 console.log(error);
-            })
+        })
     }
 
-    /* removes selected object from list*/
-    deleteBotListener(event) {
-        // var li = this.state.bot_list;
-        var li = this.props.bot_list;
-        li.pop(this.props.selected_bot);
-        // this.setState({ bot_list: li });
-        // this.set
-        this.props.setBotList(li)
+    /** Handles keyboard input to control the movement buttons */
+    handleArrowKeyDown(event) {
+        const directionArray = ["left", "forward", "right", "backward"]
+        const spaceBar = 32;
+        const leftArrow = 37;
+        const downArrow = 40;
+
+        // If user presses spacebar, make the Minibot stop
+        if (event.keyCode === spaceBar) {
+            // prevent spacebar from jumping to the end of the page
+            event.preventDefault()
+            this.buttonMapListener("stop");
+            // If user presses an arrow key, make the Minibot move in that direction
+        } else if (event.keyCode >= leftArrow && event.keyCode <= downArrow) {
+            // prevent arrow key from causing the page to scroll
+            event.preventDefault()
+            this.buttonMapListener(directionArray[event.keyCode - leftArrow])
+        }
+    }
+
+    /*motor ports*/
+    motorPorts(name, port1) {
+        const _this = this;
 
         axios({
             method: 'POST',
-            url: '/start',
-            data: JSON.stringify(
-                {
-                    key: "DISCONNECTBOT",
-                    bot: this.props.selected_bot
-                }),
-        })
-            .then(function (response) {
-                console.log('removed bot successfully');
+            url: '/ports',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: JSON.stringify({
+                ports: [name, String(port1)],
+                bot_name: _this.props.selectedBotName,
             })
-            .catch(function (error) {
-                console.warn(error);
-            });
+        }).catch(function (error) {
+            if (error.response.data.error_msg.length > 0)
+                window.alert(error.response.data.error_msg);
+            else
+                console.log(error);
+        })
     }
 
-    getBotStatus() {
-        let bot_name = this.props.selected_bot;
-        // let li = this.state.bot_list;
-        let li = this.props.bot_list;
-        const _this = this;
-        if (li.includes(bot_name)) {
-            axios({
-                method: 'POST',
-                url: '/start',
-                data: JSON.stringify({
-                    key: "BOTSTATUS",
-                    bot_name: this.props.selected_bot
-                })
-            })
-                .then(function (response) {
-                    //console.log(response.data);
-                })
-                .catch(function (error) {
-                    // console.log(error);
-                })
-        }
+    /* removes selected bot label and button */
+    deleteBotListener(event) {
+        this.props.setSelectedBotName("");
+        this.props.setSelectedBotStyle("hidden");
     }
+
 
     getVisionData() {
         const _this = this;
@@ -276,144 +453,157 @@ export default class AddBot extends React.Component {
                 }
             })
             .catch(function (error) {
-                // console.log(error);
+                console.log(error);
             })
 
     }
 
-    lineFollowOnClick() {
+    setObjectOnClick(mode) {
         const _this = this;
         axios({
             method: 'POST',
-            url: '/start', //url to backend endpoint
+            url: '/mode', //url to backend endpoint
+            headers: {
+                'Content-Type': 'application/json'
+            },
             data: JSON.stringify({
-                key: "MODE",
-                bot_name: _this.props.selected_bot,
-                value: "line_follow",
+                bot_name: _this.props.selectedBotName,
+                mode: mode,
             })
-        })
-            .then(function (response) {
-                //do stuff after success
-            })
-            .catch(function (error) {
-                //handle errors
-            });
+        }).catch(function (error) {
+            if (error.response.data.error_msg.length > 0)
+                window.alert(error.response.data.error_msg);
+            else
+                console.log(error);
+        });
     }
 
-    objectDetectionOnClick() {
+    setColorOnClick(mode) {
         const _this = this;
-        console.log("Object Detection")
         axios({
             method: 'POST',
-            url: '/start', //url to backend endpoint
+            url: '/mode', //url to backend endpoint
+            headers: {
+                'Content-Type': 'application/json'
+            },
             data: JSON.stringify({
-                key: "MODE",
-                bot_name: _this.props.selected_bot,
-                value: "object_detection",
+                bot_name: _this.props.selectedBotName,
+                mode: mode,
             })
-        })
-            .then(function (response) {
-                //do stuff after success
-            })
-            .catch(function (error) {
-                //handle errors
-            });
+        }).catch(function (error) {
+            if (error.response.data.error_msg.length > 0)
+                window.alert(error.response.data.error_msg);
+            else
+                console.log(error);
+        });
     }
-
 
     render() {
-        var styles = {
-            Select: {
-                marginLeft: '10px',
-                marginRight: '10px'
-            },
-            Button: {
-                marginLeft: '10px',
-                marginRight: '10px',
-                float: 'left'
-            }
-        }
-        var _this = this;
+        const _this = this;
         return (
-            <div className="control">
-                <p id="small_title">Minibot Setup </p>
-                <table>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <label>
-                                    Available Bots:
-                                    <RefreshingList ref={this.refreshingBotListRef}></RefreshingList>
-                                </label>
-                            </td>
-                            <td><button style={styles.Button} onClick={this.addBotListener}>Add Bot</button></td>
-                            <div className="led-box">&nbsp;&nbsp;
-                                <div id="led-red"></div>
+            // Set tabindex to -1 so that this div is in focus to caputure
+            // the keyboard event handler for arrow key movement
+            <div id="setup_control_tab" tabindex="-1" className="container-fluid control">
+                <div className="container">
+                    <div className="row">
+                        <div className="col text-center">
+                            <br />
+                            <p className="small-title"> Minibot Setup </p>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col horizontalDivCenter">
+                            <div className="element-wrapper">
+                                <label className="white-label"> Available Bots: &nbsp; </label>
+                                <RefreshingList ref={this.refreshingBotListRef} />
                             </div>
-                        </tr>
-                        <tr>
-                            <td>
-                                <label>
-                                    Bot List:
-                                    <select style={styles.Select} onChange={this.selectBotListener}>
-                                        {this.props.bot_list.map(function (bot_name, idx) {
-                                            return <option
-                                                key={idx}
-                                                value={bot_name}>
-                                                {bot_name}</option>
-                                        })
-                                        }
-                                    </select>
+                            <Button id="add-bot" name="Add Bot" onClick={this.addBotListener} />
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col horizontalDivCenter">
+                            <div className="element-wrapper">
+                                <label id="selected-bot" style={this.props.selectedBotStyle}>
+                                    Connected to: &nbsp; &nbsp;
+                                    <span id="botName">
+                                        {_this.getSelectedBotText()}
+                                    </span>
                                 </label>
-                            </td>
-                            <td><button style={styles.Button} bot_list={this.props.bot_list}
-                                onClick={() => _this.deleteBotListener()}>Remove</button></td>
-                        </tr>
-
-                    </tbody>
-                </table>
-                <div className="newDiv">
-                    <p id="small_title">Movement </p>
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td></td>
-                                <td><button className="btn_btn-dir_movement" onClick={() => this.buttonMapListener("forward")}>forward</button></td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td><button className="btn_btn-dir_movement" onClick={() => this.buttonMapListener("left")}>left</button></td>
-                                <td><button className="btn_btn-dir_movement" onClick={() => this.buttonMapListener("stop")}>stop</button></td>
-                                <td><button className="btn_btn-dir_movement" onClick={() => this.buttonMapListener("right")}>right</button></td>
-                            </tr>
-                            <tr>
-                                <td></td>
-                                <td><button className="btn_btn-dir_movement" onClick={() => this.buttonMapListener("backward")}>backward</button></td>
-                                <td></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <form className="newDiv">
-                        <label>
-                            Power:
-                            <input type="text" defaultValue="50" name="wheel_power" onChange={evt => this.updatePowerValue(evt)} />
-                        </label>
-                    </form>
+                            </div>
+                            <Button id="remove-bot" name="Remove"
+                                onClick={() => _this.deleteBotListener()}
+                                style={_this.props.selectedBotStyle} />
+                        </div>
+                    </div>
+                    <br />
                 </div>
-                {/* button-wrapper is a custom class to add padding
-                    the rest is bootstrap css */}
-                <div className="row button-wrapper">
-                    <div className="col-md-3">
-                        <button type="button" className="btn btn-primary" onClick={() => this.lineFollowOnClick()}>Line Follow</button>
-                    </div>
-                    <div className="divider" />
-                    <div className="col-md-3">
-                        <button type="button" className="btn btn-success" onClick={() => this.objectDetectionOnClick()}>Object Detection</button>
-                    </div>
-                    <div className="col-md-6">
-
+                <br />
+                <div className="container">
+                    <div className="row">
+                        <div className="col horizontalDivCenter">
+                            <p className="small-title">Ports </p>
+                            <div className="element-wrapper in-front-of-other-elems">
+                                <PortsList motorPorts={this.motorPorts} />
+                            </div>
+                        </div>
                     </div>
                 </div>
+                <br />
+                <div className="container">
+                    <div className="row">
+                        <div className="col horizontalDivCenter">
+                            <p className="small-title">Movement </p>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col text-center">
+                            <button className="button-movement" onClick={() => this.buttonMapListener("forward")}>forward</button>
+                            <br />
+                            <button className="button-movement" onClick={() => this.buttonMapListener("left")}>left</button>
+                            <button className="button-stop" onClick={() => this.buttonMapListener("stop")}>stop</button>
+                            <button className="button-movement" onClick={() => this.buttonMapListener("right")}>right</button>
+                            <br />
+                            <button className="button-movement" onClick={() => this.buttonMapListener("backward")}>backward</button>
+                            <br />
+                            <br />
+                            <form className="horizontalDivCenter">
+                                <div>
+                                    <label className="white-label"> Power: &nbsp; </label>
+                                </div>
+                                <input id="custom-range-1" className="custom-range" name="wheel_power" type="range" min="0" max="100"
+                                    step="5" onChange={evt => this.updatePowerValue(evt)} />
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <div className="container">
+                    <div className="row">
+                        <div className="col horizontalDivCenter">
+                            <p className="small-title"> Speech Recognition </p>
+                        </div>
+                    </div>
+                    <div className="col horizontalDivCenter">
+                        <SpeechRecognition selectedBotName={this.props.selectedBotName}
+                            float="right" />
+                    </div>
+                    <div className="col horizontalDivCenter">
+                        <label id="speech_recognition_feedback_box" />
+                    </div>
+                </div>
+                <br />
+                <div className="container">
+                    <div className="row">
+                        <div className="col horizontalDivCenter">
+                            <p className="small-title"> Custom Modes </p>
+                            <button className="btn btn-success element-wrapper mr-1" onClick={() => this.setObjectOnClick("object_detection")}>Object Detection</button>
+                            <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.setColorOnClick("color_detection")}>Color Detection</button>
+                        </div>
+                    </div>
+                    <br />
+                </div>
+
+                <br />
             </div>
         );
     }

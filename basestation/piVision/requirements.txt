@@ -10,6 +10,7 @@ click==6.6
 colorama==0.3.7
 colorzero==1.1
 cryptography==1.7.1
+cv2==4.5.5 
 docutils==0.13.1
 drumhat==0.1.0
 envirophat==1.0.0
@@ -18,7 +19,8 @@ Flask==0.12.1
 fourletterphat==0.1.0
 gpiozero==1.5.0
 idna==2.2
-imutils==0.5.3
+imagezmq==1.1.1
+imutils==0.5.4
 isort==4.2.5
 itsdangerous==0.24
 jedi==0.10.2
