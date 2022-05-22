@@ -36,7 +36,7 @@ function BotVoiceControl({
         setActiveMicComponent(ACT_MIC_COMMAND)
       }
     } else {
-      setInputText("Please connect to a Minibot!")
+      setInputText("Please connect to a bot!")
     }
   }
 
