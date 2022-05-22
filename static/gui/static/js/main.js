@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { CookiesProvider } from 'react-cookie';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+} from "react-router-dom";
 import Navbar from './components/Navbar.js';
 import Platform from './components/Platform.js';
 import Chatbot from './components/Chatbot/chatbot2.js';
@@ -79,26 +84,28 @@ function ClientGUI({ }) {
 
   return (
     <div className="main-body">
-      <Navbar />
-      <div className="container">
-        <Platform
-          parentContext={chatbotContext}
+      <Router>
+        <Navbar />
+        <div className="container">
+          <Platform
+            parentContext={chatbotContext}
+            selectedBotName={selectedBotName}
+            setSelectedBotName={setSelectedBotName}
+            setActiveMicComponent={setActiveMicComponent}
+            activeMicComponent={activeMicComponent}
+            botVoiceControlMic={botVoiceControlMic}
+            setBotVoiceControlMic={setBotVoiceControlMic}
+          />
+        </div>
+        <Chatbot
+          setParentContext={setChatbotContext}
           selectedBotName={selectedBotName}
-          setSelectedBotName={setSelectedBotName}
-          setActiveMicComponent={setActiveMicComponent}
           activeMicComponent={activeMicComponent}
-          botVoiceControlMic={botVoiceControlMic}
-          setBotVoiceControlMic={setBotVoiceControlMic}
+          setActiveMicComponent={setActiveMicComponent}
+          mic={chatbotMic}
+          setMic={setChatbotMic}
         />
-      </div>
-      <Chatbot
-        setParentContext={setChatbotContext}
-        selectedBotName={selectedBotName}
-        activeMicComponent={activeMicComponent}
-        setActiveMicComponent={setActiveMicComponent}
-        mic={chatbotMic}
-        setMic={setChatbotMic}
-      />
+      </Router>
     </div>
   );
 }

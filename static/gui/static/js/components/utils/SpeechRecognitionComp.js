@@ -12,7 +12,7 @@ trigger speech recognition.
 Since this component shares a single SpeechRecognition object, 
 there can only be one mic active at any time. If you want to 
 use <SpeechRecognitionComp> for your component, you might want
-to study the Mic Management code in <main.js>
+to study and add to the Mic Management code in <main.js>
 */
 
 const SpeechRecognition = SpeechRecognition || webkitSpeechRecognition

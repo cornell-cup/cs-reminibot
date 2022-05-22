@@ -311,12 +311,14 @@ def analytics():
 def coding():
     return render_template('index.html')
 
-
 @index_bp.route('/user-analytics', methods=['GET'])
 def user_analytics():
     return render_template('index.html')
 
-
 @index_bp.route('/history', methods=['GET'])
 def history():
+    return render_template('index.html')
+
+@index_bp.route('/context-history', methods=['GET'])
+def context_history():
     return render_template('index.html')

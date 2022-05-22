@@ -12,21 +12,14 @@ def create_app():
     log = logging.getLogger('werkzeug')
     log.disabled = True
 
-<<<<<<< HEAD
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SQLALCHEMY_ECHO'] = True
 
     db_filename = 'program.db'
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_filename}'
-=======
-from basestation.user_database import Submission, User
-db.init_app(app)
-with app.app_context():
-    db.create_all()
->>>>>>> db19b685aae5f101df2a2151a140526e76fc69d0
 
     db.init_app(app)
-    from basestation.databases.user_database import Program, User, Chatbot
+    from basestation.databases.user_database import Submission, User, Chatbot
     with app.app_context():
         db.create_all()
 

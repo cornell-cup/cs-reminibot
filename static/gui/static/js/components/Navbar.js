@@ -24,6 +24,7 @@ const CODING = 1;
 const ANALYTICS = 2;
 const HIST = 3
 const CONTEXTHIST = 4;
+
 const Navbar = (props) => {
   const [loginEmail, setLoginEmail] = useState(props.cookies.get('current_user_email') || "");
   const [isLoggedIn, setIsLoggedIn] = useState(loginEmail !== "");
@@ -78,6 +79,7 @@ const Navbar = (props) => {
   }
 
   const location = useLocation();
+  console.log("location", useLocation());
   const pathname = location.pathname;
 
   return (
@@ -94,7 +96,7 @@ const Navbar = (props) => {
           <Link id="history-link" to="/history" className={`nav-link ${activeIndex === HIST ? "active" : ""}`} onClick={(e) => { setActiveIndex(HIST) }}><FontAwesomeIcon icon={Icons.faChartBar} /> History</Link>
         }
         {isLoggedIn &&
-          <a id="context-history-link" to="/context-history" className={`nav-link ${activeIndex === CONTEXTHIST ? "active" : ""}`} onClick={(e) => { setActiveIndex(CONTEXTHIST) }}><FontAwesomeIcon icon={Icons.faChartBar} /> Context History</a>
+          <Link id="context-history-link" to="/context-history" className={`nav-link ${activeIndex === CONTEXTHIST ? "active" : ""}`} onClick={(e) => { setActiveIndex(CONTEXTHIST) }}><FontAwesomeIcon icon={Icons.faList} /> Context History</Link>
         }
         {isLoggedIn ? (authorizationRestrictedRoutes.includes(pathname) ? <Link className="nav-link" to="/start" onClick={() => { handleLogout(); setActiveIndex(0) }}><FontAwesomeIcon icon={Icons.faSignOutAlt} /> Logout</Link> : <a className="nav-link" onClick={handleLogout}><FontAwesomeIcon icon={Icons.faSignOutAlt} /> Logout</a>) : <a className="nav-link" data-toggle="modal" data-target="#loginModal"><FontAwesomeIcon icon={Icons.faSignInAlt} /> Login</a>}
         {!isLoggedIn && <a className="nav-link" data-toggle="modal" data-target="#registerModal"><FontAwesomeIcon icon={Icons.faUserPlus} /> Signup</a>}
