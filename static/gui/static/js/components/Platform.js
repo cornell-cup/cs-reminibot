@@ -48,7 +48,6 @@ const Platform = withCookies((props) => {
   // pythonCodeState == 1:  User has made changes to the Python code
   //    and has disallowed Blockly from overwriting these changes.
   const [pythonCodeState, setPythonCodeState] = useState(-1);
-  const [selectedBotName, setSelectedBotName] = useState('');
   const [selectedBotStyle, setSelectedBotStyleState] = useState(hiddenStyle);
   const [loginEmail, setLoginEmail] = useState(props.cookies.get('current_user_email') || "");
   const [contextHistoryLoaded, setContextHistoryLoaded] = useState(false);
@@ -76,8 +75,8 @@ const Platform = withCookies((props) => {
           <Route exact path="/start">
             <div id="setup_control_tab" tabIndex="-1" className="tab-pane active" role="tabpanel">
               <BotControl
-                selectedBotName={selectedBotName}
-                setSelectedBotName={setSelectedBotName}
+                selectedBotName={props.selectedBotName}
+                setSelectedBotName={props.setSelectedBotName}
                 selectedBotStyle={selectedBotStyle}
                 setSelectedBotStyle={setSelectedBotStyle}
                 setActiveMicComponent={props.setActiveMicComponent}
@@ -98,7 +97,7 @@ const Platform = withCookies((props) => {
                 pythonCode={pythonCode}
                 pythonCodeState={pythonCodeState}
                 setPythonCode={setPythonCode}
-                selectedBotName={selectedBotName}
+                selectedBotName={props.selectedBotName}
                 customBlockList={customBlockList}
                 redefineCustomBlockList={redefineCustomBlockList}
               />

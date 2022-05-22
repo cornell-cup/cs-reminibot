@@ -75,8 +75,8 @@ class BaseStation:
         # Only one of the two lines below is necessary, if one is not
         # working for you then comment it out and uncomment the other one.
         # NOTE: When you push, make sure only the top one is uncommented.
-        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        # self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+        # self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
 
         
 
