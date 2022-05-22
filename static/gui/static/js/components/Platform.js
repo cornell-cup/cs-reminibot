@@ -51,9 +51,13 @@ const Platform = withCookies((props) => {
   const [selectedBotName, setSelectedBotName] = useState('');
   const [selectedBotStyle, setSelectedBotStyleState] = useState(hiddenStyle);
   const [loginEmail, setLoginEmail] = useState(props.cookies.get('current_user_email') || "");
+  const [contextHistoryLoaded, setContextHistoryLoaded] = useState(false);
 
   useEffect(() => {
-    setLoginEmail(props.cookies.get('current_user_email') || "");
+    let tmp_email = props.cookies.get('current_user_email') || "";
+    setLoginEmail(tmp_email);
+    if (tmp_email) setContextHistoryLoaded(true)
+    else setContextHistoryLoaded(false);
   }, [document.cookie]);
 
   function setSelectedBotStyle(style) {
@@ -116,6 +120,9 @@ const Platform = withCookies((props) => {
           <Route path="/context-history">
             <ContextHistory
               parentContext={props.parentContext}
+              loginEmail={loginEmail}
+              contextHistoryLoaded={contextHistoryLoaded}
+              setContextHistoryLoaded={setContextHistoryLoaded}
             />
           </Route>
 

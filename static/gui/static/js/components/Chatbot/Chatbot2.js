@@ -157,7 +157,6 @@ function Chatbot2({
     setInputText("");
     setMessages(newList);
     setParentContext(inputText);
-    console.log("151 id context" + temp_id);
     axios({
       method: 'POST',
       url: '/chatbot-context',
@@ -170,7 +169,7 @@ function Chatbot2({
       })
     }).then(function (response) {
       if (response.data) {
-        console.log("context is sent successfully")
+        // console.log("context is sent successfully")
       }
     }).catch(function (error) {
       if (error.response.data.error_msg.length > 0)
@@ -190,7 +189,6 @@ function Chatbot2({
     setId(temp_id);
     setInputText("");
     setMessages(newTempList);
-    console.log("181 id question " + temp_id);
     axios({
       method: 'POST',
       url: '/chatbot-ask',
@@ -203,7 +201,6 @@ function Chatbot2({
     }).then(function (response) {
       if (response.data) {
         const res = response.data;
-        console.log(res);
         newList = newList.concat({ id: temp_id, who: "other", message: res, timeStamp: getTimeStamp() });
         setMessages(newList);
       }
@@ -218,7 +215,6 @@ function Chatbot2({
   const toggleMic = (e) => {
     e.preventDefault();
     if (contextMode || selectedBotName) {
-      console.log("toggle mic");
       if (activeMicComponent == ACT_MIC_CHATBOT) {
         var temp = !mic;
         setMic(temp);
@@ -233,7 +229,6 @@ function Chatbot2({
   }
 
   const toggleMode = (e) => {
-    console.log("toggle context mode", contextMode);
     setContextMode(!contextMode);
     setMic(false);
     setInputText("");
@@ -258,9 +253,7 @@ function Chatbot2({
   /***************************** Bot Voice Control ***************************/
   useEffect(() => {
     if (!contextMode) {
-      console.log(lastLen);
       let queue = tempCommands.split(" ");
-      console.log(queue);
       // Run this code if a new word has been spoken.
       if (queue.length > lastLen) {
         // only read the lastest word in the queue (last item is always '')

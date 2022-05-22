@@ -79,7 +79,6 @@ const Navbar = (props) => {
   }
 
   const location = useLocation();
-  console.log("location", useLocation());
   const pathname = location.pathname;
 
   return (

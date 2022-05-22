@@ -74,10 +74,12 @@ class ChatbotWrapper:
             return FAILURE
 
     def edit_context_by_id(self, id, context):
-        '''Replaces the <self.context_stack[<id>]> with <context>.
+        '''Changes the <self.context_stack[<id>]> to <context>.
         '''
         if len(self.context_stack) > id:
-            if context[-1] == ".":
+            if not len(context):
+                self.context_stack[id] = ""
+            elif context[-1] == ".":
                 self.context_stack[id] = context
             else:
                 self.context_stack[id] = context + "."

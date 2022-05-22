@@ -11,66 +11,102 @@ const initialHistory = []
 function ContextHistory(props) {
   const [contextHistory, setContextHistory] = useState(initialHistory);
   const [id, setID] = useState(0);
+  const [wait, setWait] = useState(true);
+
+  function displayList(lst) {
+    let tempContextHist = contextHistory;
+    let tmp_id = id;
+    for (let i = 0; i < lst.length; i++) {
+      tempContextHist = tempContextHist.concat({ "id": tmp_id, "context": lst[i] });
+      tmp_id++;
+    }
+    setID(tmp_id);
+    console.log("temp context history: ", tempContextHist)
+    setContextHistory(tempContextHist);
+  }
 
   useEffect(() => {
-    /* Fetches contexts and displays them on page 
-    from database when user logs in. */
-    setID(0);
-    let contextArr = [];
-    axios({
-      method: 'POST',
-      url: '/chatbot-context',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      data: JSON.stringify({
-        command: 'get-all-db-context',
-      })
-    }).then(function (response) {
-      if (response.data) {
-        let context = response.data['context'];
-        if (!context) {
-          contextArr = context.split(".");
-        } else {
-          contextArr = [];
+    if (!props.contextHistoryLoaded) {
+      console.log("context history loaded", props.contextHistoryLoaded)
+      /* Fetches contexts and displays them on page 
+      from database when user logs in. */
+      setID(0);
+      let contextArr = [];
+      axios({
+        method: 'POST',
+        url: '/chatbot-context',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        data: JSON.stringify({
+          command: 'get-all-db-context',
+        })
+      }).then(function (response) {
+        if (response.data) {
+          let context = response.data['context'];
+          if (!context) {
+            contextArr = context.split(".");
+          } else {
+            contextArr = [];
+          }
         }
-      }
-    }).catch(function (error) {
-      console.log("Chatbot", error);
-    })
-
-    axios({
-      method: 'POST',
-      url: '/chatbot-context',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      data: JSON.stringify({
-        command: 'replace-context-stack',
-        contextStack: contextArr,
+      }).catch(function (error) {
+        console.log("Chatbot", error);
       })
-    }).then(function (response) {
-      if (response.data) {
-        console.log("ContextHistory.js 54: successfully replaced context \
-        stack with", contextArr)
-      }
-    }).catch(function (error) {
-      console.log("Chatbot", error);
-    })
 
-    let contextHistoryTemp = []
-    contextArr.forEach((context) => {
-      contextHistoryTemp.append({ "id": id, "context": context });
-      setID(id + 1);
-    })
-    setContextHistory(contextHistoryTemp);
-  }, [props.cookies.get('current_user_email')])
+      axios({
+        method: 'POST',
+        url: '/chatbot-context',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        data: JSON.stringify({
+          command: 'replace-context-stack',
+          contextStack: contextArr,
+        })
+      }).then(function (response) {
+        if (response.data) {
+          // console.log("ContextHistory.js 54: successfully replaced context \
+          // stack with", contextArr)
+        }
+      }).catch(function (error) {
+        console.log("Chatbot", error);
+      })
+
+      let contextHistoryTemp = []
+      contextArr.forEach((context) => {
+        contextHistoryTemp.append({ "id": id, "context": context });
+        setID(id + 1);
+      })
+      setContextHistory(contextHistoryTemp);
+      props.setContextHistoryLoaded(true);
+    } else {
+      axios({
+        method: 'POST',
+        url: '/chatbot-context',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        data: JSON.stringify({
+          command: 'get-all-local-context',
+        })
+      }).then(function (response) {
+        if (response.data) {
+          console.log(response.data['context']);
+          displayList(response.data['context']);
+        }
+      }).catch(function (error) {
+        console.log("Chatbot", error);
+      })
+    }
+    setWait(false);
+  }, [props.loginEmail])
 
 
   useEffect(() => {
     /* When user enters new context in chatbot, fetches the context - 
     <parentContext> - from parent component and displays it on page. */
-    if (props.parentContext != "") {
+    if (props.parentContext != "" && !wait) {
       let newContextHist = contextHistory.concat({ "id": id, "context": props.parentContext })
       setID(id + 1);
       setContextHistory(newContextHist);
@@ -89,4 +125,4 @@ function ContextHistory(props) {
   )
 }
 
-export default withCookies(ContextHistory);
+export default ContextHistory;

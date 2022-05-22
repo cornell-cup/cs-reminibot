@@ -21,7 +21,7 @@ function ContextBox({ id, context }) {
   }
 
   const editContext = (e) => {
-    console.log("ContextBox.js Edit: ", id, " Context: ", currContext);
+    // console.log("ContextBox.js Edit: ", id, " Context: ", currContext);
     setEditing(!editing);
     if (!editing) return;
     e.preventDefault();
@@ -73,7 +73,7 @@ function ContextBox({ id, context }) {
   }
 
   // returns a contextbox only if currContext is not an empty string
-  if (currContext) {
+  if (currContext || editing) {
     return (
       <div className="contextBox" key={id}>
         <input class="context-box" type="text" value={currContext} style={editing ? editStyle : defaultStyle} onChange={(e) => { changeCurrContext(e) }} />

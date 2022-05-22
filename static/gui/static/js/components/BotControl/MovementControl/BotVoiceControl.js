@@ -41,12 +41,9 @@ function BotVoiceControl({
   }
 
   useEffect(() => {
-    console.log(lastLen);
     let queue = text.split(" ");
-    // setPrevLast(queue[0]);
-    console.log(queue);
     // only read the lastest word in the queue (last item is always ''):
-    if (queue.length > lastLen) { 
+    if (queue.length > lastLen) {
       if (commands.hasOwnProperty(queue[queue.length - 2])) {
         setInputText(queue[queue.length - 2] + ": " + commands[queue[queue.length - 2]]);
 
