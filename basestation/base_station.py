@@ -71,10 +71,14 @@ class BaseStation:
         # so that we can connect to the Minibot
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
+        ### IMPORTANT ###
+        # Only one of the two lines below is necessary, if one is not
+        # working for you then comment it out and uncomment the other one.
+        # NOTE: When you push, make sure only the top one is uncommented.
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        # if the above line runs into a socket error then comment it out
-        # and uncomment the one below.
         # self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+
+        
 
         # an arbitrarily small time
         self.sock.settimeout(0.01)
