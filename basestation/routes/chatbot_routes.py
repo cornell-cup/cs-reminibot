@@ -32,7 +32,7 @@ def chatbot_context():
             base_station.replace_context_stack(context_stack)
             return json.dumps(True), status.HTTP_200_OK
         
-        elif command == 'clear':
+        elif command == 'reset-context-stack':
             base_station.chatbot_clear_context()
             return json.dumps(True), status.HTTP_200_OK
         
@@ -42,10 +42,12 @@ def chatbot_context():
        
         elif command == 'commit-to-db':
             returned = base_station.update_chatbot_context_db()
+            # if userEmail is '', basestation will use basestation.loginEmail
+            user_email = data["userEmail"]
             if returned == 1:
                 return json.dumps(True), status.HTTP_200_OK
             elif returned == -1:
-                return json.dumps({'error': 'Not logged in'}), status.HTTP_401_UNAUTHORIZED
+                return json.dumps({'error': 'Not logged in or context stack has not been loaded'}), status.HTTP_401_UNAUTHORIZED
         
         elif command == 'get-all-db-context':
             user = base_station.login_email

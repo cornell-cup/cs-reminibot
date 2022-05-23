@@ -89,7 +89,7 @@ def script():
     base_station.send_bot_script(bot_name, script_code)
     return json.dumps(True), status.HTTP_200_OK
 
-@app.route('/compile-virtual-program', methods=['POST'])
+@index_bp.route('/compile-virtual-program', methods=['POST'])
 def compile_virtual_program():
     """ Compile a Python script so that it can be use to run virtual minibots """
     data = request.get_json()
@@ -137,7 +137,7 @@ def vision():
         info = request.args.to_dict()
         return json.dumps(base_station.get_vision_data(info)), status.HTTP_200_OK
 
-@app.route('/object-mapping', methods=['POST', 'GET'])
+@index_bp.route('/object-mapping', methods=['POST', 'GET'])
 def object_mapping():
     """Updates vision object mapping"""
     if request.method == 'POST':
@@ -147,7 +147,7 @@ def object_mapping():
     else:
         return json.dumps(base_station.get_vision_object_map()), status.HTTP_200_OK
 
-@app.route('/virtual-objects', methods=['POST', 'GET'])
+@index_bp.route('/virtual-objects', methods=['POST', 'GET'])
 def virtual_objects():
     """Updates vision virtual objects"""
     if request.method == 'POST':
@@ -157,7 +157,7 @@ def virtual_objects():
     else:
         return json.dumps(base_station.get_virtual_objects()), status.HTTP_200_OK
 
-@app.route('/delete_virtual_room', methods=['POST', 'GET'])
+@index_bp.route('/delete_virtual_room', methods=['POST', 'GET'])
 def delete_virtual_room():
     """Deletes a virtual enviroment given a virtual_room_id"""
     if request.method == 'POST':
@@ -372,6 +372,6 @@ def history():
 def context_history():
     return render_template('index.html')
 
-@index.route('/vision-page', methods=['GET'])
+@index_bp.route('/vision-page', methods=['GET'])
 def vision_page():
     return render_template('index.html')

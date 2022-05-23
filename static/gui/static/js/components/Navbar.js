@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { withCookies, Cookies } from 'react-cookie';
+import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as Icons from '@fortawesome/free-solid-svg-icons';
 import LoginModal from './Login/LoginModal.js';
@@ -45,6 +46,47 @@ const Navbar = (props) => {
 
   }, []);
 
+  function commit_context_stack_to_db() {
+    axios({
+      method: 'POST',
+      url: '/chatbot-context',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: JSON.stringify({
+        command: 'commit-to-db',
+        userEmail: loginEmail
+      })
+    }).then(function (response) {
+      if (response.data) {
+        console.log("Navbar.js: Successfully commits context to db.")
+      }
+    }).catch(function (error) {
+      console.log("Chatbot", error);
+    })
+
+  }
+
+  function clear_chatbot_context_stack() {
+    axios({
+      method: 'POST',
+      url: '/chatbot-context',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: JSON.stringify({
+        command: 'reset-context-stack',
+      })
+    }).then(function (response) {
+      if (response.data) {
+        console.log("Navbar.js: Successfully clear context stack")
+      }
+    }).catch(function (error) {
+      console.log("Chatbot", error);
+    })
+  }
+
+
 
   function handleLogout(e) {
     console.log("logout")
@@ -55,8 +97,11 @@ const Navbar = (props) => {
     // }
     // const current_user_email = props.cookies.remove('current_user_email');
     props.cookies.remove('current_user_email');
+    commit_context_stack_to_db();
     setIsLoggedIn(false);
     setLoginEmail("");
+    clear_chatbot_context_stack();
+
   }
 
   function openNav() {

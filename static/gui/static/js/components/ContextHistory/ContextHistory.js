@@ -25,6 +25,31 @@ function ContextHistory(props) {
     setContextHistory(tempContextHist);
   }
 
+  const add_period_to_context = (lst) => lst.map(el => el + ".")
+
+  function replace_chatbot_context_stack(contextArr) {
+    axios({
+      method: 'POST',
+      url: '/chatbot-context',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: JSON.stringify({
+        command: 'replace-context-stack',
+        contextStack: contextArr,
+      })
+    }).then(function (response) {
+      if (response.data) {
+        console.log("ContextHistory.js: successfully replaced context \
+        stack with", contextArr);
+        displayList(contextArr);
+        props.setContextHistoryLoaded(true);
+      }
+    }).catch(function (error) {
+      console.log("Chatbot", error);
+    })
+  }
+
   useEffect(() => {
     if (!props.contextHistoryLoaded) {
       console.log("context history loaded", props.contextHistoryLoaded)
@@ -44,43 +69,24 @@ function ContextHistory(props) {
       }).then(function (response) {
         if (response.data) {
           let context = response.data['context'];
-          if (!context) {
+          console.log("ContextHistory", context)
+          if (context) {
             contextArr = context.split(".");
+            contextArr.pop();
+            // console.log("ContextHistory: ", contextArr);
+            contextArr = add_period_to_context(contextArr);
           } else {
             contextArr = [];
           }
+
+          replace_chatbot_context_stack(contextArr);
         }
       }).catch(function (error) {
         console.log("Chatbot", error);
       })
+    }
 
-      axios({
-        method: 'POST',
-        url: '/chatbot-context',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        data: JSON.stringify({
-          command: 'replace-context-stack',
-          contextStack: contextArr,
-        })
-      }).then(function (response) {
-        if (response.data) {
-          // console.log("ContextHistory.js 54: successfully replaced context \
-          // stack with", contextArr)
-        }
-      }).catch(function (error) {
-        console.log("Chatbot", error);
-      })
-
-      let contextHistoryTemp = []
-      contextArr.forEach((context) => {
-        contextHistoryTemp.append({ "id": id, "context": context });
-        setID(id + 1);
-      })
-      setContextHistory(contextHistoryTemp);
-      props.setContextHistoryLoaded(true);
-    } else {
+    else {
       axios({
         method: 'POST',
         url: '/chatbot-context',
@@ -92,7 +98,7 @@ function ContextHistory(props) {
         })
       }).then(function (response) {
         if (response.data) {
-          console.log(response.data['context']);
+          // console.log(response.data['context']);
           displayList(response.data['context']);
         }
       }).catch(function (error) {

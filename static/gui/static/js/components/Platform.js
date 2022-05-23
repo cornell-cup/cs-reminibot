@@ -15,15 +15,24 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCogs, faCode } from '@fortawesome/free-solid-svg-icons';
 library.add(faCogs, faCode);
 
+import { nanoid } from 'nanoid';
+
 // import Signup from './components/signup.js';
 // import { BrowserRouter as Router, Link} from 'react-router-dom';
 // import Navbar from './Navbar.js';
 import Blockly from './BotCode/blockly.js';
 import BotControl from './BotControl/BotControl.js';
-import Dashboard from './components/Analytics/dashboard.js';
-import History from './components/Analytics/submissionHistory.js';
+import Dashboard from './Analytics/dashboard.js';
+import History from './Analytics/submissionHistory.js';
 import ContextHistory from './ContextHistory/ContextHistory.js';
-import Vision from './components/Vision/Vision.js';
+import Vision from './Vision/Vision.js';
+
+// Utils import
+import VirtualEnviroment from './utils/VirtualEnviroment.js';
+
+// Context import
+import { PythonCodeContext } from '../context/PythonCodeContext.js';
+import { VirtualEnviromentContext } from '../context/VirtualEnviromentContext.js';
 
 
 /**
@@ -57,9 +66,9 @@ const Platform = withCookies((props) => {
 
   useEffect(() => {
     let tmp_email = props.cookies.get('current_user_email') || "";
+    let tmp_cont_hist_loaded = contextHistoryLoaded && tmp_email == loginEmail
+    setContextHistoryLoaded(tmp_cont_hist_loaded);
     setLoginEmail(tmp_email);
-    if (tmp_email) setContextHistoryLoaded(true)
-    else setContextHistoryLoaded(false);
 
     setVirtualRoomId(props.cookies.get('virtual_room_id') || nanoid());
   }, [document.cookie]);

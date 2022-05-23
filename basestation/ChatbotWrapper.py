@@ -28,6 +28,7 @@ class ChatbotWrapper:
         '''Replaces the self.context_stack with <context_stack>.
         '''
         self.context_stack = context_stack
+        print("ChatbotWrapper", context_stack)
 
     def update_context(self, context):
         '''Appends context to <self.context_stack>. If the context does not
@@ -53,7 +54,7 @@ class ChatbotWrapper:
     def reset_context(self):
         '''Replaces self.context_stack with the default context.
         '''
-        self.context_stack = [default_context]
+        self.context_stack = []
 
     def undo_context(self):
         '''Removes the last item from self.context_stack.

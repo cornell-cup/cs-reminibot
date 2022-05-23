@@ -1,5 +1,5 @@
 /* ES6 */
-
+import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { nanoid } from 'nanoid';
 import ReactDOM from 'react-dom';
@@ -14,20 +14,11 @@ import {
 
 // Minibot components import
 import Navbar from './components/Navbar.js';
-import BotControl from './components/BotControl/BotControl.js';
-import Dashboard from './components/Analytics/dashboard.js';
-import History from './components/Analytics/submissionHistory.js';
-import Vision from './components/Vision/Vision.js';
 import Platform from './components/Platform.js';
 import Chatbot from './components/Chatbot/chatbot2.js';
 
 // Utils import
 import { ACT_MIC_CHATBOT, ACT_MIC_COMMAND } from './components/utils/Constants.js';
-import VirtualEnviroment from './components/utils/VirtualEnviroment.js';
-
-// Context import
-import { PythonCodeContext } from './context/PythonCodeContext.js';
-import { VirtualEnviromentContext } from './context/VirtualEnviromentContext.js';
 
 
 function ClientGUI({ }) {
@@ -103,7 +94,26 @@ function ClientGUI({ }) {
   }, [botVoiceControlMic, chatbotMic, changedMic])
   /****************************************************************************/
 
+  function commit_context_stack_to_db(user_email) {
+    axios({
+      method: 'POST',
+      url: '/chatbot-context',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: JSON.stringify({
+        command: 'commit-to-db',
+        userEmail: user_email
+      })
+    }).then(function (response) {
+      if (response.data) {
+        console.log("Navbar.js: Successfully commits context to db.")
+      }
+    }).catch(function (error) {
+      console.log("Chatbot", error);
+    })
 
+  }
 
   useEffect(() => {
     window.addEventListener("beforeunload", alertUser);
@@ -111,9 +121,15 @@ function ClientGUI({ }) {
       window.removeEventListener("beforeunload", alertUser);
     };
   }, []);
+
+  const commit_to_db = () => {
+    commit_context_stack_to_db('');
+  }
+
   const alertUser = (e) => {
     e.preventDefault();
     e.returnValue = "";
+    commit_to_db();
   };
 
   return (

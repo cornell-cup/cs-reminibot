@@ -755,19 +755,18 @@ class BaseStation:
         """
         return self.chatbot.get_all_context()
 
-    def update_chatbot_context_db(self) -> int:
+    def update_chatbot_context_db(self, user_email = '') -> int:
         """ Update user's context if user exists upon exiting the session.
         (closing the GUI tab)
         """
-        user_email = self.login_email
-        if user_email is not None and user_email != "":
+        user_email =  user_email if user_email else self.login_email
+        curr_context_stack = self.chatbot.get_all_context()
+        if curr_context_stack and user_email is not None:
             # get user_id from user_email
-            print("user email", user_email)
             user_id = self.get_user_id_by_email(user_email)
-            print("user id", user_id)
             user = ChatbotTable.query.filter_by(id=user_id)
             # get current context from chatbot_wrapper
-            new_context = ' '.join(self.chatbot.get_all_context())
+            new_context = ''.join(curr_context_stack)
             # commit it to the db
             user.update({'context': new_context})
             db.session.commit()
