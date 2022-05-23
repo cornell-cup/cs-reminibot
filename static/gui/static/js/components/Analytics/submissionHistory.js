@@ -31,8 +31,8 @@ export default class History extends React.Component {
 
 			const listItems = subs.map((subs, submissionNums) =>
 				subs["result"] == "Successful execution" ?
-					<li id={submissionNums} class="list-group-item list-group-item-success" onClick={() => this.onClick(subs["code"], submissionNums)}>{subs["time"]}</li>
-					: <li id={submissionNums} class="list-group-item list-group-item-danger" onClick={() => this.onClick(subs["code"], submissionNums)}>{subs["time"]}</li>,
+					<li id={submissionNums} className="list-group-item list-group-item-success" onClick={() => this.onClick(subs["code"], submissionNums)}>{subs["time"]}</li>
+					: <li id={submissionNums} className="list-group-item list-group-item-danger" onClick={() => this.onClick(subs["code"], submissionNums)}>{subs["time"]}</li>,
 			);
 
 			this.setState({ history: listItems });
@@ -98,14 +98,14 @@ export default class History extends React.Component {
 			mode: 'python',
 		};
 		return (
-			<div class="row">
-				<div class="col">
+			<div className="row">
+				<div className="col">
 					<p className="small-title"> Code Submission History </p>
-					<ul class="list-group">
+					<ul className="list-group">
 						{this.state.history}
 					</ul>
 				</div>
-				<div class="col col-offset-2" style={visStyle}>
+				<div className="col col-offset-2" style={visStyle}>
 					<CodeMirror
 						ref={this.codeRef}
 						options={options}

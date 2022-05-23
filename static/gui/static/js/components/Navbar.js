@@ -12,8 +12,8 @@ import {
   useLocation
 } from "react-router-dom";
 
-const allRoutes = ['/start','/coding','/user-analytics','/history']
-const authorizationRestrictedRoutes = ['/user-analytics','/history'];
+const allRoutes = ['/start', '/coding', '/user-analytics', '/history', 'vision']
+const authorizationRestrictedRoutes = ['/user-analytics', '/history'];
 
 /**
  * New component for the Navbar on top
@@ -71,8 +71,8 @@ const Navbar = (props) => {
 
   return (
     <div>
-      <div id="mySidenav" class="sidenav">
-        <button class="closebtn" onClick={closeNav}>&times;</button>
+      <div id="mySidenav" className="sidenav">
+        <button className="closebtn" onClick={closeNav}>&times;</button>
         {isLoggedIn && <a className="nav-link"><FontAwesomeIcon icon={Icons.faUser} /> &nbsp; {loginEmail.substring(0, loginEmail.indexOf('@'))}</a>}
         <Link id="setup-control-link" to="/start" className={`nav-link ${activeIndex === 0 ? "active" : ""}`} onClick={(e) => { setActiveIndex(0) }}><FontAwesomeIcon icon="cogs" /> Setup/Movement</Link>
         <Link id="coding-link" to="/coding" className={`nav-link ${activeIndex === 1 ? "active" : ""}`} onClick={(e) => { setActiveIndex(1) }}><FontAwesomeIcon icon="code" /> Coding</Link>
@@ -82,7 +82,8 @@ const Navbar = (props) => {
         {isLoggedIn &&
           <Link id="history-link" to="/history" className={`nav-link ${activeIndex === 3 ? "active" : ""}`} onClick={(e) => { setActiveIndex(3) }}><FontAwesomeIcon icon={Icons.faChartBar} /> History</Link>
         }
-        {isLoggedIn ? ( authorizationRestrictedRoutes.includes(pathname) ? <Link className="nav-link" to="/start" onClick={() => {handleLogout(); setActiveIndex(0)}}><FontAwesomeIcon icon={Icons.faSignOutAlt} /> Logout</Link> : <a className="nav-link" onClick={handleLogout}><FontAwesomeIcon icon={Icons.faSignOutAlt} /> Logout</a> ): <a className="nav-link" data-toggle="modal" data-target="#loginModal"><FontAwesomeIcon icon={Icons.faSignInAlt} /> Login</a>}
+        <Link id="vision-link" to="/vision-page" className={`nav-link ${activeIndex === 4 ? "active" : ""}`} onClick={(e) => { setActiveIndex(4) }}><FontAwesomeIcon icon={Icons.faCamera} /> Vision</Link>
+        {isLoggedIn ? (authorizationRestrictedRoutes.includes(pathname) ? <Link className="nav-link" to="/start" onClick={() => { handleLogout(); setActiveIndex(0) }}><FontAwesomeIcon icon={Icons.faSignOutAlt} /> Logout</Link> : <a className="nav-link" onClick={handleLogout}><FontAwesomeIcon icon={Icons.faSignOutAlt} /> Logout</a>) : <a className="nav-link" data-toggle="modal" data-target="#loginModal"><FontAwesomeIcon icon={Icons.faSignInAlt} /> Login</a>}
         {!isLoggedIn && <a className="nav-link" data-toggle="modal" data-target="#registerModal"><FontAwesomeIcon icon={Icons.faUserPlus} /> Signup</a>}
       </div>
 
@@ -94,7 +95,7 @@ const Navbar = (props) => {
               Minibot
             </a>
             <button className="" type="button" onClick={toggleNav} data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-              <span class="navbar-toggler-icon"></span>
+              <span className="navbar-toggler-icon"></span>
             </button>
           </div>
         </nav>
