@@ -80,12 +80,21 @@ def script():
     script_code = data['script_code']
     login_email = data['login_email']
     try:
+        print("script code",script_code)
         submission = base_station.save_submission(script_code, login_email)
+        print("submissions",submission)
         submission_id = submission.id
     except Exception as exception:
         print(exception)
     base_station.send_bot_script(bot_name, script_code)
     return json.dumps(True), status.HTTP_200_OK
+
+@app.route('/compile-virtual-program', methods=['POST'])
+def compile_virtual_program():
+    """ Compile a Python script so that it can be use to run virtual minibots """
+    data = request.get_json()
+    data_to_send = base_station.get_virtual_program_execution_data(data)
+    return json.dumps(data_to_send), status.HTTP_200_OK
 
 
 @index_bp.route('/ports', methods=['POST'])
@@ -119,12 +128,52 @@ def mode():
 @index_bp.route('/vision', methods=['POST', 'GET'])
 def vision():
     """Updates vision status"""
+    # TODO add FPS tracking on server side
     if request.method == 'POST':
         info = request.get_json()
-        base_station.update_vision_log(info)
+        base_station.update_vision_snapshot(info)
         return json.dumps(True), status.HTTP_200_OK
     else:
-        return json.dumps(base_station.get_vision_data()), status.HTTP_200_OK
+        info = request.args.to_dict()
+        return json.dumps(base_station.get_vision_data(info)), status.HTTP_200_OK
+
+@app.route('/object-mapping', methods=['POST', 'GET'])
+def object_mapping():
+    """Updates vision object mapping"""
+    if request.method == 'POST':
+        info = request.get_json()
+        base_station.update_vision_object_map(info)
+        return json.dumps(True), status.HTTP_200_OK
+    else:
+        return json.dumps(base_station.get_vision_object_map()), status.HTTP_200_OK
+
+@app.route('/virtual-objects', methods=['POST', 'GET'])
+def virtual_objects():
+    """Updates vision virtual objects"""
+    if request.method == 'POST':
+        info = request.get_json()
+        base_station.update_virtual_objects(info)
+        return json.dumps(True), status.HTTP_200_OK
+    else:
+        return json.dumps(base_station.get_virtual_objects()), status.HTTP_200_OK
+
+@app.route('/delete_virtual_room', methods=['POST', 'GET'])
+def delete_virtual_room():
+    """Deletes a virtual enviroment given a virtual_room_id"""
+    if request.method == 'POST':
+        info = request.get_json()
+        print(info)
+        if info and info["virtual_room_id"]:
+            base_station.delete_virtual_room(info["virtual_room_id"])
+            return json.dumps(True), status.HTTP_200_OK
+        else:
+            error_json = {"error_msg": "/delete_virtual_room was not given a virtual_room_id field"}
+            return json.dumps(error_json), status.HTTP_400_BAD_REQUEST
+    else:
+        error_json = {"error_msg": "/delete_virtual_room only accepts post requests"}
+        return json.dumps(error_json), status.HTTP_400_BAD_REQUEST
+
+
 
 
 @index_bp.route('/result', methods=['POST'])
@@ -321,4 +370,8 @@ def history():
 
 @index_bp.route('/context-history', methods=['GET'])
 def context_history():
+    return render_template('index.html')
+
+@index.route('/vision-page', methods=['GET'])
+def vision_page():
     return render_template('index.html')

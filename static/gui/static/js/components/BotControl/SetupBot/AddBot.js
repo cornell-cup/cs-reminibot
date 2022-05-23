@@ -252,7 +252,7 @@ export default class AddBot extends React.Component {
         return (
             // Set tabindex to -1 so that this div is in focus to caputure 
             // the keyboard event handler for arrow key movement
-            <div id="setup_control_tab" tabindex="-1" className="container-fluid control">
+            <div id="setup_control_tab" tabIndex="-1" className="container-fluid control">
                 <div className="container">
                     <div className="row">
                         <div className="col text-center">

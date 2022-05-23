@@ -1,0 +1,7 @@
+numpy
+opencv-contrib-python
+opencv-python
+scikit-learn
+requests
+kivy
+pygame

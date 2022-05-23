@@ -15,6 +15,15 @@ urllib3==1.25.8
 Werkzeug==1.0.0
 SpeechRecognition==3.8.1
 pytest
+pint
+control
+pathfinding
+collision
 imutils==0.5.4
 opencv-python==4.5.5.62
 imagezmq==1.1.1
+numpy
+opencv-contrib-python
+scikit-learn
+kivy
+pygame

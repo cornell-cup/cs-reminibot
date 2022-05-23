@@ -68,22 +68,22 @@ class RegisterModal extends React.Component {
                         <form className="signup" id="registerForm" method="POST">
                             <div className="modal-body">
                                 <div className="form-group">
-                                    <label for="email" className="col-form-label">Email:</label>
+                                    <label htmlFor="email" className="col-form-label">Email:</label>
                                     <input id="email" type="email" name="email" className="form-control" value={this.state.email} onChange={this.handleChange} required />
                                 </div>
 
                                 <div className="form-group">
-                                    <label for="confirm_email" className="col-form-label">Please confirm your email:</label>
+                                    <label htmlFor="confirm_email" className="col-form-label">Please confirm your email:</label>
                                     <input id="confirm_email" type="email" name="email_confirmation" className="form-control" value={this.state.email_confirmation} onChange={this.handleChange} required />
                                 </div>
 
                                 <div className="form-group">
-                                    <label for="password" className="col-form-label">Password:</label>
+                                    <label htmlFor="password" className="col-form-label">Password:</label>
                                     <input id="password" type="password" name="password" className="form-control" value={this.state.password} onChange={this.handleChange} required />
                                 </div>
 
                                 <div className="form-group">
-                                    <label for="confirm_password" className="col-form-label">Confirm Password:</label>
+                                    <label htmlFor="confirm_password" className="col-form-label">Confirm Password:</label>
                                     <input id="confirm_password" type="password" name="password_confirmation" className="form-control" value={this.state.password_confirmation} onChange={this.handleChange} required />
                                 </div>
                             </div>

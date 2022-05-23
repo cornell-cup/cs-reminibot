@@ -1,22 +1,42 @@
-import React, { useState, useEffect } from 'react';
+/* ES6 */
+
+import React, { useEffect, useState } from 'react';
+import { nanoid } from 'nanoid';
 import ReactDOM from 'react-dom';
 import { CookiesProvider } from 'react-cookie';
+import { withCookies, Cookies } from 'react-cookie';
 import {
   BrowserRouter as Router,
   Switch,
   Route,
 } from "react-router-dom";
+
+
+// Minibot components import
 import Navbar from './components/Navbar.js';
+import BotControl from './components/BotControl/BotControl.js';
+import Dashboard from './components/Analytics/dashboard.js';
+import History from './components/Analytics/submissionHistory.js';
+import Vision from './components/Vision/Vision.js';
 import Platform from './components/Platform.js';
 import Chatbot from './components/Chatbot/chatbot2.js';
+
+// Utils import
 import { ACT_MIC_CHATBOT, ACT_MIC_COMMAND } from './components/utils/Constants.js';
+import VirtualEnviroment from './components/utils/VirtualEnviroment.js';
+
+// Context import
+import { PythonCodeContext } from './context/PythonCodeContext.js';
+import { VirtualEnviromentContext } from './context/VirtualEnviromentContext.js';
+
 
 function ClientGUI({ }) {
   const [chatbotContext, setChatbotContext] = useState("");
   const [selectedBotName, setSelectedBotName] = useState("");
 
+
   /**
-   ********************** PROPS TO MANAGE MICROPHONE **************************
+   ********************** MICROPHONE MANAGEMENT **************************
    * We use these props to switch off the mic of one component before
    * turning on the mic of another component.
    ****************************************************************************
@@ -81,6 +101,20 @@ function ClientGUI({ }) {
       // SpeechRecognition objection in <SpeechRecognitionComp.js>
     }
   }, [botVoiceControlMic, chatbotMic, changedMic])
+  /****************************************************************************/
+
+
+
+  useEffect(() => {
+    window.addEventListener("beforeunload", alertUser);
+    return () => {
+      window.removeEventListener("beforeunload", alertUser);
+    };
+  }, []);
+  const alertUser = (e) => {
+    e.preventDefault();
+    e.returnValue = "";
+  };
 
   return (
     <div className="main-body">

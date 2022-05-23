@@ -3,26 +3,27 @@
 import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faCogs, faCode } from '@fortawesome/free-solid-svg-icons';
-library.add(faCogs, faCode);
-
 import {
   BrowserRouter as Router,
   Switch,
   Route,
 } from "react-router-dom";
+import { CookiesProvider } from 'react-cookie';
+import { withCookies, Cookies } from 'react-cookie';
+
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faCogs, faCode } from '@fortawesome/free-solid-svg-icons';
+library.add(faCogs, faCode);
 
 // import Signup from './components/signup.js';
 // import { BrowserRouter as Router, Link} from 'react-router-dom';
-import Blockly from './BotCode/blockly.js';
 // import Navbar from './Navbar.js';
+import Blockly from './BotCode/blockly.js';
 import BotControl from './BotControl/BotControl.js';
-import { CookiesProvider } from 'react-cookie';
-import { withCookies, Cookies } from 'react-cookie';
-import Dashboard from './Analytics/dashboard.js';
-import History from './Analytics/submissionHistory.js';
+import Dashboard from './components/Analytics/dashboard.js';
+import History from './components/Analytics/submissionHistory.js';
 import ContextHistory from './ContextHistory/ContextHistory.js';
+import Vision from './components/Vision/Vision.js';
 
 
 /**
@@ -51,13 +52,23 @@ const Platform = withCookies((props) => {
   const [selectedBotStyle, setSelectedBotStyleState] = useState(hiddenStyle);
   const [loginEmail, setLoginEmail] = useState(props.cookies.get('current_user_email') || "");
   const [contextHistoryLoaded, setContextHistoryLoaded] = useState(false);
+  const [virtualRoomId, setVirtualRoomId] = useState(props.cookies.get('virtual_room_id') || nanoid())
+  const [virtualEnviroment, setVirtualEnviroment] = useState(new VirtualEnviroment([], []));
 
   useEffect(() => {
     let tmp_email = props.cookies.get('current_user_email') || "";
     setLoginEmail(tmp_email);
     if (tmp_email) setContextHistoryLoaded(true)
     else setContextHistoryLoaded(false);
+
+    setVirtualRoomId(props.cookies.get('virtual_room_id') || nanoid());
   }, [document.cookie]);
+
+
+  useEffect(() => {
+    props.cookies.set('virtual_room_id', virtualRoomId, { path: '/' });
+  }, []);
+
 
   function setSelectedBotStyle(style) {
     setSelectedBotStyleState(style === "hidden" ? hiddenStyle : visibleStyle);
@@ -74,16 +85,20 @@ const Platform = withCookies((props) => {
             // the keyboard event handler for arrow key movement */}
           <Route exact path="/start">
             <div id="setup_control_tab" tabIndex="-1" className="tab-pane active" role="tabpanel">
-              <BotControl
-                selectedBotName={props.selectedBotName}
-                setSelectedBotName={props.setSelectedBotName}
-                selectedBotStyle={selectedBotStyle}
-                setSelectedBotStyle={setSelectedBotStyle}
-                setActiveMicComponent={props.setActiveMicComponent}
-                activeMicComponent={props.activeMicComponent}
-                botVoiceControlMic={props.botVoiceControlMic}
-                setBotVoiceControlMic={props.setBotVoiceControlMic}
-              />
+              <PythonCodeContext.Provider value={{ pythonCode: pythonCode }}>
+                <VirtualEnviromentContext.Provider value={{ virtualEnviroment, setVirtualEnviroment }}>
+                  <BotControl
+                    selectedBotName={props.selectedBotName}
+                    setSelectedBotName={props.setSelectedBotName}
+                    selectedBotStyle={selectedBotStyle}
+                    setSelectedBotStyle={setSelectedBotStyle}
+                    setActiveMicComponent={props.setActiveMicComponent}
+                    activeMicComponent={props.activeMicComponent}
+                    botVoiceControlMic={props.botVoiceControlMic}
+                    setBotVoiceControlMic={props.setBotVoiceControlMic}
+                  />
+                </VirtualEnviromentContext.Provider>
+              </PythonCodeContext.Provider>
             </div>
           </Route>
 
@@ -123,6 +138,14 @@ const Platform = withCookies((props) => {
               contextHistoryLoaded={contextHistoryLoaded}
               setContextHistoryLoaded={setContextHistoryLoaded}
             />
+          </Route>
+
+          <Route path="/vision-page">
+            <PythonCodeContext.Provider value={{ pythonCode: pythonCode }}>
+              <VirtualEnviromentContext.Provider value={{ virtualEnviroment, setVirtualEnviroment }}>
+                <Vision />
+              </VirtualEnviromentContext.Provider>
+            </PythonCodeContext.Provider>
           </Route>
 
         </Switch>

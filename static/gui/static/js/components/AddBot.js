@@ -1,6 +1,6 @@
 import React from 'react';
 import axios from 'axios';
-import { Button } from './Util.js'
+import { Button } from './utils/Util.js'
 
 /*
  *  A RefreshingList is a list designed to refresh when its update()
@@ -401,7 +401,7 @@ export default class AddBot extends React.Component {
             // prevent spacebar from jumping to the end of the page
             event.preventDefault()
             this.buttonMapListener("stop");
-        // If user presses an arrow key, make the Minibot move in that direction
+            // If user presses an arrow key, make the Minibot move in that direction
         } else if (event.keyCode >= leftArrow && event.keyCode <= downArrow) {
             // prevent arrow key from causing the page to scroll
             event.preventDefault()
@@ -522,7 +522,7 @@ export default class AddBot extends React.Component {
                             <div className="element-wrapper">
                                 <label id="selected-bot" style={this.props.selectedBotStyle}>
                                     Connected to: &nbsp; &nbsp;
-                                <span id="botName">
+                                    <span id="botName">
                                         {_this.getSelectedBotText()}
                                     </span>
                                 </label>
@@ -592,9 +592,9 @@ export default class AddBot extends React.Component {
                 <div className="container">
                     <div className="row">
                         <div className="col horizontalDivCenter">
-                          <p className="small-title"> Custom Modes </p>
-                          <button className="btn btn-success element-wrapper mr-1" onClick={() => this.setObjectOnClick("object_detection")}>Object Detection</button>
-                          <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.setColorOnClick("color_detection")}>Color Detection</button>
+                            <p className="small-title"> Custom Modes </p>
+                            <button className="btn btn-success element-wrapper mr-1" onClick={() => this.setObjectOnClick("object_detection")}>Object Detection</button>
+                            <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.setColorOnClick("color_detection")}>Color Detection</button>
                         </div>
                     </div>
                     <br />

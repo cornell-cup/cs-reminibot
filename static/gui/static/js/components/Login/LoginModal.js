@@ -61,12 +61,12 @@ class LoginModal extends React.Component {
                         <form className="login" id="loginForm" method="POST">
                             <div className="modal-body">
                                 <div className="form-group">
-                                    <label for="login_email" className="col-form-label">Email:</label>
+                                    <label htmlFor="login_email" className="col-form-label">Email:</label>
                                     <input id="login_email" type="email" name="email" className="form-control" required />
                                 </div>
 
                                 <div className="form-group">
-                                    <label for="login_password" className="col-form-label">Password:</label>
+                                    <label htmlFor="login_password" className="col-form-label">Password:</label>
                                     <input id="login_password" type="password" name="password" className="form-control" required />
                                 </div>
 

@@ -12,7 +12,7 @@ import {
   useLocation
 } from "react-router-dom";
 
-const allRoutes = ['/start', '/coding', '/user-analytics', '/history', '/context-history']
+const allRoutes = ['/start', '/coding', '/user-analytics', '/history', '/context-history', 'vision']
 const authorizationRestrictedRoutes = ['/user-analytics', '/history', '/context-history'];
 
 /**
@@ -23,7 +23,8 @@ const SETUP = 0;
 const CODING = 1;
 const ANALYTICS = 2;
 const HIST = 3
-const CONTEXTHIST = 4;
+const VISION = 4;
+const CONTEXTHIST = 5;
 
 const Navbar = (props) => {
   const [loginEmail, setLoginEmail] = useState(props.cookies.get('current_user_email') || "");
@@ -83,11 +84,12 @@ const Navbar = (props) => {
 
   return (
     <div>
-      <div id="mySidenav" class="sidenav">
-        <button class="closebtn" onClick={closeNav}>&times;</button>
+      <div id="mySidenav" className="sidenav">
+        <button className="closebtn" onClick={closeNav}>&times;</button>
         {isLoggedIn && <a className="nav-link"><FontAwesomeIcon icon={Icons.faUser} /> &nbsp; {loginEmail.substring(0, loginEmail.indexOf('@'))}</a>}
         <Link id="setup-control-link" to="/start" className={`nav-link ${activeIndex === SETUP ? "active" : ""}`} onClick={(e) => { setActiveIndex(SETUP) }}><FontAwesomeIcon icon="cogs" /> Setup/Movement</Link>
         <Link id="coding-link" to="/coding" className={`nav-link ${activeIndex === CODING ? "active" : ""}`} onClick={(e) => { setActiveIndex(CODING) }}><FontAwesomeIcon icon="code" /> Coding</Link>
+        <Link id="vision-link" to="/vision-page" className={`nav-link ${activeIndex === VISION ? "active" : ""}`} onClick={(e) => { setActiveIndex(VISION) }}><FontAwesomeIcon icon={Icons.faCamera} /> Vision</Link>
         {isLoggedIn &&
           <Link id="analytics-link" to="/user-analytics" className={`nav-link ${activeIndex === ANALYTICS ? "active" : ""}`} onClick={(e) => { setActiveIndex(ANALYTICS) }}><FontAwesomeIcon icon={Icons.faChartBar} /> Analytics</Link>
         }
@@ -109,7 +111,7 @@ const Navbar = (props) => {
               Minibot
             </a>
             <button className="" type="button" onClick={toggleNav} data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-              <span class="navbar-toggler-icon"></span>
+              <span className="navbar-toggler-icon"></span>
             </button>
           </div>
         </nav>
