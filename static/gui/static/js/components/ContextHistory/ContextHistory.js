@@ -5,13 +5,19 @@ import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { withCookies } from 'react-cookie';
 import ContextBox from './ContextBox.js';
+import { replace_chatbot_context_stack, get_all_db_context, get_all_local_context } from '../utils/axios/chatbotAxios.js';
+import { faArrowAltCircleDown } from '@fortawesome/free-solid-svg-icons';
 
 const initialHistory = []
 
 function ContextHistory(props) {
   const [contextHistory, setContextHistory] = useState(initialHistory);
-  const [id, setID] = useState(0);
   const [wait, setWait] = useState(true);
+  const [id, setID] = useState(0);
+
+  function partialApply(fn, ...args) {
+    return fn.bind(null, ...args);
+  }
 
   function displayList(lst) {
     let tempContextHist = contextHistory;
@@ -27,27 +33,35 @@ function ContextHistory(props) {
 
   const add_period_to_context = (lst) => lst.map(el => el + ".")
 
-  function replace_chatbot_context_stack(contextArr) {
-    axios({
-      method: 'POST',
-      url: '/chatbot-context',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      data: JSON.stringify({
-        command: 'replace-context-stack',
-        contextStack: contextArr,
-      })
-    }).then(function (response) {
-      if (response.data) {
-        console.log("ContextHistory.js: successfully replaced context \
-        stack with", contextArr);
-        displayList(contextArr);
-        props.setContextHistoryLoaded(true);
-      }
-    }).catch(function (error) {
-      console.log("Chatbot", error);
-    })
+  function handleInitialContextLoading(contextArr) {
+    displayList(contextArr)
+    props.setContextHistoryLoaded(true);
+  }
+
+  function concat_DB_context_to_local(local_context, db_context) {
+    console.log("db context", db_context);
+    console.log("local context", local_context);
+    let concat_res = db_context.concat(local_context);
+    replace_chatbot_context_stack(concat_res, handleInitialContextLoading);
+  }
+
+  function handleFetchContextDB(local_context, db_context) {
+    let contextArr = [];
+    if (db_context) {
+      contextArr = db_context.split(".");
+      contextArr.pop();
+      // console.log("ContextHistory: ", contextArr);
+      contextArr = add_period_to_context(contextArr);
+    } else {
+      contextArr = [];
+    }
+    console.log("context array ", contextArr);
+    concat_DB_context_to_local(local_context, contextArr);
+    // get_all_local_context(partialApply(concat_DB_context_to_local, contextArr));
+  }
+
+  function initialLoadContext(context) {
+    get_all_db_context(partialApply(handleFetchContextDB, context));
   }
 
   useEffect(() => {
@@ -55,55 +69,10 @@ function ContextHistory(props) {
       console.log("context history loaded", props.contextHistoryLoaded)
       /* Fetches contexts and displays them on page 
       from database when user logs in. */
-      setID(0);
-      let contextArr = [];
-      axios({
-        method: 'POST',
-        url: '/chatbot-context',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        data: JSON.stringify({
-          command: 'get-all-db-context',
-        })
-      }).then(function (response) {
-        if (response.data) {
-          let context = response.data['context'];
-          console.log("ContextHistory", context)
-          if (context) {
-            contextArr = context.split(".");
-            contextArr.pop();
-            // console.log("ContextHistory: ", contextArr);
-            contextArr = add_period_to_context(contextArr);
-          } else {
-            contextArr = [];
-          }
-
-          replace_chatbot_context_stack(contextArr);
-        }
-      }).catch(function (error) {
-        console.log("Chatbot", error);
-      })
+      get_all_local_context(initialLoadContext);
     }
-
     else {
-      axios({
-        method: 'POST',
-        url: '/chatbot-context',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        data: JSON.stringify({
-          command: 'get-all-local-context',
-        })
-      }).then(function (response) {
-        if (response.data) {
-          // console.log(response.data['context']);
-          displayList(response.data['context']);
-        }
-      }).catch(function (error) {
-        console.log("Chatbot", error);
-      })
+      get_all_local_context(displayList);
     }
     setWait(false);
   }, [props.loginEmail])

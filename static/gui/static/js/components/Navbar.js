@@ -6,6 +6,10 @@ import * as Icons from '@fortawesome/free-solid-svg-icons';
 import LoginModal from './Login/LoginModal.js';
 import RegisterModal from './Login/RegisterModal.js';
 import {
+  clear_chatbot_context_stack,
+  commit_context_stack_to_db
+} from './utils/axios/chatbotAxios.js';
+import {
   BrowserRouter as Router,
   Switch,
   Route,
@@ -46,62 +50,14 @@ const Navbar = (props) => {
 
   }, []);
 
-  function commit_context_stack_to_db() {
-    axios({
-      method: 'POST',
-      url: '/chatbot-context',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      data: JSON.stringify({
-        command: 'commit-to-db',
-        userEmail: loginEmail
-      })
-    }).then(function (response) {
-      if (response.data) {
-        console.log("Navbar.js: Successfully commits context to db.")
-      }
-    }).catch(function (error) {
-      console.log("Chatbot", error);
-    })
-
-  }
-
-  function clear_chatbot_context_stack() {
-    axios({
-      method: 'POST',
-      url: '/chatbot-context',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      data: JSON.stringify({
-        command: 'reset-context-stack',
-      })
-    }).then(function (response) {
-      if (response.data) {
-        console.log("Navbar.js: Successfully clear context stack")
-      }
-    }).catch(function (error) {
-      console.log("Chatbot", error);
-    })
-  }
-
-
 
   function handleLogout(e) {
     console.log("logout")
-    // if (activeIndex === ANALYTICS || activeIndex === CONTEXTHIST) {
-    //   document.querySelector("#analytics-tab").classList.remove("active");
-    //   document.querySelector("#setup_control_tab").classList.add("active");
-    //   setActiveIndex(SETUP);
-    // }
-    // const current_user_email = props.cookies.remove('current_user_email');
+    commit_context_stack_to_db(loginEmail);
     props.cookies.remove('current_user_email');
-    commit_context_stack_to_db();
     setIsLoggedIn(false);
     setLoginEmail("");
     clear_chatbot_context_stack();
-
   }
 
   function openNav() {

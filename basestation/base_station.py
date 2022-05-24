@@ -761,6 +761,8 @@ class BaseStation:
         """
         user_email =  user_email if user_email else self.login_email
         curr_context_stack = self.chatbot.get_all_context()
+        print("current context stack", curr_context_stack)
+        print("user email", user_email)
         if curr_context_stack and user_email is not None:
             # get user_id from user_email
             user_id = self.get_user_id_by_email(user_email)

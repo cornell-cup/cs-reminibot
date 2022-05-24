@@ -22,13 +22,13 @@ FAILURE = 400
 class ChatbotWrapper:
 
     def __init__(self, context=default_context):
-        self.context_stack = [context]  # context
+        self.context_stack = []  # context
 
     def replace_context_stack(self, context_stack):
         '''Replaces the self.context_stack with <context_stack>.
         '''
         self.context_stack = context_stack
-        print("ChatbotWrapper", context_stack)
+        # print("ChatbotWrapper", context_stack)
 
     def update_context(self, context):
         '''Appends context to <self.context_stack>. If the context does not
@@ -40,6 +40,7 @@ class ChatbotWrapper:
                 self.context_stack.append(context)
             else:
                 self.context_stack.append(context + ".")
+            # print("context updated", self.context_stack)
 
     def get_latest_context(self):
         '''Returns the last entry on the context_stack.
@@ -49,12 +50,14 @@ class ChatbotWrapper:
     def get_all_context(self):
         '''Returns all local context as a list.
         '''
+        # print("get all local context", self.context_stack)
         return self.context_stack
 
     def reset_context(self):
         '''Replaces self.context_stack with the default context.
         '''
         self.context_stack = []
+        # print("local context reset", self.context_stack)
 
     def undo_context(self):
         '''Removes the last item from self.context_stack.
