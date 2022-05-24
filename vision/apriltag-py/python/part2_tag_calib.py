@@ -7,9 +7,10 @@ import util
 import json
 import math
 from detector import Detector
+from detection import Detection
 
 
-
+MAX_DETECTOR_SNAPSHOTS = 100
 
 
 def main():
@@ -74,7 +75,7 @@ def main():
         gray = cv2.cvtColor(undst, cv2.COLOR_BGR2GRAY)
 
         # Use the detector and compute useful values from it
-        detections = get_filtered_detections(positions_file_name, positions_data, detector, gray)
+        iteration_detections = get_filtered_detections(positions_file_name, positions_data, detector, gray)
 
         img_points = np.ndarray((4 * len(detections), 2))
         obj_points = np.ndarray((4 * len(detections), 3))
@@ -89,8 +90,8 @@ def main():
         overall_x_center = 0
         overall_y_center = 0
 
-        for i in range(len(detections)):
-            d = detections[i]
+        for i in range(len(iteration_detections)):
+            d = iteration_detections[i]
             id = int(d.tag_id)
             
 
@@ -106,8 +107,8 @@ def main():
 
             
 
-        overall_x_center /= 1 if len(detections) == 0 else len(detections)
-        overall_y_center /= 1 if len(detections) == 0 else len(detections)
+        overall_x_center /= 1 if len(iteration_detections) == 0 else len(iteration_detections)
+        overall_y_center /= 1 if len(iteration_detections) == 0 else len(iteration_detections)
         
         cv2.circle(undst, (int(overall_x_center), int(overall_y_center)), 5, (255, 0, 0), 3)
         
@@ -117,6 +118,46 @@ def main():
             break
     print("passed")
     cv2.destroyAllWindows()
+
+    iteration_detections_history = []
+    discovered_ids = set()
+    for iteration in range(MAX_DETECTOR_SNAPSHOTS):
+        frame = util.get_image(camera)  # take a new picture
+
+        # For weird reasons, anti-distortion measures WORSENED the problem,
+        # so they have been removed. If you need to put them back,
+        # this is the place for it.
+        undst = util.undistort_image(frame, camera_matrix, dist_coeffs)
+        # Convert undistorted image to grayscale
+        gray = cv2.cvtColor(undst, cv2.COLOR_BGR2GRAY)
+
+        # Use the detector and compute useful values from it
+        iteration_detections = get_filtered_detections(positions_file_name, positions_data, detector, gray)
+
+        iteration_detections_history += [detection.to_dict() for detection in iteration_detections]
+        discovered_ids.update([detection.tag_id for detection in iteration_detections])
+    
+    for id in discovered_ids:
+        detections_with_id = [detection for detection in iteration_detections_history if detection["id"] == id]
+        detections.append(Detection.from_dict({
+                "id": id, 
+                "center_x": util.average_value_for_key(detections_with_id, "center_x",True,1),
+                "center_y": util.average_value_for_key(detections_with_id, "center_y",True,1),
+                "corner_0_x": util.average_value_for_key(detections_with_id, "corner_0_x",True,1), 
+                "corner_0_y": util.average_value_for_key(detections_with_id, "corner_0_y",True,1), 
+                "corner_1_x": util.average_value_for_key(detections_with_id, "corner_1_x",True,1), 
+                "corner_1_y": util.average_value_for_key(detections_with_id, "corner_1_y",True,1), 
+                "corner_2_x": util.average_value_for_key(detections_with_id, "corner_2_x",True,1), 
+                "corner_2_y": util.average_value_for_key(detections_with_id, "corner_2_y",True,1), 
+                "corner_3_x": util.average_value_for_key(detections_with_id, "corner_3_x",True,1), 
+                "corner_3_y": util.average_value_for_key(detections_with_id, "corner_3_y",True,1), 
+                "angle": util.average_value_for_key(detections_with_id, "angle",True,1)%360
+        }))
+
+
+
+    img_points = np.ndarray((4 * len(detections), 2))
+    obj_points = np.ndarray((4 * len(detections), 3))
 
     # Compute transformation via PnP
     # TODO What's the reasoning from this math?
@@ -139,7 +180,6 @@ def main():
         if position == None:
             print(f"Waring:\nid: {id} not found in {positions_file_name}")
             continue
-        print(f"position: {position}")
         center_x = position["x"]
         center_y = position["y"]
         object_center_points.append((center_x, center_y))
@@ -152,7 +192,6 @@ def main():
         for index, unrotated_corner_vector  in enumerate(unrotated_corner_vectors):
             rotated_corner_vector = np.matmul(rotation_matrix,unrotated_corner_vector)
             obj_points[index + 4 * i] = [center_x+rotated_corner_vector[0][0], center_y+rotated_corner_vector[1][0], 0]
-            print("obj_points",obj_points)
         
 
     # Make transform matrices
@@ -237,6 +276,7 @@ def get_filtered_detections(positions_file_name, positions_data, detector, gray)
     detections, det_image = detector.detect(gray, return_image=True)
     if positions_file_name != None:
         detections = filter_detections_from_file(positions_data, detections)
+    
     return detections
 
 def filter_detections_from_file(positions_data, detections):

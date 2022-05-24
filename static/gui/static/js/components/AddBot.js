@@ -1,6 +1,6 @@
 import React from 'react';
 import axios from 'axios';
-import { Button } from './Util.js'
+import { Button } from './utils/Util.js'
 
 /*
  *  A RefreshingList is a list designed to refresh when its update()
@@ -285,13 +285,10 @@ export default class AddBot extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            bot_name: "",
+            botName: "",
             availableBots: [], // bots connected to Base Station but not GUI
-            // bot_list: [],
             botList: [],
-            // selected_bot: "",
             power: 50,
-            input_ip: "192.168.4.65"
         };
 
         // Needed to use a ref for react

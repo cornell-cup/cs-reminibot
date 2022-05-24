@@ -1,18 +1,19 @@
 """
 Base Station for the MiniBot.
 """
-
 import math
 import subprocess
 from basestation.bot import Bot
+from basestation.controller.minibot_sim_gui_adapter import run_program_string_for_gui_data
 from basestation.user_database import Submission, User
 from basestation import db
+from basestation.util.path_planning import PathPlanner
 from basestation.util.stoppable_thread import StoppableThread, ThreadSafeVariable
 from basestation.util.helper_functions import distance
 
 from random import choice, randint
 from string import digits, ascii_lowercase, ascii_uppercase
-from typing import Tuple, Optional
+from typing import Any, Dict, List, Tuple, Optional
 import os
 import re
 import socket
@@ -22,13 +23,18 @@ import speech_recognition as sr
 from copy import deepcopy
 import queue 
 import subprocess
-
 from basestation.util.units import AngleUnits, LengthUnits, convert_angle, convert_length
 import shlex
+from basestation.util.units import AngleUnits, LengthUnits, convert_angle, convert_length
+from basestation.util.world_builder import WorldBuilder
 
-MAX_VISION_LOG_LENGTH = 5
+
+
+import subprocess
+
+MAX_VISION_LOG_LENGTH = 1000
 VISION_UPDATE_FREQUENCY = 30
-VISION_DATA_HOLD_THRESHOLD = 1
+VISION_DATA_HOLD_THRESHOLD = 5
 
 
 def make_thread_safe(func):
@@ -67,10 +73,15 @@ class BaseStation:
 
         self.blockly_function_map = {
             "move_forward": "fwd",         "move_backward": "back",
+            "move_forward_distance": "fwd_dst",         "move_backward_distance": "back_dst",
+            "move_to": "move_to",
             "wait": "time.sleep",          "stop": "stop",
             "set_wheel_power":             "ECE_wheel_pwr",
             "turn_clockwise": "right",     "turn_counter_clockwise": "left",
+            "turn_clockwise_angle": "right_angle",     "turn_counter_clockwise_angle": "left_angle",
+            "turn_to": "turn_to",
             "move_servo": "move_servo",    "read_ultrasonic": "read_ultrasonic",
+
         }
         # functions that run continuously, and hence need to be started
         # in a new thread on the Minibot otherwise the Minibot will get
@@ -128,118 +139,10 @@ class BaseStation:
         self.bot_vision_server = None
 
     # ==================== VISION ====================
-
-    def print_location(self, id):
-        """ Prints the location of a minibot given its id """
-        #calls the get_vision_data_by_id method with the id (as a string hence the 
-        #casting with the str() function) of the minibot that you want 
-        #to track as the argument in order to get the position data for the minibot
-
-        minibot_data = self.get_vision_data_by_id(id)
-        #first check to make sure the method call was able to retrieve the data
-        if minibot_data:
-            """
-                minibot_data structure:
-                {"x": float, "y": float, "orientation": float}
-            """
-            #the minibots x coordinate in inches
-            minibot_x_coordinate_inches = minibot_data["x"]
-            #the minibots y coordinate in inches
-            minibot_y_coordinate_inches = minibot_data["y"]
-            #the minibots orientation in degrees
-            minibot_orientation_degrees = minibot_data["orientation"]
-            print("inches and degrees: ({},{}) {}°".format(
-                    minibot_x_coordinate_inches, 
-                    minibot_y_coordinate_inches, 
-                    minibot_orientation_degrees
-                )
-            )
-
-            """
-                You can convert units using the following functions:
-                convert_length(length, from_units, to_units)
-                convert_angle(angle, from_units, to_units)
-            """
-            #the minibots x coordinate in meters
-            minibot_x_coordinate_meters = convert_length(
-                minibot_data["x"], 
-                LengthUnits.INCHES, 
-                LengthUnits.METERS
-            )
-            #the minibots y coordinate in meters 
-            minibot_y_coordinate_meters = convert_length(
-                minibot_data["y"], 
-                LengthUnits.INCHES, 
-                LengthUnits.METERS
-            )
-            #the minibots orientation in radians
-            minibot_orientation_radians = convert_angle(
-                minibot_data["orientation"], 
-                AngleUnits.DEGREES, 
-                AngleUnits.RADIANS
-            )
-            print("meters and radians: ({},{}) {}".format(
-                    minibot_x_coordinate_meters, 
-                    minibot_y_coordinate_meters, 
-                    minibot_orientation_radians
-                )
-            )
-    def update_virtual_minibot_position_randomly(self, id):
-        """ Randomly updates the position of a virtual minibot given an id """ 
-        #generating random point and orientation (values can be decimals too 
-        #this is just an example)   
-        x = randint(-50,50)
-        y = randint(-50,50)
-        orientation = randint(0,360)
-        #calls the add_minibot_to_virtual_objects method with the id (as a string hence the 
-        #casting with the str() function) of the minibot that you want 
-        #to update the position of as the argument as well as the 
-        #new x coordinate in inches, y coordinate in inches, and orientation in degrees
-        self.add_minibot_to_virtual_objects(str(id),x,y,orientation)
-
-    def update_virtual_minibot_position_randomly_meters_radians(self, id):
-        """ Randomly updates the position of a virtual minibot given an id """ 
-        #generating random point and orientation (values can be decimals too 
-        #this is just an example)   
-        # x coordinate in meters
-        x_meters = randint(-50,50)
-        # y coordinate in meters
-        y_meters = randint(-50,50)
-        # orientation in radians
-        orientation_radians = randint(0,360)
-        # x coordinate in inches
-        x_inches = convert_length(
-            x_meters,  
-            LengthUnits.METERS,
-            LengthUnits.INCHES
-        )
-        # y coordinate in inches
-        y_inches = convert_length(
-            y_meters,  
-            LengthUnits.METERS,
-            LengthUnits.INCHES
-        )
-        # orientation in degrees
-        orientation_degrees = convert_angle(
-            orientation_radians,  
-            AngleUnits.RADIANS,
-            AngleUnits.DEGREES
-        )
-        #calls the add_minibot_to_virtual_objects method with the id 
-        #(as a string hence the casting with the str() function) of 
-        #the minibot that you want to update the position of as 
-        #the argument as well as the new x coordinate in inches, 
-        #y coordinate in inches, and orientation in degrees
-        self.add_minibot_to_virtual_objects(
-            str(id),
-            x_inches,
-            y_inches,
-            orientation_degrees
-        )
-            
-        
-
-
+    def delete_virtual_room(self, virtual_room_id):
+        """ Removes a virtual room given its virtual room id """
+        self.virtual_objects.pop(virtual_room_id,None)
+        self.vision_object_map.pop(virtual_room_id,None)
 
     def update_virtual_objects(self, update):
         """ Updates vision virtual objects list. """
@@ -254,7 +157,9 @@ class BaseStation:
             else:
                 self.remove_from_virtual_objects(update["virtual_object"])
         else:
-            print("The vision virtual object list was not given a valid update")
+            print("The vision virtual object list was not given a valid update in update_virtual_objects")
+
+
             
 
     def add_to_virtual_objects(self, virtual_object):
@@ -265,6 +170,7 @@ class BaseStation:
             self.virtual_objects[virtual_object["virtual_room_id"]][virtual_object["id"]] = {
                 "name": virtual_object["name"], 
                 "type": virtual_object["type"],   
+                "is_physical": False,
                 "x": virtual_object["x"],  
                 "y": virtual_object["y"],  
                 "orientation": virtual_object["orientation"],                        
@@ -278,7 +184,7 @@ class BaseStation:
                 "radiusY": virtual_object["radiusY"] if "radiusY" in virtual_object else None,  
             }
         else:
-            print("The vision virtual object list was not given a valid update")
+            print("The vision virtual object list was not given a valid update in add_to_virtual_objects")
 
     # to be used for simulation
     def add_minibot_to_virtual_objects(self, id, x, y, orientation):
@@ -306,7 +212,7 @@ class BaseStation:
         if "virtual_room_id" in virtual_object and virtual_object["virtual_room_id"] in self.virtual_objects and "id" in virtual_object:
             self.virtual_objects[virtual_object["virtual_room_id"]].pop(virtual_object["id"], None)
         else:
-            print("The vision virtual object list was not given a valid update")
+            print("The vision virtual object list was not given a valid removal update")
 
     def remove_multiple_from_virtual_objects(self, virtual_objects):
         """ Removes multiple virtual objects from virtual objects list """
@@ -323,11 +229,13 @@ class BaseStation:
         """ Updates vision object mapping. """
         if "mappings" in update and "add" in update and type(update["mappings"]) is list and len(update["mappings"]) > 0:
             if update["add"]:
+                self.remove_multiple_from_vision_object_map(update["mappings"])
                 self.add_multiple_to_vision_object_map(update["mappings"])
             else:
                 self.remove_multiple_from_vision_object_map(update["mappings"])
         elif "mapping" in update and "add" in update:
             if update["add"]:
+                self.remove_from_vision_object_map(update["mapping"])
                 self.add_to_vision_object_map(update["mapping"])
             else:
                 self.remove_from_vision_object_map(update["mapping"])
@@ -380,6 +288,11 @@ class BaseStation:
         """ Returns most recent vision data """
         return list(filter(lambda data_entry: self.matchesQuery(data_entry, query_params), self.get_estimated_positions(True, query_params["virtual_room_id"]))) 
 
+    def get_worlds(self, virtual_room_id, world_width, world_height, cell_size, excluded_ids):
+        vision_data = self.get_vision_data({"virtual_room_id": virtual_room_id})
+        worlds = WorldBuilder.from_vision_data_all(vision_data, world_width, world_height, cell_size, excluded_ids)
+        return worlds
+
     def matchesQuery(self, data_entry, query_params):
         matches = True
         if query_params != None:
@@ -392,9 +305,10 @@ class BaseStation:
             
 
     # to be used for simulation
-    def get_vision_data_by_id(self, id):
+    def get_vision_data_by_id(self, query_params):
         """ Returns position data of an object given its id """
-        allVisionData = self.get_vision_data()
+        id = query_params["id"]
+        allVisionData = self.get_vision_data(query_params)
         for object in allVisionData:
             if object["id"] == id:
                 return object
@@ -438,14 +352,14 @@ class BaseStation:
                 )
         if use_vision_log and len(self.vision_log) > 0:
             for object_position_data in self.vision_log[-1]["POSITION_DATA"]:
-                estimated_position = self.format_estimated_position(object_position_data["id"], object_position_data["x"], object_position_data["y"], object_position_data["orientation"], virtual_room_id=virtual_room_id)
+                estimated_position = self.format_estimated_position(object_position_data["id"], object_position_data["x"], object_position_data["y"], object_position_data["orientation"], virtual_room_id=virtual_room_id, is_physical=True)
                 estimated_positions.append(
                     estimated_position
                 )
         else:
             for object_id, object_position_data in object_positions.items():
                 estimated_x, estimated_y, estimated_orientation = self.get_estimated_position_data(object_position_data)
-                estimated_position = self.format_estimated_position(object_id, estimated_x, estimated_y, estimated_orientation, virtual_room_id=virtual_room_id)
+                estimated_position = self.format_estimated_position(object_id, estimated_x, estimated_y, estimated_orientation, virtual_room_id=virtual_room_id, is_physical=True)
                 estimated_positions.append(
                     estimated_position
                 )
@@ -458,7 +372,7 @@ class BaseStation:
                 )
         return estimated_positions
 
-    def format_estimated_position(self, object_id, estimated_x, estimated_y, estimated_orientation, virtual_object_data=None,virtual_room_id=None):
+    def format_estimated_position(self, object_id, estimated_x, estimated_y, estimated_orientation, virtual_object_data=None,virtual_room_id=None, is_physical=False):
         estimated_position = {
                 "id": object_id, 
                 "name": None,
@@ -473,7 +387,8 @@ class BaseStation:
                 "color": None, 
                 "x": estimated_x, 
                 "y": estimated_y, 
-                "orientation": estimated_orientation
+                "orientation": estimated_orientation,
+                "is_physical": is_physical
             }
         if virtual_object_data:
             for key in list(estimated_position.keys()):
@@ -681,6 +596,25 @@ class BaseStation:
         bot = self.get_bot(bot_name)
         # reset the previous script_exec_result
         bot.script_exec_result = None
+        parsed_program_string = self.parse_program(script)
+        # Now actually send to the bot
+        bot.sendKV("SCRIPTS", parsed_program_string)
+
+    def get_virtual_program_execution_data(self, query_params: Dict[str, Any]) -> Dict[str, List[Dict]]:
+        script = query_params['script_code']
+        virtual_room_id = query_params['virtual_room_id']
+        minibot_id = query_params['minibot_id']  
+        world_width = query_params['world_width']
+        world_height = query_params['world_height']
+        cell_size = query_params['cell_size']
+        query_params['id'] = query_params['minibot_id']  
+        parsed_program_string = self.parse_program(script)
+        worlds = self.get_worlds(virtual_room_id, world_width, world_height, cell_size, [minibot_id])
+        minibot_location = self.get_vision_data_by_id(query_params)
+        start = (minibot_location['x'],minibot_location['y'])
+        return run_program_string_for_gui_data(parsed_program_string, start, worlds)
+
+    def parse_program(self, script: str) -> str:
         # Regex is for bot-specific functions (move forward, stop, etc)
         # 1st group is the whitespace (useful for def, for, etc),
         # 2nd group is for func name, 3rd group is for args,
@@ -710,9 +644,7 @@ class BaseStation:
             else:
                 parsed_program.append(line + '\n')  # "normal" Python
         parsed_program_string = "".join(parsed_program)
-
-        # Now actually send to the bot
-        bot.sendKV("SCRIPTS", parsed_program_string)
+        return parsed_program_string
 
     def set_bot_ports(self, bot_name: str, ports: str):
         """Sets motor port(s) of the specific bot"""

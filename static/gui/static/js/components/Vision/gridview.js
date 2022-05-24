@@ -3,8 +3,8 @@ import axios from "axios";
 
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { withCookies } from "react-cookie";
-import { triangulate } from "./CollisionDetection/Polygon";
 import Vector from "./CollisionDetection/Vector";
+import { logIfShapesCollide } from "./CollisionDetection/CollisionDection";
 
 
 const scaleFactor = 40;
@@ -23,7 +23,8 @@ const unknownColor = "black";
  */
 const GridView = (props) => {
 
-  const [intervalId, setIntervalId] = useState(null);
+  const [displayIntervalId, setDisplayIntervalId] = useState(null);
+  const [collisionIntervalId, setCollisionIntervalId] = useState(null);
   const [detections, setDetections] = useState([]);
   const [displayOn, setDisplayOn] = useState(false);
   const [virtualRoomId, setVirtualRoomId] = useState(props.cookies.get('virtual_room_id'));
@@ -33,11 +34,23 @@ const GridView = (props) => {
 
   useEffect(() => {
     if (displayOn) {
-      clearInterval(intervalId);
+      clearInterval(displayIntervalId);
+      clearInterval(collisionIntervalId);
       setDetections([]);
-      setIntervalId(setInterval(getVisionData, 100));
+      setDisplayIntervalId(setInterval(getVisionData, 100));
+      setCollisionIntervalId(setInterval(checkCollisions, 100));
     }
   }, [virtualRoomId]);
+
+  useEffect(() => {
+    if (displayOn) {
+      clearInterval(collisionIntervalId);
+      if (detections && detections.length > 1) {
+        logIfShapesCollide(detections);
+        // setCollisionIntervalId(setInterval(checkCollisions, 100));
+      }
+    }
+  }, [detections]);
 
 
 
@@ -63,7 +76,7 @@ const GridView = (props) => {
     for (let i = 0; i < numXAxisTicks; i++) {
       ticks.push(
         <g
-          className="tick"
+          class="tick"
           opacity="1"
           transform={`translate(${scaleFactor * distanceBetweenTicks * i},0)`}
         >
@@ -77,11 +90,11 @@ const GridView = (props) => {
     }
     return (
       <g
-        className="x-axis"
+        class="x-axis"
         fill="none"
-        fontSize="40"
-        fontFamily="sans-serif"
-        textAnchor="middle"
+        font-size="40"
+        font-family="sans-serif"
+        text-anchor="middle"
       >
         {ticks}
       </g>
@@ -96,7 +109,7 @@ const GridView = (props) => {
     for (let i = 0; i < numYAxisTicks; i++) {
       ticks.push(
         <g
-          className="tick"
+          class="tick"
           opacity="1"
           transform={`translate(0,${scaleFactor * distanceBetweenTicks * i})`}
         >
@@ -110,11 +123,11 @@ const GridView = (props) => {
     }
     return (
       <g
-        className="y-axis"
+        class="y-axis"
         fill="none"
-        fontSize="40"
-        fontFamily="sans-serif"
-        textAnchor="start"
+        font-size="40"
+        font-family="sans-serif"
+        text-anchor="start"
       >
         {ticks}
       </g>
@@ -137,7 +150,29 @@ const GridView = (props) => {
     );
   }
 
+  //returns an array of x and y deltas from center point to vertices of a regular polygon with a given numberOfSides and a given sideLength
+  generateRegularPolygonDeltas(numberOfSides, sideLength) {
+    const individualVertexAngle = 2 * Math.PI / numberOfSides;
+    const radius = Math.sqrt(sideLength * sideLength / (2 - 2 * Math.cos(individualVertexAngle)));
+    const initialAngleOffset = -Math.PI / 2 + (numberOfSides % 2 == 0 ? individualVertexAngle / 2 : 0);
+    const deltas = [];
+    for (let i = 0; i < numberOfSides; i++) {
+      deltas.push({ x: radius * Math.cos(initialAngleOffset + i * individualVertexAngle), y: radius * Math.sin(initialAngleOffset + i * individualVertexAngle) })
+    }
+    return deltas;
+  }
 
+  getDeltasFromVerticesXAndY(x, y, vertices) {
+    return vertices.map((vertex) => ({ x: vertex['x'] - x, y: vertex['y'] - y }));
+  }
+
+  getPolygonInfoFromVertices(vertices) {
+    const center = vertices.reduce(
+      (previousValue, currentValue) => ({ x: previousValue['x'] + currentValue['x'] / vertices.length, y: previousValue['y'] + currentValue['y'] / vertices.length }),
+      { x: 0, y: 0 }
+    );
+    return { x: center['x'], y: center['y'], deltas: this.getDeltasFromVerticesXAndY(center['x'], center['y'], vertices) };
+  }
 
 
   const renderObjects = () => {
@@ -194,10 +229,8 @@ const GridView = (props) => {
     const x = scaleFactor * (props.world_width / 2 + x_pos);
     const y = scaleFactor * (props.world_height / 2 - y_pos);
     const orientation_pos = parseFloat(detection["orientation"]);
-    let orientation_adjusted_detection = JSON.parse(JSON.stringify(detection));
-    orientation_adjusted_detection["orientation"] = -orientation_adjusted_detection["orientation"]
     return (
-      <g onClick={() => {
+      <g className="popup" onClick={() => {
         alert(`${detection["name"] ? detection["name"] : ""}: (${Math.round(
           x_pos
         )},${Math.round(y_pos)}) ${Math.round(orientation_pos)}°, id: ${detection['id']}`)
@@ -222,7 +255,7 @@ const GridView = (props) => {
     const radiusY = detection["radiusY"] ? detection["radiusY"] : unknownMeasure;
     const deltas_to_vertices = detection["deltas_to_vertices"] ? detection["deltas_to_vertices"] : [];
     const vertices = deltas_to_vertices.map(
-      (currentValue) => new Vector(currentValue['x'],currentValue['y'])
+      (currentValue) => new Vector(currentValue['x'], currentValue['y'])
     );
     const text_vertices = deltas_to_vertices.reduce(
       (previousValue, currentValue) => `${previousValue} ${x + scaleFactor * currentValue['x']},${y + scaleFactor * currentValue['y']}`,
@@ -249,7 +282,7 @@ const GridView = (props) => {
               transform={`rotate(${orientation_pos}, ${x}, ${y})`}
               width={scaleFactor * width}
               height={scaleFactor * height}
-              fill={detection["color"] ? detection["color"] : unknownColor}
+              fill={detection["color"]}
             ></rect>
             {image_path && renderShape(
               {
@@ -274,7 +307,7 @@ const GridView = (props) => {
               cx={x}
               cy={y}
               r={scaleFactor * radius}
-              fill={detection["color"] ? detection["color"] : unknownColor}
+              fill={detection["color"] ? detection["color"] : unknownMeasure}
               transform={`rotate(${orientation_pos}, ${x}, ${y})`}
             ></circle>
             {image_path && renderShape(
@@ -301,7 +334,7 @@ const GridView = (props) => {
               cy={y}
               rx={scaleFactor * radius}
               ry={scaleFactor * radiusY}
-              fill={detection["color"] ? detection["color"] : unknownColor}
+              fill={detection["color"] ? detection["color"] : unknownMeasure}
               transform={`rotate(${orientation_pos}, ${x}, ${y})`}
             ></ellipse>
             {image_path && renderShape(
@@ -325,6 +358,10 @@ const GridView = (props) => {
             y={y - (scaleFactor * height) / 2}
             width={scaleFactor * width}
             height={scaleFactor * height}
+            fill={
+              scaleFactor *
+              (detection["color"] ? detection["color"] : unknownMeasure)
+            }
             href={image_path || "./static/img/unknown-dot.png"}
             transform={`rotate(${orientation_pos}, ${x}, ${y})`}
           ></image>
@@ -332,20 +369,13 @@ const GridView = (props) => {
       case "regular_polygon":
       case "polygon":
       default:
-        const triangles = triangulate(vertices);
-        const colors = ["red","green","yellow","blue","red","purple","orange"]
         return (
           <React.Fragment>
             <polygon
               points={text_vertices}
-              fill={detection["color"] ? detection["color"] : unknownColor}
+              fill={detection["color"] ? detection["color"] : unknownMeasure}
               transform={`rotate(${orientation_pos}, ${x}, ${y})`}
             ></polygon>
-            {triangles.map((triangle, index) => (<polygon
-              points={`${x + scaleFactor *triangle[0][0]},${y + scaleFactor *triangle[0][1]} ${x + scaleFactor *triangle[1][0]},${y + scaleFactor *triangle[1][1]} ${x + scaleFactor *triangle[2][0]},${y + scaleFactor *triangle[2][1]}`}
-              fill={colors[index%colors.length]}
-              transform={`rotate(${orientation_pos}, ${x}, ${y})`}
-            ></polygon>))}
             {image_path && renderShape(
               {
                 x: x_pos,
@@ -403,9 +433,16 @@ const GridView = (props) => {
 
   }
 
+  const checkCollisions = () => {
+    if (detections && detections.length > 1) {
+      // logIfShapesCollide(detections);
+    }
+  }
+
   const toggleVisionDisplay = () => {
     if (displayOn) {
-      clearInterval(intervalId);
+      clearInterval(displayIntervalId);
+      clearInterval(collisionIntervalId);
       setDisplayOn(false);
       setDetections([]);
     }
@@ -416,11 +453,11 @@ const GridView = (props) => {
     // concurrently, or we need to use WebSockets which will hopefully
     // allow for faster communication
     else {
-      setIntervalId(setInterval(getVisionData, 100));
+      setDisplayIntervalId(setInterval(getVisionData, 100));
+      setCollisionIntervalId(setInterval(checkCollisions, 100));
       setDisplayOn(true);
     }
   }
-
 
 
 

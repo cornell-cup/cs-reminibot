@@ -1,10 +1,10 @@
+from statistics import mode
 import cv2
 import argparse
 import numpy as np
 import sys
 import time
 import requests
-from sqlalchemy import true
 import util
 from detector import Detector
 from platform import node as platform_node
@@ -20,9 +20,11 @@ FRAME_HEIGHT = 720
 # These are effectively constant after the argument parser has ran.
 TAG_SIZE = 6.5 # The length of one side of an apriltag, in inches
 SEND_DATA = True  # Sends data to URL if True. Set to False for debug
+MAX_LOCATION_HISTORY_LENGTH = 20
+MODE_THRESHOLD = 1
 
 
-BASE_STATION_DEVICE_ID = hash(platform_node()+str(randint(0,1000000))+environ["USER"]+str(randint(0,1000000))+str(DEVICE_ID)+str(time.time()))
+BASE_STATION_DEVICE_ID = hash(platform_node()+str(randint(0,1000000))+str(randint(0,1000000))+str(DEVICE_ID)+str(time.time()))
 
 def main():
     # DEBUGGING AND TIMING VARIABLES
@@ -85,6 +87,8 @@ def main():
     obj_points = np.ndarray((4, 3))  # 4 3D points
     detections = []
     past_time = time.time()
+    location_history = []
+    discovered_ids = set()
     while True:
         if not camera.isOpened():
             print("Failed to open camera")
@@ -106,7 +110,7 @@ def main():
 
         
         data_for_BS = {"DEVICE_ID": str(BASE_STATION_DEVICE_ID), "TIMESTAMP": time.time(), "DEVICE_CENTER_X": FRAME_WIDTH/2, "DEVICE_CENTER_Y": FRAME_HEIGHT/2, "position_data" : []}
-
+        snapshot_locations = []
         for i, d in enumerate(detections):
             # TODO draw tag - might be better to generalize, because
             # locate_cameras does this too.
@@ -118,56 +122,89 @@ def main():
             # Scale the coordinates, and print for debugging
             # prints Device ID :: tag id :: x y z angle
             # TODO debug offset method - is better, but not perfect.
-            center_cell_offset = get_closest_reference_point_offset(detected_x,detected_y,center_cell_offsets)
-
-            x = x_scale_factor * (detected_x + overall_center_x_offset) + predict_x_offset((detected_x,detected_y))
-            y = y_scale_factor * (detected_y + overall_center_y_offset) + predict_y_offset((detected_x,detected_y))
+            #center_cell_offset = get_closest_reference_point_offset(detected_x,detected_y,center_cell_offsets)
+            x_offset, y_offset, _ = get_x_y_angle_offsets(detected_x, detected_y, center_cell_offsets)
+            x = x_scale_factor * (detected_x + overall_center_x_offset) + x_offset
+            y = y_scale_factor * (detected_y + overall_center_y_offset) + y_offset
             z = detected_z
-            angle = ((detected_angle + overall_angle_offset)%360 + predict_y_offset((detected_x,detected_y)))%360
+            # angle fudge factor interpolation still needs work,
+            # it may be possible but angle errors are not as predictable
+            # as distance errors
+            angle = ((detected_angle + overall_angle_offset)%360)%360
             (ctr_x, ctr_y) = d.center
             
             # displaying tag id
             # cv2.putText(undst, str(round(angle,2)),(int(ctr_x), int(ctr_y)), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 0, 255),2)
 
-            if detector.detector != None:
-                pose, e0, e1 = detector.detector.detection_pose(d, util.camera_matrix_to_camera_params(camera_matrix), TAG_SIZE)
-                util.draw_square(undst,util.camera_matrix_to_camera_params(camera_matrix), TAG_SIZE, pose)
-            
+
+            # displaying tag id
+            cv2.putText(undst, str(d.tag_id),(int(ctr_x), int(ctr_y)), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 0, 255),2)
+            cv2.putText(undst, str((round(x),round(y))),(int(ctr_x), int(ctr_y)+15), cv2.FONT_HERSHEY_SIMPLEX, .5,  (255, 0, 255),2)
+            cv2.putText(undst, str(round(angle)),(int(ctr_x), int(ctr_y)+30), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 255, 255),2)
            
 
-            # prints DEVICE_ID tag id x y z angle
-            print("{}, {},{},{},{},{}".format(BASE_STATION_DEVICE_ID, d.tag_id, x, y, z, angle))
-            data_for_BS["position_data"].append({"id": str(d.tag_id), "image_x": ctr_x, "image_y": ctr_y,"x": x, "y": y, "orientation": angle})
+            # # prints DEVICE_ID tag id x y z angle
+            # print("{}, {},{},{},{},{}".format(BASE_STATION_DEVICE_ID, d.tag_id, x, y, z, angle))
+            snapshot_locations.append({"id": str(d.tag_id), "image_x": ctr_x, "image_y": ctr_y,"x": x, "y": y, "orientation": angle})
+            discovered_ids.add(str(d.tag_id))
+        location_history.append(snapshot_locations)
 
-        data_for_BS["TIMESTAMP"] = time.time()
-        # Send the data to the URL specified.
-        # This is usually a URL to the base station.
-        if SEND_DATA:
-            payload = data_for_BS
-            r = requests.post(url, json=payload)
-            status_code = r.status_code
-            if status_code / 100 != 2:
-                # Status codes not starting in '2' are usually error codes.
-                print(
-                    "WARNING: Basestation returned status code {}".format(
-                        status_code
+        if len(location_history) >= MAX_LOCATION_HISTORY_LENGTH:
+            average_locations = []
+            for id in list(discovered_ids):
+                locations_with_id = [location for snapshot_locations in location_history for location in snapshot_locations if location["id"] == id]
+                if len(locations_with_id) > 0:
+                    average_locations.append({
+                        "id": id, 
+                        "image_x": util.average_value_for_key(locations_with_id, "image_x",True,1), 
+                        "image_y": util.average_value_for_key(locations_with_id, "image_y",True,1),
+                        "x": util.average_value_for_key(locations_with_id, "x",True,1),
+                        "y": util.average_value_for_key(locations_with_id, "y",True,1), 
+                        "orientation": util.average_value_for_key(locations_with_id, "orientation",True,1)%360
+                    })
+                else:
+                    discovered_ids.remove(id)
+            
+            # prints DEVICE_ID tag id x y z angle
+            print("id,actual_x,actual_y,actual_angle")
+            average_locations.sort(key=lambda entry : int(entry["id"]))     
+            [print("{},{},{},{}".format(location["id"], location["x"], location["y"], location["orientation"])) for location in average_locations]
+            while len(location_history) >= MAX_LOCATION_HISTORY_LENGTH:
+                location_history.pop(0)
+
+            data_for_BS["position_data"] = average_locations
+            data_for_BS["TIMESTAMP"] = time.time()
+            # Send the data to the URL specified.
+            # This is usually a URL to the base station.
+            if SEND_DATA:
+                payload = data_for_BS
+                r = requests.post(url, json=payload)
+                status_code = r.status_code
+                if status_code / 100 != 2:
+                    # Status codes not starting in '2' are usually error codes.
+                    print(
+                        "WARNING: Basestation returned status code {}".format(
+                            status_code
+                        )
                     )
-                )
-            else:
-                print(r)
-                print("total seconds:",r.elapsed.total_seconds())
-                num_frames += 1
-                print(
-                    "Vision FPS (Vision System outflow): {}".format(
-                        num_frames / (time.time() - past_time)
+                else:
+                    print(r)
+                    print("total seconds:",r.elapsed.total_seconds())
+                    num_frames += 1
+                    print(
+                        "Vision FPS (Vision System outflow): {}".format(
+                            num_frames / (time.time() - past_time)
+                        )
                     )
-                )
         cv2.imshow("Tag Locations", undst)
         if cv2.waitKey(1) & 0xFF == ord(" "):
             break
         else:
             continue
-    pass
+
+
+        
+    
 
 
 def get_transform_matrix(file):
@@ -232,7 +269,140 @@ def get_args():
 
 def get_closest_reference_point_offset(x, y, center_cell_offsets):
     """ gets the reference point and its corresponding offsets that are closest to the detected point """
-    return min(center_cell_offsets, key=lambda item: util.distance(x, y, item["reference_point_x"],item["reference_point_y"]))
+    try:
+        return min(center_cell_offsets, key=lambda item: util.distance(x, y, item["reference_point_x"],item["reference_point_y"]))
+    except:
+        return None
+
+def get_two_point_line_equation(x1, y1, x2, y2):
+    try:
+        m = (y2-y1)/(x2-x1)
+        b = m*(-x2)+y2
+    except:
+        print("here")
+        m = 0
+        b = (y1+y2)/2
+    return lambda x: m*x + b
+
+
+def linear_interpolation_with_2_ref_points(x1, y1, x2, y2, x):
+    linear_model = get_two_point_line_equation(x1, y1, x2, y2)
+    return linear_model(x)
+
+def get_x_y_angle_offsets(x, y, center_cell_offsets):
+
+    closest_offsets = []
+    remaining_offsets = center_cell_offsets[:]
+    for i in range(4):
+        closest_offsets.append(get_closest_reference_point_offset(x,y,remaining_offsets))
+        remaining_offsets.pop(remaining_offsets.index(closest_offsets[i])) 
+    
+    right_offset = None
+    left_offset = None
+    closest_offset = closest_offsets[0]
+    left_most_offset = min(closest_offsets[1:4], key=lambda offset: offset["reference_point_x"])
+    left_most_offset_delta = abs(closest_offset["reference_point_x"]-left_most_offset["reference_point_x"])
+    right_most_offset = max(closest_offsets[1:4], key=lambda offset: offset["reference_point_x"])
+    right_most_offset_delta = abs(right_most_offset["reference_point_x"]-closest_offset["reference_point_x"])
+    other_offset = util.compliment_of_list(closest_offsets, [left_most_offset, closest_offset, right_most_offset])[0]
+    if left_most_offset_delta > right_most_offset_delta:
+        right_offset = closest_offset
+        go_with_other = abs(left_most_offset["reference_point_y"]-y) > abs(other_offset["reference_point_y"]-y) and other_offset["reference_point_x"] < closest_offset["reference_point_x"]
+        left_offset =  other_offset if go_with_other else left_most_offset
+    else:
+        left_offset = closest_offset
+        go_with_other = abs(right_most_offset["reference_point_y"]-y) > abs(other_offset["reference_point_y"]-y) and other_offset["reference_point_x"] > closest_offset["reference_point_x"]
+        right_offset = other_offset if go_with_other else right_most_offset
+
+    x_offset = linear_interpolation_with_2_ref_data_points(x, "reference_point_x", "x_offset", left_offset, right_offset)
+    x_offset = 0 if x_offset == None else x_offset
+
+    
+    top_offset = max(center_cell_offsets, key=lambda offset: offset["reference_point_y"])
+    bottom_offset = min(center_cell_offsets, key=lambda offset: abs(offset["reference_point_y"] - y))
+    
+    
+    bottom_offset = None
+    top_offset = None
+    closest_offset = closest_offsets[0]
+    bottom_most_offset = min(closest_offsets[1:4], key=lambda offset: offset["reference_point_y"])
+    bottom_most_offset_delta = abs(closest_offset["reference_point_y"]-bottom_most_offset["reference_point_y"])
+    top_most_offset = max(closest_offsets[1:4], key=lambda offset: offset["reference_point_y"])
+    top_most_offset_delta = abs(top_most_offset["reference_point_y"]-closest_offset["reference_point_y"])
+    other_offset = util.compliment_of_list(closest_offsets, [bottom_most_offset, closest_offset, top_most_offset])[0]
+    if bottom_most_offset_delta > top_most_offset_delta:
+        top_offset = closest_offset
+        go_with_other = abs(bottom_most_offset["reference_point_x"]-x) > abs(other_offset["reference_point_x"]-x) and other_offset["reference_point_y"] < closest_offset["reference_point_y"] 
+        bottom_offset = other_offset if go_with_other else bottom_most_offset
+    else:
+        bottom_offset = closest_offset
+        go_with_other = abs(top_most_offset["reference_point_x"]-x) > abs(other_offset["reference_point_x"]-x) and other_offset["reference_point_y"] > closest_offset["reference_point_y"] 
+        top_offset = other_offset if go_with_other else top_most_offset
+
+    
+    y_offset = linear_interpolation_with_2_ref_data_points(y, "reference_point_y", "y_offset", bottom_offset, top_offset)
+    y_offset = 0 if y_offset == None else y_offset
+
+
+    angle_offset_x = linear_interpolation_with_2_ref_data_points(x, "reference_point_x", "angle_offset", left_offset, right_offset)
+    angle_offset_x = 0 if angle_offset_x == None else angle_offset_x
+
+    angle_offset_y = linear_interpolation_with_2_ref_data_points(y, "reference_point_y", "angle_offset", bottom_offset, top_offset)
+    angle_offset_y = 0 if angle_offset_y == None else angle_offset_y
+
+    x_offsets_distance = distance_from_2_ref_data_points(x,y,"reference_point_x","reference_point_y", left_offset, right_offset)
+    y_offsets_distance = distance_from_2_ref_data_points(x,y,"reference_point_x","reference_point_y", bottom_offset, top_offset)
+
+    angle_offset = 0
+    if x_offsets_distance != None and y_offsets_distance != None:
+        angle_offset = util.weighted_average([angle_offset_x,angle_offset_y],[y_offsets_distance,x_offsets_distance])
+    elif x_offsets_distance != None:
+        angle_offset = angle_offset_x
+    elif y_offsets_distance != None:
+        angle_offset = angle_offset_y
+    
+
+    return (x_offset, y_offset, angle_offset)
+
+def linear_interpolation_with_2_ref_data_points(independent_variable_input, independent_variable_property, dependent_property, reference_point_1, reference_point_2):
+    result = None
+    x1 = util.get_property_or_default(reference_point_1,independent_variable_property)
+    y1 = util.get_property_or_default(reference_point_1,dependent_property)
+    x2 = util.get_property_or_default(reference_point_2,independent_variable_property)
+    y2 = util.get_property_or_default(reference_point_2,dependent_property)
+    point1_exists = x1 != None and y1 != None
+    point2_exists = x2 != None and y2 != None
+    if point1_exists and point2_exists:
+        result = linear_interpolation_with_2_ref_points(x1, y1, x2, y2, independent_variable_input)
+    elif point1_exists:
+        result = y1
+    elif point2_exists:
+        result = y2
+    else:
+        # print("neither point exists")
+        pass
+        
+    return result
+
+def distance_from_2_ref_data_points(independent_variable_input, dependent_variable_input, independent_variable_property, dependent_property, reference_point_1, reference_point_2):
+    result = None
+    x1 = util.get_property_or_default(reference_point_1,independent_variable_property)
+    y1 = util.get_property_or_default(reference_point_1,dependent_property)
+    x2 = util.get_property_or_default(reference_point_2,independent_variable_property)
+    y2 = util.get_property_or_default(reference_point_2,dependent_property)
+    point1_exists = x1 != None and y1 != None
+    point2_exists = x2 != None and y2 != None
+    if point1_exists and point2_exists:
+        result = util.distance(independent_variable_input,dependent_variable_input,x1,y1)+util.distance(independent_variable_input,dependent_variable_input,x2,y2)
+    else:
+        # print("a point doesn't exist")
+        pass
+        
+    return result
+
+
+
+
 
 if __name__ == "__main__":
     main()

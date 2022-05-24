@@ -80,27 +80,27 @@ class Minibot:
             delta_position = 0
             delta_orientation = 0
             if self.direction == "forward":
-                delta_position = 1
+                delta_position = .1
             elif self.direction == "right":
-                delta_orientation = -5
+                delta_orientation = -.5
             elif self.direction == "backward":
-                delta_position = -1
+                delta_position = -.1
             elif self.direction == "left":
-                delta_orientation = 5
+                delta_orientation = .5
             else:
                 pass
         
             try:
-                vision_data = requests.get("http://localhost:8080/vision",params={"id":"-1"}).json()
+                vision_data = requests.get("http://localhost:8080/vision",params={"id":"-1", "virtual_room_id": "-pqCHcy9vxzzfyVQBVjJk",}).json()
                 print(vision_data)
                 if vision_data:
                     requests.post("http://localhost:8080/virtual-objects", json={"add": True,
-                    "virtual_objects": [{"id":"-1", "name": "minibot-1", "type": "minibot","x": vision_data['x']+delta_position*math.cos(math.radians(vision_data['orientation'])), "y" : vision_data['y']+delta_position*math.sin(math.radians(vision_data['orientation'])), "orientation": vision_data['orientation']+delta_orientation}]})
+                    "virtual_objects": [{"virtual_room_id": "-pqCHcy9vxzzfyVQBVjJk","id":"-1", "name": "minibot-1", "type": "minibot","x": vision_data[0]['x']+delta_position*math.cos(math.radians(vision_data[0]['orientation'])), "y" : vision_data[0]['y']+delta_position*math.sin(math.radians(vision_data[0]['orientation'])), "orientation": vision_data[0]['orientation']+delta_orientation}]})
                 else:
                     requests.post("http://localhost:8080/virtual-objects", json={"add": True,
-                    "virtual_objects": [{"id":"-1",  "name": "minibot-1", "type": "minibot", "x": 0, "y" : 0, "orientation": 0}]})
-            except:
-                pass
+                    "virtual_objects": [{"virtual_room_id": "-pqCHcy9vxzzfyVQBVjJk","id":"-1",  "name": "minibot-1", "type": "minibot", "x": 0, "y" : 0, "orientation": 0}]})
+            except Exception as e:
+                print(e)
 
 
     def main(self):
