@@ -1,0 +1,12 @@
+{
+    "commands" : {
+        "turn left": [0], 
+        "turn right": [1, 19], 
+        "go forwards": [2, 20], 
+        "stop": [4], 
+        "repeat": [5, 23, 22], 
+        "end": [3, 21, 18]
+    }, 
+    "tagRangeStart": 0, 
+    "tagRangeEnd": 23
+}

@@ -5,6 +5,7 @@ import CodeMirror from 'react-codemirror';
 require('codemirror/mode/python/python');
 
 
+
 class PythonEditor extends React.Component {
     constructor(props) {
         super(props);
@@ -285,6 +286,7 @@ class PythonEditor extends React.Component {
 export default class MinibotBlockly extends React.Component {
     constructor(props) {
         super(props);
+
         this.state = {
             blocklyFilename: 'FileName.xml',
             pyblock: "",
@@ -317,6 +319,9 @@ export default class MinibotBlockly extends React.Component {
         this.updateCustomBlocks = this.updateCustomBlocks.bind(this)
         this.customBlock = this.customBlock.bind(this)
         this.manageDefaultCustomBlocklyFunction = this.manageDefaultCustomBlocklyFunction.bind(this)
+    }
+
+    componentDidMount() {
     }
 
     /* Populates the customBlocklyList with a default function if addOrDelete == true
@@ -480,6 +485,7 @@ export default class MinibotBlockly extends React.Component {
         });
 
         /* Loads blockly state from parent component */
+        /* this.props.blocklyXml is poorly named. It's text not Xml*/
         if (this.props.blocklyXml) {
             let xml = Blockly.Xml.textToDom(this.props.blocklyXml);
             Blockly.Xml.domToWorkspace(xml, _this.workspace);

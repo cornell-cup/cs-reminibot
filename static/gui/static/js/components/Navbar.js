@@ -12,7 +12,7 @@ import {
   useLocation
 } from "react-router-dom";
 
-const allRoutes = ['/start', '/coding', '/user-analytics', '/history', 'vision']
+const allRoutes = ['/start', '/coding', '/user-analytics', '/history', 'vision', '/physical-blockly']
 const authorizationRestrictedRoutes = ['/user-analytics', '/history'];
 
 /**
@@ -78,6 +78,9 @@ const Navbar = (props) => {
         <Link id="coding-link" to="/coding" className={`nav-link ${activeIndex === 1 ? "active" : ""}`} onClick={(e) => { setActiveIndex(1) }}><FontAwesomeIcon icon="code" /> Coding</Link>
         {isLoggedIn &&
           <Link id="analytics-link" to="/user-analytics" className={`nav-link ${activeIndex === 2 ? "active" : ""}`} onClick={(e) => { setActiveIndex(2) }}><FontAwesomeIcon icon={Icons.faChartBar} /> Analytics</Link>
+        }
+        {
+          <Link id="physical-blockly-link" to="/physical-blockly" className={`nav-link ${activeIndex === 2 ? "active" : ""}`} onClick={(e) => { setActiveIndex(2) }}><FontAwesomeIcon icon={Icons.faChartBar} /> Physical Blockly</Link>
         }
         {isLoggedIn &&
           <Link id="history-link" to="/history" className={`nav-link ${activeIndex === 3 ? "active" : ""}`} onClick={(e) => { setActiveIndex(3) }}><FontAwesomeIcon icon={Icons.faChartBar} /> History</Link>

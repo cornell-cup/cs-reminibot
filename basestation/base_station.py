@@ -1,8 +1,8 @@
 """
 Base Station for the MiniBot.
 """
-
 import math
+import subprocess
 from basestation.bot import Bot
 from basestation.controller.minibot_sim_gui_adapter import run_program_string_for_gui_data
 from basestation.user_database import Submission, User
@@ -17,13 +17,14 @@ from typing import Any, Dict, List, Tuple, Optional
 import os
 import re
 import socket
-import sys
 import time
 import threading
-import pyaudio
 import speech_recognition as sr
 from copy import deepcopy
-
+import queue 
+import subprocess
+from basestation.util.units import AngleUnits, LengthUnits, convert_angle, convert_length
+import shlex
 from basestation.util.units import AngleUnits, LengthUnits, convert_angle, convert_length
 from basestation.util.world_builder import WorldBuilder
 
@@ -66,6 +67,9 @@ class BaseStation:
         self.virtual_objects = {}
         self.vision_snapshot = {}
         self.vision_object_map = {}
+        self.phys_blockly_py = None
+
+        self.py_commands = []
 
         self.blockly_function_map = {
             "move_forward": "fwd",         "move_backward": "back",
@@ -535,6 +539,7 @@ class BaseStation:
 
     @make_thread_safe
     def move_bot_wheels(self, bot_name: str, direction: str, power: str):
+        print("basestation: bot name = " + bot_name)
         """ Gives wheels power based on user input """
         bot = self.get_bot(bot_name)
         direction = direction.lower()
@@ -543,8 +548,26 @@ class BaseStation:
     def set_bot_mode(self, bot_name: str, mode: str):
         """ Set the bot to either line follow or object detection mode """
         bot = self.get_bot(bot_name)
-
-        if mode == "object_detection":
+        if(mode == "physical-blockly" or mode == "physical-blockly-2"):
+            print("starting phys blockly subprocess")
+            self.phys_blockly_py = None 
+            if(mode == 'physical-blockly'):
+                self.phys_blockly_py = subprocess.Popen(['python', 'pb.py', bot_name, '0'], cwd = 'basestation/piVision', 
+                    stdout=subprocess.PIPE, bufsize=1)
+            else: 
+                self.phys_blockly_py = subprocess.Popen(['python', 'pb.py', bot_name, '1'], cwd = 'basestation/piVision', 
+                    stdout=subprocess.PIPE, bufsize=1)
+            while True:
+                output = self.phys_blockly_py.stdout.readline()
+                if output == '' and self.phys_blockly_py.poll() is not None:
+                    break
+                if output:
+                    s = output.strip().decode("utf-8")
+                    if(s[0:3] != "pb:"):
+                        continue; 
+                    self.py_commands.append(s)
+                self.phys_blockly_py.poll()
+        elif mode == "object_detection":
             self.bot_vision_server = subprocess.Popen(
                 ['python', './basestation/piVision/server.py', '-p MobileNetSSD_deploy.prototxt', 
                 '-m', 'MobileNetSSD_deploy.caffemodel', '-mW', '2', '-mH', '2', '-v', '1'])
@@ -557,6 +580,16 @@ class BaseStation:
                 self.bot_vision_server.kill()
 
         bot.sendKV("MODE", mode)
+        
+    def end_physical_blockly(self): 
+        self.phys_blockly_py.kill()
+
+    def get_next_py_command(self):
+        if(len(self.py_commands) == 0):
+            return ""
+        val = self.py_commands[0]
+        self.py_commands.pop(0) 
+        return val
 
     def send_bot_script(self, bot_name: str, script: str):
         """Sends a python program to the specific bot"""
@@ -802,7 +835,7 @@ class BaseStation:
         submission.result = result
         db.session.commit()
 
-    def get_all_submissions(self, user: User) -> []:
+    def get_all_submissions(self, user: User):
         submissions = []
         submissions = Submission.query.filter_by(user_id=User.id)
         return submissions

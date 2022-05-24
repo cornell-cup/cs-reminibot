@@ -229,6 +229,7 @@ def move_servo(angle):
 def line_follow():
     """ Tell minibot to follow a line """
     acquire_lock()
+    transmit_continuously('T')
     release_lock()
 
 def object_detection():

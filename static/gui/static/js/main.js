@@ -24,6 +24,7 @@ import { withCookies, Cookies } from 'react-cookie';
 import Dashboard from './components/Analytics/dashboard.js';
 import History from './components/Analytics/submissionHistory.js';
 import Vision from './components/Vision/Vision.js';
+import PhysicalBlockly from './components/PhysicalBlockly/PhysicalBlockly.js';
 import { PythonCodeContext } from './context/PythonCodeContext.js';
 import { VirtualEnviromentContext } from './context/VirtualEnviromentContext.js';
 import VirtualEnviroment from './components/utils/VirtualEnviroment.js';
@@ -57,6 +58,8 @@ const Platform = withCookies((props) => {
   const [virtualRoomId, setVirtualRoomId] = useState(props.cookies.get('virtual_room_id') || nanoid())
   const [virtualEnviroment, setVirtualEnviroment] = useState(new VirtualEnviroment([], []));
 
+  const [pb, setPb] = useState("");
+
   useEffect(() => {
     setLoginEmail(props.cookies.get('current_user_email') || "");
     setVirtualRoomId(props.cookies.get('virtual_room_id') || nanoid());
@@ -65,7 +68,6 @@ const Platform = withCookies((props) => {
   useEffect(() => {
     props.cookies.set('virtual_room_id', virtualRoomId, { path: '/' });
   }, []);
-
 
 
   function setSelectedBotStyle(style) {
@@ -122,6 +124,16 @@ const Platform = withCookies((props) => {
           <Route path="/history">
             <History
               loginEmail={loginEmail}
+            />
+          </Route>
+          <Route path="/physical-blockly">
+            <PhysicalBlockly
+              selectedBotName={selectedBotName}
+              pb={pb}
+              setPb={setPb}
+              setPythonCode={setPythonCode}
+              setBlocklyXml={setBlocklyXml}
+              setPythonCodeState = {setPythonCodeState}
             />
           </Route>
           <Route path="/vision-page">

@@ -7,4 +7,3 @@ cd static/gui
 npm run webpack &
 echo "=========== STARTING BASESTATION ==============="
 cd ../..
-flask run

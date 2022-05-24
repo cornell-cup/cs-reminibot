@@ -34,17 +34,20 @@ def discover_bots():
     base_station.listen_for_minibot_broadcast()
     return json.dumps(True), status.HTTP_200_OK
 
+@app.route('/get-py-command', methods=['GET'])
+def get_py_command(): 
+    v = base_station.get_next_py_command()
+    return json.dumps(v)
 
 @app.route('/active-bots', methods=['GET'])
 def active_bots():
     """ Get all Minibots connected to the Basestation """
     return json.dumps(base_station.get_active_bots()), status.HTTP_200_OK
 
-
 @app.route('/wheels', methods=['POST'])
 def wheels():
     """ Makes the Minibot move. """
-    data = request.get_json()
+    data = json.loads(request.data, strict=False)
     bot_name = data['bot_name']
     if not bot_name:
         error_json = {"error_msg": NO_BOT_ERROR_MSG}
@@ -111,6 +114,10 @@ def mode():
     base_station.set_bot_mode(bot_name, mode)
     return json.dumps(True), status.HTTP_200_OK
 
+@app.route('/end_physical_blockly', methods=['GET'])
+def end_physical_blockly():
+    base_station.end_physical_blockly()
+    return json.dumps(True), status.HTTP_200_OK
 
 @app.route('/vision', methods=['POST', 'GET'])
 def vision():
