@@ -57,7 +57,7 @@ class ChatbotWrapper:
         '''Replaces self.context_stack with the default context.
         '''
         self.context_stack = []
-        # print("local context reset", self.context_stack)
+        print("local context reset", self.context_stack)
 
     def undo_context(self):
         '''Removes the last item from self.context_stack.

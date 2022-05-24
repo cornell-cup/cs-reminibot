@@ -53,6 +53,7 @@ const Navbar = (props) => {
 
   function handleLogout(e) {
     console.log("logout")
+    console.log("email", loginEmail);
     commit_context_stack_to_db(loginEmail);
     props.cookies.remove('current_user_email');
     setIsLoggedIn(false);

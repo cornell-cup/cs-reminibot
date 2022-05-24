@@ -59,14 +59,13 @@ const Platform = withCookies((props) => {
   const [pythonCodeState, setPythonCodeState] = useState(-1);
   const [selectedBotStyle, setSelectedBotStyleState] = useState(hiddenStyle);
   const [loginEmail, setLoginEmail] = useState(props.cookies.get('current_user_email') || "");
-  const [contextHistoryLoaded, setContextHistoryLoaded] = useState(false);
   const [virtualRoomId, setVirtualRoomId] = useState(props.cookies.get('virtual_room_id') || nanoid())
   const [virtualEnviroment, setVirtualEnviroment] = useState(new VirtualEnviroment([], []));
 
   useEffect(() => {
     let tmp_email = props.cookies.get('current_user_email') || "";
-    let tmp_cont_hist_loaded = contextHistoryLoaded && tmp_email == loginEmail
-    setContextHistoryLoaded(tmp_cont_hist_loaded);
+    let tmp_cont_hist_loaded = props.contextHistoryLoaded && tmp_email == loginEmail
+    props.setContextHistoryLoaded(tmp_cont_hist_loaded);
     setLoginEmail(tmp_email);
 
     setVirtualRoomId(props.cookies.get('virtual_room_id') || nanoid());
@@ -143,8 +142,8 @@ const Platform = withCookies((props) => {
             <ContextHistory
               parentContext={props.parentContext}
               loginEmail={loginEmail}
-              contextHistoryLoaded={contextHistoryLoaded}
-              setContextHistoryLoaded={setContextHistoryLoaded}
+              contextHistoryLoaded={props.contextHistoryLoaded}
+              setContextHistoryLoaded={props.setContextHistoryLoaded}
             />
           </Route>
 

@@ -761,9 +761,9 @@ class BaseStation:
         """
         user_email =  user_email if user_email else self.login_email
         curr_context_stack = self.chatbot.get_all_context()
-        print("current context stack", curr_context_stack)
-        print("user email", user_email)
         if curr_context_stack and user_email is not None:
+            print("user email", user_email)
+            print("commit context stack to db", curr_context_stack)
             # get user_id from user_email
             user_id = self.get_user_id_by_email(user_email)
             user = ChatbotTable.query.filter_by(id=user_id)
@@ -799,6 +799,7 @@ class BaseStation:
     def chatbot_clear_context(self) -> None:
         """ Resets all context stored in the Chatbot object. 
         """
+        print("reset context stack")
         self.chatbot.reset_context()
 
     def chatbot_delete_context_idx(self, idx) -> None:

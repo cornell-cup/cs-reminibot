@@ -27,7 +27,6 @@ function ContextHistory(props) {
       tmp_id++;
     }
     setID(tmp_id);
-    console.log("temp context history: ", tempContextHist)
     setContextHistory(tempContextHist);
   }
 
@@ -39,8 +38,6 @@ function ContextHistory(props) {
   }
 
   function concat_DB_context_to_local(local_context, db_context) {
-    console.log("db context", db_context);
-    console.log("local context", local_context);
     let concat_res = db_context.concat(local_context);
     replace_chatbot_context_stack(concat_res, handleInitialContextLoading);
   }

@@ -25,6 +25,7 @@ import { commit_context_stack_to_db, clear_chatbot_context_stack } from './compo
 function ClientGUI({ }) {
   const [chatbotContext, setChatbotContext] = useState("");
   const [selectedBotName, setSelectedBotName] = useState("");
+  const [contextHistoryLoaded, setContextHistoryLoaded] = useState(false);
 
 
   /**
@@ -98,22 +99,17 @@ function ClientGUI({ }) {
 
   useEffect(() => {
     window.addEventListener("beforeunload", alertUser);
-    window.addEventListener("unload", handleUnload);
     return () => {
       window.removeEventListener("beforeunload", alertUser);
     };
   }, []);
 
-  const handleUnload = (e) => {
-    e.preventDefault();
-    clear_chatbot_context_stack();
-    e.returnValue = "";
-  }
-
   const alertUser = (e) => {
     e.preventDefault();
     e.returnValue = "";
     commit_context_stack_to_db('');
+    clear_chatbot_context_stack();
+    setContextHistoryLoaded(false);
   };
 
   return (
@@ -125,10 +121,14 @@ function ClientGUI({ }) {
             parentContext={chatbotContext}
             selectedBotName={selectedBotName}
             setSelectedBotName={setSelectedBotName}
+
             setActiveMicComponent={setActiveMicComponent}
             activeMicComponent={activeMicComponent}
             botVoiceControlMic={botVoiceControlMic}
             setBotVoiceControlMic={setBotVoiceControlMic}
+
+            contextHistoryLoaded={contextHistoryLoaded}
+            setContextHistoryLoaded={setContextHistoryLoaded}
           />
         </div>
         <Chatbot
