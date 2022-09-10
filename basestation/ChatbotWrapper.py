@@ -22,7 +22,7 @@ FAILURE = 400
 class ChatbotWrapper:
 
     def __init__(self, context=default_context):
-        self.context_stack = []  # context
+        self.context_stack = [default_context]  # context
 
     def replace_context_stack(self, context_stack):
         '''Replaces the self.context_stack with <context_stack>.
@@ -56,7 +56,7 @@ class ChatbotWrapper:
     def reset_context(self):
         '''Replaces self.context_stack with the default context.
         '''
-        self.context_stack = []
+        self.context_stack = [default_context]
         print("local context reset", self.context_stack)
 
     def undo_context(self):

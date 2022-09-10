@@ -42,8 +42,6 @@ def chatbot_context():
        
         elif command == 'commit-to-db':
             returned = base_station.update_chatbot_context_db()
-            # if userEmail is '', basestation will use basestation.loginEmail
-            user_email = data["userEmail"]
             if returned == 1:
                 return json.dumps(True), status.HTTP_200_OK
             elif returned == -1:

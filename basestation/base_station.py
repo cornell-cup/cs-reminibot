@@ -104,8 +104,8 @@ class BaseStation:
         # working for you then comment it out and uncomment the other one.
         # NOTE: When you push, make sure only the top one is uncommented.
 
-        # self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        # self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
 
         
 
@@ -761,7 +761,7 @@ class BaseStation:
         """
         user_email =  user_email if user_email else self.login_email
         curr_context_stack = self.chatbot.get_all_context()
-        if curr_context_stack and user_email is not None:
+        if curr_context_stack and user_email:
             print("user email", user_email)
             print("commit context stack to db", curr_context_stack)
             # get user_id from user_email

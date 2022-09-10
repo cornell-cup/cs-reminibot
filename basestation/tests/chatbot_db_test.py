@@ -1,17 +1,5 @@
 """ Test file for chatbot database functionality.
 
-*** IMPORTANT ***
-The test will not pass when run repeatedly unless these two lines in 
-basestation/__init__.py are COMMENTED OUT
-and these same two lines are 
-UNCOMMENTED in basestation/databases/__init__.py
-
-THE TWO LINES:
-# db_filename = 'program.db' #or 'test.db' in chatbot_db_test.py
-# app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_filename}'  
-
-******************
-
 HOW TO RUN:
 COMMAND: python chatbot_db_test.py
 """
@@ -30,7 +18,7 @@ def app():
     """ Test version of __init__.py for the flask server
     """
     print("creating app")
-    app = create_app()
+    app = create_app(test_config = True)
     app.config.update({
     "TESTING": True,
     })
@@ -135,12 +123,10 @@ def test_get_db_context(client):
 
 
 def test_clear_local_context(client):
-    """d
-taabase    """
     # send the clear command
     response = client.post(
         '/chatbot-context',
-        data = json.dumps(dict(command = 'clear')),
+        data = json.dumps(dict(command = 'reset-context-stack')),
         content_type='application/json'
     )
     # make sure local context is clear now
@@ -226,7 +212,7 @@ def test_clear_local_context_guest(client):
     # send the clear command
     response = client.post(
         '/chatbot-context',
-        data = json.dumps(dict(command = 'clear')),
+        data = json.dumps(dict(command = 'reset-context-stack')),
         content_type='application/json'
     )
     # make sure local context is clear now
