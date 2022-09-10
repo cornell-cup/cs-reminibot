@@ -15,7 +15,7 @@ Please install the following:
 - [Git](https://github.com/git-guides/install-git)
 - Python version 3.8 or later
 - pip3 (The package manager for python3)
-- [Anaconda](https://www.anaconda.com/)
+- [Anaconda](https://www.anaconda.com/) (Optional but recommended for advanced users)
 - [CMake](https://cmake.org/download/)
 - Node.js (The Javascript runtime library)
 - npm (The Javascript package manager)
@@ -253,7 +253,7 @@ Download the official Anaconda distribution found [here](https://www.anaconda.co
 
 Please follow the official Windows NodeJS and npm installation instructions found [here](https://docs.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-windows).
 
-
+<!-- 
 ## Windows 10 (WSL): Installing Initial Requirements
 
 #### Windows Subsystem for Linux Installation
@@ -311,7 +311,7 @@ Upgrade npm to the lastest version by running:
 sudo npm install npm@latest -g
 ```
 
-[Continue with the remaining installation steps](#Continue)
+[Continue with the remaining installation steps](#Continue) -->
 
 # 5. Common Problems & Fixes:
 
