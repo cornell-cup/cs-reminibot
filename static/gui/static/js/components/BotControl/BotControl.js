@@ -9,12 +9,16 @@ import { INFOBOXTYPE, INFOBOXID, INFO_ICON } from "../utils/Constants.js";
 library.add(faInfoCircle);
 import UltimateGridview from "../Vision/UltimateGridview.js";
 
+
 function BotControl({
   selectedBotName,
   setSelectedBotName,
   selectedBotStyle,
   setSelectedBotStyle,
-}) {
+  activeMicComponent,
+  setActiveMicComponent,
+  botVoiceControlMic,
+  setBotVoiceControlMic }) {
   return (
     <div className="row">
       <div className="col-md">
@@ -34,6 +38,10 @@ function BotControl({
             setSelectedBotName={setSelectedBotName}
             selectedBotStyle={selectedBotStyle}
             setSelectedBotStyle={setSelectedBotStyle}
+            setActiveMicComponent={setActiveMicComponent}
+            activeMicComponent={activeMicComponent}
+            botVoiceControlMic={botVoiceControlMic}
+            setBotVoiceControlMic={setBotVoiceControlMic}
           />
         </div>
         <br />
@@ -66,6 +74,7 @@ function BotControl({
           </div >
         </div>
       </div>
+
     </div>
   );
 }
