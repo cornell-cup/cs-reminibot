@@ -98,10 +98,12 @@ class BaseStation:
         # so that we can connect to the Minibot
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-        ### IMPORTANT ###
+
+        ########################### IMPORTANT ###########################
         # Only one of the two lines below is necessary, if one is not
         # working for you then comment it out and uncomment the other one.
         # NOTE: When you push, make sure only the top one is uncommented.
+
         # self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
 
@@ -179,8 +181,6 @@ class BaseStation:
         else:
             print("The vision virtual object list was not given a valid update in update_virtual_objects")
 
-
-            
 
     def add_to_virtual_objects(self, virtual_object):
         """ Adds single virtual object to virtual objects list """
