@@ -5,7 +5,7 @@ from flask import request, render_template, jsonify, session, redirect
 import logging
 
 
-def create_app():
+def create_app(test_config=None):
     app = Flask(
         __name__, template_folder='../static/gui/', static_folder='../static/gui/static'
     )
@@ -15,8 +15,9 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SQLALCHEMY_ECHO'] = True
 
-    db_filename = 'program.db'
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_filename}'
+    if test_config is None:
+        db_filename = 'program.db'
+        app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_filename}'
 
     db.init_app(app)
     from basestation.databases.user_database import Submission, User, Chatbot
