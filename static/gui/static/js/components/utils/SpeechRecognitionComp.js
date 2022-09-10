@@ -24,13 +24,13 @@ recognition.lang = 'en-US'
 
 function SpeechRecognitionComp({ setText, mic }) {
 
-  const handleListen = () => {
+  async function handleListen() {
     if (mic) {
       console.log("start listening");
-      recognition.start()
+      await recognition.start()
       recognition.onend = () => recognition.start()
     } else {
-      recognition.stop()
+      await recognition.stop()
       recognition.onend = () => {
         console.log("Stopped listening per click")
       }
@@ -46,7 +46,10 @@ function SpeechRecognitionComp({ setText, mic }) {
   }
 
   useEffect(() => {
-    handleListen();
+    const handleListenWrapper = async () => {
+      await handleListen();
+    }
+    handleListenWrapper;
     console.log("mic", mic);
   }, [mic]);
 

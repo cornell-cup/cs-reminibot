@@ -20,6 +20,7 @@ import Chatbot from './components/Chatbot/chatbot2.js';
 // Utils import
 import { ACT_MIC_CHATBOT, ACT_MIC_COMMAND } from './components/utils/Constants.js';
 import { commit_context_stack_to_db, clear_chatbot_context_stack } from './components/utils/axios/chatbotAxios.js';
+import { set } from 'lodash';
 
 
 function ClientGUI({ }) {
@@ -81,17 +82,11 @@ function ClientGUI({ }) {
   useEffect(() => {
     if (activeMicComponent == ACT_MIC_CHATBOT && changedMic && !botVoiceControlMic) {
       setChangedMic(false);
-      setTimeout(function () {
-        setChatbotMic(true)
-      }, 500); //need to wait for 0.5 second to prevent race condition with the
-      // SpeechRecognition objection in <SpeechRecognitionComp.js>
+      setChatbotMic(true);
     }
     else if (activeMicComponent == ACT_MIC_COMMAND && changedMic && !chatbotMic) {
       setChangedMic(false);
-      setTimeout(function () {
-        setBotVoiceControlMic(true)
-      }, 500); //need to wait for 0.5 second to prevent race condition with the
-      // SpeechRecognition objection in <SpeechRecognitionComp.js>
+      setBotVoiceControlMic(true);
     }
   }, [botVoiceControlMic, chatbotMic, changedMic])
   /****************************************************************************/
