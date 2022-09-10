@@ -8,19 +8,19 @@ minibot and send custom scripts.
 
 This repository is currently in development.
 
-# Initial Requirements
+# 1. Initial Requirements
 
 Please install the following:
 
-- Git
-- Python3
+- [Git](https://github.com/git-guides/install-git)
+- Python version 3.8 or later
 - pip3 (The package manager for python3)
 - [Anaconda](https://www.anaconda.com/)
 - [CMake](https://cmake.org/download/)
 - Node.js (The Javascript runtime library)
 - npm (The Javascript package manager)
 
-**Click on the links below for Operating System specific guides on how to install the above dependencies:**
+**Click on the links below for Operating System-specific guides on how to install the above dependencies:**
 
 [Ubuntu 18 Installing Initial Requirements guide](#Ubuntu)
 
@@ -30,15 +30,15 @@ Please install the following:
 
 <a name="Continue"></a>
 
-# Cloning the respository
+# 2. Cloning the respository
 
-To clone (download) the respository onto your local machine. On Windows open WSL (Windows Subsystem for Linux) and run the following command. On Linux or MacOS open terminal and run the command.
+Please clone (download) the respository onto your local machine. On Windows open Powershell or WSL (Windows Subsystem for Linux) and run the following command. On Linux or MacOS open the terminal and run the command.
 
 ```
 git clone https://github.com/cornell-cup/cs-reminibot.git
 ```
 
-# Installing BaseStation Python Dependencies
+# 3. Installing BaseStation Python Dependencies
 
 Run the following commands to navigate to the basestation directory in and install the Python3 dependencies. On Windows open WSL (Windows Subsystem for Linux) and run the following commands. On Linux or MacOS open terminal and run the commands
 
@@ -48,10 +48,9 @@ pip3 install -r requirements.txt
 cd ..
 ```
 
-# Installing JavaScript Dependencies
+# 3. Installing JavaScript Dependencies
 
-Run the following commands to navigate to the gui directory in static/gui and install JavaScript dependencies.
-You should currently be in the cs-reminibot directory
+Navigate to the cs-reminibot directory and run the following commands to navigate to the gui directory in static/gui and install the JavaScript dependencies.
 
 ```
 cd static/gui
@@ -59,7 +58,10 @@ npm install
 cd ../..
 ```
 
-# Setting Up Vision System (Windows)
+# 4. Vision System Installation
+
+
+## Setting Up Vision System (Windows)
 
 See **Vision System Troubleshooting** section of this [troubleshooting guide](https://docs.google.com/document/d/17iD53BYdfiRP9ht-XtAxGYFpu55B4e1CCysB0ldnopU/edit?usp=sharing) for visual steps
 
@@ -69,7 +71,7 @@ See **Vision System Troubleshooting** section of this [troubleshooting guide](ht
 4. Select the **Open with** option from the resulting drop down.
 5. Select the **Git for Windows** option from the resulting sub-drop down
 
-# Setting Up Vision System (MacOS/Linux)
+## Setting Up Vision System (MacOS/Linux)
 
 Run the following commands to navigate to the apriltag-py directory in vision/apriltag-py and install JavaScript dependencies.
 On Linux or MacOS open terminal and run the commands. You should currently be in the cs-reminibot directory
@@ -84,7 +86,7 @@ sudo make install
 cd ../..
 ```
 
-# Run the BaseStation
+## Run the BaseStation
 
 After all dependencies are successfully installed, you can run the BaseStation on your
 computer and start working with the minibot.
@@ -104,7 +106,7 @@ Wait until you see the message _======= STARTING BASESTATION========_ in your te
 If you are having trouble running the previous line, make sure that python3 is installed.
 You can check this by typing `python3` in your terminal.
 
-# Run the Vision System
+## Run the Vision System
 
 To run the Vision system, run the following command. You should currently be in the cs-reminibot directory.
 
@@ -122,7 +124,7 @@ python3 calibrationgui.py
 cd ../../..
 ```
 
-# Operating System Specific Guides to Install Initial Requirements
+# 1a. Operating System-Specific Guides to Install Initial Requirements
 
 <a name="Ubuntu"></a>
 
@@ -170,22 +172,13 @@ Upgrade npm to the lastest version by running:
 sudo npm install npm@latest -g
 ```
 
-#### Pyaudio installation:
-
-These dependencies must be installed if you want to use the speech recognition feature of our Minibot platform. In a terminal run:
-
-```
-sudo apt-get install libasound-dev portaudio19-dev libportaudio2 libportaudiocpp0
-sudo apt-get install ffmpeg libav-tools
-```
-
 [Continue with the remaining installation steps](#Continue)
 
 <a name="MacOS"></a>
 
 ## MacOS: Installing Initial Requirements
 
-#### Homebrew Installation
+#### Homebrew installation
 
 1. Press _Cmd + Space_ to open Spotlight Search. Search for Terminal and open it.
 2. Visit brew.sh in your browser to install Homebrew. Copy the command specified in the installation section into your terminal and run it.
@@ -225,14 +218,6 @@ Upgrade npm to the lastest version by running:
 npm install npm@latest -g
 ```
 
-#### Pyaudio installation:
-
-These dependencies must be installed if you want to use the speech recognition feature of our Minibot platform. In a terminal run:
-
-```
-brew install portaudio
-```
-
 #### CMake installation:
 
 In a terminal run:
@@ -245,11 +230,31 @@ brew install cmake
 
 <a name="Windows"></a>
 
-## Windows 10 Native: Installing with installation file
+## Windows 10 (Native): Installing Initial Requirements
 
-Follow the steps in the **Installation** section of the [troubleshooting guide](https://docs.google.com/document/d/17iD53BYdfiRP9ht-XtAxGYFpu55B4e1CCysB0ldnopU/edit?usp=sharing).
+<!-- Follow the steps in the **Installation** section of the [troubleshooting guide](https://docs.google.com/document/d/17iD53BYdfiRP9ht-XtAxGYFpu55B4e1CCysB0ldnopU/edit?usp=sharing). -->
 
-## Windows 10: Installing Initial Requirements
+#### Python and pip3 installation
+Download the official Python distribution found [here](https://www.python.org/downloads/). This step should install pip3 automatically.
+
+After proper installation of Python and pip, the following commands should show the installed version, such as `Python 3.8.0` and `pip 21.2.4 from C:\Users\User\...`.
+```
+python --version
+python -m pip --version
+```
+
+#### Anaconda (optional but recommended)
+
+Installing Anaconda is recommended for advanced users in order to simplify Python version and package management.
+
+Download the official Anaconda distribution found [here](https://www.anaconda.com/products/distribution).
+
+#### NodeJS and npm
+
+Please follow the official Windows NodeJS and npm installation instructions found [here](https://docs.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-windows).
+
+
+## Windows 10 (WSL): Installing Initial Requirements
 
 #### Windows Subsystem for Linux Installation
 
@@ -306,12 +311,9 @@ Upgrade npm to the lastest version by running:
 sudo npm install npm@latest -g
 ```
 
-#### Pyaudio installation:
-
-Not supported for WSL.  
 [Continue with the remaining installation steps](#Continue)
 
-# Common Problems & Fixes:
+# 5. Common Problems & Fixes:
 
 #### ERROR: EACCES when trying to run npm commands
 
