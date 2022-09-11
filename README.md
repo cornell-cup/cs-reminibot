@@ -12,13 +12,11 @@ This repository is currently in development.
 
 Please install the following:
 
-- [Git](https://github.com/git-guides/install-git)
-- Python version 3.8 or later
-- pip3 (The package manager for python3)
-- [Anaconda](https://www.anaconda.com/) (Optional but recommended for advanced users)
-- [CMake](https://cmake.org/download/)
-- Node.js (The Javascript runtime library)
-- npm (The Javascript package manager)
+- Git ([Ubuntu](#Ubuntu_git) | [MacOS](#Mac_git) | [Windows 10](#Windows_git))
+- Python version 3.8 or later & pip3 ([Ubuntu](#Ubuntu_python) | [MacOS](#Mac_python) | [Windows 10](#Windows_python))
+- [Anaconda](https://www.anaconda.com/) (Optional but recommended for advanced users) ([MacOS](#Mac_conda) | [Windows 10](#Windows_conda))
+- Cmake ([MacOS](#Mac_cmake) | [Windows 10](#Windows_cmake))
+- Node.js (the Javascript runtime library) and npm (the Javascript package manager) ([Ubuntu](#Ubuntu_node) | [MacOS](#Mac_node) | [Windows 10](#Windows_node))
 
 **Click on the links below for Operating System-specific guides on how to install the above dependencies:**
 
@@ -126,19 +124,22 @@ cd ../../..
 
 # 1a. Operating System-Specific Guides to Install Initial Requirements
 
-<a name="Ubuntu"></a>
+<a name="#Ubuntu"></a>
 
 ## Ubuntu 18: Installing Initial Requirements
 
-#### Git installation:
+<a name="#Ubuntu_git"></a>
+
+#### Git installation
 
 In a terminal run:
 
 ```
 sudo apt install git
 ```
+<a name="#Ubuntu_python"></a>
 
-#### Python3 installation:
+#### Python3 installation
 
 Python 3 should already be installed. Run the following command in a terminal and you should see the python interpreter open.
 
@@ -148,7 +149,7 @@ python3
 
 Run quit() in the interpreter to exit out of it.
 
-#### Pip3 installation:
+#### Pip3 installation
 
 In a terminal run:
 
@@ -156,7 +157,9 @@ In a terminal run:
 sudo apt install python3-pip
 ```
 
-#### Node.js and npm installation:
+<a name="#Ubuntu_node"></a>
+
+#### Node.js and npm installation
 
 In a terminal run:
 
@@ -174,7 +177,7 @@ sudo npm install npm@latest -g
 
 [Continue with the remaining installation steps](#Continue)
 
-<a name="MacOS"></a>
+<a name="#MacOS"></a>
 
 ## MacOS: Installing Initial Requirements
 
@@ -188,7 +191,7 @@ sudo npm install npm@latest -g
 brew upgrade
 ```
 
-#### Git installation:
+#### Git installation
 
 In a terminal run:
 
@@ -196,7 +199,9 @@ In a terminal run:
 brew install git
 ```
 
-#### Python3 and Pip3 installation:
+<a name="#Mac_python"></a>
+
+#### Python3 and Pip3 installation
 
 In a terminal run:
 
@@ -204,7 +209,16 @@ In a terminal run:
 brew install python
 ```
 
-#### Node.js and npm installation:
+<a name="#Mac_conda"></a>
+#### Anaconda installation (optional but recommended)
+
+Installing Anaconda is recommended for advanced users in order to simplify Python version and package management.
+
+Follow the instructions to install Anaconda through homebrew found [here](https://formulae.brew.sh/cask/anaconda).
+
+<a name="#Mac_node"></a>
+
+#### Node.js and npm installation
 
 In a terminal run:
 
@@ -217,8 +231,9 @@ Upgrade npm to the lastest version by running:
 ```
 npm install npm@latest -g
 ```
+<a name="#Mac_cmake"></a>
 
-#### CMake installation:
+#### CMake installation
 
 In a terminal run:
 
@@ -228,11 +243,20 @@ brew install cmake
 
 [Continue with the remaining installation steps](#Continue)
 
-<a name="Windows"></a>
+<a name="#Windows"></a>
 
 ## Windows 10 (Native): Installing Initial Requirements
 
 <!-- Follow the steps in the **Installation** section of the [troubleshooting guide](https://docs.google.com/document/d/17iD53BYdfiRP9ht-XtAxGYFpu55B4e1CCysB0ldnopU/edit?usp=sharing). -->
+
+
+<a name="#Windows_git"></a>
+
+#### Git installation
+
+Follow the instructions under **Install Git on Windows** found [here](https://github.com/git-guides/install-git).
+
+<a name="#Windows_python"></a>
 
 #### Python and pip3 installation
 Download the official Python distribution found [here](https://www.python.org/downloads/). This step should install pip3 automatically.
@@ -243,13 +267,24 @@ python --version
 python -m pip --version
 ```
 
-#### Anaconda (optional but recommended)
+<a name="#Windows_conda"></a>
+
+#### Anaconda installation (optional but recommended)
 
 Installing Anaconda is recommended for advanced users in order to simplify Python version and package management.
 
 Download the official Anaconda distribution found [here](https://www.anaconda.com/products/distribution).
 
-#### NodeJS and npm
+
+<a name="#Windows_cmake"></a>
+
+#### CMake installation
+
+Download and install the official CMake distribution found [here](https://cmake.org/download/).
+
+<a name="#Windows_node"></a>
+
+#### NodeJS and npm installation
 
 Please follow the official Windows NodeJS and npm installation instructions found [here](https://docs.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-windows).
 
@@ -313,7 +348,7 @@ sudo npm install npm@latest -g
 
 [Continue with the remaining installation steps](#Continue) -->
 
-# 5. Common Problems & Fixes:
+# 5. Common Problems & Fixes
 
 #### ERROR: EACCES when trying to run npm commands
 
