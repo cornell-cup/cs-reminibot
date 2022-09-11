@@ -124,11 +124,11 @@ cd ../../..
 
 # 1a. Operating System-Specific Guides to Install Initial Requirements
 
-<a name="#Ubuntu"></a>
+<a name="Ubuntu"></a>
 
 ## Ubuntu 18: Installing Initial Requirements
 
-<a name="#Ubuntu_git"></a>
+<a name="Ubuntu_git"></a>
 
 #### Git installation
 
@@ -137,7 +137,7 @@ In a terminal run:
 ```
 sudo apt install git
 ```
-<a name="#Ubuntu_python"></a>
+<a name="Ubuntu_python"></a>
 
 #### Python3 installation
 
@@ -157,7 +157,7 @@ In a terminal run:
 sudo apt install python3-pip
 ```
 
-<a name="#Ubuntu_node"></a>
+<a name="Ubuntu_node"></a>
 
 #### Node.js and npm installation
 
@@ -177,7 +177,7 @@ sudo npm install npm@latest -g
 
 [Continue with the remaining installation steps](#Continue)
 
-<a name="#MacOS"></a>
+<a name="MacOS"></a>
 
 ## MacOS: Installing Initial Requirements
 
@@ -199,7 +199,7 @@ In a terminal run:
 brew install git
 ```
 
-<a name="#Mac_python"></a>
+<a name="Mac_python"></a>
 
 #### Python3 and Pip3 installation
 
@@ -209,14 +209,14 @@ In a terminal run:
 brew install python
 ```
 
-<a name="#Mac_conda"></a>
+<a name="Mac_conda"></a>
 #### Anaconda installation (optional but recommended)
 
 Installing Anaconda is recommended for advanced users in order to simplify Python version and package management.
 
 Follow the instructions to install Anaconda through homebrew found [here](https://formulae.brew.sh/cask/anaconda).
 
-<a name="#Mac_node"></a>
+<a name="Mac_node"></a>
 
 #### Node.js and npm installation
 
@@ -231,7 +231,7 @@ Upgrade npm to the lastest version by running:
 ```
 npm install npm@latest -g
 ```
-<a name="#Mac_cmake"></a>
+<a name="Mac_cmake"></a>
 
 #### CMake installation
 
@@ -243,20 +243,20 @@ brew install cmake
 
 [Continue with the remaining installation steps](#Continue)
 
-<a name="#Windows"></a>
+<a name="Windows"></a>
 
 ## Windows 10 (Native): Installing Initial Requirements
 
 <!-- Follow the steps in the **Installation** section of the [troubleshooting guide](https://docs.google.com/document/d/17iD53BYdfiRP9ht-XtAxGYFpu55B4e1CCysB0ldnopU/edit?usp=sharing). -->
 
 
-<a name="#Windows_git"></a>
+<a name="Windows_git"></a>
 
 #### Git installation
 
 Follow the instructions under **Install Git on Windows** found [here](https://github.com/git-guides/install-git).
 
-<a name="#Windows_python"></a>
+<a name="Windows_python"></a>
 
 #### Python and pip3 installation
 Download the official Python distribution found [here](https://www.python.org/downloads/). This step should install pip3 automatically.
@@ -267,7 +267,7 @@ python --version
 python -m pip --version
 ```
 
-<a name="#Windows_conda"></a>
+<a name="Windows_conda"></a>
 
 #### Anaconda installation (optional but recommended)
 
@@ -276,13 +276,13 @@ Installing Anaconda is recommended for advanced users in order to simplify Pytho
 Download the official Anaconda distribution found [here](https://www.anaconda.com/products/distribution).
 
 
-<a name="#Windows_cmake"></a>
+<a name="Windows_cmake"></a>
 
 #### CMake installation
 
 Download and install the official CMake distribution found [here](https://cmake.org/download/).
 
-<a name="#Windows_node"></a>
+<a name="Windows_node"></a>
 
 #### NodeJS and npm installation
 
