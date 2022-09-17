@@ -16,6 +16,7 @@ Please install the following:
 - [Anaconda](https://www.anaconda.com/) (Optional but recommended for advanced users) ([MacOS](#Mac_conda) | [Windows 10](#Windows_conda))
 - Cmake ([MacOS](#Mac_cmake) | [Windows 10](#Windows_cmake))
 - Node.js (the Javascript runtime library) and npm (the Javascript package manager) ([Ubuntu](#Ubuntu_node) | [MacOS](#Mac_node) | [Windows 10](#Windows_node))
+- Windows only - [Build Tools for Visual Studio 2022](https://aka.ms/vs/17/release/vs_BuildTools.exe)
 
 **Click on the links below for Operating System-specific guides on how to install the above dependencies:**
 
@@ -134,7 +135,7 @@ To stop running the program, press Ctrl+C in the terminal window.
 The following script in the `minibot` directory starts up a virtual Minibot to send messages to the BaseStation.
 
 ```
-cd /minibot
+cd minibot
 python minibot.py -t
 ```
 To stop running the program, press Ctrl+C in the terminal window.
