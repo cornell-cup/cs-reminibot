@@ -1,10 +1,9 @@
 # MiniBot Platform
 
-Minibot is a modular robotics kit meant for children and students from age 6 - 18,
-developed in partnership with DaVinci Robotics. This repository contains sample
-scripts that allow users to run simple algorithms on their minibot, as well as
-a simple web app that is a simple interface from which users can control the
-minibot and send custom scripts.
+Minibot is a modular robotics kit designed for students from age 6 - 18
+developed in partnership with DaVinci Robotics. This repository contains 
+a web app for controlling the Minibot and sample
+scripts that allow users to run simple algorithms on their Minibot.
 
 This repository is currently in development.
 
@@ -38,13 +37,18 @@ git clone https://github.com/cornell-cup/cs-reminibot.git
 
 # 3. Installing BaseStation Python Dependencies
 
-Run the following commands to navigate to the basestation directory in and install the Python3 dependencies. On Windows open WSL (Windows Subsystem for Linux) and run the following commands. On Linux or MacOS open terminal and run the commands
+Run the following commands to navigate to the basestation directory in and install the Python3 dependencies. On Windows open WSL (Windows Subsystem for Linux) and run the following commands. On Linux or MacOS open terminal and run the following commands:
 
 ```
 cd cs-reminibot/basestation
 pip3 install -r requirements.txt
 cd ..
 ```
+<a name="conda_install"></a>
+
+## Optional Anaconda-based installation
+
+For Windows users who are having trouble
 
 # 3. Installing JavaScript Dependencies
 
@@ -56,7 +60,7 @@ npm install
 cd ../..
 ```
 
-# 4. Vision System Installation
+# 4. Installing the Vision System
 
 
 ## Setting Up Vision System (Windows)
@@ -84,27 +88,19 @@ sudo make install
 cd ../..
 ```
 
-## Run the BaseStation
+# 6. Running the WebGUI
+After all dependencies are successfully installed, you can run the WebGUI on your computer and start working with the Minibot.
 
-After all dependencies are successfully installed, you can run the BaseStation on your
-computer and start working with the minibot.
-
-The BaseStation is the intermediary that manages information flow between the minibot and
-hardware to the software and GUI. BaseStation runs on `cs-reminibot/basestation/base_station_interface.py` and is a
-simple web application that runs on HTTP.
-
-To run the BaseStation, run the following command. You should currently be in the cs-reminibot directory.
-**If you want the use the speech recognition feature of the Minibot platform, run this command in your regular terminal (not VSCode terminal). This is because VSCode does not have permission to access your computer's microphone.**
-
+From the terminal, navigate to the home `cs-reminibot` directory and run the following command.
 ```
-./run_BS.sh
+./run_bs.sh
 ```
 
-Wait until you see the message _======= STARTING BASESTATION========_ in your terminal. Go to any browser on your computer and go to `localhost:8080/start` to see the GUI in action.
-If you are having trouble running the previous line, make sure that python3 is installed.
-You can check this by typing `python3` in your terminal.
+Wait until you see the message _======= STARTING BASESTATION========_ in your terminal. Go to any browser on your computer and go to localhost:8080/start to see the GUI in action.
 
-## Run the Vision System
+Windows users who are having trouble with this step can try [installing the python dependencies via Anaconda](#conda_install).
+
+# 7. Running the Vision System
 
 To run the Vision system, run the following command. You should currently be in the cs-reminibot directory.
 
@@ -121,6 +117,27 @@ cd vision/apriltag-py/python
 python3 calibrationgui.py
 cd ../../..
 ```
+
+
+# 8. Running the BaseStation & WebGUI
+
+The BaseStation & WebGUI are both started by running the following command from the root of the `cs-reminibot` project directory in the terminal:
+
+```
+./run_BS.sh
+```
+
+To stop running the program, press Ctrl+C in the terminal window.
+
+# 9. Starting a virtual Minibot
+
+The following script in the `/minibot` directory starts up a virtual Minibot to send messages to the BaseStation.
+
+```
+cd /minibot
+python minibot.py -t
+```
+To stop running the program, press Ctrl+C in the terminal window.
 
 # 1a. Operating System-Specific Guides to Install Initial Requirements
 
@@ -349,6 +366,8 @@ sudo npm install npm@latest -g
 [Continue with the remaining installation steps](#Continue) -->
 
 # 5. Common Problems & Fixes
+
+Please see the [Minibot Software Install Troubleshooting Guide](https://docs.google.com/document/d/17iD53BYdfiRP9ht-XtAxGYFpu55B4e1CCysB0ldnopU/edit#heading=h.k4oli3pdzdzn) for common installation problems.
 
 #### ERROR: EACCES when trying to run npm commands
 
