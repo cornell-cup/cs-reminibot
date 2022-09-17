@@ -131,7 +131,7 @@ To stop running the program, press Ctrl+C in the terminal window.
 
 # 9. Starting a virtual Minibot
 
-The following script in the `/minibot` directory starts up a virtual Minibot to send messages to the BaseStation.
+The following script in the `minibot` directory starts up a virtual Minibot to send messages to the BaseStation.
 
 ```
 cd /minibot
