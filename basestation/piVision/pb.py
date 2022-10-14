@@ -101,10 +101,9 @@ threading.Thread(target=worker, daemon=True).start()
 # Create an object to read camera video 
 camVid = cv2.VideoCapture(0)
 iterations = 0
-    
+
 while(True): 
     _, frame = camVid.read()
-
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     detections, det_image = detector.detect(frame, return_image=True)
 

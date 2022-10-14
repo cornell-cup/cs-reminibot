@@ -370,7 +370,9 @@ library used by ctypes.
         '''Run detectons on the provided image. The image must be a grayscale
 image of type numpy.uint8.'''
 
-        assert len(img.shape) == 2
+        img = numpy.add(img[:, 0], img[:, 1])
+        assert len(
+            img.shape) == 2, ("the dimensions of the image are: " + str(len(img.shape)))
         assert img.dtype == numpy.uint8
 
         c_img = self._convert_image(img)
@@ -528,7 +530,7 @@ def _camera_params(pstr):
 
     params = tuple([float(param.strip()) for param in pstr.split(',')])
 
-    assert(len(params) == 4)
+    assert (len(params) == 4)
 
     return params
 
