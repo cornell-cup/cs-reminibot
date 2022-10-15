@@ -678,7 +678,9 @@ class BaseStation:
         """Registers a new user if the email and password are not null and
         there is no account associated wth the email yet"""
         print("registering new account")
-        if not email:
+        regex = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
+
+        if not email or not re.fullmatch(regex, email):
             return -1
         if not password:
             return 0
