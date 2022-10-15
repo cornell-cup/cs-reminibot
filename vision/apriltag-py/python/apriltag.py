@@ -370,7 +370,7 @@ library used by ctypes.
         '''Run detectons on the provided image. The image must be a grayscale
 image of type numpy.uint8.'''
 
-        img = numpy.add(img[:, 0], img[:, 1])
+        img = numpy.append(img[:, 0], img[:, 1], axis=0)
         assert len(
             img.shape) == 2, ("the dimensions of the image are: " + str(len(img.shape)))
         assert img.dtype == numpy.uint8
