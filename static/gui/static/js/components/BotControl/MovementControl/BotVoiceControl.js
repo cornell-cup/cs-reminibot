@@ -37,6 +37,7 @@ function BotVoiceControl({
       }
     } else {
       setInputText("Please connect to a bot!")
+      window.alert("Please connect to a bot!");
     }
   }
 

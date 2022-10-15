@@ -221,6 +221,9 @@ function Chatbot2({
       } else
         setActiveMicComponent(ACT_MIC_CHATBOT);
     }
+    else {
+      window.alert("Please connect to a bot!");
+    }
   }
 
   const alertInfo = (e) => {
