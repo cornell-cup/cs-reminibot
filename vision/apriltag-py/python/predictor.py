@@ -1,6 +1,4 @@
-
 import numpy as np
-
 
 class Predictor:
   def __init__(self, model=None):

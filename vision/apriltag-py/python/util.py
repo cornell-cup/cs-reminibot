@@ -431,8 +431,12 @@ def get_model_with_data(inputs,outputs):
 
 
 
-
 def get_predictors_with_calibration_file(calibration_file_name):
+    '''
+    The Predictors class takes in a model as a parameter (i.e. LinearRegression), and it is used to more easily
+    make predictions with the model
+    '''
+
     models = get_models_with_calibration_file(calibration_file_name)
     return {
         "x_offsets_predictor_x_input_only": Predictor(models["x_offsets_model_x_input_only"]),

@@ -10,7 +10,6 @@ from detector import Detector
 from detection import Detection
 
 
-
 MAX_DETECTOR_SNAPSHOTS = 100
 
 
@@ -22,6 +21,7 @@ def main():
     positions_file, positions_data = util.read_json(positions_file_name)
     NUM_DETECTIONS = len(positions_data)
 
+    
 
 
     
