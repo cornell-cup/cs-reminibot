@@ -180,7 +180,6 @@ class DetectorOptions(object):
     '''Convience wrapper for object to pass into Detector
 initializer. You can also pass in the output of an
 argparse.ArgumentParser on which you have called add_arguments.
-
     '''
 
 # pylint: disable=R0902

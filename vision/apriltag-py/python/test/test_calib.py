@@ -70,15 +70,6 @@ def get_checkerboard_interactive(camera, cols, rows):
             break
     return image, gray_image, corners
 
-def get_image_on_keypress(camera):
-    image = None
-    while True:
-        image = util.get_image(camera)
-        cv2.imshow("Raw Image", image)
-        if cv2.waitKey(1) & 0xFF == ord("q"):
-            break
-    return image
-
 
 def get_camera(idx):
     camera = cv2.VideoCapture(idx)
