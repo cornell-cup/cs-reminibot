@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 import json
 import math
-from predictor import Predictor
+from util.predictor import Predictor
 from sklearn.linear_model import LinearRegression
 
 """
@@ -178,7 +178,7 @@ def compute_tag_undistorted_pose(camera_matrix, dist_coeffs, transform_matrix, d
     dst[2,0] dst[2,1] dst[2,2] tvec[2,0]
     0           0       0       1
     """
-    dst, jac = cv2.Rodrigues(rvec)  # dst is a 3 x 3 rotation matrix
+    dst, _ = cv2.Rodrigues(rvec)  # dst is a 3 x 3 rotation matrix
     dst = np.append(dst, tvec, axis=1)
     tag_to_camera = np.append(dst, np.array([[0, 0, 0, 1]]), axis=0)
 

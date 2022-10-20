@@ -5,8 +5,8 @@ import numpy as np
 import sys
 import time
 import requests
-import util
-from detector import Detector
+import util.util as util
+from util.detector import Detector
 from platform import node as platform_node
 from random import randint
 from os import environ

@@ -8,8 +8,8 @@ except ImportError:
         import apriltag
     except:
         print("Unable to import any apriltag detection libraries please check the installation of the vision system")
-import util
-from detection import Detection
+import util.util as util
+from util.detection import Detection
 
 
 class Detector:

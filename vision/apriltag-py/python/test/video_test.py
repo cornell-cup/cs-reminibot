@@ -1,4 +1,4 @@
-from cv2 import *
+import cv2
 import numpy as np
 import apriltag
 import time

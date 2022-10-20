@@ -1,6 +1,6 @@
 from fileinput import filename
 import cv2
-import util
+import util.util as util
 import numpy as np
 import json
 import argparse

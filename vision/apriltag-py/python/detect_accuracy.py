@@ -3,7 +3,7 @@ import numpy as np
 import apriltag
 import argparse
 import time
-import util
+import util.util as util
 import itertools
 import statistics
 import sys

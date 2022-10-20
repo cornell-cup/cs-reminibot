@@ -3,12 +3,11 @@ import argparse
 import sys
 import numpy as np
 import time
-import util
+import util.util as util
 import json
 import math
-from detector import Detector
-from detection import Detection
-
+from util.detection import Detection
+from util.detector import Detector
 
 MAX_DETECTOR_SNAPSHOTS = 100
 

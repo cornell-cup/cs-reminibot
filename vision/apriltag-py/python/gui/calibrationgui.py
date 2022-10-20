@@ -8,7 +8,6 @@ from kivy.uix.screenmanager import ScreenManager, Screen, TransitionBase
 from kivy.uix.textinput import TextInput
 from kivy.uix.popup import Popup
 from kivy.properties import BooleanProperty
-import part1_checkerboard as checkerboard #importing the calibration function
 from subprocess import call #to call calibration functions
 from kivy.config import Config
 import subprocess
@@ -28,21 +27,21 @@ class InputWindow(Screen):
 			row = int(row)
 			col = int(col)
 		except: 
-			# display error msg
+			# TODO: display error msg
 			pass
 
 		if isinstance(row, int) and isinstance(col, int):
 				if row > 2 and col > 2:
 					# checkerboard.checkerboardTest(row, col)	
 					#if calibFile or posFile is 0, then that means the default files should be used
-					calibFile = calibFile[0] if len(calibFile) != 0 else "calibration.json"
-					posFile = posFile[0] if len(posFile) != 0 else "calibration_board_positions.json"
-					part1 = ["python3", "part1_checkerboard.py", "-r", str(row),"-c", str(col),"-o",calibFile]
-					part1_win = ["python", "part1_checkerboard.py", "-r", str(row),"-c", str(col),"-o",calibFile]
-					part2 = ["python3", "part2_tag_calib.py", "-cf", calibFile, "-pf", posFile, "-b", "4"]
-					part2_win = ["python", "part2_tag_calib.py", "-cf", calibFile, "-pf", posFile, "-b", "4"]
-					part3 = ["python3", "part3_tag_locate.py", "-f", calibFile, "-s", "4", "-u", "http://localhost:8080/vision"]
-					part3_win = ["python", "part3_tag_locate.py", "-f", calibFile, "-s", "4", "-u", "http://localhost:8080/vision"]
+					calibFile = calibFile[0] if len(calibFile) != 0 else "../calib/calibration.json"
+					posFile = posFile[0] if len(posFile) != 0 else "../calib/calibration_board_positions.json"
+					part1 = ["python3", "../part1_checkerboard.py", "-r", str(row),"-c", str(col),"-o",calibFile]
+					part1_win = ["python", "../part1_checkerboard.py", "-r", str(row),"-c", str(col),"-o",calibFile]
+					part2 = ["python3", "../part2_tag_calib.py", "-cf", calibFile, "-pf", posFile, "-b", "4"]
+					part2_win = ["python", "../part2_tag_calib.py", "-cf", calibFile, "-pf", posFile, "-b", "4"]
+					part3 = ["python3", "../part3_tag_locate.py", "-f", calibFile, "-s", "4", "-u", "http://localhost:8080/vision"]
+					part3_win = ["python", "../part3_tag_locate.py", "-f", calibFile, "-s", "4", "-u", "http://localhost:8080/vision"]
 
 					try:
 						call(part1_win)
