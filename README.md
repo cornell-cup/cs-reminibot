@@ -32,7 +32,7 @@ Note: Windows users are highly recommended to install on Windows Native rather t
 
 # 2. Cloning the respository
 
-Please clone (download) the respository onto your local machine. On Windows open Powershell or WSL (Windows Subsystem for Linux) and run the following command. On Linux or MacOS open the terminal and run the command.
+Please clone (download) the respository onto your local machine. On Windows open Powershell and run the following command from the directory where you would like the `cs-reminibot` repository to be located. On Linux or MacOS open the terminal and run the command.
 
 ```
 git clone https://github.com/cornell-cup/cs-reminibot.git
@@ -76,7 +76,7 @@ cd ..
 ```
 
 
-# 3. Installing JavaScript Dependencies
+# 4. Installing JavaScript Dependencies
 
 Navigate to the cs-reminibot directory and run the following commands to navigate to the gui directory in static/gui and install the JavaScript dependencies.
 
@@ -86,7 +86,7 @@ npm install
 cd ../..
 ```
 
-# 4. Installing the Vision System
+# 5. Installing the Vision System
 
 
 ## Setting Up Vision System (Windows)
@@ -133,12 +133,14 @@ To stop running the program, press Ctrl+C in the terminal window.
 
 # 7. Starting a virtual Minibot
 
-The following script in the `minibot` directory starts up a virtual Minibot to send messages to the BaseStation.
+Many features on the GUI require a connection to a Minibot. In the absence of a physical Minibot, we can simulate a virtual Minibot which can receive commands from the GUI with the following script. Open a new shell and run the following command from the root `cs-reminibot` directory:
 
 ```
-cd minibot
-python minibot.py -t
+python minibot/minibot.py -t
 ```
+
+Note: Anaconda users should activate the `cup` environment before running the script.
+
 To stop running the program, press Ctrl+C in the terminal window.
 
 # 8. Running the Vision System
@@ -216,6 +218,9 @@ sudo npm install npm@latest -g
 
 [Continue with the remaining installation steps](#Continue)
 
+
+---
+
 <a name="MacOS"></a>
 
 ## MacOS: Installing Initial Requirements
@@ -281,6 +286,8 @@ brew install cmake
 ```
 
 [Continue with the remaining installation steps](#Continue)
+
+---
 
 <a name="Windows"></a>
 
@@ -387,7 +394,7 @@ sudo npm install npm@latest -g
 
 [Continue with the remaining installation steps](#Continue) -->
 
-# 5. Common Problems & Fixes
+# Common Problems & Fixes
 
 Please see the [Minibot Software Install Troubleshooting Guide](https://docs.google.com/document/d/17iD53BYdfiRP9ht-XtAxGYFpu55B4e1CCysB0ldnopU/edit#heading=h.k4oli3pdzdzn) for common installation problems.
 
