@@ -45,7 +45,7 @@ Please choose either Anaconda OR Base environment installation.
 
 <a name="conda_install"></a>
 
-## Anaconda installation (highly recommended)
+## Anaconda environment package installation (highly recommended)
 
 Anaconda is a Python environment and package manager.
 
@@ -66,7 +66,7 @@ Note: After installing the packages within the Anaconda environment, you **must 
 The command to deactivate the current environment and return to the base environment is `conda deactivate`.
 
 
-## Base environment installation
+## Base environment package installation
 
 Run the following commands to navigate to the basestation directory in and install the Python3 dependencies. On Windows open Windows Powershell and run the following commands. On Linux or MacOS open terminal and run the following commands:
 
@@ -114,7 +114,7 @@ sudo make install
 cd ../..
 ```
 
-# 6. Running the WebGUI
+# 6. Running the BaseStation & WebGUI
 After all dependencies are successfully installed, you can run the WebGUI on your computer and start working with the Minibot.
 
 From the terminal, navigate to the home `cs-reminibot` directory and run the following command.
@@ -129,7 +129,19 @@ Wait until you see the message _======= STARTING BASESTATION========_ in your te
 
 Windows users who are having trouble with this step can try [installing the python dependencies via Anaconda](#conda_install).
 
-# 7. Running the Vision System
+To stop running the program, press Ctrl+C in the terminal window.
+
+# 7. Starting a virtual Minibot
+
+The following script in the `minibot` directory starts up a virtual Minibot to send messages to the BaseStation.
+
+```
+cd minibot
+python minibot.py -t
+```
+To stop running the program, press Ctrl+C in the terminal window.
+
+# 8. Running the Vision System
 
 To run the Vision system, run the following command. You should currently be in the cs-reminibot directory.
 
@@ -147,26 +159,7 @@ python3 calibrationgui.py
 cd ../../..
 ```
 
-
-# 8. Running the BaseStation & WebGUI
-
-The BaseStation & WebGUI are both started by running the following command from the root of the `cs-reminibot` project directory in the terminal:
-
-```
-./run_BS.sh
-```
-
-To stop running the program, press Ctrl+C in the terminal window.
-
-# 9. Starting a virtual Minibot
-
-The following script in the `minibot` directory starts up a virtual Minibot to send messages to the BaseStation.
-
-```
-cd minibot
-python minibot.py -t
-```
-To stop running the program, press Ctrl+C in the terminal window.
+---
 
 # 1a. Operating System-Specific Guides to Install Initial Requirements
 
