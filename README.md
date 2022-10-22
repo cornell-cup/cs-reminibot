@@ -11,6 +11,8 @@ This repository is currently in development.
 
 Please install the following:
 
+Note: Windows users are highly recommended to install on Windows Native rather than Ubuntu WSL.
+
 - Git ([Ubuntu](#Ubuntu_git) | [MacOS](#Mac_git) | [Windows 10](#Windows_git))
 - Python version 3.8 or later & pip3 ([Ubuntu](#Ubuntu_python) | [MacOS](#Mac_python) | [Windows 10](#Windows_python))
 - [Anaconda](https://www.anaconda.com/) (Optional but recommended for advanced users) ([MacOS](#Mac_conda) | [Windows 10](#Windows_conda))
@@ -38,18 +40,41 @@ git clone https://github.com/cornell-cup/cs-reminibot.git
 
 # 3. Installing BaseStation Python Dependencies
 
-Run the following commands to navigate to the basestation directory in and install the Python3 dependencies. On Windows open WSL (Windows Subsystem for Linux) and run the following commands. On Linux or MacOS open terminal and run the following commands:
+Please choose either Anaconda OR Base environment installation.
 
-```
-cd cs-reminibot/basestation
-pip3 install -r requirements.txt
-cd ..
-```
+
 <a name="conda_install"></a>
 
-## Optional Anaconda-based installation
+## Anaconda installation (highly recommended)
 
-For Windows users who are having trouble
+Anaconda is a Python environment and package manager.
+
+After installing Anaconda, create a new Python 3.8 Anaconda environment named `cup` with the following command in your shell:
+
+```
+conda create -n cup python=3.8
+```
+
+To activate this environment and install the required Python packages, run the following commands:
+```
+conda activate cup
+python -m pip install basestation/requirements.txt
+```
+
+Note: After installing the packages within the Anaconda environment, you **must run** `conda activate cup` on a newly opened shell window to activate the environment before starting the GUI. You'll know the environment is activated if the name of the environment `(cup)` is displayed before the shell prompt. Example of what the Windows Powershell prompt should look like: `(cup) C:\Users\YourName`
+
+The command to deactivate the current environment and return to the base environment is `conda deactivate`.
+
+
+## Base environment installation
+
+Run the following commands to navigate to the basestation directory in and install the Python3 dependencies. On Windows open Windows Powershell and run the following commands. On Linux or MacOS open terminal and run the following commands:
+
+```
+python -m pip install -r basestation/requirements.txt
+cd ..
+```
+
 
 # 3. Installing JavaScript Dependencies
 
@@ -93,11 +118,14 @@ cd ../..
 After all dependencies are successfully installed, you can run the WebGUI on your computer and start working with the Minibot.
 
 From the terminal, navigate to the home `cs-reminibot` directory and run the following command.
+
+Note: Anaconda users should activate the `cup` environment before running the GUI.
+
 ```
 ./run_bs.sh
 ```
 
-Wait until you see the message _======= STARTING BASESTATION========_ in your terminal. Go to any browser on your computer and go to localhost:8080/start to see the GUI in action.
+Wait until you see the message _======= STARTING BASESTATION========_ in your terminal. Open Google Chrome and go to [localhost:8080/start](localhost:8080/start) to see the GUI in action.
 
 Windows users who are having trouble with this step can try [installing the python dependencies via Anaconda](#conda_install).
 
@@ -276,8 +304,8 @@ Follow the instructions under **Install Git on Windows** found [here](https://gi
 
 <a name="Windows_python"></a>
 
-#### Python and pip3 installation
-Download the official Python distribution found [here](https://www.python.org/downloads/). This step should install pip3 automatically.
+#### Python and Pip installation
+Download the official Python distribution found [here](https://www.python.org/downloads/). This step should install pip automatically.
 
 After proper installation of Python and pip, the following commands should show the installed version, such as `Python 3.8.0` and `pip 21.2.4 from C:\Users\User\...`.
 ```
@@ -289,7 +317,7 @@ python -m pip --version
 
 #### Anaconda installation (optional but recommended)
 
-Installing Anaconda is recommended for advanced users in order to simplify Python version and package management.
+Installing Anaconda is recommended to simplify Python version and package management.
 
 Download the official Anaconda distribution found [here](https://www.anaconda.com/products/distribution).
 
