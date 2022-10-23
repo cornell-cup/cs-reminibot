@@ -65,7 +65,6 @@ Note: After installing the packages within the Anaconda environment, you **must 
 
 The command to deactivate the current environment and return to the base environment is `conda deactivate`.
 
-
 ## Base environment package installation
 
 Run the following commands to navigate to the basestation directory in and install the Python3 dependencies. On Windows open Windows Powershell and run the following commands. On Linux or MacOS open terminal and run the following commands:
@@ -317,7 +316,7 @@ python -m pip --version
 
 <a name="Windows_conda"></a>
 
-#### #### Anaconda installation (highly recommended for developers)
+#### Anaconda installation (highly recommended for developers)
 
 Installing Anaconda is recommended to simplify Python version and package management.
 
@@ -398,7 +397,13 @@ sudo npm install npm@latest -g
 
 # Common Problems & Fixes
 
-Please see the [Minibot Software Install Troubleshooting Guide](https://docs.google.com/document/d/17iD53BYdfiRP9ht-XtAxGYFpu55B4e1CCysB0ldnopU/edit#heading=h.k4oli3pdzdzn) for common installation problems.
+#### ImportError: cannot import name 'soft_unicode' from 'markupsafe'
+
+Downgrade markupsafe to version 2.0.1:
+
+```
+python -m pip install markupsafe==2.0.1
+```
 
 #### ERROR: EACCES when trying to run npm commands
 
@@ -413,3 +418,6 @@ And then run your npm command with sudo in front of it if it still doesn't work.
 ```
 sudo npm install
 ```
+
+
+Please see the [Minibot Software Install Troubleshooting Guide](https://docs.google.com/document/d/17iD53BYdfiRP9ht-XtAxGYFpu55B4e1CCysB0ldnopU/edit#heading=h.k4oli3pdzdzn) for other common installation problems.
