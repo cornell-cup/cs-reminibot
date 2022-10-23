@@ -14,8 +14,8 @@ Please install the following:
 Note: Windows users are highly recommended to install on Windows Native rather than Ubuntu WSL.
 
 - Git ([Ubuntu](#Ubuntu_git) | [MacOS](#Mac_git) | [Windows 10](#Windows_git))
-- Python version 3.8 or later & pip3 ([Ubuntu](#Ubuntu_python) | [MacOS](#Mac_python) | [Windows 10](#Windows_python))
-- [Anaconda](https://www.anaconda.com/) (Optional but recommended for advanced users) ([MacOS](#Mac_conda) | [Windows 10](#Windows_conda))
+- Python version 3.8 and pip3 ([Ubuntu](#Ubuntu_python) | [MacOS](#Mac_python) | [Windows 10](#Windows_python))
+- [Anaconda](https://www.anaconda.com/) (Highly recommended for developers) ([MacOS](#Mac_conda) | [Windows 10](#Windows_conda))
 - Cmake ([MacOS](#Mac_cmake) | [Windows 10](#Windows_cmake))
 - Node.js (the Javascript runtime library) and npm (the Javascript package manager) ([Ubuntu](#Ubuntu_node) | [MacOS](#Mac_node) | [Windows 10](#Windows_node))
 - Windows only - [Build Tools for Visual Studio 2022](https://aka.ms/vs/17/release/vs_BuildTools.exe)
@@ -42,10 +42,9 @@ git clone https://github.com/cornell-cup/cs-reminibot.git
 
 Please choose either Anaconda OR Base environment installation.
 
-
 <a name="conda_install"></a>
 
-## Anaconda environment package installation (highly recommended)
+## Anaconda environment package installation (highly recommended for developers)
 
 Anaconda is a Python environment and package manager.
 
@@ -58,7 +57,8 @@ conda create -n cup python=3.8
 To activate this environment and install the required Python packages, run the following commands:
 ```
 conda activate cup
-python -m pip install basestation/requirements.txt
+cd basestation
+python -m pip install -r requirements.txt
 ```
 
 Note: After installing the packages within the Anaconda environment, you **must run** `conda activate cup` on a newly opened shell window to activate the environment before starting the GUI. You'll know the environment is activated if the name of the environment `(cup)` is displayed before the shell prompt. Example of what the Windows Powershell prompt should look like: `(cup) C:\Users\YourName`
@@ -71,7 +71,8 @@ The command to deactivate the current environment and return to the base environ
 Run the following commands to navigate to the basestation directory in and install the Python3 dependencies. On Windows open Windows Powershell and run the following commands. On Linux or MacOS open terminal and run the following commands:
 
 ```
-python -m pip install -r basestation/requirements.txt
+cd basestation
+python -m pip install -r requirements.txt
 cd ..
 ```
 
@@ -254,9 +255,10 @@ brew install python
 ```
 
 <a name="Mac_conda"></a>
-#### Anaconda installation (optional but recommended)
 
-Installing Anaconda is recommended for advanced users in order to simplify Python version and package management.
+#### Anaconda installation (highly recommended for developers)
+
+Installing Anaconda is highly recommended to simplify management of Python virtual environments and packages.
 
 Follow the instructions to install Anaconda through homebrew found [here](https://formulae.brew.sh/cask/anaconda).
 
@@ -315,7 +317,7 @@ python -m pip --version
 
 <a name="Windows_conda"></a>
 
-#### Anaconda installation (optional but recommended)
+#### #### Anaconda installation (highly recommended for developers)
 
 Installing Anaconda is recommended to simplify Python version and package management.
 
