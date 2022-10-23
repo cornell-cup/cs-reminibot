@@ -11,6 +11,7 @@ import math
 
 from basestation.bot import Bot
 from basestation.controller.minibot_sim_gui_adapter import run_program_string_for_gui_data
+from basestation import config
 
 # database imports
 from basestation.databases.user_database import User, Chatbot as ChatbotTable, Submission
@@ -65,7 +66,7 @@ def make_thread_safe(func):
 
 
 class BaseStation:
-    def __init__(self, app_debug=False):
+    def __init__(self, app_debug=False, reuseport = config.reuseport):
         self.active_bots = {}
         self.vision_log = []
         self.chatbot = ChatbotWrapper()
