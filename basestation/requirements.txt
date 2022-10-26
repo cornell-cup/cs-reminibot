@@ -6,6 +6,7 @@ Flask-API==2.0
 Flask-SQLAlchemy==2.4.1    
 itsdangerous==0.24
 Jinja2==2.10.1
+markupsafe==2.0.1
 pycparser==2.19
 python-dotenv==0.15.0
 six==1.11.0            
