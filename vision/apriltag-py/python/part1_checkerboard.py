@@ -24,7 +24,7 @@ def main():
 
     # Get checkerboard
     cols, rows = args["cols"], args["rows"]
-    camera = util.get_camera(args["cameraid"])
+    camera = util.get_camera(0) # args["cameraid"]
     image, gray_image, corners = get_checkerboard_interactive(
         camera, cols, rows)
     cv2.waitKey(0)
