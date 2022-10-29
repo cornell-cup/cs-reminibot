@@ -6,7 +6,10 @@
 	<!-- IMPORTS -->
 	<link rel="stylesheet" href="{{ url_for('static', filename = 'css/gui_update.css') }}" />
 	<link rel="stylesheet" href="{{ url_for('static', filename = 'css/codemirror.css') }}" />
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" 
+	<link rel="stylesheet" href="{{ url_for('static', filename = 'css/chatbot.css') }}" />
+	<link rel="stylesheet" href="{{ url_for('static', filename = 'css/contextHistory.css') }}" />
+	<link rel="stylesheet" href="{{ url_for('static', filename = 'css/toggle.css') }}" />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
 		integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
 	<link rel="icon" href="{{ url_for('static', filename = 'img/logo.png' )}}" />
 
@@ -25,7 +28,7 @@
 <body style="background-color: #212529;">
 	<!-- HTML HERE -->
 	<div id="root"></div>
-	<xml id="toolbox"> 
+	<xml id="toolbox">
 		<category name="Control" colour="220">
 			<block type="controls_repeat_ext"></block>
 			<block type="controls_repeat"></block>
@@ -115,9 +118,15 @@
 	</xml>
 	<!-- basic imports + bootstrap -->
 	<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script> -->
-	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" integrity="sha384-+YQ4JLhjyBLPDQt//I+STsc9iw4uQqACwlvpslubQzn4u2UU2UFM80nGisd026JF" crossorigin="anonymous"></script>
+	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+		integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+		crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+		integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+		crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"
+		integrity="sha384-+YQ4JLhjyBLPDQt//I+STsc9iw4uQqACwlvpslubQzn4u2UU2UFM80nGisd026JF"
+		crossorigin="anonymous"></script>
 	<!-- IMPORT CUSTOM BLOCKS -->
 	<script type="text/javascript" src="{{ url_for('static', filename='js/blocks/custom_blocks.js')}}"></script>
 	<script type="text/javascript" src="{{ url_for('static', filename='js/blocks/custom_json.js')}}"></script>

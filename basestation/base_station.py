@@ -1,31 +1,36 @@
 """
 Base Station for the MiniBot.
 """
-
-import math
-from basestation.bot import Bot
-from basestation.controller.minibot_sim_gui_adapter import run_program_string_for_gui_data
-from basestation.user_database import Submission, User
-from basestation import db
-from basestation.util.path_planning import PathPlanner
-from basestation.util.stoppable_thread import StoppableThread, ThreadSafeVariable
-from basestation.util.helper_functions import distance
-
-from random import choice, randint
-from string import digits, ascii_lowercase, ascii_uppercase
-from typing import Any, Dict, List, Tuple, Optional
 import os
 import re
 import socket
 import sys
 import time
 import threading
-import pyaudio
-import speech_recognition as sr
-from copy import deepcopy
+import math
 
+from basestation.bot import Bot
+from basestation.controller.minibot_sim_gui_adapter import run_program_string_for_gui_data
+
+# database imports
+from basestation.databases.user_database import User, Chatbot as ChatbotTable, Submission
+from basestation.databases.user_database import db
+
+# imports from basestation util
+from basestation.util.path_planning import PathPlanner
+from basestation.util.stoppable_thread import StoppableThread, ThreadSafeVariable
+from basestation.util.helper_functions import distance
 from basestation.util.units import AngleUnits, LengthUnits, convert_angle, convert_length
 from basestation.util.world_builder import WorldBuilder
+
+from random import choice, randint
+from string import digits, ascii_lowercase, ascii_uppercase
+from typing import Any, Dict, List, Tuple, Optional
+from copy import deepcopy
+
+from .ChatbotWrapper import ChatbotWrapper
+
+
 
 
 
@@ -63,6 +68,7 @@ class BaseStation:
     def __init__(self, app_debug=False):
         self.active_bots = {}
         self.vision_log = []
+        self.chatbot = ChatbotWrapper()
         self.virtual_objects = {}
         self.vision_snapshot = {}
         self.vision_object_map = {}
@@ -91,7 +97,18 @@ class BaseStation:
         # The Minibot broadcast will allow us to learn the Minibot's ipaddress
         # so that we can connect to the Minibot
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+
+        ########################### IMPORTANT ###########################
+        # Only one of the two lines below is necessary, if one is not
+        # working for you then comment it out and uncomment the other one.
+        # NOTE: When you push, make sure only the top one is uncommented.
+
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        # self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+
+        
+
         # an arbitrarily small time
         self.sock.settimeout(0.01)
 
@@ -110,6 +127,7 @@ class BaseStation:
         self.vision_monitior_thread.start()
         # self.connections = BaseConnection()
 
+        
         # only bind in debug mode if you are the debug server, if you are the
         # monitoring program which restarts the debug server, do not bind,
         # otherwise the debug server won't be able to bind
@@ -124,7 +142,15 @@ class BaseStation:
 
         self._login_email = None
         self.speech_recog_thread = None
+        self.chatbot_listening_thread = None
         self.lock = threading.Lock()
+        self.commands = {
+            "forward": "Minibot moves forward",
+            "backward": "Minibot moves backwards",
+            "left": "Minibot moves left",
+            "right": "Minibot moves right",
+            "stop": "Minibot stops",
+        }
 
         # Keep track of any built-in scripts that are running / should run next
         self.builtin_script_state = {
@@ -155,8 +181,6 @@ class BaseStation:
         else:
             print("The vision virtual object list was not given a valid update in update_virtual_objects")
 
-
-            
 
     def add_to_virtual_objects(self, virtual_object):
         """ Adds single virtual object to virtual objects list """
@@ -491,6 +515,7 @@ class BaseStation:
 
     def add_bot(self, port: int, ip_address: str, bot_name: str = None):
         """ Adds a bot to the list of active bots """
+        print("added bot")
         if not bot_name:
             # bot name is "minibot" + <last three digits of ip_address> + "_" +
             # <port number>
@@ -652,6 +677,7 @@ class BaseStation:
     def register(self, email: str, password: str) -> int:
         """Registers a new user if the email and password are not null and
         there is no account associated wth the email yet"""
+        print("registering new account")
         if not email:
             return -1
         if not password:
@@ -662,9 +688,19 @@ class BaseStation:
         if user:
             return -2
         user = User(email=email, password=password)
+        context = ChatbotTable(
+            user_id=user.id,
+            context=''
+        )
+        db.session.add(context)
         db.session.add(user)
         db.session.commit()
+        self.login(email, password)
         return 1
+
+    def get_user_id_by_email(self, email: str) -> int:
+        user = User.query.filter(User.email == email).first()
+        return user.id
 
     def update_custom_function(self, custom_function: str) -> bool:
         """Adds custom function(s) for the logged in user if there is a user
@@ -678,94 +714,103 @@ class BaseStation:
         db.session.commit()
         return True
 
-    # ==================== SPEECH RECOGNITION ====================
-    def get_speech_recognition_status(self) -> str:
-        """Retrieves the speech recognition status string"""
-        message = (
-            self.speech_recog_thread.message_queue.pop()
-            if self.speech_recog_thread else ""
-        )
-        # could be None because message_queue.pop() can return None
-        message = "" if message is None else message
-        return message
+    # ==================== NEW SPEECH RECOGNITION ============================
+    def send_command(self, bot_name, command):
+        if command in self.commands:
+            self.move_bot_wheels(bot_name, command, 100)
+            return self.commands[command] + " command sent"
+        else:
+            return "invalid commands"
 
-    def toggle_speech_recognition(self, bot_name: str, command: str) -> None:
-        """Toggles the speech recognition between states of running and stopped"""
-        if command == "START":
-            # create a new thread that listens and converts speech
-            # to text in the background.  Cannot run this non-terminating
-            # function  in the current thread because the current post request
-            # will not terminate and our server will not handle any more
-            # requests.
-            self.speech_recog_thread = StoppableThread(
-                self.speech_recognition, bot_name
-            )
-            self.speech_recog_thread.start()
-        # stop listening
-        elif command == "STOP":
-            if self.speech_recog_thread:
-                self.speech_recog_thread.stop()
+    # ==================== CHATBOT ==========================================
 
-    def speech_recognition(
-        self,
-        thread_safe_condition: ThreadSafeVariable,
-        thread_safe_message_queue: ThreadSafeVariable,
-        bot_name: str
-    ) -> None:
-        """ Listens to the user and converts the user's speech to text.
-        Arguments:
-            thread_safe_condition: This variable is used by the parent function
-                to stop this speech recognition thread.  As long as this variable
-                is True, the speech recognition service runs.  When it becomes
-                False, the service exits its loop.
-            thread_safe_message_queue:  The queue of messages to be displayed
-                on the GUI. Needs to be thread safe because messages are pushed
-                on to the queue by this thread, and the parent function / thread
-                pops messages from this queue. The parent function relays these
-                messages to the front-end as the response of a post request.
-            session_id:  Unique identifier for the user's current session.
-            bot_id:  Unique identifier for the Minibot we are connected to
-                currently.
+    def chatbot_compute_answer(self, question: str) -> str:
+        """ Computes answer for [question].
+        Returns: <answer> : string
         """
-        RECORDING_TIME_LIMIT = 5
-        # dictionary of commmands
-        commands = {
-            "forward": "Minibot moves forward",
-            "backward": "Minibot moves backwards",
-            "left": "Minibot moves left",
-            "right": "Minibot moves right",
-            "stop": "Minibot stops",
-        }
-        # open the Microphone as variable microphone
-        with sr.Microphone() as microphone:
-            recognizer = sr.Recognizer()
-            while thread_safe_condition.get_val():
-                thread_safe_message_queue.push("Say something!")
-                try:
-                    recognizer.adjust_for_ambient_noise(microphone)
-                    # listen for 5 seconds
-                    audio = recognizer.listen(microphone, RECORDING_TIME_LIMIT)
-                    thread_safe_message_queue.push(
-                        "Converting from speech to text")
+        return self.chatbot.compute_answer(question)
 
-                    # convert speech to text
-                    words = recognizer.recognize_google(audio)
+    def update_chatbot_context(self, context: str) -> None:
+        """ Update user's context to the Chatbot object
+        """
+        self.chatbot.update_context(context)
 
-                    # remove non-alphanumeric characters
-                    regex = re.compile('[^a-zA-Z]')  # removing punctuation
-                    regex.sub('', words)
-                    thread_safe_message_queue.push(f"You said: {words}")
+    def replace_context_stack(self, context_stack) -> None:
+        """ Replace chatbot obj contextStack with <context_stack>.
+        """
+        self.chatbot.replace_context_stack(context_stack)
 
-                    # check if the command is valid
-                    if words in commands:
-                        thread_safe_message_queue.push(commands[words])
-                        self.move_bot_wheels(bot_name, words, 100)
-                    else:
-                        thread_safe_message_queue.push("Invalid command!")
-                except sr.WaitTimeoutError:
-                    thread_safe_message_queue.push("Timed out!")
-                except sr.UnknownValueError:
-                    thread_safe_message_queue.push("Words not recognized!")
+    def update_chatbot_all_context(self, context: str) -> None:
+        """ Replaces all context in the Chatbot object
+        with the input context.
+
+        Usage: called when user logs in, replaces context with context fetched
+        from database.
+        """
+        self.chatbot.reset_context()
+        self.chatbot.update_context(context)
+
+    def get_chatbot_obj_context(self) -> str:
+        """ Returns all context currently stored in the chatbot object. 
+        """
+        return self.chatbot.get_all_context()
+
+    def update_chatbot_context_db(self, user_email = '') -> int:
+        """ Update user's context if user exists upon exiting the session.
+        (closing the GUI tab)
+        """
+        user_email =  user_email if user_email else self.login_email
+        curr_context_stack = self.chatbot.get_all_context()
+        if curr_context_stack and user_email:
+            print("user email", user_email)
+            print("commit context stack to db", curr_context_stack)
+            # get user_id from user_email
+            user_id = self.get_user_id_by_email(user_email)
+            user = ChatbotTable.query.filter_by(id=user_id)
+            # get current context from chatbot_wrapper
+            new_context = ''.join(curr_context_stack)
+            # commit it to the db
+            user.update({'context': new_context})
+            db.session.commit()
+            return 1
+        return -1
+
+    def chatbot_get_context(self):
+        """Gets the stored context for the chatbot based on user_id.
+         If user_id is nonexistent or empty, returns an empty
+         json object. Otherwise, returns a json object with the context and its
+         corresponding user_id """
+
+        user_email = self.login_email
+
+        if user_email is not None and user_email != "":
+            user_id = self.get_user_id_by_email(user_email)
+            user = ChatbotTable.query.filter_by(id=user_id).first()
+            if user is None:
+                return {'context': '', 'user_id': ''}
+            else:
+                print("user's context: " + user.context)
+                self.chatbot.context_stack = [user.context]
+                data = {'context': user.context, 'user_id': user_id}
+                return data
+        else:
+            return {'context': '', 'user_id': ''}
+
+    def chatbot_clear_context(self) -> None:
+        """ Resets all context stored in the Chatbot object. 
+        """
+        print("reset context stack")
+        self.chatbot.reset_context()
+
+    def chatbot_delete_context_idx(self, idx) -> None:
+        """ Deletes the local context at a given index. 
+        """
+        return self.chatbot.delete_context_by_id(idx)
+
+    def chatbot_edit_context_idx(self, idx, context) -> None:
+        """ Edits the local context based on input.
+        """
+        return self.chatbot.edit_context_by_id(idx, context)
 
     # ==================== GETTERS and SETTERS ====================
     @property
@@ -802,7 +847,7 @@ class BaseStation:
         submission.result = result
         db.session.commit()
 
-    def get_all_submissions(self, user: User) -> []:
+    def get_all_submissions(self, user: User):
         submissions = []
         submissions = Submission.query.filter_by(user_id=User.id)
         return submissions

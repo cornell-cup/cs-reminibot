@@ -113,8 +113,6 @@ def select_folder():
             pip3 install SQLAlchemy==1.3.13    
             pip3 install urllib3==1.25.8    
             pip3 install Werkzeug==1.0.0
-            pip3 install pyaudio==0.2.11
-            pip3 install SpeechRecognition==3.8.1
             pip3 install pint
             pip3 install control
 
@@ -134,8 +132,6 @@ def select_folder():
             pip3 install SQLAlchemy  
             pip3 install urllib3   
             pip3 install Werkzeug
-            pip3 install pyaudio
-            pip3 install SpeechRecognition
             pip3 install pint
             pip3 install control
 
