@@ -96,7 +96,9 @@ class ChatbotWrapper:
         Returns:
         <answer> - str 
         """
-        url = "http://3.135.244.37:8000/qa"
+        url = "http://128.84.127.231:5000/qa"
+        print("input question ", input_question)
+
         if ' '.join(self.context_stack) == "":
             return "Tell me something first!"
         else:

@@ -8,6 +8,7 @@ import {
   ACT_MIC_CHATBOT
 } from "../utils/Constants.js";
 import SpeechRecognitionComp from "../utils/SpeechRecognitionComp.js";
+import { chatbot_ask } from '../utils/axios/chatbotAxios.js';
 
 //Voice Control 
 var lastLen = 0;
@@ -44,17 +45,24 @@ function Chatbot2({
   const [enter, setEnter] = useState("");
   const [open, setOpen] = useState(false);
   const [expand, setExpand] = useState("");
+
   const [right, setRight] = useState(false); // state right means that you can move to the right
   const [fullSize, setFullSize] = useState(false);
   const [fontSize, setFontSize] = useState(defaultFontSize);
   const [canChangeFont, setCanChangeFont] = useState(false);
+  const [date, setDate] = useState("");
+  const messagesEndRef = useRef(null);
 
   const [id, setId] = useState(2);
   const [inputText, setInputText] = useState("");
+
+  //list of all messages from bot and user
   const [messages, setMessages] = useState([]);
-  const messagesEndRef = useRef(null);
+
+  //two modes: q&a, bot movement control
   const [contextMode, setContextMode] = useState(true);
-  const [date, setDate] = useState("");
+
+  //list of bot commands
   const [tempCommands, setTempCommands] = useState("");
 
   // style for the overall chatbot window
@@ -189,26 +197,10 @@ function Chatbot2({
     setId(temp_id);
     setInputText("");
     setMessages(newTempList);
-    axios({
-      method: 'POST',
-      url: '/chatbot-ask',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      data: JSON.stringify({
-        question: inputText
-      })
-    }).then(function (response) {
-      if (response.data) {
-        const res = response.data;
-        newList = newList.concat({ id: temp_id, who: "other", message: res, timeStamp: getTimeStamp() });
-        setMessages(newList);
-      }
-    }).catch(function (error) {
-      if (error.response.data.error_msg.length > 0)
-        window.alert(error.response.data.error_msg);
-      else
-        console.log("Chatbot", error);
+    chatbot_ask(inputText, (res) => {
+      console.log("responding");
+      newList = newList.concat({ id: temp_id, who: "other", message: res, timeStamp: getTimeStamp() });
+      setMessages(newList);
     })
   }
 
@@ -334,6 +326,7 @@ function Chatbot2({
             </div>
           ))}
         </ul>
+
         <div class="footer">
           {/* textbox for the user to enter text messages */}
           <textarea rows="3" cols="70" class="text-box" id="textbox"

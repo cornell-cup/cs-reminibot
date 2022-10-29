@@ -43,7 +43,12 @@ function ContextBox({ id, context }) {
     })
   }
 
-  const deleteContext = (e) => {
+  const handleDeleteContext = (e) => {
+    e.preventDefault();
+    deleteContext();
+  }
+
+  const deleteContext = () => {
     /**  READ: ********************
     *
     How it works: When user deletes context, it does not actually remove the 
@@ -52,9 +57,8 @@ function ContextBox({ id, context }) {
 
     Reason: We do not want to readjust the indices and the context list 
     for both front and backend every time the user makes an edit to the context 
-    history in one session. 
+    history within one session. 
     ******************************/
-    e.preventDefault();
     axios({
       method: 'POST',
       url: '/chatbot-context',
@@ -79,7 +83,7 @@ function ContextBox({ id, context }) {
         <input class="context-box" type="text" value={currContext} style={editing ? editStyle : defaultStyle} onChange={(e) => { changeCurrContext(e) }} />
         <div className="context-buttons">
           <button onClick={(e) => { editContext(e) }} >{editing ? "Save" : "Edit"}</button>
-          <button onClick={(e) => { deleteContext(e) }}>Delete</button>
+          <button onClick={(e) => { handleDeleteContext(e) }}>Delete</button>
         </div>
       </div >
     )

@@ -98,3 +98,27 @@ export function get_all_local_context(action) {
     console.log("Chatbot", error);
   })
 }
+
+export function chatbot_ask(question, action) {
+  axios({
+    method: 'POST',
+    url: '/chatbot-ask',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    data: JSON.stringify({
+      question: question,
+    })
+  }).then(function (response) {
+    if (response.data) {
+      const res = response.data;
+      console.log("the question is ", question)
+      action(res);
+    }
+  }).catch(function (error) {
+    if (error.response.data.error_msg.length > 0)
+      window.alert(error.response.data.error_msg);
+    else
+      console.log("Chatbot", error);
+  })
+}
