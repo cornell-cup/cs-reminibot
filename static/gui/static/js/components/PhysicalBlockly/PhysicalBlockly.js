@@ -6,7 +6,9 @@ import axios from 'axios';
 import CodeMirror from 'react-codemirror';
 require('codemirror/mode/python/python');
 
-
+import SelectionBox from './SelectionBox';
+const commands = ['Move Foward', 'Move Backward', 'Move Left', 'Move Right', 'Stop'];
+const choices = ["yellow", "blue", "red", "orange", "purple"]
 
 export default class PhysicalBlockly extends React.Component {
 	constructor(props) {
@@ -15,6 +17,10 @@ export default class PhysicalBlockly extends React.Component {
 		this.codeRef = React.createRef();
 		this.pollForUpdates = this.pollForUpdates.bind(this);
 		this.bWorkspace = null;
+		this.customCommand = new Map();
+		for(var i = 0; i < commands.length; i ++) {
+			this.customCommand.set(commands[i], choices[i]);
+		}
 	}
 
 	componentDidMount() {
@@ -189,7 +195,14 @@ export default class PhysicalBlockly extends React.Component {
 		this.endProcess();
 	}
 
-	render() {
+	updateSelection(e, command, choice) {
+		console.log("selection");
+		console.log(command);
+		console.log(choice);
+		this.customCommand.set(command, choice);
+	}
+
+	render(props) {
 		var visStyle = {
 			position: "relative",
 			zIndex: 0,
@@ -206,13 +219,24 @@ export default class PhysicalBlockly extends React.Component {
 			lineNumbers: true,
 			mode: 'python',
 		};
+
+		let customTitleStyle = {
+			paddingTop: '15px',
+			fontSize: '16px'
+		}
 		return (
 			<div className="row">
 				<div className="col">
 					<p className="small-title"> Physical Blockly </p>
 					{this.props.selectedBotName != '' && this.state.stage == 0 ?
-						<div><button className="btn btn-primary element-wrapper mr-1" onClick={() => this.physicalBlocklyClick(0)}>Start Camera Mode</button>
+						<div>
+							<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.physicalBlocklyClick(0)}>Start Camera Mode</button>
 							<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.physicalBlocklyClick(1)}>Start Real Time Mode</button>
+							<p className="small-title" style={customTitleStyle}> Customization of Blocks </p>
+							{
+								commands.map((c) => <SelectionBox key={c.id} command={c} choiceList={choices} default={this.customCommand.get(c)} changeSelection={this.updateSelection}/> )
+							};
+							<button className="btn btn-primary element-wrapper mr-1">Save</button>
 						</div> :
 						this.props.selectedBotName != '' && this.state.stage == 1 ?
 							<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.endProcess()}>End Process</button>
