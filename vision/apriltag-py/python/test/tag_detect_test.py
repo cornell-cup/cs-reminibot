@@ -8,6 +8,7 @@ import time
 import requests
 import math
 import json
+from constants import *
 from util import get_image, get_matrices_from_file, undistort_image, get_offsets_from_file
 from util import compute_tag_undistorted_pose
 
@@ -16,7 +17,6 @@ DEVICE_ID = 0  # The device the camera is, usually 0. TODO make this adjustable
 
 # Arguments
 # These are effectively constant after the argument parser has ran.
-TAG_SIZE = 6.5  # The length of one side of an apriltag, in inches
 MULT_FACTOR = 5  # The scale factor of the output coordinates
 SEND_DATA = True
 
@@ -139,9 +139,9 @@ def get_camera():
     camera = cv2.VideoCapture(0)
     if not cv2.VideoCapture.isOpened(camera):
         raise Exception("Unable to open camera")
-    camera.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-    camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
-    camera.set(cv2.CAP_PROP_FPS, 30)
+    camera.set(cv2.CAP_PROP_FRAME_WIDTH, FRAME_WIDTH)
+    camera.set(cv2.CAP_PROP_FRAME_HEIGHT, FRAME_HEIGHT)
+    camera.set(cv2.CAP_PROP_FPS, VISION_FPS)
     return camera
 
 
@@ -162,7 +162,7 @@ def get_args():
                         help='.calib file to use for un-distortion')
 
     parser.add_argument('-s', '--size', metavar='<size>',
-                        type=float, required=False, default=6.5,
+                        type=float, required=False, default=TAG_SIZE,
                         help='size of tags to detect')
 
     options = parser.parse_args()

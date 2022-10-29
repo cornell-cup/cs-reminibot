@@ -8,6 +8,7 @@ import json
 import math
 from util.detection import Detection
 from util.detector import Detector
+from constants import *
 
 
 MAX_DETECTOR_SNAPSHOTS = 100
@@ -28,7 +29,7 @@ def main():
     x_offset = 0
     y_offset = 0
 
-    camera = util.get_camera(0)
+    camera = util.get_camera(DEVICE_ID)
 
     # Get matrices from file
     calib_file, calib_data = util.read_json(calib_file_name)
@@ -102,14 +103,14 @@ def main():
             overall_y_center += ctr_y
 
             # Draw onto the frame
-            cv2.circle(undst, (int(ctr_x), int(ctr_y)), 5, (0, 0, 255), 3)
+            cv2.circle(undst, (int(ctr_x), int(ctr_y)), 5, BLUE, 3)
 
             
 
         overall_x_center /= 1 if len(iteration_detections) == 0 else len(iteration_detections)
         overall_y_center /= 1 if len(iteration_detections) == 0 else len(iteration_detections)
         
-        cv2.circle(undst, (int(overall_x_center), int(overall_y_center)), 5, (255, 0, 0), 3)
+        cv2.circle(undst, (int(overall_x_center), int(overall_y_center)), 5, RED, 3)
         
         
         cv2.imshow("Calibration board", undst)
@@ -258,7 +259,7 @@ def main():
     } for detection_index in range(len(detections)) if True] 
         
     
-    cv2.circle(undst, (int(overall_x_center), int(overall_y_center)), 5, (255, 0, 0), 3)
+    cv2.circle(undst, (int(overall_x_center), int(overall_y_center)), 5, RED, 3)
 
     
 
@@ -396,7 +397,7 @@ def get_args():
         metavar="<board tag size>",
         type=float,
         required=True,
-        default=6.5,
+        default=TAG_SIZE,
         help="size of one side of a tag on the axis calibration \
                             board, in inches",
     )

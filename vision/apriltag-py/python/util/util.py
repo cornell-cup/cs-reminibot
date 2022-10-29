@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 import json
 import math
+from constants import *
 from util.predictor import Predictor
 from sklearn.linear_model import LinearRegression
 
@@ -245,9 +246,9 @@ def get_camera(idx):
     camera = cv2.VideoCapture(idx)
     if not cv2.VideoCapture.isOpened(camera):
         raise Exception("Unable to open camera: {}".format(idx))
-    camera.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-    camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
-    camera.set(cv2.CAP_PROP_FPS, 30)
+    camera.set(cv2.CAP_PROP_FRAME_WIDTH, FRAME_WIDTH)
+    camera.set(cv2.CAP_PROP_FRAME_HEIGHT, FRAME_HEIGHT)
+    camera.set(cv2.CAP_PROP_FPS, VISION_FPS)
     return camera
 
 def get_numpy_matrix(src, name):

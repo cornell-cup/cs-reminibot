@@ -10,6 +10,7 @@ from util import (
     get_matrices_from_file,
     undistort_image,
 )
+from constants import VISION_FPS, FRAME_WIDTH, FRAME_HEIGHT, TAG_SIZE
 from util import compute_tag_undistorted_pose
 
 BOARD_TAG_SIZE = 6.5  # The length of a side of a tag on the axis board, in inches
@@ -31,9 +32,9 @@ def main():
     if not VideoCapture.isOpened(camera):
         print("Failed to open video capture device")
         exit(0)
-    camera.set(CAP_PROP_FRAME_WIDTH, 1280)
-    camera.set(CAP_PROP_FRAME_HEIGHT, 720)
-    camera.set(CAP_PROP_FPS, 30)
+    camera.set(CAP_PROP_FRAME_WIDTH, FRAME_WIDTH)
+    camera.set(CAP_PROP_FRAME_HEIGHT, FRAME_HEIGHT)
+    camera.set(CAP_PROP_FPS, VISION_FPS)
 
     # Get matrices from file
     calib_file, camera_matrix, dist_coeffs = get_matrices_from_file(calib_file_name)
@@ -216,7 +217,7 @@ def get_args():
         metavar="<board tag size>",
         type=float,
         required=False,
-        default=6.5,
+        default=TAG_SIZE,
         help="size of one side of a tag on the axis calibration \
                             board, in inches",
     )
@@ -227,7 +228,7 @@ def get_args():
         metavar="<origin tag size>",
         type=float,
         required=False,
-        default=6.5,
+        default=TAG_SIZE,
         help="size of one side of the tag to calibrate \
                             the origin, in inches",
     )

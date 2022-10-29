@@ -10,19 +10,7 @@ from util.detector import Detector
 from platform import node as platform_node
 from random import randint
 from os import environ
-
-
-# Constants
-DEVICE_ID = 0  # The device the camera is, usually 0. TODO make this adjustable
-FRAME_WIDTH = 1280
-FRAME_HEIGHT = 720
-# Arguments
-# These are effectively constant after the argument parser has ran.
-TAG_SIZE = 6.5 # The length of one side of an apriltag, in inches
-SEND_DATA = True  # Sends data to URL if True. Set to False for debug
-MAX_LOCATION_HISTORY_LENGTH = 20
-MODE_THRESHOLD = 1
-
+from constants import *
 
 BASE_STATION_DEVICE_ID = hash(platform_node()+str(randint(0,1000000))+str(randint(0,1000000))+str(DEVICE_ID)+str(time.time()))
 
@@ -138,9 +126,9 @@ def main():
 
 
             # displaying tag id
-            cv2.putText(undst, str(d.tag_id),(int(ctr_x), int(ctr_y)), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 0, 255),2)
-            cv2.putText(undst, str((round(x),round(y))),(int(ctr_x), int(ctr_y)+15), cv2.FONT_HERSHEY_SIMPLEX, .5,  (255, 0, 255),2)
-            cv2.putText(undst, str(round(angle)),(int(ctr_x), int(ctr_y)+30), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 255, 255),2)
+            cv2.putText(undst, str(d.tag_id),(int(ctr_x), int(ctr_y)), cv2.FONT_HERSHEY_SIMPLEX, .5,  BLUE,2)
+            cv2.putText(undst, str((round(x),round(y))),(int(ctr_x), int(ctr_y)+15), cv2.FONT_HERSHEY_SIMPLEX, .5, MAGENTA, 2)
+            cv2.putText(undst, str(round(angle)),(int(ctr_x), int(ctr_y)+VISION_FPS), cv2.FONT_HERSHEY_SIMPLEX, .5, CYAN, 2)
            
 
             # # prints DEVICE_ID tag id x y z angle
@@ -257,7 +245,7 @@ def get_args():
         metavar="<size>",
         type=float,
         required=False,
-        default=6.5,
+        default=TAG_SIZE,
         help="size of tags to detect",
     )
 
