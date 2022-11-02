@@ -76,7 +76,7 @@ class BaseStation:
         # empty string means 0.0.0.0, which is all IP addresses on the local
         # machine, because some machines can have multiple Network Interface
         # Cards, and therefore will have multiple ip_addresses
-        server_address = ("0.0.0.0", 9434)
+        server_address = ("0.0.0.0", 5001)
 
         # only bind in debug mode if you are the debug server, if you are the
         # monitoring program which restarts the debug server, do not bind,
@@ -89,6 +89,8 @@ class BaseStation:
         self._login_email = None
         self.speech_recog_thread = None
         self.lock = threading.Lock()
+
+        self.is_reading_ir = False
 
     # ==================== VISION ====================
 
@@ -150,7 +152,8 @@ class BaseStation:
             if data_lst[0] == request_password:
                 # Tell the minibot that you are the base station
                 self.sock.sendto(response.encode(), address)
-                self.add_bot(ip_address=address[0], port=data_lst[1])
+                # self.add_bot(ip_address=address[0], port=data_lst[1])
+                self.add_bot(ip_address=address[0], port=10000)
 
     def add_bot(self, port: int, ip_address: str, bot_name: str = None):
         """ Adds a bot to the list of active bots """
@@ -408,8 +411,8 @@ class BaseStation:
         """Sets the login email property"""
         self._login_email = email
 
+    # data analytics
 
-    ### data analytics
     def get_user(self, email: str) -> User:
         user = User.query.filter_by(email=email).first()
         return user
@@ -438,4 +441,20 @@ class BaseStation:
         submissions = []
         submissions = Submission.query.filter_by(user_id=User.id)
         return submissions
-    
+
+    def start_ir(self, bot_name: str):
+        """ Starts and reads from the IR sensor """
+        bot = self.get_bot(bot_name)
+
+        if not self.is_reading_ir:
+            print("SENDING KV")
+            bot.ir_sensor_data = ""
+            bot.sendKV("IR", "")
+            self.is_reading_ir = True
+        else:
+            print("READING KV")
+            bot.readKV()
+            if bot.ir_sensor_data != "":
+                self.is_reading_ir = False
+
+        return bot.ir_sensor_data

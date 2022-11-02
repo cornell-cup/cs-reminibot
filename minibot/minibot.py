@@ -11,9 +11,10 @@ import time
 import argparse
 import signal
 
-# NOTE: Please add "flush=True" to all print statements so that our test 
-# harness (test_minibot.py) can pipe the stdout output, and use it 
+# NOTE: Please add "flush=True" to all print statements so that our test
+# harness (test_minibot.py) can pipe the stdout output, and use it
 # determine the correctness of the tests
+
 
 class Minibot:
     """ Represents a minibot.  Handles all communication with the basestation
@@ -143,6 +144,8 @@ class Minibot:
             data = self.broadcast_sock.recv(4096)
         except timeout:
             print("Timed out", flush=True)
+        except OSError:
+            print("Try again", flush=True)
 
         # TODO this security policy is stupid.  We should be doing
         # authentication after we create the TCP connection and also we should
@@ -174,7 +177,7 @@ class Minibot:
             if sock is self.listener_sock:
                 connection, base_station_addr = sock.accept()
                 print(
-                    f"Connected to base station with address {base_station_addr}", 
+                    f"Connected to base station with address {base_station_addr}",
                     flush=True
                 )
                 # set to non-blocking reads (when we call connection.recv,
@@ -324,7 +327,7 @@ class Minibot:
                 "right": ece.right,
             }
             if value in cmds_functions_map:
-                # TODO use the appropriate power arg instead of 50 when 
+                # TODO use the appropriate power arg instead of 50 when
                 # that's implemented
                 Thread(target=cmds_functions_map[value], args=[50]).start()
             else:
@@ -332,6 +335,29 @@ class Minibot:
                 if self.blockly_python_proc.is_running():
                     self.blockly_python_proc.kill_proc()
                 Thread(target=ece.stop).start()
+        elif key == "IR":
+            return_val = []
+
+            thread = Thread(target=ece.read_ir, args=[return_val])
+            thread.start()
+
+            while thread.is_alive():
+                time.sleep(0.01)
+
+            now = datetime.now()
+            file = open("/home/pi/Documents/" +
+                        now.strftime('%H:%M:%S.%f') + ".txt", "w")
+
+            file.write("From Arduino\n")
+            file.write(str(return_val))
+            file.close()
+
+            if return_val[0] == 0:
+                self.sendKV(sock, key, "HIGH")
+            elif return_val[0] == 1:
+                self.sendKV(sock, key, "LOW")
+            else:
+                self.sendKV(sock, key, "")
 
     def sendKV(self, sock: socket, key: str, value: str):
         """ Sends a key-value pair to the specified socket. The key value

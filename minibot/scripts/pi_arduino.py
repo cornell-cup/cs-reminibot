@@ -164,7 +164,9 @@ def acquire_lock():
         time.sleep(0.01)
     # Send the starting character to tell the Arduino
     # that we will be starting to transmit commands to it
-    setSlave(1)
+
+    # set slave 1 doesnt work
+    setSlave(0)
     transmit_once(START_TRASMISSION_CMD)
 
 
@@ -226,6 +228,14 @@ def read_ultrasonic():
     return return_val
 
 
+def read_ir(return_value):
+    acquire_lock()
+    transmit_once('T')
+    return_val = read_once()
+    return_value.append(return_val[0])
+    release_lock()
+
+
 def move_servo(angle):
     """ Tell the Arduino to move its servo motor to a specific angle """
     acquire_lock()
@@ -275,7 +285,3 @@ def set_ports(ports):
     arr = list(port_number) + list(ports_dict[port_name])
     transmit_once(arr)
     release_lock()
-
-
-def ECE_wheel_pwr(left, right):
-    raise NotImplementedError()

@@ -100,6 +100,12 @@ class Bot:
                 self.last_status_time = time.time()
             elif key == "SCRIPT_EXEC_RESULT":
                 self.script_exec_result = value
+            elif key == "IR":
+                if value == "":
+                    self.ir_sensor_data = ""
+                else:
+                    print('IR value' + value)
+                    self.ir_sensor_data = value
 
             data_str = data_str[end + token_len:]
 

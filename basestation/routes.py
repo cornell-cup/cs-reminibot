@@ -55,6 +55,23 @@ def wheels():
     return json.dumps(True), status.HTTP_200_OK
 
 
+@app.route('/ir', methods=['POST'])
+def ir():
+    data = request.get_json()
+    bot_name = data['bot_name']
+    if not bot_name:
+        error_json = {"error_msg": NO_BOT_ERROR_MSG}
+        return json.dumps(error_json), status.HTTP_400_BAD_REQUEST
+
+    ir_data = base_station.start_ir(bot_name)
+    if ir_data == "":
+        received = False
+    else:
+        received = True
+    response_dict = {"data": ir_data, "received": received}
+    return json.dumps(response_dict), status.HTTP_200_OK
+
+
 @app.route('/script', methods=['POST'])
 def script():
     """ Make Minibot run a Python script """
@@ -125,7 +142,7 @@ def error_message_update():
     script_exec_result = base_station.get_bot_script_exec_result(bot_name)
     if not script_exec_result:
         code = -1
-    else: 
+    else:
         # invariant: submission_id is not None inside this block
         base_station.update_result(script_exec_result, submission_id)
         code = 1 if script_exec_result == "Successful execution" else 0
@@ -234,22 +251,29 @@ def create_submission():
     else:
         return json.dumps("Submission failed"), 400
 
+
 @app.route('/analytics', methods=['GET'])
 def analytics():
     email = request.args.get('email')
     user = base_station.get_user(email)
     if user is not None:
         submissions = base_station.get_all_submissions(user)
-        
-        successful_executions_per_month = {"January":0, "February":0, "March":0, "April":0, "May":0, "June":0, "July":0, "August":0, "September":0, "October":0, "November":0, "December":0}
-        errors_per_month = {"January":0, "February":0, "March":0, "April":0, "May":0, "June":0, "July":0, "August":0, "September":0, "October":0, "November":0, "December":0}
 
-        monthly_statistics = [successful_executions_per_month, errors_per_month]
-        
+        successful_executions_per_month = {"January": 0, "February": 0, "March": 0, "April": 0, "May": 0,
+                                           "June": 0, "July": 0, "August": 0, "September": 0, "October": 0, "November": 0, "December": 0}
+        errors_per_month = {"January": 0, "February": 0, "March": 0, "April": 0, "May": 0, "June": 0,
+                            "July": 0, "August": 0, "September": 0, "October": 0, "November": 0, "December": 0}
+
+        monthly_statistics = [
+            successful_executions_per_month, errors_per_month]
+
         for submission in submissions:
-            month = datetime.datetime.strptime(submission.time, "%Y/%b/%d %H:%M:%S").month
-            year = datetime.datetime.strptime(submission.time, "%Y/%b/%d %H:%M:%S").year
-            month_str = datetime.datetime.strptime(str(month), "%m").strftime("%B")
+            month = datetime.datetime.strptime(
+                submission.time, "%Y/%b/%d %H:%M:%S").month
+            year = datetime.datetime.strptime(
+                submission.time, "%Y/%b/%d %H:%M:%S").year
+            month_str = datetime.datetime.strptime(
+                str(month), "%m").strftime("%B")
 
             if year == time.localtime().tm_year:
                 if submission.result != "Successful execution":
