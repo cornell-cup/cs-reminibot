@@ -116,7 +116,7 @@ node_modules/
 #SqlLitedb files
 *.db
 
-gui/package-lock.json
+static/gui/package-lock.json
 
 # User entered Python program
 minibot/scripts/bot_script.py

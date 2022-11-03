@@ -1,359 +1,548 @@
+/** REARRANGE THE CSS **/
+
 /* GlOBAL */
+@import url("https://fonts.googleapis.com/css2?family=Audiowide&display=swap");
+@import url("http://fonts.googleapis.com/css?family=Ubuntu:regular,bold&subset=Latin");
+
+/*** NAVBAR ***/
+#top-nav .navbar-brand,
+#top-nav .navbar {
+  font-family: "Audiowide", cursive;
+  font-size: 1.5em;
+}
+
+.navbar a {
+  margin-left: 30px;
+  font-size: 17pt;
+  color: white;
+}
+
+.navbar button {
+  margin-left: 15px;
+  background: none;
+  color: white;
+  border: none;
+  font: inherit;
+  font-size: 15pt;
+  cursor: pointer;
+  outline: inherit;
+}
+
+.navbar a:hover {
+  text-decoration: none;
+  color: white;
+}
 
 .box {
-    margin: 1vh;
-    padding: 1vh;
-    width: 560px;
+  margin: 1vh;
+  padding: 1vh;
+  width: 560px;
 }
 
 .button-wrapper {
-    padding-top: 10px;
-    padding-bottom: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 .button-login {
-    background: #d1150c;
-    color: white;
-    height: 40px;
-    font-weight: 650;
-    letter-spacing: 0.11em;
+  background: #d1150c;
+  color: white;
+  height: 40px;
+  font-weight: 650;
+  letter-spacing: 0.11em;
 }
 
 .button-gradient {
-    background-image: linear-gradient(to right, #e34850, rgb(255, 155, 0));
-    color: white;
-    border-radius: 5px;
-    padding: 5px;   
-    border: 0px;
+  background-image: linear-gradient(to right, #e34850, rgb(255, 155, 0));
+  color: white;
+  border-radius: 5px;
+  padding: 5px;
+  border: 0px;
 }
 
 .button-gradient:hover {
-    background-image: linear-gradient(to right, rgb(235, 0, 0), rgb(245, 145, 0));
+  background-image: linear-gradient(to right, rgb(235, 0, 0), rgb(245, 145, 0));
 }
 
-
-.control {
-    padding-left: 15px;
-    padding-top: 15px;
-}
+/* .control {
+  padding-left: 15px;
+  padding-top: 15px;
+} */
 
 .divider {
-    width: 100px;
-    height: auto;
-    display: inline-block;
+  width: 100px;
+  height: auto;
+  display: inline-block;
 }
 
 .white-label {
-    color:white;
+  color: white;
 }
 
 .element-wrapper {
-    padding-right: 15px;
+  padding-right: 15px;
 }
 
 .horizontalDiv {
-    clear: both;
-    padding-top: 10px;
+  clear: both;
+  padding-top: 10px;
 }
 
 .horizontalDivCenter {
-    clear: both;
-    padding-top: 10px;
-    text-align: center;
+  clear: both;
+  padding-top: 10px;
+  text-align: center;
 }
 
 .horizontalDiv div {
-    float: left;
+  float: left;
 }
 
 .horizontalDivCenter div {
-    display: inline-block; 
+  display: inline-block;
 }
 
 .main-body {
-    background: #212529;
+  background: #212529;
+  padding-bottom: 50px;
 }
 
 .jumbotron {
-    background-color:#212529;
+  background-color: #212529;
 }
 
-.navbar {
+/* .navbar {
     width: 100vw;
     height: 8vh;
     size: 5em;
     background: #212529;
     color: white;
+} */
+
+/* The side navigation menu */
+.sidenav {
+  height: 100%;
+  /* 100% Full-height */
+  width: 0;
+  /* 0 width - change this with JavaScript */
+  position: fixed;
+  /* Stay in place */
+  z-index: 1;
+  /* Stay on top */
+  top: 0;
+  /* Stay at the top */
+  right: 0;
+  background-color: #111;
+  /* Black*/
+  overflow-x: hidden;
+  /* Disable horizontal scroll */
+  padding-top: 60px;
+  /* Place content 60px from the top */
+  transition: 0.25s;
+  /* 0.5 second transition effect to slide in the sidenav */
+}
+
+/* The navigation menu links */
+.sidenav a {
+  padding: 8px 8px 8px 32px;
+  text-decoration: none;
+  font-size: 25px;
+  color: #818181;
+  display: block;
+  transition: 0;
+}
+
+/* When you mouse over the navigation links, change their color */
+.sidenav a:hover {
+  color: #f1f1f1;
+  text-decoration: none;
+}
+
+.sidenav a.active {
+  color: #f1f1f1;
+  text-decoration: none;
+}
+
+/* Position and style the close button (top right corner) */
+.sidenav .closebtn {
+  position: absolute;
+  top: 0;
+  right: 25px;
+  font-size: 36px;
+  margin-left: 50px;
+  background-color: transparent;
+  border: none;
+  color: white;
+}
+
+/* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
+@media screen and (max-height: 450px) {
+  .sidenav {
+    padding-top: 15px;
+  }
+
+  .sidenav a {
+    font-size: 18px;
+  }
 }
 
 .logo {
-    height: 7vh;
-    width: 7vh;
-    padding: 0.5vh;
-    text-align: right;
+  height: 7vh;
+  width: 7vh;
+  padding: 0.5vh;
+  text-align: right;
 }
 
 .slightly_larger_text {
-    size: 5em;
-}
-
-
-table {
-    text-align: center;
+  size: 5em;
 }
 
 table {
-    text-align: center;
+  text-align: center;
+}
+
+table {
+  text-align: center;
 }
 
 /*SETUP TAB*/
 
 #view {
-    min-height: 0;
+  min-height: 0;
 }
 
-.available-bots {
-    background-color:#e34850;
-    color: white;
-    padding: 2px;
-    border-radius: 5px;
+#bot-setup .form-control {
+  background-color: white;
+  color: #ff8d29;
+  margin-top: 10px;
+  padding: 2px;
+  border-radius: 5px;
 }
 
 .gridControlTable {
-    width: 40%;
+  width: 40%;
 }
 
 .gridControl {
-    width: 200%;
+  width: 200%;
 }
 
 #component_view {
-    min-height: 0;
+  min-height: 0;
 }
-
 
 /*CONTROL TAB*/
 
 .controlgrid {
-    padding: 10px;
+  padding: 10px;
 }
 
 #generatedPythonFromBlocklyBox {
-    background: #000000;
-    color: white;
-    border: 1px solid gray;
-    overflow: scroll;
-    font-family: Consolas, monospace;
-    font-size: 17px;
-    padding: 10px;
-    max-width: 39vw;
-    max-height: 67vh;
+  background: #000000;
+  color: white;
+  border: 1px solid gray;
+  overflow: scroll;
+  font-family: Consolas, monospace;
+  font-size: 17px;
+  padding: 10px;
+  max-width: 39vw;
+  max-height: 67vh;
 }
-
 
 /* REACT TABS */
 
 .react-tabs__tab-list {
-    border-bottom: 1px solid #aaa;
-    margin: 0 0 10px;
-    padding: 0;
+  border-bottom: 1px solid #aaa;
+  margin: 0 0 10px;
+  padding: 0;
 }
 
 .react-tabs__tab {
-    display: inline-block;
-    border: 1px solid transparent;
-    border-bottom: none;
-    bottom: -1px;
-    position: relative;
-    list-style: none;
-    padding: 6px 12px;
-    cursor: pointer;
-    color: white;
-    background-color:#3c434b ;
-    border-radius: 5px 5px 0 0;
+  display: inline-block;
+  border: 1px solid transparent;
+  border-bottom: none;
+  bottom: -1px;
+  position: relative;
+  list-style: none;
+  padding: 6px 12px;
+  cursor: pointer;
+  color: white;
+  background-color: #3c434b;
+  border-radius: 5px 5px 0 0;
 }
 
 .react-tabs__tab--selected {
-    background: #fff;
-    border-color: #aaa;
-    color: #121212;
-    border-radius: 5px 5px 0 0;
+  background: #fff;
+  border-color: #aaa;
+  color: #121212;
+  border-radius: 5px 5px 0 0;
 }
 
 .react-tabs__tab-panel {
-    display: none;
+  display: none;
 }
 
 .react-tabs__tab-panel--selected {
-    display: block;
+  display: block;
 }
 
 .react-tabs__tab--disabled {
-    color: GrayText;
-    cursor: default;
+  color: gray;
+  cursor: default;
 }
 
 .react-tabs__tab:focus {
-    box-shadow: 0 0 5px hsl(208, 99%, 50%);
-    border-color: hsl(208, 99%, 50%);
-    outline: none;
+  box-shadow: 0 0 5px hsl(208, 99%, 50%);
+  border-color: hsl(208, 99%, 50%);
+  outline: none;
 }
 
 .react-tabs__tab:focus:after {
-    content: "";
-    position: absolute;
-    height: 5px;
-    left: -4px;
-    right: -4px;
-    bottom: -5px;
-    background: #fff;
+  content: "";
+  position: absolute;
+  height: 5px;
+  left: -4px;
+  right: -4px;
+  bottom: -5px;
+  background: #fff;
 }
 
-.button-movement {
-    background: #e34850;
-    color: white;
-    border-radius: 30px;
-    height: 40px;
-    width: 120px;
-    font-weight: 500;
-    letter-spacing: 0.11em;
+.button-movement .row {
+  margin: 4px 0;
 }
 
-.button-stop {
-    background: #d1150c;
-    color: white;
-    border-radius: 30px;
-    height: 40px;
-    width: 120px;
-    font-weight: 650;
-    letter-spacing: 0.11em;
+.button-movement .movement {
+  margin: 0 4px;
+  line-height: 0;
+  font-size: 2.5em;
+  box-shadow: none;
+}
+
+.button-movement .vertical-btn {
+  padding: 0 15px;
+}
+
+#setup_control_tab>.row {
+  margin: 0;
 }
 
 #title {
-    font-size: 50px;
-    color: white
+  font-size: 50px;
+  color: white;
 }
 
 .small-title {
-    font-size: 30px; 
-    font-weight: bold;
-    color: white
+  font-size: 1.75em;
+  font-weight: bold;
+  color: white;
 }
 
 #main_nav ul {
-    background: transparent;
-    float: left;
-    -webkit-transition: .5s;
-    transition: .5s;
-    text-align: center;
-    color: white;
+  background: transparent;
+  float: left;
+  -webkit-transition: 0.5s;
+  transition: 0.5s;
+  text-align: center;
+  color: white;
 }
 
 #main_nav li {
-    float: right;
-    position: relative;
-    width: 150px;
-    list-style: none;
-    -webkit-transition: .5s;
-    transition: .5s;
-    text-align: center;
-    background: transparent;
-    color: white;
-
+  float: right;
+  position: relative;
+  width: 150px;
+  list-style: none;
+  -webkit-transition: 0.5s;
+  transition: 0.5s;
+  text-align: center;
+  background: transparent;
+  color: white;
 }
 
 #main_nav a {
-    display: block;
-    text-decoration: none;
-    padding: 5px 15px;
-    color: white;
-    text-align: center;
-    background-color:  #EA4C46;
+  display: block;
+  text-decoration: none;
+  padding: 5px 15px;
+  color: white;
+  text-align: center;
+  background-color: #ea4c46;
 }
 
 #main_nav ul ul {
-    position: absolute;
-    left: 75%;
-    top: 40%;
-    visibility: hidden;
-    opacity: 0;
+  position: absolute;
+  left: 75%;
+  top: 40%;
+  visibility: hidden;
+  opacity: 0;
 }
 
 #main_nav ul ul ul {
-    left: 75%;
-    top: 0%;
-    position: absolute;
+  left: 75%;
+  top: 0%;
+  position: absolute;
 }
 
-
 #main_nav li:hover>ul {
-    visibility: visible;
-    opacity: 1;
+  visibility: visible;
+  opacity: 1;
 }
 
 .in-front-of-other-elems {
-    position: relative;
-    z-index: 10;
+  position: relative;
+  z-index: 10;
 }
 
 .btn_ports {
-    background: #ddd;
-    width: 150px;
-    border-radius: 0.5em;
-    color: white;
-    background-color: #F07470;
+  background: #ddd;
+  width: 150px;
+  border-radius: 0.5em;
+  color: white;
+  background-color: #f07470;
 }
 
-.modal {
-    background-color: white;
-    display: none;
-    position: fixed;
-    top: 45%;
-    left: 45%;
-    width: 400px;
-    max-width: 100%;
-    height: 200px;
-    max-height: 100%;
-    z-index: 1;
-    /* background-color: rgba(0, 0, 0, 0.25); */
+.modal2 {
+  background-color: white;
+  display: none;
+  position: fixed;
+  top: 45%;
+  left: 45%;
+  width: 400px;
+  max-width: 100%;
+  height: 200px;
+  max-height: 100%;
+  z-index: 1;
 }
 
 .modal_content {
-    background-color: white;
-    position: absolute;
+  background-color: white;
+  position: absolute;
 }
 
 #selected-bot {
-    border-style: solid;
-    border-color: white;
-    border-width: 1px;
-    color: white;
-    padding: 5px;
-    background-color:#3c434b ;
+  border-style: solid;
+  border-color: white;
+  border-width: 1px;
+  color: white;
+  padding: 5px;
+  background-color: #3c434b;
 }
 
 #speech_recognition_feedback_box {
-    background-color : 	#ffb2b2;
-    border-style: solid;
-    border-width: 0.5px;
-    padding: 20px;
-    width: 320px;
+  background-color: #aaa;
+  width: 90%;
+  height: 140px;
+  /* padding: 10px; */
+  border-radius: 5px;
+  text-align: center;
+  /* background-color: #ffb2b2;
+  border-style: solid;
+  border-width: 0.5px; */
+  padding: 10px;
+  margin: 0 auto;
+  /* width: 320px; */
+}
+
+#speech-button {
+  margin-bottom: 10px;
 }
 
 #botName {
-    color: orange;
-    font-weight: bold;
+  color: #ff8484;
+  font-weight: bold;
 }
 
-
-.container{
-    background-color: #2c3137;
-    border-radius: 25px;
-    padding: 5px 1px 5px 1px; 
+.available-bots {
+  padding: 5px;
 }
 
-.container-coding{
-    background-color: #2c3137;
-    border-radius: 25px;
-    padding: 5px 5px 5px 5px; 
+.control-option {
+  box-sizing: border-box;
+  width: 100%;
+  /* background-color: #2c3137; */
+  border-radius: 15px;
+  padding: 0px 15px;
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+#movement-control {
+  padding: 10px 20px;
+  background-color: #2c3137;
+}
+
+.small-title {
+  font-family: "Audiowide", cursive;
+  color: #ff8484;
+  font-weight: 60;
+  font-size: 20pt;
+}
+
+.info-icon {
+  font-size: 0.5em;
+  color: white;
+}
+
+#bot-setup .col-form-label {
+  font-family: "Ubuntu";
+  text-align: right;
+  color: #b1c7ff;
+  font-size: 18px;
+  padding-right: 0px;
+  letter-spacing: 0.02em;
+}
+
+#bot-setup .form-group {
+  margin-top: 13px;
+  align-items: center;
+}
+
+.port-form {
+  font-family: "Ubuntu";
+  text-align: right;
+  color: #b1c7ff;
+  font-size: 18px;
+  padding-right: 0px;
+  letter-spacing: 0.02em;
+}
+
+/* MOVEMENT CONTROLS */
+
+/* triangle stuff */
+/* .tr {
+  width: 30%;
+  padding-bottom: 21.27%; /* = width / 1.41 */
+/* position: relative;
+  overflow: hidden; */
+/* } */
+
+/* .tr:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #0079c6;
+  transform-origin: 0 100%;
+  transform: rotate(45deg);
+} */
+
+.btn-speech {
+  margin: 0 auto;
+}
+
+.btn-speech,
+.btn-stop {
+  background-color: #f07470;
+}
+
+#stop {
+  padding: 13px 15px;
+  line-height: 0;
+  font-size: 1.76em;
+}
+
+.container-coding {
+  background-color: #2c3137;
+  border-radius: 25px;
+  padding: 5px 5px 5px 5px;
 }

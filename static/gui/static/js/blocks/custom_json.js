@@ -1,10 +1,10 @@
 /*
-	JSON configurations for custom blocks.
+  JSON configurations for custom blocks.
 
-	Current custom blocks:
-	- move
-	- turn
-	- set wheel power
+  Current custom blocks:
+  - move
+  - turn
+  - set wheel power
   - wait
 */
 
@@ -23,8 +23,8 @@ var miniblocks = {
         type: "field_dropdown",
         name: "while_or_until",
         options: [
-          ["while","while"],
-          ["until","until"]
+          ["while", "while"],
+          ["until", "until"]
         ]
       },
       {
@@ -227,6 +227,69 @@ var miniblocks = {
     tooltip: "",
     helpUrl: ""
   },
+  move_distance: {
+    type: "move_distance",
+    message0: "move %1 %2 inches",
+    args0: [
+      {
+        type: "field_dropdown",
+        name: "direction",
+        options: [["forwards", "fwd_dst"], ["backwards", "bk_dst"]]
+      },
+      {
+        type: "field_number",
+        name: "inches",
+        value: 0
+      }
+    ],
+    previousStatement: null,
+    nextStatement: null,
+    colour: 230,
+    tooltip: "",
+    helpUrl: ""
+  },
+  move_to_position: {
+    type: "move_to_position",
+    message0: "move to (%1 inches,%2 inches)",
+    args0: [
+      {
+        type: "field_number",
+        name: "x_inches",
+        value: 0
+      },
+      {
+        type: "field_number",
+        name: "y_inches",
+        value: 0
+      }
+    ],
+    previousStatement: null,
+    nextStatement: null,
+    colour: 230,
+    tooltip: "",
+    helpUrl: ""
+  },
+  path_plan_to_position: {
+    type: "path_plan_to_position",
+    message0: "path plan to (%1 inches,%2 inches)",
+    args0: [
+      {
+        type: "field_number",
+        name: "x_inches",
+        value: 0
+      },
+      {
+        type: "field_number",
+        name: "y_inches",
+        value: 0
+      }
+    ],
+    previousStatement: null,
+    nextStatement: null,
+    colour: 230,
+    tooltip: "",
+    helpUrl: ""
+  },
   stop_moving: {
     type: "stop_moving",
     message0: "stop moving",
@@ -323,7 +386,46 @@ var miniblocks = {
     tooltip: "",
     helpUrl: ""
   },
-
+  turn_angle: {
+    type: "turn_angle",
+    message0: "turn %1 %2 degrees",
+    args0: [
+      {
+        type: "field_dropdown",
+        name: "direction",
+        options: [
+          ["right", "turn_clockwise_angle"],
+          ["left", "turn_counter_clockwise_angle"]
+        ]
+      },
+      {
+        type: "field_number",
+        name: "degrees",
+        value: 0
+      }
+    ],
+    previousStatement: null,
+    nextStatement: null,
+    colour: 230,
+    tooltip: "",
+    helpUrl: ""
+  },
+  turn_to_angle: {
+    type: "turn_to_angle",
+    message0: "turn to %1 degrees",
+    args0: [
+      {
+        type: "field_number",
+        name: "angle_degrees",
+        value: 0
+      }
+    ],
+    previousStatement: null,
+    nextStatement: null,
+    colour: 230,
+    tooltip: "",
+    helpUrl: ""
+  },
   move_servo: {
     type: "move_servo",
     message0: "move servo to %1 angle",

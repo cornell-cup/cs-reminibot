@@ -1,6 +1,6 @@
 import React from 'react';
 import axios from 'axios';
-import { Button } from './Util.js'
+import { Button } from './utils/Util.js'
 
 /*
  *  A RefreshingList is a list designed to refresh when its update()
@@ -21,15 +21,15 @@ class RefreshingList extends React.Component {
     /**
      * This function is called when the user presses on the Available Bots List
      * This function simply tells the backend to listen for incoming Minibot
-     * broadcasts and update its internal list of active Minibots.  This 
+     * broadcasts and update its internal list of active Minibots.  This
      * function doesn't update the WebGUI at all.  Instead, the refreshAvailableBots
      * function, which runs continuously, fetches the updated active Minibots list
-     * from the backend.  refreshAvailableBots must run continuously to update the 
+     * from the backend.  refreshAvailableBots must run continuously to update the
      * Available Bots List in case a previously active Minibot disconnects.
      * The reason we have a separate discoverBots function and a separate
-     * refreshAvailableBots function is because fetching the active Minibots 
+     * refreshAvailableBots function is because fetching the active Minibots
      * is inexpensive, so its okay if refreshAvailableBots runs continuously.
-     * However, making the Basestation listen for all active Minibots can be 
+     * However, making the Basestation listen for all active Minibots can be
      * relatively expensive, so we want to make the Basestation perform this
      * not too frequently.  Hence, with this implementation, the Basestation will
      * only need to perform this operation when the Available Bots List is clicked.
@@ -147,15 +147,15 @@ class SpeechRecognition extends React.Component {
         this.toggle = this.toggle.bind(this);
         // Number of messages to display in GUI
         this.maxMessages = 4;
-        // Used to alternate the colors between odd and even messages.  This is 
-        // so that when the messages are scrolling, the messages retain the 
-        // same color.  For example, let's say we have the messages ["a", b", 
+        // Used to alternate the colors between odd and even messages.  This is
+        // so that when the messages are scrolling, the messages retain the
+        // same color.  For example, let's say we have the messages ["a", b",
         // "c", "d"] and "a" and "c" are blue and "b" and "d" are black.  Hence,
         // the odd-index messages are blue and the even-index are black. When we
         // add "e" to the queue and pop "a", the queue will look like ["b", "c",
         // "d", "e"].  We still want "b" and "d" to be black and "c" to be blue.
         // Hence now we must make the even-index messages blue and the odd-index
-        // messages black. 
+        // messages black.
         this.queueColorIndex = 0;
         this.queue = [""];
         // Interval function to poll server backend
@@ -172,8 +172,8 @@ class SpeechRecognition extends React.Component {
         // If button was previously off, turn_on should be True.
         let turnOn = !this.state.on;
 
-        // If we are turning the speech recognition service on, 
-        // start polling the backend server for status messages to be 
+        // If we are turning the speech recognition service on,
+        // start polling the backend server for status messages to be
         // displayed on the GUI
         if (turnOn) {
             this.speechRecognitionInterval = setInterval(
@@ -191,7 +191,7 @@ class SpeechRecognition extends React.Component {
             this.queue = [""];
         }
 
-        // Tell the backend server to start / stop the speech recognition service 
+        // Tell the backend server to start / stop the speech recognition service
         axios({
             method: 'POST',
             url: '/speech_recognition',
@@ -242,8 +242,8 @@ class SpeechRecognition extends React.Component {
                 );
                 feedbackBox.innerHTML = "";
 
-                // Iterate through the queue, adding each message to the 
-                // feedback box as a separate html paragraph (so that we can 
+                // Iterate through the queue, adding each message to the
+                // feedback box as a separate html paragraph (so that we can
                 // style each message differently).  Iterate through the queue
                 // backwards so that the most recent messages show up first
                 for (let i = _this.queue.length - 1; i >= 0; i--) {
@@ -319,7 +319,7 @@ export default class AddBot extends React.Component {
         }).then(function (response) {
             _this.state.availableBots = response.data;
             // If the Selected Bot (the currently connected bot)
-            // is no longer active, remove it from the Selected Bot label (the 
+            // is no longer active, remove it from the Selected Bot label (the
             // currently connected bot label)
             if (!(_this.props.selectedBotName === "") &&
                 !_this.state.availableBots.includes(_this.props.selectedBotName)
@@ -401,7 +401,7 @@ export default class AddBot extends React.Component {
             // prevent spacebar from jumping to the end of the page
             event.preventDefault()
             this.buttonMapListener("stop");
-        // If user presses an arrow key, make the Minibot move in that direction
+            // If user presses an arrow key, make the Minibot move in that direction
         } else if (event.keyCode >= leftArrow && event.keyCode <= downArrow) {
             // prevent arrow key from causing the page to scroll
             event.preventDefault()
@@ -455,7 +455,7 @@ export default class AddBot extends React.Component {
 
     }
 
-    lineFollowOnClick() {
+    setObjectOnClick(mode) {
         const _this = this;
         axios({
             method: 'POST',
@@ -465,7 +465,7 @@ export default class AddBot extends React.Component {
             },
             data: JSON.stringify({
                 bot_name: _this.props.selectedBotName,
-                mode: "line_follow",
+                mode: mode,
             })
         }).catch(function (error) {
             if (error.response.data.error_msg.length > 0)
@@ -475,9 +475,8 @@ export default class AddBot extends React.Component {
         });
     }
 
-    objectDetectionOnClick() {
+    setColorOnClick(mode) {
         const _this = this;
-        console.log("Object Detection")
         axios({
             method: 'POST',
             url: '/mode', //url to backend endpoint
@@ -486,23 +485,20 @@ export default class AddBot extends React.Component {
             },
             data: JSON.stringify({
                 bot_name: _this.props.selectedBotName,
-                mode: "object_detection",
+                mode: mode,
             })
         }).catch(function (error) {
             if (error.response.data.error_msg.length > 0)
                 window.alert(error.response.data.error_msg);
             else
                 console.log(error);
-                //handle errors
         });
     }
-
-
 
     render() {
         const _this = this;
         return (
-            // Set tabindex to -1 so that this div is in focus to caputure 
+            // Set tabindex to -1 so that this div is in focus to caputure
             // the keyboard event handler for arrow key movement
             <div id="setup_control_tab" tabindex="-1" className="container-fluid control">
                 <div className="container">
@@ -526,7 +522,7 @@ export default class AddBot extends React.Component {
                             <div className="element-wrapper">
                                 <label id="selected-bot" style={this.props.selectedBotStyle}>
                                     Connected to: &nbsp; &nbsp;
-                                <span id="botName">
+                                    <span id="botName">
                                         {_this.getSelectedBotText()}
                                     </span>
                                 </label>
@@ -597,15 +593,15 @@ export default class AddBot extends React.Component {
                     <div className="row">
                         <div className="col horizontalDivCenter">
                             <p className="small-title"> Custom Modes </p>
-                            <button className="btn btn-success element-wrapper mr-1" onClick={() => this.objectDetectionOnClick()}>Object Detection</button>
-                            <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.lineFollowOnClick()}>Line Follow</button>
+                            <button className="btn btn-success element-wrapper mr-1" onClick={() => this.setObjectOnClick("object_detection")}>Object Detection</button>
+                            <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.setColorOnClick("color_detection")}>Color Detection</button>
                         </div>
                     </div>
                     <br />
                 </div>
 
                 <br />
-            </div >
+            </div>
         );
     }
 }
