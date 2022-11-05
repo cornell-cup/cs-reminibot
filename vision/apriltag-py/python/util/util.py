@@ -232,6 +232,7 @@ def undistort_image(frame, camera_matrix, dist_coeffs):
     return dst
 
 def read_json(calibration_file_name):
+    """ returns file and calibration json as a dictionary """
     calibration_file = None
     try:
         with open(calibration_file_name) as calibration_file:
@@ -243,7 +244,8 @@ def read_json(calibration_file_name):
     
 
 def get_camera(idx):
-    camera = cv2.VideoCapture(idx)
+    """ returns video capture object """
+    camera = cv2.VideoCapture(idx) 
     if not cv2.VideoCapture.isOpened(camera):
         raise Exception("Unable to open camera: {}".format(idx))
     camera.set(cv2.CAP_PROP_FRAME_WIDTH, FRAME_WIDTH)
@@ -258,6 +260,10 @@ def get_numpy_matrix(src, name):
     return np.asarray(src[name])
 
 def compute_angle(corners):
+    """ 
+    input: corners in form of [[x1,y1],[x2,y2],[x3,y3],[x4,y4]
+    uses (x1,y1) and (x4,y4), top left and bottome right to compute angle of tag
+    """
     x1 = corners[0][0]
     y1 = corners[0][1]
     x4 = corners[3][0]
@@ -266,26 +272,33 @@ def compute_angle(corners):
     return (math.degrees(math.atan2(y1-y4, x4 - x1))%360)
 
 def distance(x1, y1, x2, y2):
+    """ output: euclidean distance between pints (x1,y1) and (x2,y2）"""
     return math.sqrt((x2-x1)**2 + (y2-y1)**2)
 
 def draw_pose(overlay, camera_params, tag_size, pose, z_sign=1):
+    """ overlays x,y,z points of tag corners after changing basis to image plane """
+    # object points
+    # left bottom, right bottom, right top, left top coordinates of tag with center at (0,0)
+    # first dimention inferred with -1
     opoints = np.array([
         -1, -1, 0,
         1, -1, 0,
         1, 1, 0,
         1, -1, -1 * z_sign,
-    ]).reshape(-1, 1, 3) * 0.5 * tag_size
+    ]).reshape(-1, 1, 3) * 0.5 * tag_size 
+
 
     fx, fy, cx, cy = camera_params
 
-    K = np.array([fx, 0, cx, 0, fy, cy, 0, 0, 1]).reshape(3, 3)
+    K = np.array([fx, 0, cx, 0, fy, cy, 0, 0, 1]).reshape(3, 3) # rotation matrix
 
-    rvec, _ = cv2.Rodrigues(pose[:3, :3])
-    tvec = pose[:3, 3]
+    rvec, _ = cv2.Rodrigues(pose[:3, :3]) # rotation matrix -> rotation vector
+    tvec = pose[:3, 3] # translation vector
 
-    dcoeffs = np.zeros(5)
+    dcoeffs = np.zeros(5) # distortion coefficients
 
-    ipoints, _ = cv2.projectPoints(opoints, rvec, tvec, K, dcoeffs)
+    # projects 3D points to image plane
+    ipoints, _ = cv2.projectPoints(opoints, rvec, tvec, K, dcoeffs) 
 
     ipoints = np.round(ipoints).astype(int)
 
@@ -344,6 +357,7 @@ def draw_cube(overlay, camera_params, tag_size, pose, z_sign=-1):
 
     for i, j in edges:
         cv2.line(overlay, ipoints[i], ipoints[j], (0, 255, 0), 1, 16)
+
 def draw_square(overlay, camera_params, tag_size, pose, z_sign=-1):
 
     opoints = np.array([
@@ -398,6 +412,7 @@ def camera_matrix_to_camera_params(camera_matrix):
     return (fx, fy, cx, cy)
 
 def get_inputs_and_outputs_for_models(calibration_file_name):
+    """ parses calibration file and returns coordinate input, offsets, and angle offsets"""
     calibration_file, calibration_data = read_json(calibration_file_name)
     center_cell_offsets = calibration_data["cell_center_offsets"]
     inputs = []
@@ -429,9 +444,6 @@ def get_models_with_calibration_file(calibration_file_name):
 def get_model_with_data(inputs,outputs):
     return LinearRegression().fit(np.array(inputs), np.array(outputs))
 
-
-
-
 def get_predictors_with_calibration_file(calibration_file_name):
     '''
     The Predictors class takes in a model as a parameter (i.e. LinearRegression), and it is used to more easily
@@ -447,7 +459,7 @@ def get_predictors_with_calibration_file(calibration_file_name):
         "angle_offsets_predictor": Predictor(models["angle_offsets_model"])
     }
 
-def compliment_of_list(full_list, partial_list):
+def complement_of_list(full_list, partial_list):
     return [entry for entry in full_list if not (entry in partial_list)]
 
 def weighted_average(values, weights):
@@ -466,6 +478,7 @@ def get_property_or_default(object, property, default=None):
     return object[property] if object != None and property in object else default
 
 def reject_outliers(data):
+    """ filters outliers out of the data, returns filtered dataset"""
     data = np.array(data)
     u = np.mean(data)
     s = np.std(data)
@@ -473,9 +486,11 @@ def reject_outliers(data):
     return filtered
     
 def to_dict(self):
+    """ json to dictionary, returns dictionary """
     return json.loads(json.dumps(self, default=lambda o: o.__dict__))
 
 def average_value_for_key(list_of_dicts, key, remove_outliers=False, threshold=None):
+    """ returns average key value for a dictionary. Can include/exclude outliers and set threshold"""
     values = [d[key] for d in list_of_dicts]
     if remove_outliers and threshold == None:
         values_without_outliers = reject_outliers(values)
@@ -485,8 +500,6 @@ def average_value_for_key(list_of_dicts, key, remove_outliers=False, threshold=N
         values_without_outliers = [value for value in values if abs(value-mode) <= threshold]
         values = values if len(values_without_outliers) == 0 else values_without_outliers
     return float(sum(values)) / len(values)
-
-
 
 def mode(sample):
     c = Counter(sample)

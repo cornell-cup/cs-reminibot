@@ -5,7 +5,7 @@ try:
 except ImportError:
     print("could not import pyAprilTag")
     try:
-        import apriltag
+        import util.apriltag as apriltag
     except:
         print("Unable to import any apriltag detection libraries please check the installation of the vision system")
 import util.util as util

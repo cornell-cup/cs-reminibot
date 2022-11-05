@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-import apriltag
+import util.apriltag as apriltag
 import argparse
 import time
 import util.util as util

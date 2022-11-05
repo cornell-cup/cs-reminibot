@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-import apriltag
+import util.apriltag as apriltag
 import time
 import util
 
@@ -91,9 +91,11 @@ def main():
 
             horizontal_dist = np.array(horizontal_dist)
             vertical_dist = np.array(vertical_dist)
-
+            
+            horizontal_mean = np.mean(horizontal_dist)
             horizontal_median = np.median(horizontal_dist)
             horizontal_std = np.std(horizontal_dist)
+            vertical_mean = np.mean(vertical_dist)
             vertical_median = np.median(vertical_dist)
             vertical_std = np.std(vertical_dist)
 
@@ -107,10 +109,12 @@ def main():
             print("V: {}".format(dy))
 
             print("H: {}".format(horizontal_dist))
+            print("H mean: {}".format(horizontal_mean))
             print("H median: {}".format(horizontal_median))
             print("H stddev: {}".format(horizontal_std))
             print("")
             print("V: {}".format(vertical_dist))
+            print("V mean: {}".format(vertical_mean))
             print("V median: {}".format(vertical_median))
             print("V stddev: {}".format(vertical_std))
             print("")
