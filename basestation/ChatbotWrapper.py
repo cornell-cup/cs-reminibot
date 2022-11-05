@@ -2,6 +2,7 @@ import requests
 import time
 from requests.structures import CaseInsensitiveDict
 import json
+from basestation import config
 
 default_context = "Hello, I am minibot. My creators are from Cornell but I \
 legally can't say that because they signed a waiver. Oh well, let's just say \
@@ -21,7 +22,9 @@ FAILURE = 400
 
 class ChatbotWrapper:
 
-    def __init__(self, context=default_context):
+    def __init__(self, context=default_context, url = config.chatbot_url):
+        print(config.chatbot_url)
+        self.url = url
         self.context_stack = [default_context]  # context
 
     def replace_context_stack(self, context_stack):
@@ -96,9 +99,7 @@ class ChatbotWrapper:
         Returns:
         <answer> - str 
         """
-        url = "http://10.48.8.231:8081/qa"
-        print("input question ", input_question)
-
+        url = self.url
         if ' '.join(self.context_stack) == "":
             return "Tell me something first!"
         else:
