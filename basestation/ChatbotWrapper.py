@@ -25,6 +25,7 @@ class ChatbotWrapper:
     def __init__(self, context=default_context, url = config.chatbot_url):
         print(config.chatbot_url)
         self.context_stack = [default_context]  # context
+        self.url = url
 
     def replace_context_stack(self, context_stack):
         '''Replaces the self.context_stack with <context_stack>.
@@ -99,6 +100,7 @@ class ChatbotWrapper:
         <answer> - str 
         """
         url = self.url
+        print(url)
         if ' '.join(self.context_stack) == "":
             return "Tell me something first!"
         else:
