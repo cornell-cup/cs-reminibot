@@ -7,6 +7,17 @@
 
 #include <SPI.h>
 #include "CRC.h"
+#include <Wire.h>
+#include <SPI.h>
+#include <Adafruit_PN532.h>
+
+// If using the breakout or shield with I2C, define just the pins connected
+// to the IRQ and reset lines.  Use the values below (2, 3) for the shield!
+#define PN532_IRQ (2)
+#define PN532_RESET (3) // Not connected by default on the NFC Shield
+
+// Or use this line for a breakout or shield with an I2C connection:
+Adafruit_PN532 nfc(PN532_IRQ, PN532_RESET);
 
 volatile byte result;
 const int limit = 22;
@@ -26,8 +37,38 @@ volatile int lightValue = 0;
 
 void setup()
 {
+  Serial.begin(9600);
+  Serial.println("Hello!");
+
+  nfc.begin();
+
+  uint32_t versiondata = nfc.getFirmwareVersion();
+  if (!versiondata)
+  {
+    Serial.print("Didn't find PN53x board");
+    while (1)
+      ; // halt
+  }
+
+  // Got ok data, print it out!
+  Serial.print("Found chip PN5");
+  Serial.println((versiondata >> 24) & 0xFF, HEX);
+  Serial.print("Firmware ver. ");
+  Serial.print((versiondata >> 16) & 0xFF, DEC);
+  Serial.print('.');
+  Serial.println((versiondata >> 8) & 0xFF, DEC);
+
+  // Set the max number of retry attempts to read from a card
+  // This prevents us from waiting forever for a card, which is
+  // the default behaviour of the PN532.
+  nfc.setPassiveActivationRetries(0xFF);
+
+  // configure board to read RFID tags
+  nfc.SAMConfig();
+
+  Serial.println("Waiting for an ISO14443A card");
+
   // put your setup code here, to run once:
-  Serial.begin(115200);
   pinMode(MISO, OUTPUT);
   SPCR |= bit(SPE); // slave ctrl register
   idx = 0;
@@ -92,6 +133,37 @@ void loop()
     idx = 0;
     process = false;
   }
+
+  boolean success;
+  uint8_t uid[] = {0, 0, 0, 0}; // Buffer to store the returned UID
+  uint8_t uidLength;            // Length of the UID (4 or 7 bytes depending on ISO14443A card type)
+
+  // Wait for an ISO14443A type cards (Mifare, etc.).  When one is found
+  // 'uid' will be populated with the UID, and uidLength will indicate
+  // if the uid is 4 bytes (Mifare Classic) or 7 bytes (Mifare Ultralight)
+
+  success = nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, &uid[0], &uidLength);
+  if (success)
+  {
+    Serial.println("Found a card!");
+    Serial.print("UID Length: ");
+    Serial.print(uidLength, DEC);
+    Serial.println(" bytes");
+    Serial.print("UID Value: ");
+    for (uint8_t i = 0; i < uidLength; i++)
+    {
+      Serial.print(" 0x");
+      Serial.print(uid[i], HEX);
+    }
+    Serial.println("");
+    // Wait 1 second before continuing
+    delay(1000);
+  }
+  else
+  {
+    // PN532 probably timed out waiting for a card
+    Serial.println("Timed out waiting for a card");
+  }
 }
 
 bool checkBuffer()
@@ -109,7 +181,7 @@ void useBuffer()
   //  Serial.print("\n");
 
   // Respond to message
-  if (buf[4] == 'L' && buf[5] == 'O' && buf[6] == 'A' && buf[7] == 'D')
+  if (buf[4] == 'R' && buf[5] == 'F' && buf[6] == 'I' && buf[7] == 'D')
   {
     // LOAD = Next SPI transfers will data
 
@@ -121,14 +193,20 @@ void useBuffer()
 
     if (buf[8] == 4)
     {
-      // light sensor
-      lightValue = analogRead(A0);
-      dataBuf[4] = (lightValue >> 24) & 0xFF;
-      dataBuf[5] = (lightValue >> 16) & 0xFF;
-      dataBuf[6] = (lightValue >> 8) & 0xFF;
-      dataBuf[7] = lightValue & 0xFF;
-      Serial.print("Light value is: ");
-      Serial.println(lightValue);
+      // RFID
+      dataBuf[4] = uid[0];
+      dataBuf[5] = uid[1];
+      dataBuf[6] = uid[2];
+      dataBuf[7] = uid[3];
+
+      // // light sensor
+      // lightValue = analogRead(A0);
+      // dataBuf[4] = (lightValue >> 24) & 0xFF;
+      // dataBuf[5] = (lightValue >> 16) & 0xFF;
+      // dataBuf[6] = (lightValue >> 8) & 0xFF;
+      // dataBuf[7] = lightValue & 0xFF;
+      // Serial.print("Light value is: ");
+      // Serial.println(lightValue);
     }
 
     // Add checksum

@@ -136,15 +136,19 @@ def servo(id, angle):
     release_lock()
 
 
-def RFID(id1, id2, id3, id):
+def RFID(id):
     """
-    Ask the Arduino to provide each of the RFID Tag bytes(id1, id2, id3)
+    Ask the Arduino to provide each of the RFID Tag bytes(id1, id2, id3, id4)
     """
     acquire_lock()
-    data = [ord('R'), id1,  ord('F'), id2, ord('I'), id3, ord('D'), id4]
-    msg = msglib.make_crc_message(data)
-    msglib.send_message(spi, msg)
+    load_req = [ord('R'),  ord('F'), ord('I'), ord('D'), id]
+    load_msg = msglib.make_crc_message(load_req)
+    data, numTries = msglib.read_data(
+        spi, load_msg, 22, msglib.validate_crc_message)
+    data = msglib.unpack_crc_message(data)
     release_lock()
+    print("Data:" + data)
+    return data
 
 
 def stop():

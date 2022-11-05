@@ -443,7 +443,7 @@ if __name__ == "__main__":
         '-p', type=int, dest="port_number", default=10000
     )
     parser.add_argument(
-        '-m', type=int, dest="comm_mode", default=1
+        '-m', type=int, dest="comm_mode", default=2
     )
     args = parser.parse_args()
 
