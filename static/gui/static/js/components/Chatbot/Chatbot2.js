@@ -199,28 +199,10 @@ function Chatbot2({
     setInputText("");
     setMessages(newTempList);
     setAnimating(true);
-    axios({
-      method: 'POST',
-      url: '/chatbot-ask',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      data: JSON.stringify({
-        question: inputText
-      })
-    }).then(function (response) {
-      if (response.data) {
-        const res = response.data;
-        newList = newList.concat({ id: temp_id, who: "other", message: res, timeStamp: getTimeStamp() });
-        setMessages(newList);
-        setAnimating(false);
-      }
-    }).catch(function (error) {
+    chatbot_ask(inputText, (res) => {
+      newList = newList.concat({ id: temp_id, who: "other", message: res, timeStamp: getTimeStamp() });
+      setMessages(newList);
       setAnimating(false);
-      if (error.response.data.error_msg.length > 0)
-        window.alert(error.response.data.error_msg);
-      else
-        console.log("Chatbot", error);
     })
   }
 
