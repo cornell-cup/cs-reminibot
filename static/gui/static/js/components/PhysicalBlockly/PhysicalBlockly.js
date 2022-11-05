@@ -9,24 +9,25 @@ require('codemirror/mode/python/python');
 import SelectionBox from './SelectionBox';
 const commands = ['Move Foward', 'Move Backward', 'Move Left', 'Move Right', 'Stop'];
 const choices = ["yellow", "blue", "red", "orange", "purple"]
+const customCommand = new Map();
+for(var i = 0; i < commands.length; i ++) {
+	customCommand.set(commands[i], choices[i]);
+}
 
 export default class PhysicalBlockly extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = { stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "" };
+		this.state = { stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "", tempCommandData: new Map() };
 		this.codeRef = React.createRef();
 		this.pollForUpdates = this.pollForUpdates.bind(this);
 		this.bWorkspace = null;
-		this.customCommand = new Map();
-		for(var i = 0; i < commands.length; i ++) {
-			this.customCommand.set(commands[i], choices[i]);
-		}
 	}
 
 	componentDidMount() {
 		setInterval(this.pollForUpdates, 1000);
 		this.bWorkspace = Blockly.inject('pbBlocklyDiv');
 		this.setState({ code: "" });
+		this.setState({tempCommandData: customCommand});
 	}
 
 	componentWillUnmount() {
@@ -195,11 +196,15 @@ export default class PhysicalBlockly extends React.Component {
 		this.endProcess();
 	}
 
-	updateSelection(e, command, choice) {
+	updateSelection(e, pb, command, choice) {
+		// console.log(pb);
+		// console.log(pb.state);
 		console.log("selection");
 		console.log(command);
 		console.log(choice);
-		this.customCommand.set(command, choice);
+		var newCustomCommand = pb.state.tempCommandData;
+		newCustomCommand.set(command, choice);
+		pb.setState({tempCommandData: newCustomCommand});
 	}
 
 	render(props) {
@@ -234,7 +239,7 @@ export default class PhysicalBlockly extends React.Component {
 							<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.physicalBlocklyClick(1)}>Start Real Time Mode</button>
 							<p className="small-title" style={customTitleStyle}> Customization of Blocks </p>
 							{
-								commands.map((c) => <SelectionBox key={c.id} command={c} choiceList={choices} default={this.customCommand.get(c)} changeSelection={this.updateSelection}/> )
+								commands.map((c) => <SelectionBox key={c.id} command={c} choiceList={choices} default={customCommand.get(c)} pb={this} changeSelection={this.updateSelection}/> )
 							};
 							<button className="btn btn-primary element-wrapper mr-1">Save</button>
 						</div> :

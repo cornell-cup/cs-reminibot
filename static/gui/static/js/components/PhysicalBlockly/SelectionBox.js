@@ -15,7 +15,7 @@ export default class SelectionBox extends React.Component {
             <div class="container">
                 <label for="selection" style={labelStyle}>{this.props.command}</label>
                 <select class="selectpicker" id={this.props.command} onChange={(event) => 
-                       this.props.changeSelection(event, event.target.id, event.target.value)}>
+                       this.props.changeSelection(event, this.props.pb, event.target.id, event.target.value)}>
                     {
                         this.props.choiceList.map((c) => c === this.props.default 
                         ? <option selected value={c} key={c.id}>{c}</option> 
