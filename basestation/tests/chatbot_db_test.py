@@ -53,7 +53,7 @@ def test_add_user(client):
     response = client.post(
         '/register',
         data={
-            "email":"michael",
+            "email":"michael@michael.michael",
             "password":"test123"
         }
     )
