@@ -14,6 +14,7 @@
     "babel-loader": "^7.1.2",
     "codemirror": "^5.65.1",
     "jest": "^22.4.3",
+    "matter-js": "^0.18.0",
     "nanoid": "^3.3.1",
     "react": "^17.0.2",
     "react-codemirror": "^1.0.0",
