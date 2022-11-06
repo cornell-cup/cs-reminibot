@@ -34,6 +34,7 @@ class Bot:
         self.last_status_time = time.time()
         self.is_socket_connected = True
         self._script_exec_result = None
+        self.rfid_tags = ""
 
     def try_receive_data(self, peek: bool = False) -> Optional[str]:
         """ Tries to receive data from the Minibot. 
@@ -106,6 +107,11 @@ class Bot:
                 else:
                     print('IR value' + value)
                     self.ir_sensor_data = value
+            elif key == "RFID":
+                if value == "":
+                    self.rfid_tags = ""
+                else:
+                    self.rfid_tags = value
 
             data_str = data_str[end + token_len:]
 
