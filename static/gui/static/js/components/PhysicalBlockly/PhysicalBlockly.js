@@ -33,10 +33,12 @@ for(var i = 0; i < commands.length; i ++) {
 export default class PhysicalBlockly extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = { stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "", tempCommandData: new Map(), detectionState: false, detectionCall: null };
+		this.state = { stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "", customCommands: new Map(), tempCommandData: new Map(), detectionState: false, detectionCall: null };
 		this.codeRef = React.createRef();
 		this.pollForUpdates = this.pollForUpdates.bind(this);
 		this.respondToTag = this.respondToTag.bind(this);
+		this.saveSelection = this.saveSelection.bind(this);
+		this.getCustomCommandID = this.getCustomCommandID.bind(this);
 		this.bWorkspace = null;
 	}
 
@@ -44,7 +46,7 @@ export default class PhysicalBlockly extends React.Component {
 		setInterval(this.pollForUpdates, 1000);
 		this.bWorkspace = Blockly.inject('pbBlocklyDiv');
 		this.setState({ code: "" });
-		this.setState({tempCommandData: customCommand});
+		this.setState({customCommands: customCommand, tempCommandData: customCommand});
 		const _this = this;
 		_this.codeRef["current"].getCodeMirror().setValue("");
 		_this.setState({ stage: 1, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "" });
@@ -218,8 +220,6 @@ export default class PhysicalBlockly extends React.Component {
 	}
 
 	updateSelection(e, pb, command, choice) {
-		// console.log(pb);
-		// console.log(pb.state);
 		console.log("selection");
 		console.log(command);
 		console.log(choice);
@@ -228,9 +228,23 @@ export default class PhysicalBlockly extends React.Component {
 		pb.setState({tempCommandData: newCustomCommand});
 	}
 
+	saveSelection() {
+		let commandSet = new Set();
+		for(var val of this.state.tempCommandData.values()) {
+			commandSet.add(val);
+		}
+		console.log(this.state.tempCommandData);
+        if (commandSet.size != commands.length) {
+            alert("Invalid customization! Please make sure that the commands are matched to an unique color!");
+            return;
+        }
+		let newCustomCommand = this.state.tempCommandData;
+		this.setState({customCommands: newCustomCommand});
+    }
+
 	detectRFID() {
 		console.log("start detecting RFID");
-		console.log(this);
+		console.log(this.state.customCommands);
 		let detectionState = this.state.detectionState;
 		this.setState({detectionState: !this.state.detectionState});
 		if (detectionState) {
@@ -238,6 +252,18 @@ export default class PhysicalBlockly extends React.Component {
 		} else {
 			this.setState({detectionCall: setInterval(this.respondToTag, 1000)});
 		}
+	}
+
+	getCustomCommandID(id) {
+		var color = choices[id];
+		let mapEntries = this.state.customCommands.entries();
+		for(var i = 0; i < 5; i ++) {
+			var binding = mapEntries.next().value;
+			if(binding[1] == color) {
+				return commands.indexOf(binding[0]);
+			}
+		}
+		return 0;
 	}
 
 	respondToTag() {
@@ -250,7 +276,8 @@ export default class PhysicalBlockly extends React.Component {
 			console.log(response);
 			console.log(response.data);
 			let commandID = tagMapping.indexOf(response.data);
-			// let commandID = testCommand[1];
+			commandID = _this.getCustomCommandID(commandID);
+
 			let isLoop = false;
 			let isEnd = false;
 			if (commandID == -1) {
@@ -315,6 +342,8 @@ export default class PhysicalBlockly extends React.Component {
 				_this.setState({ blockStack: _this.state.blockStack });
 				_this.setState({ lastBlock: lastLoop.nextConnection });
 			}
+		}).catch(function (error) {
+			console.log(error);
 		});
 	}
 
@@ -349,6 +378,7 @@ export default class PhysicalBlockly extends React.Component {
 					{
 						commands.map((c) => <SelectionBox key={c.id} command={c} choiceList={choices} default={customCommand.get(c)} pb={this} changeSelection={this.updateSelection}/> )
 					};
+					<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.saveSelection()}>Save</button>
 					{this.props.selectedBotName != '' && this.state.stage == 0 ?
 						<div>
 							<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.physicalBlocklyClick(0)}>Start Camera Mode</button>
@@ -357,7 +387,6 @@ export default class PhysicalBlockly extends React.Component {
 							{
 								commands.map((c) => <SelectionBox key={c.id} command={c} choiceList={choices} default={customCommand.get(c)} pb={this} changeSelection={this.updateSelection}/> )
 							};
-							<button className="btn btn-primary element-wrapper mr-1">Save</button>
 						</div> :
 						this.props.selectedBotName != '' && this.state.stage == 1 ?
 							<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.endProcess()}>End Process</button>

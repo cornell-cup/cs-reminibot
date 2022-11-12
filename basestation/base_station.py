@@ -117,8 +117,8 @@ class BaseStation:
         # working for you then comment it out and uncomment the other one.
         # NOTE: When you push, make sure only the top one is uncommented.
 
-        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        # self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+        # self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
 
         # an arbitrarily small time
         self.sock.settimeout(0.01)
@@ -587,11 +587,14 @@ class BaseStation:
 
     @make_thread_safe
     def get_rfid(self, bot_name: str):
-        bot = self.get_bot(bot_name)
-        bot.sendKV("RFID", 4)
-        bot.readKV()
-        return bot.rfid_tags
-        # return "0xF9 0x3E 0x4 0xF4"
+        # bot = self.get_bot(bot_name)
+        # print(bot)
+        # bot.sendKV("fRFID", 4)
+        # bot.readKV()
+        # print(bot.rfid_tags)
+        # return bot.rfid_tags
+        # TODO: temporary setup using dummy data, should be removed
+        return "0xF9 0x3E 0x4 0xF4"
 
     def set_bot_mode(self, bot_name: str, mode: str):
         """ Set the bot to either line follow or object detection mode """
