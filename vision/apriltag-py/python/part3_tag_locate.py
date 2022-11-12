@@ -15,6 +15,9 @@ from constants import *
 BASE_STATION_DEVICE_ID = hash(platform_node()+str(randint(0,1000000))+str(randint(0,1000000))+str(DEVICE_ID)+str(time.time()))
 
 def main():
+
+    # Can factor out the below code
+    '''---------------------------------------------------------------------------'''
     # DEBUGGING AND TIMING VARIABLES
     past_time = -1  # time to start counting. Set just before first picture taken
     num_frames = 0  # number of frames processed
@@ -27,8 +30,13 @@ def main():
     calib_file = open(calib_file_name)
 
     camera = util.get_camera(DEVICE_ID)
-    FRAME_WIDTH  = camera.get(cv2.CAP_PROP_FRAME_WIDTH )   # float `width`
+    FRAME_WIDTH  = camera.get(cv2.CAP_PROP_FRAME_WIDTH)   # float `width`
     FRAME_HEIGHT = camera.get(cv2.CAP_PROP_FRAME_HEIGHT)  # float `height`
+    '''---------------------------------------------------------------------------'''
+
+    # ADDED JUST TO SEE WHAT THE FRAME WIDTH AND HEIGHT ARE
+    # print(FRAME_WIDTH)
+    # print(FRAME_HEIGHT)
 
     # Get matrices from calibration file
     print("Parsing calibration file " + calib_file_name + "...")
@@ -38,6 +46,8 @@ def main():
     predict_x_offset_x_input_only = predictors["x_offsets_predictor_x_input_only"].predict
     predict_y_offset_y_input_only = predictors["y_offsets_predictor_y_input_only"].predict
     predict_angle_offset = predictors["angle_offsets_predictor"].predict
+
+    """-----------------------------------------------------------------------------------"""
     calib_file, calib_data = util.read_json(calib_file_name)
     transform_matrix = util.get_numpy_matrix(calib_data, "transform_matrix")
     camera_matrix = util.get_numpy_matrix(calib_data, "camera_matrix")
@@ -49,7 +59,7 @@ def main():
     overall_angle_offset = calib_data["overall_center_offset"]["angle"]
     center_cell_offsets = calib_data["cell_center_offsets"]
     calib_file.close()
-
+    """-----------------------------------------------------------------------------------"""
 
     assert camera_matrix.shape == (3, 3)
     assert dist_coeffs.shape == (1, 5)
@@ -82,7 +92,10 @@ def main():
             print("Failed to open camera")
             exit(0)
 
+        # Let frame be the image file (if we were to test with a file)
         # take a picture and get detections
+
+        """------------------------------------------------------------------"""
         frame = util.get_image(camera)
 
         undst = util.undistort_image(frame, camera_matrix, dist_coeffs)
@@ -92,7 +105,7 @@ def main():
             detections, det_image = detector.detect(gray, return_image=True)
         except Exception:
             pass
-
+        """"-----------------------------------------------------------------"""
 
         print("Found " + str(len(detections)) + " apriltags")
 
@@ -103,6 +116,7 @@ def main():
             # TODO draw tag - might be better to generalize, because
             # locate_cameras does this too.
 
+            
             (detected_x, detected_y, detected_z, detected_angle) = util.compute_tag_undistorted_pose(
                 camera_matrix, dist_coeffs, transform_matrix, d, TAG_SIZE
             )
@@ -122,23 +136,25 @@ def main():
             (ctr_x, ctr_y) = d.center
             
             # displaying tag id
-            # cv2.putText(undst, str(round(angle,2)),(int(ctr_x), int(ctr_y)), cv2.FONT_HERSHEY_SIMPLEX, .5,  (0, 0, 255),2)
-
-
-            # displaying tag id
             cv2.putText(undst, str(d.tag_id),(int(ctr_x), int(ctr_y)), cv2.FONT_HERSHEY_SIMPLEX, .5,  BLUE,2)
+            # displays the x and y position of the apriltags
             cv2.putText(undst, str((round(x),round(y))),(int(ctr_x), int(ctr_y)+15), cv2.FONT_HERSHEY_SIMPLEX, .5, MAGENTA, 2)
-            cv2.putText(undst, str(round(angle)),(int(ctr_x), int(ctr_y)+VISION_FPS), cv2.FONT_HERSHEY_SIMPLEX, .5, CYAN, 2)
-           
+            # displays the angle of the april tag (why is VISION_FPS added to the coordinate offset? make it 30)
+            cv2.putText(undst, str(round(angle)),(int(ctr_x), int(ctr_y)+30), cv2.FONT_HERSHEY_SIMPLEX, .5, CYAN, 2)
 
             # # prints DEVICE_ID tag id x y z angle
             # print("{}, {},{},{},{},{}".format(BASE_STATION_DEVICE_ID, d.tag_id, x, y, z, angle))
             snapshot_locations.append({"id": str(d.tag_id), "image_x": ctr_x, "image_y": ctr_y,"x": x, "y": y, "orientation": angle})
+            # adds the discovered april tag ids into a set
             discovered_ids.add(str(d.tag_id))
+        # append the detected april tag details onto location_history
         location_history.append(snapshot_locations)
 
+        average_locations = []
         if len(location_history) >= MAX_LOCATION_HISTORY_LENGTH:
             average_locations = []
+
+
             for id in list(discovered_ids):
                 locations_with_id = [location for snapshot_locations in location_history for location in snapshot_locations if location["id"] == id]
                 if len(locations_with_id) > 0:
@@ -162,6 +178,7 @@ def main():
 
             data_for_BS["position_data"] = average_locations
             data_for_BS["TIMESTAMP"] = time.time()
+
             # Send the data to the URL specified.
             # This is usually a URL to the base station.
             if SEND_DATA:
@@ -181,9 +198,10 @@ def main():
                     num_frames += 1
                     print(
                         "Vision FPS (Vision System outflow): {}".format(
-                            num_frames / (time.time() - past_time)
+                            num_frames / (time.time() - past_time) # calculating FPS
                         )
                     )
+        # display the undistorted camera view
         cv2.imshow("Tag Locations", undst)
         if cv2.waitKey(1) & 0xFF == ord(" "):
             break
@@ -191,9 +209,61 @@ def main():
             continue
 
 
-        
-    
+def parse_calibration_data(calib_file_name):
+    """
+    Parses the calibration file
 
+    Returns an array of calculated values (scale factors, offsets, etc.)
+    """
+    calib_file, calib_data = util.read_json(calib_file_name)
+    transform_matrix = util.get_numpy_matrix(calib_data, "transform_matrix")
+    camera_matrix = util.get_numpy_matrix(calib_data, "camera_matrix")
+    dist_coeffs = util.get_numpy_matrix(calib_data, "dist_coeffs")
+    x_scale_factor = calib_data["scale_factors"]["x"]
+    y_scale_factor = calib_data["scale_factors"]["y"]
+    overall_center_x_offset = calib_data["overall_center_offset"]["x"]
+    overall_center_y_offset = calib_data["overall_center_offset"]["y"]
+    overall_angle_offset = calib_data["overall_center_offset"]["angle"]
+    center_cell_offsets = calib_data["cell_center_offsets"]
+    calib_file.close()
+    return {
+        "transform_matrix": transform_matrix,
+        "camera_matrix": camera_matrix,
+        "dist_coeffs": dist_coeffs,
+        "x_scale_factor": x_scale_factor,
+        "y_scale_factor": y_scale_factor,
+        "overall_center_x_offset": overall_center_x_offset,
+        "overall_center_y_offset": overall_center_y_offset,
+        "overall_angle_offset": overall_angle_offset,
+        "center_cell_offsets": center_cell_offsets
+    }
+
+def calc_tag_data(calib_data, detections):
+    """
+    Calculates the tag data (x, y, angle)
+
+    Takes in a dictionary for calibration data, and the detections found via Detector()
+    Outputs a list of data about the detected tags
+    """
+
+    snapshot_locations = []
+    for i, d in enumerate(detections):
+        
+        (detected_x, detected_y, detected_z, detected_angle) = util.compute_tag_undistorted_pose(
+            calib_data["transform_matrix"], calib_data["dist_coeffs"], calib_data["transform_matrix"], d, TAG_SIZE
+        )
+
+        x_offset, y_offset, _ = get_x_y_angle_offsets(detected_x, detected_y, calib_data["center_cell_offsets"])
+        x = calib_data["x_scale_factor"] * (detected_x + calib_data["overall_center_x_offset"]) + x_offset
+        y = calib_data["y_scale_factor"] * (detected_y + calib_data["overall_center_y_offset"]) + y_offset
+        z = detected_z
+
+        angle = ((detected_angle + calib_data["overall_angle_offset"])%360)%360
+        (ctr_x, ctr_y) = d.center
+
+        # # prints DEVICE_ID tag id x y z angle
+        snapshot_locations.append({"id": str(d.tag_id), "image_x": ctr_x, "image_y": ctr_y,"x": x, "y": y, "orientation": angle})
+    return snapshot_locations
 
 def get_transform_matrix(file):
     """
@@ -381,15 +451,13 @@ def distance_from_2_ref_data_points(independent_variable_input, dependent_variab
     point1_exists = x1 != None and y1 != None
     point2_exists = x2 != None and y2 != None
     if point1_exists and point2_exists:
-        result = util.distance(independent_variable_input,dependent_variable_input,x1,y1)+util.distance(independent_variable_input,dependent_variable_input,x2,y2)
+        result = util.distance(independent_variable_input, dependent_variable_input, x1, y1) + \
+         util.distance(independent_variable_input, dependent_variable_input, x2, y2)
     else:
         # print("a point doesn't exist")
         pass
         
     return result
-
-
-
 
 
 if __name__ == "__main__":
