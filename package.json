@@ -1,7 +1,14 @@
 {
   "dependencies": {
+<<<<<<< HEAD
     "matter-js": "^0.18.0",
     "nanoid": "^3.3.1",
     "util": "^0.12.4"
+=======
+    "chokidar": "^3.5.2",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-scrollable-feed": "^1.3.1"
+>>>>>>> multi_char_spi
   }
 }

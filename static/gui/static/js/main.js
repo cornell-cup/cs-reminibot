@@ -1,162 +1,139 @@
 /* ES6 */
-
+import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { nanoid } from 'nanoid';
 import ReactDOM from 'react-dom';
-
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faCogs, faCode } from '@fortawesome/free-solid-svg-icons';
-library.add(faCogs, faCode);
-
+import { CookiesProvider } from 'react-cookie';
+import { withCookies, Cookies } from 'react-cookie';
 import {
   BrowserRouter as Router,
   Switch,
   Route,
 } from "react-router-dom";
 
-// import Signup from './components/signup.js';
-// import { BrowserRouter as Router, Link} from 'react-router-dom';
-import Blockly from './components/BotCode/blockly.js';
+
+// Minibot components import
 import Navbar from './components/Navbar.js';
-import BotControl from './components/BotControl/BotControl.js';
-import { CookiesProvider } from 'react-cookie';
-import { withCookies, Cookies } from 'react-cookie';
-import Dashboard from './components/Analytics/dashboard.js';
-import History from './components/Analytics/submissionHistory.js';
-import Vision from './components/Vision/Vision.js';
-import PhysicalBlockly from './components/PhysicalBlockly/PhysicalBlockly.js';
+import Platform from './components/Platform.js';
+import Chatbot from './components/Chatbot/chatbot2.js';
+
+// Utils import
+import { ACT_MIC_CHATBOT, ACT_MIC_COMMAND } from './components/utils/Constants.js';
+import { commit_context_stack_to_db, clear_chatbot_context_stack } from './components/utils/axios/chatbotAxios.js';
+import { set } from 'lodash';
 
 
-/**
- * Top Level component for the GUI, includes two tabs
- */
-const Platform = withCookies((props) => {
+function ClientGUI({ }) {
+  const [chatbotContext, setChatbotContext] = useState("");
+  const [selectedBotName, setSelectedBotName] = useState("");
+  const [contextHistoryLoaded, setContextHistoryLoaded] = useState(false);
 
-  const hiddenStyle = {
-    visibility: 'hidden',
-  };
-  const visibleStyle = {
-    visibility: 'visible',
-  };
 
-  const [customBlockList, redefineCustomBlockList] = useState([]);
-  const [blocklyXml, setBlocklyXml] = useState(null);
-  const [pythonCode, setPythonCode] = useState("");
-  // pythonCodeState == -1:  Code is completely blockly generated, no user
-  //    changes have been made
-  // pythonCodeState == 0:  User has made changes to the Python code, but 
-  //    the user has not yet disallowed Blockly from overwiting these changes
-  // pythonCodeState == 1:  User has made changes to the Python code
-  //    and has disallowed Blockly from overwriting these changes.
-  const [pythonCodeState, setPythonCodeState] = useState(-1);
-  const [selectedBotName, setSelectedBotName] = useState('');
-  const [selectedBotStyle, setSelectedBotStyleState] = useState(hiddenStyle);
-  const [loginEmail, setLoginEmail] = useState(props.cookies.get('current_user_email') || "");
+  /**
+   ********************** MICROPHONE MANAGEMENT **************************
+   * We use these props to switch off the mic of one component before
+   * turning on the mic of another component.
+   ****************************************************************************
+   */
 
-  const [pb, setPb] = useState("");
+  /** 
+   * activeMicComponent is ACT_MIC_CHATBOT when Chatbot2 is using the mic,
+   * and ACT_MIC_COMMAND when BotVoiceControl is using the mic.
+   */
+  const [activeMicComponent, setActiveMicComponent] = useState("");
 
+  /** 
+   * botVoiceControlMic is true when the BotVoiceControl mic is on and false 
+   * when the BotVoiceControl mic is off or when Chatbot2 is using the mic.
+   */
+  const [botVoiceControlMic, setBotVoiceControlMic] = useState(false);
+
+  /** 
+   * chatbotMic is true when the Chatbot2 mic is on and false when the 
+   * Chatbot2 mic is off or when BotVoiceControl is using the mic.
+   */
+  const [chatbotMic, setChatbotMic] = useState(false);
+
+  /** changedMic is true while we are switching to a different active mic. */
+  const [changedMic, setChangedMic] = useState(false);
+
+  /**
+   * This function runs when we try to turn on a mic while the other
+   * mic is still on. We must turn the old mic off before turning the new mic on.
+   */
   useEffect(() => {
-    setLoginEmail(props.cookies.get('current_user_email') || "");
-  }, [document.cookie]);
+    /* Mic Manager to switch off the current active mics before switching
+    to another one */
+    if (activeMicComponent == ACT_MIC_CHATBOT) {
+      console.log("turn off bot voice control mic.")
+      setBotVoiceControlMic(false);
+      setChangedMic(true);
+    } else if (activeMicComponent == ACT_MIC_COMMAND) {
+      console.log("turn off chatbot mic.")
+      setChatbotMic(false);
+      setChangedMic(true);
+    }
+  }, [activeMicComponent]);
 
+  /**
+   * This function runs when all the other mic has been turned off. It turns
+   * on the corresponding mic in <activeMicComponent>.
+   */
   useEffect(() => {
-    props.cookies.set('virtual_room_id', props.cookies.get('virtual_room_id') || nanoid(), { path: '/' });
-  }, []);
+    if (activeMicComponent == ACT_MIC_CHATBOT && changedMic && !botVoiceControlMic) {
+      setChangedMic(false);
+      setChatbotMic(true);
+    }
+    else if (activeMicComponent == ACT_MIC_COMMAND && changedMic && !chatbotMic) {
+      setChangedMic(false);
+      setBotVoiceControlMic(true);
+    }
+  }, [botVoiceControlMic, chatbotMic, changedMic])
+  /****************************************************************************/
 
 
-  function setSelectedBotStyle(style) {
-    setSelectedBotStyleState(style === "hidden" ? hiddenStyle : visibleStyle);
-  }
-
-
-
-  return (
-    <div id="platform">
-      <div className="tab-content">
-        <Switch>
-
-          {/* // Set tabindex to -1 so that this div is in focus to caputure 
-            // the keyboard event handler for arrow key movement */}
-          <Route exact path="/start">
-            <div id="setup_control_tab" tabIndex="-1" className="tab-pane active" role="tabpanel">
-              <BotControl
-                selectedBotName={selectedBotName}
-                setSelectedBotName={setSelectedBotName}
-                selectedBotStyle={selectedBotStyle}
-                setSelectedBotStyle={setSelectedBotStyle}
-              />
-            </div>
-          </Route>
-
-          <Route exact path="/coding">
-            <div id="coding-tab">
-
-              <Blockly
-                loginEmail={loginEmail}
-                blocklyXml={blocklyXml}
-                setBlockly={setBlocklyXml}
-                pythonCode={pythonCode}
-                pythonCodeState={pythonCodeState}
-                setPythonCode={setPythonCode}
-                selectedBotName={selectedBotName}
-                customBlockList={customBlockList}
-                redefineCustomBlockList={redefineCustomBlockList}
-              />
-            </div>
-          </Route>
-
-          <Route path="/user-analytics">
-            <Dashboard
-              loginEmail={loginEmail}
-            />
-          </Route>
-
-          <Route path="/history">
-            <History
-              loginEmail={loginEmail}
-            />
-          </Route>
-          <Route path="/physical-blockly">
-            <PhysicalBlockly
-              selectedBotName={selectedBotName}
-              pb={pb}
-              setPb={setPb}
-              setPythonCode={setPythonCode}
-              setBlocklyXml={setBlocklyXml}
-              setPythonCodeState = {setPythonCodeState}
-            />
-          </Route>
-          <Route path="/vision-page">
-            <Vision />
-          </Route>
-        </Switch>
-      </div>
-    </div>
-  );
-
-})
-
-
-const ClientGUI = () => {
   useEffect(() => {
     window.addEventListener("beforeunload", alertUser);
     return () => {
       window.removeEventListener("beforeunload", alertUser);
     };
   }, []);
+
   const alertUser = (e) => {
     e.preventDefault();
     e.returnValue = "";
+    commit_context_stack_to_db('');
+    clear_chatbot_context_stack();
+    setContextHistoryLoaded(false);
   };
 
   return (
     <div className="main-body">
       <Router>
-        <Navbar
-        />
+        <Navbar />
         <div className="container">
-          <Platform />
+          <Platform
+            parentContext={chatbotContext}
+            selectedBotName={selectedBotName}
+            setSelectedBotName={setSelectedBotName}
+
+            setActiveMicComponent={setActiveMicComponent}
+            activeMicComponent={activeMicComponent}
+            botVoiceControlMic={botVoiceControlMic}
+            setBotVoiceControlMic={setBotVoiceControlMic}
+
+            contextHistoryLoaded={contextHistoryLoaded}
+            setContextHistoryLoaded={setContextHistoryLoaded}
+          />
         </div>
+        <Chatbot
+          setParentContext={setChatbotContext}
+          selectedBotName={selectedBotName}
+          activeMicComponent={activeMicComponent}
+          setActiveMicComponent={setActiveMicComponent}
+          mic={chatbotMic}
+          setMic={setChatbotMic}
+        />
       </Router>
     </div>
   );

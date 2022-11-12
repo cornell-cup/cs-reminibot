@@ -27,7 +27,7 @@ class Minibot:
     """
     # address refers to ip_address and port
     # 255.255.255.255 to indicate that we are broadcasting to all addresses
-    # on port 9434.  The Basestation has been hard-coded to listen on port 9434
+    # on port 5001.  The Basestation has been hard-coded to listen on port 5001
     # for incoming Minibot broadcasts
     BROADCAST_ADDRESS = ('255.255.255.255', 5001)
     MINIBOT_MESSAGE = "i_am_a_minibot"
@@ -50,7 +50,6 @@ class Minibot:
         self.port_number = port_number
         self.lock = Lock()
         self.direction = None
-        
 
         # Note:  The same socket can be in the readable_socks, writeable_socks
         # and errorable_socks i.e. the intersection of these lists does not need
@@ -80,28 +79,28 @@ class Minibot:
             delta_position = 0
             delta_orientation = 0
             if self.direction == "forward":
-                delta_position = 1
+                delta_position = .1
             elif self.direction == "right":
-                delta_orientation = -5
+                delta_orientation = -.5
             elif self.direction == "backward":
-                delta_position = -1
+                delta_position = -.1
             elif self.direction == "left":
-                delta_orientation = 5
+                delta_orientation = .5
             else:
                 pass
-        
+
             try:
-                vision_data = requests.get("http://localhost:8080/vision",params={"id":"-1"}).json()
+                vision_data = requests.get("http://localhost:8080/vision", params={
+                                           "id": "-1", "virtual_room_id": "-pqCHcy9vxzzfyVQBVjJk", }).json()
                 print(vision_data)
                 if vision_data:
                     requests.post("http://localhost:8080/virtual-objects", json={"add": True,
-                    "virtual_objects": [{"id":"-1", "name": "minibot-1", "type": "minibot","x": vision_data['x']+delta_position*math.cos(math.radians(vision_data['orientation'])), "y" : vision_data['y']+delta_position*math.sin(math.radians(vision_data['orientation'])), "orientation": vision_data['orientation']+delta_orientation}]})
+                                                                                 "virtual_objects": [{"virtual_room_id": "-pqCHcy9vxzzfyVQBVjJk", "id": "-1", "name": "minibot-1", "type": "minibot", "x": vision_data[0]['x']+delta_position*math.cos(math.radians(vision_data[0]['orientation'])), "y": vision_data[0]['y']+delta_position*math.sin(math.radians(vision_data[0]['orientation'])), "orientation": vision_data[0]['orientation']+delta_orientation}]})
                 else:
                     requests.post("http://localhost:8080/virtual-objects", json={"add": True,
-                    "virtual_objects": [{"id":"-1",  "name": "minibot-1", "type": "minibot", "x": 0, "y" : 0, "orientation": 0}]})
-            except:
-                pass
-
+                                                                                 "virtual_objects": [{"virtual_room_id": "-pqCHcy9vxzzfyVQBVjJk", "id": "-1",  "name": "minibot-1", "type": "minibot", "x": 0, "y": 0, "orientation": 0}]})
+            except Exception as e:
+                print(e)
 
     def main(self):
         """ Implements the main activity loop for the Minibot.  This activity 

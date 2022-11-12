@@ -7,8 +7,24 @@ import CodeMirror from 'react-codemirror';
 require('codemirror/mode/python/python');
 
 import SelectionBox from './SelectionBox';
-const commands = ['Move Foward', 'Move Backward', 'Move Left', 'Move Right', 'Stop'];
+
+const commands = ['Move Foward', 'Move Backward', 'Turn Left', 'Turn Right', 'Stop'];
 const choices = ["yellow", "blue", "red", "orange", "purple"]
+const tagMapping = [
+	"0xF9 0x3E 0x4 0xF4",
+	"0xC9 0x12 0xD 0xF4",
+	"0x59 0xE3 0xB 0xF4",
+	"0x59 0xC8 0x6 0xF4",
+	"0x69 0xDB 0x6 0xF4"
+]
+const commandDisplay = [
+	"bot.move_forward(100)",
+	"bot.move_backward()",
+	"bot.turn_counter_clockwise(100)",
+	"bot.turn_clockwise(100)",
+	"bot.stop()"
+]
+
 const customCommand = new Map();
 for(var i = 0; i < commands.length; i ++) {
 	customCommand.set(commands[i], choices[i]);
@@ -17,9 +33,10 @@ for(var i = 0; i < commands.length; i ++) {
 export default class PhysicalBlockly extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = { stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "", tempCommandData: new Map() };
+		this.state = { stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "", tempCommandData: new Map(), detectionState: false, detectionCall: null };
 		this.codeRef = React.createRef();
 		this.pollForUpdates = this.pollForUpdates.bind(this);
+		this.respondToTag = this.respondToTag.bind(this);
 		this.bWorkspace = null;
 	}
 
@@ -28,6 +45,10 @@ export default class PhysicalBlockly extends React.Component {
 		this.bWorkspace = Blockly.inject('pbBlocklyDiv');
 		this.setState({ code: "" });
 		this.setState({tempCommandData: customCommand});
+		const _this = this;
+		_this.codeRef["current"].getCodeMirror().setValue("");
+		_this.setState({ stage: 1, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "" });
+		_this.bWorkspace.clear();
 	}
 
 	componentWillUnmount() {
@@ -207,6 +228,96 @@ export default class PhysicalBlockly extends React.Component {
 		pb.setState({tempCommandData: newCustomCommand});
 	}
 
+	detectRFID() {
+		console.log("start detecting RFID");
+		console.log(this);
+		let detectionState = this.state.detectionState;
+		this.setState({detectionState: !this.state.detectionState});
+		if (detectionState) {
+			clearInterval(this.state.detectionCall);
+		} else {
+			this.setState({detectionCall: setInterval(this.respondToTag, 1000)});
+		}
+	}
+
+	respondToTag() {
+		const _this = this;
+		axios.post('/start_physical_blockly', {
+			"bot_name": this.props.selectedBotName
+		})
+		.then(function (response) {
+			console.log("Received response from rfid call");
+			console.log(response);
+			console.log(response.data);
+			let commandID = tagMapping.indexOf(response.data);
+			// let commandID = testCommand[1];
+			let isLoop = false;
+			let isEnd = false;
+			if (commandID == -1) {
+				return;
+			}
+			let n = "";
+			for (let i = 0; i < _this.state.tabs; i++) {
+				n += "    ";
+			}
+			n += commandDisplay[commandID] + "\n";
+			_this.setState({ loopvar: _this.state.loopvar + 1 });
+			_this.setState({ code: _this.state.code + n });
+			_this.codeRef["current"].getCodeMirror().setValue(_this.state.code);
+
+			let block = document.createElement("block");
+			if (commandID == 4) {
+				isEnd = true;
+			} else if (commandID == 0) {
+				block.setAttribute("type", "move_power");
+			} else if (commandID == 1) {
+				block.setAttribute("type", "move_power");
+				let dir_field = document.createElement("field");
+				dir_field.setAttribute("name", "direction");
+				dir_field.innerHTML = "backward";
+				block.appendChild(dir_field);
+			} else if (commandID == 4) {
+				block.setAttribute("type", "stop_moving");
+			} else if (commandID == 3) {
+				block.setAttribute("type", "turn_power")
+				let dir_field = document.createElement("field");
+				dir_field.setAttribute("name", "direction");
+				dir_field.innerHTML = "right"
+				block.appendChild(dir_field);
+			} else if (commandID == 2) {
+				block.setAttribute("type", "turn_power")
+				let dir_field = document.createElement("field");
+				dir_field.setAttribute("name", "direction");
+				dir_field.innerHTML = "left"
+				block.appendChild(dir_field);
+			}
+			if (block.getAttribute("type") != null) {
+				let placedBlock = Blockly.Xml.domToBlock(block, _this.bWorkspace);
+				let childConnection = placedBlock.previousConnection;
+				if (_this.state.lastBlock != null) {
+					_this.state.lastBlock.connect(childConnection);
+				}
+				if (isLoop) {
+					_this.setState({ lastBlock: placedBlock.getInput("DO").connection });
+					let tempStack = _this.state.blockStack;
+					tempStack.push(placedBlock);
+					let tempList = _this.state.loopList;
+					tempList.push(placedBlock);
+					_this.setState({ blockStack: tempStack, loopList: tempList });
+
+				}
+				else {
+					_this.setState({ lastBlock: placedBlock.nextConnection });
+				}
+			}
+			else {
+				let lastLoop = _this.state.blockStack.pop();
+				_this.setState({ blockStack: _this.state.blockStack });
+				_this.setState({ lastBlock: lastLoop.nextConnection });
+			}
+		});
+	}
+
 	render(props) {
 		var visStyle = {
 			position: "relative",
@@ -233,6 +344,11 @@ export default class PhysicalBlockly extends React.Component {
 			<div className="row">
 				<div className="col">
 					<p className="small-title"> Physical Blockly </p>
+					<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.detectRFID()}>{this.state.detectionState ? "Stop" : "Start"} Detect RFID</button>
+					<p className="small-title" style={customTitleStyle}> Customization of Blocks </p>
+					{
+						commands.map((c) => <SelectionBox key={c.id} command={c} choiceList={choices} default={customCommand.get(c)} pb={this} changeSelection={this.updateSelection}/> )
+					};
 					{this.props.selectedBotName != '' && this.state.stage == 0 ?
 						<div>
 							<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.physicalBlocklyClick(0)}>Start Camera Mode</button>
@@ -256,7 +372,7 @@ export default class PhysicalBlockly extends React.Component {
 								width="null"
 							/>
 						</div>
-						<div id="pbBlocklyDiv" style={{ height: "488px", width: "900px", padding: "20px", display: "inline-block" }}></div>
+						<div id="pbBlocklyDiv" style={{ height: "488px", width: "900px", padding: "20px", display: "inline-block"}}></div>
 					</div>
 				</div>
 

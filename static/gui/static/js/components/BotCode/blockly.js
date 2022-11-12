@@ -134,7 +134,7 @@ class PythonEditor extends React.Component {
         });
 
         /*
-         * Repeatedly call the ErrorMessageHandler in base_station_interface.py
+         * Repeatedly call the ErrorMessageHandler in base_station.py
          * until a non-empty execution result of the Python program is received.
          */
         let interval = setInterval(function () {
@@ -305,14 +305,15 @@ export default class MinibotBlockly extends React.Component {
 
         this.handleInputChange = this.handleInputChange.bind(this);
         this.download = this.download.bind(this);
-        this.runBlockly = this.runBlockly.bind(this);
-        this.stopBlockly = this.stopBlockly.bind(this);
+        // this.runBlockly = this.runBlockly.bind(this);
+        // this.stopBlockly = this.stopBlockly.bind(this);
         this.dblock = this.dblock.bind(this);
         this.dblockAll = this.dblockAll.bind(this);
         this.login = this.login.bind(this);
         this.register = this.register.bind(this);
         this.scriptToCode = this.scriptToCode.bind(this);
         this.handleLogin = this.handleLogin.bind(this);
+        this.printState = this.printState.bind(this);
         this.handleRegister = this.handleRegister.bind(this);
         this.logout = this.logout.bind(this);
         this.redefineCustomBlocks = this.redefineCustomBlocks.bind(this)
@@ -340,7 +341,8 @@ export default class MinibotBlockly extends React.Component {
     }
 
     updateCustomBlocks() {
-        if (!this.state.isLoggedIn) return;
+        // if (!this.state.isLoggedIn) return;
+        if (this.props.loginEmail == "") return;
         let formData = new FormData();
         formData.append("custom_function", JSON.stringify(this.props.customBlockList));
         axios({
@@ -585,26 +587,26 @@ export default class MinibotBlockly extends React.Component {
         });
     }
 
-    stopBlockly() {
-        axios({
-            method: 'POST',
-            url: '/wheels',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            data: JSON.stringify({
-                bot_name: this.props.selectedBotName,
-                direction: "stop",
-                power: 0,
-            })
-        }).catch(function (error) {
-            if (error.response.data.error_msg.length > 0)
-                window.alert(error.response.data.error_msg);
-            else
-                console.log(error);
-            console.log(error);
-        })
-    }
+    // stopBlockly() {
+    //     axios({
+    //         method: 'POST',
+    //         url: '/wheels',
+    //         headers: {
+    //             'Content-Type': 'application/json'
+    //         },
+    //         data: JSON.stringify({
+    //             bot_name: this.props.selectedBotName,
+    //             direction: "stop",
+    //             power: 0,
+    //         })
+    //     }).catch(function (error) {
+    //         if (error.response.data.error_msg.length > 0)
+    //             window.alert(error.response.data.error_msg);
+    //         else
+    //             console.log(error);
+    //         console.log(error);
+    //     })
+    // }
 
     login(event) {
         const modal = document.getElementById("loginModal2")
@@ -620,14 +622,15 @@ export default class MinibotBlockly extends React.Component {
             method: 'POST',
             url: '/logout/',
         }).then((response) => {
-            this.setState({
-                loginEmail: "",
-                loginSuccessLabel: "",
-                loginErrorLabel: "",
-                registerSuccessLabel: "",
-                registerErrorLabel: "",
-                isLoggedIn: false,
-            });
+            // this.setState({
+            //     loginEmail: "",
+            //     loginSuccessLabel: "",
+            //     loginErrorLabel: "",
+            //     registerSuccessLabel: "",
+            //     registerErrorLabel: "",
+            //     isLoggedIn: false,
+            // });
+            this.props.changeLoginEmail("");
             window.alert("Logout successful!");
         }).catch((err) => {
             window.alert("Logout error");
@@ -687,41 +690,57 @@ export default class MinibotBlockly extends React.Component {
         let temp = _this.props.customBlockList;
         axios({
             method: 'POST',
-            url: '/login/',
+            url: '/',
             data: formData,
             headers: { 'Content-Type': 'multipart/form-data' }
         }).then((response) => {
             _this.props.redefineCustomBlockList(
                 JSON.parse(response.data.custom_function));
             // invokes component did update
-            this.setState({
-                loginEmail: formData.get("email"),
-                loginSuccessLabel: "Login Success",
-                loginErrorLabel: "",
-                isLoggedIn: true,
-            });
-            if (temp[0][0] !== _this.state.emptyFunctionName && _this.props.customBlockList[0][0] !== _this.state.emptyFunctionName) {
-                _this.props.customBlockList.push.apply(_this.props.customBlockList, temp);
-            }
-            if (temp[0][0] !== _this.state.emptyFunctionName && _this.props.customBlockList[0][0] === _this.state.emptyFunctionName) {
-                _this.props.customBlockList.splice(0, 1);
-                _this.props.customBlockList.push.apply(_this.props.customBlockList[0], temp);
-            }
+            // this.setState({
+            //     loginEmail: formData.get("email"),
+            //     loginSuccessLabel: "Login Success",
+            //     loginErrorLabel: "",
+            //     isLoggedIn: true,
+            // });
+            this.props.changeLoginEmail(formData.get("email"));
+
+            // if (temp[0][0] !== _this.state.emptyFunctionName && _this.props.customBlockList[0][0] !== _this.state.emptyFunctionName) {
+            //     _this.props.customBlockList.push.apply(_this.props.customBlockList, temp);
+            // }
+            // if (temp[0][0] !== _this.state.emptyFunctionName && _this.props.customBlockList[0][0] === _this.state.emptyFunctionName) {
+            //     _this.props.customBlockList.splice(0, 1);
+            //     _this.props.customBlockList.push.apply(_this.props.customBlockList[0], temp);
+            // }
 
             _this.redefineCustomBlocks();
             _this.updateCustomBlocks();
         }).catch((error) => {
-            this.setState({
-                loginEmail: "",
-                loginSuccessLabel: "",
-                loginErrorLabel: error.response.data.error_msg
-            });
+            // this.setState({
+            //     loginEmail: "",
+            //     loginSuccessLabel: "",
+            //     loginErrorLabel: error.response.data.error_msg
+            // });
             console.log(error);
         });
     }
 
+    printState(event) {
+        console.log(this.props.loginEmail);
+    }
+
 
     render() {
+        var loginSuccessLabel = "";
+        var loginErrorLabel = "";
+        var registerSuccessLabel = "";
+        var registerErrorLabel = "";
+
+        if (this.props.loginEmail != "") {
+            loginSuccessLabel = "Login Success";
+            loginErrorLabel = "";
+        }
+
         return (
             <div className="">
                 <div className="container-coding">
@@ -783,6 +802,7 @@ export default class MinibotBlockly extends React.Component {
                             loginEmail={this.props.loginEmail}
                         />
                     </div>
+
                 </div>
             </div>
         );

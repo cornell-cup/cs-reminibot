@@ -25,7 +25,7 @@ class Minibot:
     """
     # address refers to ip_address and port
     # 255.255.255.255 to indicate that we are broadcasting to all addresses
-    # on port 9434.  The Basestation has been hard-coded to listen on port 9434
+    # on port 5001.  The Basestation has been hard-coded to listen on port 5001
     # for incoming Minibot broadcasts
     BROADCAST_ADDRESS = ('255.255.255.255', 5001)
     MINIBOT_MESSAGE = "i_am_a_minibot"
@@ -144,6 +144,8 @@ class Minibot:
             data = self.broadcast_sock.recv(4096)
         except timeout:
             print("Timed out", flush=True)
+        except OSError:
+            print("Try again", flush=True)
 
         # TODO this security policy is stupid.  We should be doing
         # authentication after we create the TCP connection and also we should
@@ -333,6 +335,39 @@ class Minibot:
                 if self.blockly_python_proc.is_running():
                     self.blockly_python_proc.kill_proc()
                 Thread(target=ece.stop).start()
+        elif key == "IR":
+            return_val = []
+
+            thread = Thread(target=ece.read_ir, args=[return_val])
+            thread.start()
+
+            while thread.is_alive():
+                time.sleep(0.01)
+
+            now = datetime.now()
+            file = open("/home/pi/Documents/" +
+                        now.strftime('%H:%M:%S.%f') + ".txt", "w")
+
+            file.write("From Arduino\n")
+            file.write(str(return_val))
+            file.close()
+
+            if return_val[0] == 0:
+                self.sendKV(sock, key, "HIGH")
+            elif return_val[0] == 1:
+                self.sendKV(sock, key, "LOW")
+            else:
+                self.sendKV(sock, key, "")
+        elif key == "RFID":
+            returned_tags = [0, 0, 0, 0]
+
+            thread = Thread(target=ece.rfid(), args=[value, returned_tags])
+            thread.start()
+
+            while thread.is_alive():
+                time.sleep(0.01)
+
+            self.sendKV(sock, key, ' '.join(str(e) for e in returned_tags))
 
     def sendKV(self, sock: socket, key: str, value: str):
         """ Sends a key-value pair to the specified socket. The key value
@@ -364,14 +399,23 @@ if __name__ == "__main__":
     parser.add_argument(
         '-p', type=int, dest="port_number", default=10000
     )
+    parser.add_argument(
+        '-m', type=int, dest="comm_mode", default=2
+    )
     args = parser.parse_args()
 
-    if args.is_simulation:
+    if args.is_simulation and args.comm_mode == 1:
         import scripts.ece_dummy_ops as ece
         BOT_LIB_FUNCS = "ece_dummy_ops"
-    else:
+    elif args.is_simulation and args.comm_mode == 2:
+        import scripts.ece_dummy_ops2 as ece
+        BOT_LIB_FUNCS = "ece_dummy_ops2"
+    elif args.comm_mode == 1:
         import scripts.pi_arduino as ece
         BOT_LIB_FUNCS = "pi_arduino"
+    elif args.comm_mode == 2:
+        import scripts.pi_arduino2 as ece
+        BOT_LIB_FUNCS = "pi_arduino2"
 
     minibot = Minibot(args.port_number)
     minibot.main()

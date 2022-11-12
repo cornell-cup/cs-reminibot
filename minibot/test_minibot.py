@@ -124,7 +124,7 @@ class TestMinibot:
 
     def connect_to_minibot(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        address = ("", 9434)
+        address = ("", 5001)
         sock.bind(address)
         response = "i_am_the_base_station"
         # a minibot should send this message in order to receive the ip_address

@@ -2,21 +2,23 @@ import React, { useState, useEffect, useRef } from "react";
 
 import AddBot from "./SetupBot/AddBot.js";
 import MovementControls from "./MovementControl/MovementControl.js";
-import GridView from "../Vision/gridview.js";
 import { library } from "@fortawesome/fontawesome-svg-core";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import InformationBoxModal from "../utils/InformationBoxModal.js";
 import { INFOBOXTYPE, INFOBOXID, INFO_ICON } from "../utils/Constants.js";
 library.add(faInfoCircle);
-import VisionUserInterface from "../Vision/VisionUserInterface.js";
+import UltimateGridview from "../Vision/UltimateGridview.js";
+
 
 function BotControl({
   selectedBotName,
   setSelectedBotName,
   selectedBotStyle,
   setSelectedBotStyle,
-}) {
+  activeMicComponent,
+  setActiveMicComponent,
+  botVoiceControlMic,
+  setBotVoiceControlMic }) {
   return (
     <div className="row">
       <div className="col-md">
@@ -36,6 +38,10 @@ function BotControl({
             setSelectedBotName={setSelectedBotName}
             selectedBotStyle={selectedBotStyle}
             setSelectedBotStyle={setSelectedBotStyle}
+            setActiveMicComponent={setActiveMicComponent}
+            activeMicComponent={activeMicComponent}
+            botVoiceControlMic={botVoiceControlMic}
+            setBotVoiceControlMic={setBotVoiceControlMic}
           />
         </div>
         <br />
@@ -57,15 +63,18 @@ function BotControl({
                 />
               </h3>
             </div>
-            <GridView view_width={520}
+            <UltimateGridview
+              view_width={520}
               view_height={520}
               world_width={300}
               world_height={300}
-              defaultEnabled={false} />
+              defaultEnabled={false}
+              experimentalFeaturesEnabled={true} />
             < InformationBoxModal type={INFOBOXTYPE.VISION} />
           </div >
         </div>
       </div>
+
     </div>
   );
 }

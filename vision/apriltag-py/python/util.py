@@ -1,3 +1,4 @@
+from collections import Counter
 from cv2 import *
 import cv2
 import numpy as np
@@ -193,7 +194,7 @@ def compute_tag_undistorted_pose(camera_matrix, dist_coeffs, transform_matrix, d
     tag_xyz = np.around(tag_xyz, decimals=3)
 
     # Compute orientation (also called heading), in degrees
-    angle = compute_angle(d.corners)
+    angle = d.angle
     return tag_xyz[0][0], tag_xyz[1][0], tag_xyz[2][0], angle
 
 
@@ -440,3 +441,54 @@ def get_predictors_with_calibration_file(calibration_file_name):
         "y_offsets_predictor": Predictor(models["y_offsets_model"]),
         "angle_offsets_predictor": Predictor(models["angle_offsets_model"])
     }
+
+def compliment_of_list(full_list, partial_list):
+    return [entry for entry in full_list if not (entry in partial_list)]
+
+def weighted_average(values, weights):
+    if len(values) != len(weights):
+        raise Exception("unequal lengths of values and weights")
+    sum = 0
+    weights_sum = 0
+    for i in range(len(values)):
+        sum += (values[i])*(weights[i])
+        weights_sum += weights[i]
+    if weights_sum == 0:
+        raise Exception("weights sum is 0")
+    return sum/weights_sum
+
+def get_property_or_default(object, property, default=None):
+    return object[property] if object != None and property in object else default
+
+def reject_outliers(data):
+    data = np.array(data)
+    u = np.mean(data)
+    s = np.std(data)
+    filtered = [e for e in data if (u - 2 * s < e < u + 2 * s)]
+    return filtered
+    
+def to_dict(self):
+    return json.loads(json.dumps(self, default=lambda o: o.__dict__))
+
+def average_value_for_key(list_of_dicts, key, remove_outliers=False, threshold=None):
+    values = [d[key] for d in list_of_dicts]
+    if remove_outliers and threshold == None:
+        values_without_outliers = reject_outliers(values)
+        values = values if len(values_without_outliers) == 0 else values_without_outliers
+    elif remove_outliers:
+        mode = mode_value_for_key(list_of_dicts, key)
+        values_without_outliers = [value for value in values if abs(value-mode) <= threshold]
+        values = values if len(values_without_outliers) == 0 else values_without_outliers
+    return float(sum(values)) / len(values)
+
+
+
+def mode(sample):
+    c = Counter(sample)
+    return [k for k, v in c.items() if v == c.most_common(1)[0][1]]
+
+def mode_value_for_key(list_of_dicts, key):
+    rounded_values = [round(d[key]) for d in list_of_dicts]
+    rounded_values_without_outliers = reject_outliers(rounded_values)
+    rounded_values = rounded_values if len(rounded_values_without_outliers) == 0 else rounded_values_without_outliers
+    return float(mode(rounded_values)[0])
