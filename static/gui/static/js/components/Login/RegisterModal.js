@@ -1,6 +1,11 @@
 import React from 'react';
 import axios from 'axios';
-import { withCookies, Cookies } from 'react-cookie';
+import { withCookies } from 'react-cookie';
+import PropTypes from 'prop-types';
+
+RegisterModal.propTypes = {
+	cookies: PropTypes.cookies
+};
 
 class RegisterModal extends React.Component {
 	constructor(props) {
@@ -25,7 +30,7 @@ class RegisterModal extends React.Component {
 		});
 	}
 
-	handleRegister(event) {
+	handleRegister(_e) {
 		console.log('handle register');
 		let formData = new FormData(document.getElementById('registerForm'));
 		if (formData.get('email') == formData.get('email_confirmation') && formData.get('password') == formData.get('password_confirmation')) {

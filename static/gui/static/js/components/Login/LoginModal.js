@@ -1,6 +1,11 @@
 import React from 'react';
 import axios from 'axios';
-import { withCookies, Cookies } from 'react-cookie';
+import { withCookies } from 'react-cookie';
+import PropTypes from 'prop-types';
+
+LoginModal.propTypes = {
+	cookies: PropTypes.cookies
+};
 
 class LoginModal extends React.Component {
 	constructor(props) {
@@ -29,7 +34,7 @@ class LoginModal extends React.Component {
 			data: formData,
 			headers: { 'Content-Type': 'multipart/form-data' }
 		})
-			.then((response) => {
+			.then((_res) => {
 				this.props.cookies.set('current_user_email', formData.get('email'), { path: '/' });
 				this.setState({
 					loginEmail: formData.get('email'),
@@ -76,7 +81,7 @@ class LoginModal extends React.Component {
 								</div>
 
 								<div className='w-100 text-center mt-2'>
-									Don't have an account yet?{' '}
+									{"Don't have an account yet? "}
 									<a href='#' data-dismiss='modal' data-toggle='modal' data-target='#registerModal'>
 										Sign Up Here
 									</a>
