@@ -28,7 +28,8 @@ class InputWindow(Screen):
 			col = int(col)
 		except: 
 			# TODO: display error msg
-			pass
+			raise Exception('Row or column input not accepted. ')
+			
 
 		if isinstance(row, int) and isinstance(col, int):
 				if row > 2 and col > 2:

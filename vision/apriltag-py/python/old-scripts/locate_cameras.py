@@ -1,5 +1,5 @@
 from cv2 import *
-import apriltag
+import util.apriltag as apriltag
 import argparse
 import sys
 import numpy as np

@@ -33,7 +33,7 @@ class RegisterModal extends React.Component {
             && formData.get('password') == formData.get('password_confirmation')) {
             axios({
                 method: 'POST',
-                url: '/register/',
+                url: '/register',
                 data: formData,
                 headers: { 'Content-Type': 'multipart/form-data' },
             },

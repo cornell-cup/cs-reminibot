@@ -333,6 +333,7 @@ def get_closest_reference_point_offset(x, y, center_cell_offsets):
         return None
 
 def get_two_point_line_equation(x1, y1, x2, y2):
+    """ computes the slope-intersect form of line between two points (x1,y1) and (x2,y2) """
     try:
         m = (y2-y1)/(x2-x1)
         b = m*(-x2)+y2
@@ -344,6 +345,8 @@ def get_two_point_line_equation(x1, y1, x2, y2):
 
 
 def linear_interpolation_with_2_ref_points(x1, y1, x2, y2, x):
+    """given two points (x1,y1) and (x2,y2), computes y given any x"""
+    #TODO: maybe rename? this could be used for exterpolation too
     linear_model = get_two_point_line_equation(x1, y1, x2, y2)
     return linear_model(x)
 
@@ -362,7 +365,7 @@ def get_x_y_angle_offsets(x, y, center_cell_offsets):
     left_most_offset_delta = abs(closest_offset["reference_point_x"]-left_most_offset["reference_point_x"])
     right_most_offset = max(closest_offsets[1:4], key=lambda offset: offset["reference_point_x"])
     right_most_offset_delta = abs(right_most_offset["reference_point_x"]-closest_offset["reference_point_x"])
-    other_offset = util.compliment_of_list(closest_offsets, [left_most_offset, closest_offset, right_most_offset])[0]
+    other_offset = util.complement_of_list(closest_offsets, [left_most_offset, closest_offset, right_most_offset])[0]
     if left_most_offset_delta > right_most_offset_delta:
         right_offset = closest_offset
         go_with_other = abs(left_most_offset["reference_point_y"]-y) > abs(other_offset["reference_point_y"]-y) and other_offset["reference_point_x"] < closest_offset["reference_point_x"]
@@ -387,7 +390,7 @@ def get_x_y_angle_offsets(x, y, center_cell_offsets):
     bottom_most_offset_delta = abs(closest_offset["reference_point_y"]-bottom_most_offset["reference_point_y"])
     top_most_offset = max(closest_offsets[1:4], key=lambda offset: offset["reference_point_y"])
     top_most_offset_delta = abs(top_most_offset["reference_point_y"]-closest_offset["reference_point_y"])
-    other_offset = util.compliment_of_list(closest_offsets, [bottom_most_offset, closest_offset, top_most_offset])[0]
+    other_offset = util.complement_of_list(closest_offsets, [bottom_most_offset, closest_offset, top_most_offset])[0]
     if bottom_most_offset_delta > top_most_offset_delta:
         top_offset = closest_offset
         go_with_other = abs(bottom_most_offset["reference_point_x"]-x) > abs(other_offset["reference_point_x"]-x) and other_offset["reference_point_y"] < closest_offset["reference_point_y"] 
