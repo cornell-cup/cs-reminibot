@@ -1,10 +1,8 @@
 /* ES6 */
 
 import React, { useEffect, useState } from 'react';
-import ReactDOM from 'react-dom';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import { CookiesProvider } from 'react-cookie';
-import { withCookies, Cookies } from 'react-cookie';
+import { BrowserRouter as Switch, Route } from 'react-router-dom';
+import { withCookies } from 'react-cookie';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCogs, faCode } from '@fortawesome/free-solid-svg-icons';
