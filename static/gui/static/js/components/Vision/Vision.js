@@ -4,7 +4,8 @@ import VisionUserInterface from './VisionUserInterface'
 
 const Vision = (props) => {
   return (
-    <React.Fragment>Vision
+    <React.Fragment>
+      Vision
       <VisionUserInterface />
       <UltimateGridview
         view_width={1000}
@@ -12,10 +13,10 @@ const Vision = (props) => {
         world_width={300}
         world_height={300}
         defaultEnabled={true}
-        experimentalFeaturesEnabled={true} />
-
+        experimentalFeaturesEnabled={true}
+      />
     </React.Fragment>
   )
 }
 
-export default Vision;
+export default Vision

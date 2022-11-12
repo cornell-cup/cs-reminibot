@@ -1,30 +1,30 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react'
+import axios from 'axios'
 
 const editStyle = {
-  backgroundColor: "#212529"
+  backgroundColor: '#212529'
 }
 const defaultStyle = {
-  backgroundColor: "#2c3137"
+  backgroundColor: '#2c3137'
 }
 
 function ContextBox({ id, context }) {
-  const [currContext, setCurrContext] = useState(context);
-  const [editing, setEditing] = useState(false);
+  const [currContext, setCurrContext] = useState(context)
+  const [editing, setEditing] = useState(false)
 
   const changeCurrContext = (e) => {
     if (editing) {
-      const input = e.currentTarget.value;
-      setCurrContext(input);
-      e.preventDefault();
+      const input = e.currentTarget.value
+      setCurrContext(input)
+      e.preventDefault()
     }
   }
 
   const editContext = (e) => {
     // console.log("ContextBox.js Edit: ", id, " Context: ", currContext);
-    setEditing(!editing);
-    if (!editing) return;
-    e.preventDefault();
+    setEditing(!editing)
+    if (!editing) return
+    e.preventDefault()
     axios({
       method: 'POST',
       url: '/chatbot-context',
@@ -38,7 +38,7 @@ function ContextBox({ id, context }) {
       })
     }).then(function (response) {
       if (response.data['res'] == 200) {
-        setCurrContext(currContext);
+        setCurrContext(currContext)
       }
     })
   }
@@ -54,7 +54,7 @@ function ContextBox({ id, context }) {
     for both front and backend every time the user makes an edit to the context 
     history in one session. 
     ******************************/
-    e.preventDefault();
+    e.preventDefault()
     axios({
       method: 'POST',
       url: '/chatbot-context',
@@ -67,7 +67,7 @@ function ContextBox({ id, context }) {
       })
     }).then(function (response) {
       if (response.data['res'] == 200) {
-        setCurrContext("");
+        setCurrContext('')
       }
     })
   }
@@ -75,18 +75,37 @@ function ContextBox({ id, context }) {
   // returns a contextbox only if currContext is not an empty string
   if (currContext || editing) {
     return (
-      <div className="contextBox" key={id}>
-        <input class="context-box" type="text" value={currContext} style={editing ? editStyle : defaultStyle} onChange={(e) => { changeCurrContext(e) }} />
-        <div className="context-buttons">
-          <button onClick={(e) => { editContext(e) }} >{editing ? "Save" : "Edit"}</button>
-          <button onClick={(e) => { deleteContext(e) }}>Delete</button>
+      <div className='contextBox' key={id}>
+        <input
+          className='context-box'
+          type='text'
+          value={currContext}
+          style={editing ? editStyle : defaultStyle}
+          onChange={(e) => {
+            changeCurrContext(e)
+          }}
+        />
+        <div className='context-buttons'>
+          <button
+            onClick={(e) => {
+              editContext(e)
+            }}
+          >
+            {editing ? 'Save' : 'Edit'}
+          </button>
+          <button
+            onClick={(e) => {
+              deleteContext(e)
+            }}
+          >
+            Delete
+          </button>
         </div>
-      </div >
+      </div>
     )
-  }
-  else {
-    return (<div></div>)
+  } else {
+    return <div></div>
   }
 }
 
-export default ContextBox;
+export default ContextBox

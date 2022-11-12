@@ -1,33 +1,26 @@
 /* ES6 */
-import axios from 'axios';
-import React, { useEffect, useState } from 'react';
-import { nanoid } from 'nanoid';
-import ReactDOM from 'react-dom';
-import { CookiesProvider } from 'react-cookie';
-import { withCookies, Cookies } from 'react-cookie';
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-} from "react-router-dom";
-
+import axios from 'axios'
+import React, { useEffect, useState } from 'react'
+import { nanoid } from 'nanoid'
+import ReactDOM from 'react-dom'
+import { CookiesProvider } from 'react-cookie'
+import { withCookies, Cookies } from 'react-cookie'
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 
 // Minibot components import
-import Navbar from './components/Navbar.js';
-import Platform from './components/Platform.js';
-import Chatbot from './components/Chatbot/chatbot2.js';
+import Navbar from './components/Navbar.js'
+import Platform from './components/Platform.js'
+import Chatbot from './components/Chatbot/chatbot2.js'
 
 // Utils import
-import { ACT_MIC_CHATBOT, ACT_MIC_COMMAND } from './components/utils/Constants.js';
-import { commit_context_stack_to_db, clear_chatbot_context_stack } from './components/utils/axios/chatbotAxios.js';
-import { set } from 'lodash';
+import { ACT_MIC_CHATBOT, ACT_MIC_COMMAND } from './components/utils/Constants.js'
+import { commit_context_stack_to_db, clear_chatbot_context_stack } from './components/utils/axios/chatbotAxios.js'
+import { set } from 'lodash'
 
-
-function ClientGUI({ }) {
-  const [chatbotContext, setChatbotContext] = useState("");
-  const [selectedBotName, setSelectedBotName] = useState("");
-  const [contextHistoryLoaded, setContextHistoryLoaded] = useState(false);
-
+function ClientGUI({}) {
+  const [chatbotContext, setChatbotContext] = useState('')
+  const [selectedBotName, setSelectedBotName] = useState('')
+  const [contextHistoryLoaded, setContextHistoryLoaded] = useState(false)
 
   /**
    ********************** MICROPHONE MANAGEMENT **************************
@@ -36,26 +29,26 @@ function ClientGUI({ }) {
    ****************************************************************************
    */
 
-  /** 
+  /**
    * activeMicComponent is ACT_MIC_CHATBOT when Chatbot2 is using the mic,
    * and ACT_MIC_COMMAND when BotVoiceControl is using the mic.
    */
-  const [activeMicComponent, setActiveMicComponent] = useState("");
+  const [activeMicComponent, setActiveMicComponent] = useState('')
 
-  /** 
-   * botVoiceControlMic is true when the BotVoiceControl mic is on and false 
+  /**
+   * botVoiceControlMic is true when the BotVoiceControl mic is on and false
    * when the BotVoiceControl mic is off or when Chatbot2 is using the mic.
    */
-  const [botVoiceControlMic, setBotVoiceControlMic] = useState(false);
+  const [botVoiceControlMic, setBotVoiceControlMic] = useState(false)
 
-  /** 
-   * chatbotMic is true when the Chatbot2 mic is on and false when the 
+  /**
+   * chatbotMic is true when the Chatbot2 mic is on and false when the
    * Chatbot2 mic is off or when BotVoiceControl is using the mic.
    */
-  const [chatbotMic, setChatbotMic] = useState(false);
+  const [chatbotMic, setChatbotMic] = useState(false)
 
   /** changedMic is true while we are switching to a different active mic. */
-  const [changedMic, setChangedMic] = useState(false);
+  const [changedMic, setChangedMic] = useState(false)
 
   /**
    * This function runs when we try to turn on a mic while the other
@@ -65,15 +58,15 @@ function ClientGUI({ }) {
     /* Mic Manager to switch off the current active mics before switching
     to another one */
     if (activeMicComponent == ACT_MIC_CHATBOT) {
-      console.log("turn off bot voice control mic.")
-      setBotVoiceControlMic(false);
-      setChangedMic(true);
+      console.log('turn off bot voice control mic.')
+      setBotVoiceControlMic(false)
+      setChangedMic(true)
     } else if (activeMicComponent == ACT_MIC_COMMAND) {
-      console.log("turn off chatbot mic.")
-      setChatbotMic(false);
-      setChangedMic(true);
+      console.log('turn off chatbot mic.')
+      setChatbotMic(false)
+      setChangedMic(true)
     }
-  }, [activeMicComponent]);
+  }, [activeMicComponent])
 
   /**
    * This function runs when all the other mic has been turned off. It turns
@@ -81,47 +74,43 @@ function ClientGUI({ }) {
    */
   useEffect(() => {
     if (activeMicComponent == ACT_MIC_CHATBOT && changedMic && !botVoiceControlMic) {
-      setChangedMic(false);
-      setChatbotMic(true);
-    }
-    else if (activeMicComponent == ACT_MIC_COMMAND && changedMic && !chatbotMic) {
-      setChangedMic(false);
-      setBotVoiceControlMic(true);
+      setChangedMic(false)
+      setChatbotMic(true)
+    } else if (activeMicComponent == ACT_MIC_COMMAND && changedMic && !chatbotMic) {
+      setChangedMic(false)
+      setBotVoiceControlMic(true)
     }
   }, [botVoiceControlMic, chatbotMic, changedMic])
   /****************************************************************************/
 
-
   useEffect(() => {
-    window.addEventListener("beforeunload", alertUser);
+    window.addEventListener('beforeunload', alertUser)
     return () => {
-      window.removeEventListener("beforeunload", alertUser);
-    };
-  }, []);
+      window.removeEventListener('beforeunload', alertUser)
+    }
+  }, [])
 
   const alertUser = (e) => {
-    e.preventDefault();
-    e.returnValue = "";
-    commit_context_stack_to_db('');
-    clear_chatbot_context_stack();
-    setContextHistoryLoaded(false);
-  };
+    e.preventDefault()
+    e.returnValue = ''
+    commit_context_stack_to_db('')
+    clear_chatbot_context_stack()
+    setContextHistoryLoaded(false)
+  }
 
   return (
-    <div className="main-body">
+    <div className='main-body'>
       <Router>
         <Navbar />
-        <div className="container">
+        <div className='container'>
           <Platform
             parentContext={chatbotContext}
             selectedBotName={selectedBotName}
             setSelectedBotName={setSelectedBotName}
-
             setActiveMicComponent={setActiveMicComponent}
             activeMicComponent={activeMicComponent}
             botVoiceControlMic={botVoiceControlMic}
             setBotVoiceControlMic={setBotVoiceControlMic}
-
             contextHistoryLoaded={contextHistoryLoaded}
             setContextHistoryLoaded={setContextHistoryLoaded}
           />
@@ -136,10 +125,15 @@ function ClientGUI({ }) {
         />
       </Router>
     </div>
-  );
+  )
 }
 
 // insert something here about localStorage function for first time tutorial
 
-let root = document.getElementById('root');
-ReactDOM.render(<CookiesProvider><ClientGUI /></CookiesProvider>, root);
+let root = document.getElementById('root')
+ReactDOM.render(
+  <CookiesProvider>
+    <ClientGUI />
+  </CookiesProvider>,
+  root
+)
