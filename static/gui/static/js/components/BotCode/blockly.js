@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import axios from 'axios';
 import { Button, LabeledTextBox } from '../utils/Util.js';
 import CodeMirror from 'react-codemirror';
@@ -29,7 +29,7 @@ class PythonEditor extends React.Component {
 	}
 
 	/* Updates the main.js state to contain the code specified in the parameter
-      Also updates the coding time */
+			Also updates the coding time */
 	updateCode(code) {
 		let codeState;
 		// Reset the codeState to -1 if the code is empty because empty code
@@ -66,7 +66,7 @@ class PythonEditor extends React.Component {
 	}
 
 	/* Target function for the button "Choose File". Uploads the file specified
-                and updates the editor-code. */
+								and updates the editor-code. */
 	upload(event) {
 		const _this = this;
 		const file = event.target.files[0];
@@ -78,7 +78,7 @@ class PythonEditor extends React.Component {
 	}
 
 	/* Target function for the button "Download". Downloads the code in the
-            editor as a python file with name as specified */
+						editor as a python file with name as specified */
 	downloadPython(event) {
 		event.preventDefault();
 		const element = document.createElement('a');
@@ -95,7 +95,7 @@ class PythonEditor extends React.Component {
 	}
 
 	/* Target function for the button "Run Code". Send python code
-         in the editing box to backend. */
+				 in the editing box to backend. */
 	runScript(event) {
 		const _this = this;
 		let startTime = this.state.codingStart;
@@ -297,8 +297,8 @@ export default class MinibotBlockly extends React.Component {
 	}
 
 	/* Populates the customBlocklyList with a default function if addOrDelete == true
-         and if there are no custom function already defined in the customBlocklyList
-         Deletes default function from customBlocklyList if addOrDelete == false */
+				 and if there are no custom function already defined in the customBlocklyList
+				 Deletes default function from customBlocklyList if addOrDelete == false */
 	manageDefaultCustomBlocklyFunction() {
 		const defaultFunction = [this.state.emptyFunctionName, ' '];
 		if (this.props.customBlockList.length == 0) {
@@ -462,8 +462,8 @@ export default class MinibotBlockly extends React.Component {
 		}
 
 		/* Realtime code generation
-                    (Every drag/drop or change in visual code will be
-                    reflected in actual code view) */
+										(Every drag/drop or change in visual code will be
+										reflected in actual code view) */
 		_this.workspace.addChangeListener(function (event) {
 			_this.scriptToCode();
 			_this.redefineCustomBlocks();
@@ -485,9 +485,9 @@ export default class MinibotBlockly extends React.Component {
 	}
 
 	/* Helper for realtime code generation (Blockly => Python)
-    Stores blockly state in parent component so it can load the previous state after switching react tabs
-    https://developers.google.com/blockly/guides/get-started/web
-    */
+		Stores blockly state in parent component so it can load the previous state after switching react tabs
+		https://developers.google.com/blockly/guides/get-started/web
+		*/
 	scriptToCode() {
 		// update Blockly
 		let xml = Blockly.Xml.workspaceToDom(this.workspace);
@@ -532,7 +532,7 @@ export default class MinibotBlockly extends React.Component {
 	}
 
 	/* Target function for the button "Run". Send python code
-         corresponding to blockly to backend. */
+				 corresponding to blockly to backend. */
 	runBlockly(event) {
 		const _this = this;
 		axios({
@@ -609,7 +609,7 @@ export default class MinibotBlockly extends React.Component {
 		});
 	}
 
-	loadFileAsBlocks(event) {
+	loadFileAsBlocks(_e) {
 		let xmlToLoad = document.getElementById('blockUpload').files[0];
 		let xmlReader = new FileReader();
 		xmlReader.onload = function (event) {
@@ -622,7 +622,7 @@ export default class MinibotBlockly extends React.Component {
 		xmlReader.readAsText(xmlToLoad, 'UTF-8');
 	}
 
-	handleRegister(event) {
+	handleRegister(_e) {
 		let formData = new FormData(document.getElementById('registerForm'));
 		axios({
 			method: 'POST',

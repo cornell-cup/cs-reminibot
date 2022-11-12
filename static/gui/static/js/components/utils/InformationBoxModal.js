@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { INFOBOXTYPE, INFOBOXID, AprilTagIdBoxModalText } from './Constants';
 import { PortBoxModalText, SetupBoxModalText, VisionBoxModalText } from './Constants';
+import PropTypes from 'prop-types';
+
+InformationBoxModal.propTypes = {
+	type: PropTypes.string.isRequired
+};
 
 function InformationBoxModal({ type }) {
 	const [boxText, setBoxText] = useState('');

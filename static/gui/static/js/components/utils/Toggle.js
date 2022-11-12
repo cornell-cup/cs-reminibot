@@ -1,4 +1,11 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
+Toggle.propTypes = {
+	isChecked: PropTypes.bool.isRequired,
+	handleToggle: PropTypes.func.isRequired,
+	size: PropTypes.string.isRequired
+};
 
 const Toggle = ({ isChecked, handleToggle, size }) => {
 	return (

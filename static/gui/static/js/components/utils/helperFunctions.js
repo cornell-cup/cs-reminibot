@@ -1,5 +1,4 @@
 import { Matrix } from 'ml-matrix';
-import { mapValues, keyBy } from 'lodash';
 export function getRandomIntInclusive(min, max) {
 	min = Math.ceil(min);
 	max = Math.floor(max);
@@ -97,7 +96,7 @@ export function getPolygonInfoFromVertices(vertices) {
 export async function readFileAsText(file) {
 	let result = await new Promise((resolve) => {
 		let fileReader = new FileReader();
-		fileReader.onloadend = (e) => resolve(fileReader.result);
+		fileReader.onloadend = (_e) => resolve(fileReader.result);
 		fileReader.readAsText(file);
 	});
 

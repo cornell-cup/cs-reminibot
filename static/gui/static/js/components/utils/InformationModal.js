@@ -1,4 +1,9 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
+BoxModal.propTypes = {
+	text: PropTypes.string.isRequired
+};
 
 export default class BoxModal extends React.Component {
 	constructor(props) {
@@ -11,7 +16,7 @@ export default class BoxModal extends React.Component {
 				<div className='modal-dialog'>
 					<div className='modal-content'>
 						<div className='modal-body'>
-							<p>{props.text}</p>
+							<p>{this.props.text}</p>
 						</div>
 						<div className='modal-footer'>
 							<button type='submit' value='submit' className='btn btn-primary' data-dismiss='modal'>

@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import PropTypes from 'prop-types';
 
 /**************************** READ: *******************************
 This component has no UI.
@@ -14,12 +15,17 @@ use <SpeechRecognitionComp> for your component, you might want
 to study and add to the Mic Management code in <main.js>
 */
 
-const SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
+const SpeechRecognition = SpeechRecognition || window.webkitSpeechRecognition;
 const recognition = new SpeechRecognition();
 
 recognition.continous = true;
 recognition.interimResults = true;
 recognition.lang = 'en-US';
+
+SpeechRecognitionComp.propTypes = {
+	setText: PropTypes.string.isRequired,
+	mic: PropTypes.bool.isRequired
+};
 
 function SpeechRecognitionComp({ setText, mic }) {
 	async function handleListen() {

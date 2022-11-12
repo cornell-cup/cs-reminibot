@@ -61,7 +61,7 @@
     "test": "jest --watchAll",
     "build": "babel src -d lib",
     "webpack": "webpack",
-    "lint": "eslint static/js/ --fix --cache-location 'cache/'",
+    "lint": "eslint static/js/ --fix --cache --cache-location 'cache/'",
     "format": "prettier static/js/ --write"
   },
   "repository": {
