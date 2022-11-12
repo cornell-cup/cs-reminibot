@@ -702,6 +702,13 @@ class BaseStation:
         user = User.query.filter(User.email == email).first()
         return user.id
 
+    def clear_databases(self) -> None:
+        meta = db.metadata
+        for table in reversed(meta.sorted_tables):
+            print ('Clear table %s' % table)
+            db.session.execute(table.delete())
+        db.session.commit()
+
     def update_custom_function(self, custom_function: str) -> bool:
         """Adds custom function(s) for the logged in user if there is a user
         logged in
