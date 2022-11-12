@@ -1,11 +1,17 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import PropTypes from 'prop-types';
 
 const editStyle = {
 	backgroundColor: '#212529'
 };
 const defaultStyle = {
 	backgroundColor: '#2c3137'
+};
+
+ContextBox.propTypes = {
+	id: PropTypes.number.isRequired,
+	context: PropTypes.string.isRequired
 };
 
 function ContextBox({ id, context }) {
@@ -45,15 +51,15 @@ function ContextBox({ id, context }) {
 
 	const deleteContext = (e) => {
 		/**  READ: ********************
-    *
-    How it works: When user deletes context, it does not actually remove the 
-    context from the contextHistory list. Instead, it empties the string in both
-    front and backend. This context is then not rendered on the frontend. 
+		*
+		How it works: When user deletes context, it does not actually remove the 
+		context from the contextHistory list. Instead, it empties the string in both
+		front and backend. This context is then not rendered on the frontend. 
 
-    Reason: We do not want to readjust the indices and the context list 
-    for both front and backend every time the user makes an edit to the context 
-    history in one session. 
-    ******************************/
+		Reason: We do not want to readjust the indices and the context list 
+		for both front and backend every time the user makes an edit to the context 
+		history in one session. 
+		******************************/
 		e.preventDefault();
 		axios({
 			method: 'POST',

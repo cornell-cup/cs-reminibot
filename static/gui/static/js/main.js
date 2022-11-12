@@ -1,11 +1,8 @@
 /* ES6 */
-import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { nanoid } from 'nanoid';
 import ReactDOM from 'react-dom';
 import { CookiesProvider } from 'react-cookie';
-import { withCookies, Cookies } from 'react-cookie';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { BrowserRouter as Router } from 'react-router-dom';
 
 // Minibot components import
 import Navbar from './components/Navbar.js';
@@ -15,9 +12,8 @@ import Chatbot from './components/Chatbot/chatbot2.js';
 // Utils import
 import { ACT_MIC_CHATBOT, ACT_MIC_COMMAND } from './components/utils/Constants.js';
 import { commit_context_stack_to_db, clear_chatbot_context_stack } from './components/utils/axios/chatbotAxios.js';
-import { set } from 'lodash';
 
-function ClientGUI({}) {
+function ClientGUI() {
 	const [chatbotContext, setChatbotContext] = useState('');
 	const [selectedBotName, setSelectedBotName] = useState('');
 	const [contextHistoryLoaded, setContextHistoryLoaded] = useState(false);
@@ -56,7 +52,7 @@ function ClientGUI({}) {
 	 */
 	useEffect(() => {
 		/* Mic Manager to switch off the current active mics before switching
-    to another one */
+		to another one */
 		if (activeMicComponent == ACT_MIC_CHATBOT) {
 			console.log('turn off bot voice control mic.');
 			setBotVoiceControlMic(false);
