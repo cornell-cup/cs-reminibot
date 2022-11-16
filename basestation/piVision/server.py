@@ -244,6 +244,8 @@ if v == 2:
 
     # start looping over all the frames
     while True:
+        Kernal = np.ones((3, 3), np.uint8)
+
         # receive RPi name and frame from the RPi and acknowledge
         # the receipt
         (rpiName, frame) = imageHub.recv_image()
@@ -294,17 +296,15 @@ if v == 2:
         # Threshold the HSV image to get only blue colors
         mask = cv2.inRange(hsv, light_blue, dark_blue)
 
+        opening = cv2.morphologyEx(mask, cv2.MORPH_OPEN, Kernal)  # Morphology
+
         # Bitwise-AND mask and original image
-        output = cv2.bitwise_and(frame, frame, mask=mask)
-
-        gray = cv2.cvtColor(output, cv2.COLOR_BGR2GRAY)
-
-        ret, binary = cv2.threshold(gray, 100, 255, cv2.THRESH_OTSU)
+        res = cv2.bitwise_and(frame, frame, mask=opening)
 
         invertedBinary = ~binary
 
-        contours, hierarchy = cv2.findContours(invertedBinary, cv2.RETR_TREE,
-                                               cv2.CHAIN_APPROX_SIMPLE)
+        contours, hierarchy = cv2.findContours(opening, cv2.RETR_TREE,
+                                               cv2.CHAIN_APPROX_NONE)
 
         for c in contours:
             area = cv2.contourArea(c)
@@ -345,7 +345,8 @@ if v == 2:
             leftRight -= 1
 
         if len(contours) != 0:
-            area = cv2.contourArea(con)
+            cnt = contours[0]
+            area = cv2.contourArea(cnt)
             distance = 966.09*area**(-0.457)
             #M = cv2.moments(con)
             #Cx = int(M['m10']/M['m00'])
