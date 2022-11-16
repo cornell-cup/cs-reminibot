@@ -53,7 +53,7 @@ def test_add_user(client):
     response = client.post(
         '/register',
         data={
-            "email":"michael",
+            "email":"michael@michael.michael",
             "password":"test123"
         }
     )
@@ -227,6 +227,13 @@ def test_clear_local_context_guest(client):
     returned_context = data['context']
     assert response.status_code == 200
     assert "the sky is green" not in ' '.join(returned_context).lower()
+
+def test_clear_db(client):
+    response = client.post(
+        '/clear',
+        content_type='application/json',
+    )
+    assert response.status_code == 200
 
 
 if __name__ == "__main__":

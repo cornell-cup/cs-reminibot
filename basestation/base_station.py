@@ -676,7 +676,9 @@ class BaseStation:
         """Registers a new user if the email and password are not null and
         there is no account associated wth the email yet"""
         print("registering new account")
-        if not email:
+        regex = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
+
+        if not email or not re.fullmatch(regex, email):
             return -1
         if not password:
             return 0
@@ -699,6 +701,13 @@ class BaseStation:
     def get_user_id_by_email(self, email: str) -> int:
         user = User.query.filter(User.email == email).first()
         return user.id
+
+    def clear_databases(self) -> None:
+        meta = db.metadata
+        for table in reversed(meta.sorted_tables):
+            print ('Clear table %s' % table)
+            db.session.execute(table.delete())
+        db.session.commit()
 
     def update_custom_function(self, custom_function: str) -> bool:
         """Adds custom function(s) for the logged in user if there is a user

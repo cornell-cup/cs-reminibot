@@ -46,6 +46,7 @@ class RegisterModal extends React.Component {
                 this.setState({ current_user_email: formData.get('email') });
             })
                 .catch((error) => {
+                    window.alert(error.response.data.error_msg);
                     console.log("fail");
                     console.log(error);
                 });
