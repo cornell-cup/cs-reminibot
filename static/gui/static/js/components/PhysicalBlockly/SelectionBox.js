@@ -7,21 +7,29 @@ export default class SelectionBox extends React.Component {
 
     render(props) {
         var labelStyle = {
-            color: 'white',
-            paddingRight: '10px'
+            fontFamily: "Ubuntu",
+            textAlign: "right",
+            color: "#b1c7ff",
+            fontSize: "18px"
         }
 
         return (
-            <div class="container">
-                <label for="selection" style={labelStyle}>{this.props.command}</label>
-                <select class="selectpicker" id={this.props.command} onChange={(event) => 
-                       this.props.changeSelection(event, this.props.pb, event.target.id, event.target.value)}>
-                    {
-                        this.props.choiceList.map((c) => c === this.props.default 
-                        ? <option selected value={c} key={c.id}>{c}</option> 
-                        : <option value={c} key={c.id}>{c}</option>)
-                    }
-                </select>
+            <div class="container" style={{marginBottom: "10px"}}>
+                 <div className="row">
+                    <div class="col-3">
+                        <label for="selection" style={labelStyle}>{this.props.command}</label>
+                    </div>
+                    <div class="col-4">
+                        <select className="custom-select custom-select-sm" id={this.props.command} onChange={(event) => 
+                            this.props.changeSelection(event, this.props.pb, event.target.id, event.target.value)}>
+                            {
+                                this.props.choiceList.map((c) => c === this.props.default 
+                                ? <option selected value={c} key={c.id}>{c}</option> 
+                                : <option value={c} key={c.id}>{c}</option>)
+                            }
+                        </select>
+                    </div>
+                </div>
             </div>
         );
     }

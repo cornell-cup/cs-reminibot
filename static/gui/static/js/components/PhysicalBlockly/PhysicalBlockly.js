@@ -49,7 +49,7 @@ export default class PhysicalBlockly extends React.Component {
 		this.setState({customCommands: customCommand, tempCommandData: customCommand});
 		const _this = this;
 		_this.codeRef["current"].getCodeMirror().setValue("");
-		_this.setState({ stage: 1, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "" });
+		// _this.setState({ stage: 1, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "" });
 		_this.bWorkspace.clear();
 	}
 
@@ -245,6 +245,7 @@ export default class PhysicalBlockly extends React.Component {
 	detectRFID() {
 		console.log("start detecting RFID");
 		console.log(this.state.customCommands);
+		this.bWorkspace.clear();
 		let detectionState = this.state.detectionState;
 		this.setState({detectionState: !this.state.detectionState});
 		if (detectionState) {
@@ -366,32 +367,31 @@ export default class PhysicalBlockly extends React.Component {
 		};
 
 		let customTitleStyle = {
-			paddingTop: '15px',
-			fontSize: '16px'
+			fontFamily: "Ubuntu",
+            color: "#b1c7ff",
+            fontSize: "22px",
+            paddingBottom: "0px",
+            marginTop: "15px",
+            marginBottom: "10px"
 		}
 		return (
 			<div className="row">
 				<div className="col">
 					<p className="small-title"> Physical Blockly </p>
-					<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.detectRFID()}>{this.state.detectionState ? "Stop" : "Start"} Detect RFID</button>
-					<p className="small-title" style={customTitleStyle}> Customization of Blocks </p>
-					{
-						commands.map((c) => <SelectionBox key={c.id} command={c} choiceList={choices} default={customCommand.get(c)} pb={this} changeSelection={this.updateSelection}/> )
-					};
-					<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.saveSelection()}>Save</button>
 					{this.props.selectedBotName != '' && this.state.stage == 0 ?
 						<div>
-							<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.physicalBlocklyClick(0)}>Start Camera Mode</button>
-							<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.physicalBlocklyClick(1)}>Start Real Time Mode</button>
 							<p className="small-title" style={customTitleStyle}> Customization of Blocks </p>
 							{
 								commands.map((c) => <SelectionBox key={c.id} command={c} choiceList={choices} default={customCommand.get(c)} pb={this} changeSelection={this.updateSelection}/> )
 							};
-						</div> :
-						this.props.selectedBotName != '' && this.state.stage == 1 ?
-							<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.endProcess()}>End Process</button>
-							:
-							<p className="white-label">Please return to Bot Control and connect to a minibot before proceeding.</p>
+							<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.detectRFID()}>{this.state.detectionState ? "Stop" : "Start"} Detect RFID</button>
+							<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.saveSelection()}>Save</button>
+							<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.physicalBlocklyClick(0)}>Start Camera Mode</button>
+							<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.physicalBlocklyClick(1)}>Start Real Time Mode</button>
+						</div>
+						: this.props.selectedBotName != '' && this.state.stage == 1 ?
+						<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.endProcess()}>End Process</button>
+						: <p className="white-label">Please return to Bot Control and connect to a minibot before proceeding.</p>
 					}
 					<div className='row'>
 						<div style={visStyle}>
