@@ -125,15 +125,27 @@ def main():
             # prints Device ID :: tag id :: x y z angle
             # TODO debug offset method - is better, but not perfect.
             #center_cell_offset = get_closest_reference_point_offset(detected_x,detected_y,center_cell_offsets)
-            x_offset, y_offset, _ = get_x_y_angle_offsets(detected_x, detected_y, center_cell_offsets)
-            x = x_scale_factor * (detected_x + overall_center_x_offset) + x_offset
-            y = y_scale_factor * (detected_y + overall_center_y_offset) + y_offset
+
+            ########## Uncomment the 3 lines below if the
+            # x_offset, y_offset, _ = get_x_y_angle_offsets(detected_x, detected_y, center_cell_offsets)
+            # x = x_scale_factor * (detected_x + overall_center_x_offset) + x_offset
+            # y = y_scale_factor * (detected_y + overall_center_y_offset) + y_offset
+
             z = detected_z
+
+            x = x_scale_factor * (detected_x + overall_center_x_offset) + predict_x_offset
+            y = y_scale_factor * (detected_y + overall_center_y_offset) + predict_y_offset
+
             # angle fudge factor interpolation still needs work,
             # it may be possible but angle errors are not as predictable
             # as distance errors
-            angle = ((detected_angle + overall_angle_offset)%360)%360
+
+            ########Uncomment below
+            # angle = ((detected_angle + overall_angle_offset)%360)%360
             (ctr_x, ctr_y) = d.center
+
+            angle = ((detected_angle + predict_angle_offset)%360)%360
+
             
             # displaying tag id
             cv2.putText(undst, str(d.tag_id),(int(ctr_x), int(ctr_y)), cv2.FONT_HERSHEY_SIMPLEX, .5,  BLUE,2)
@@ -250,7 +262,7 @@ def calc_tag_data(calib_data, detections):
     for i, d in enumerate(detections):
         
         (detected_x, detected_y, detected_z, detected_angle) = util.compute_tag_undistorted_pose(
-            calib_data["transform_matrix"], calib_data["dist_coeffs"], calib_data["transform_matrix"], d, TAG_SIZE
+            calib_data["camera_matrix"], calib_data["dist_coeffs"], calib_data["transform_matrix"], d, TAG_SIZE
         )
 
         x_offset, y_offset, _ = get_x_y_angle_offsets(detected_x, detected_y, calib_data["center_cell_offsets"])
@@ -362,9 +374,9 @@ def get_x_y_angle_offsets(x, y, center_cell_offsets):
     left_offset = None
     closest_offset = closest_offsets[0]
     left_most_offset = min(closest_offsets[1:4], key=lambda offset: offset["reference_point_x"])
-    left_most_offset_delta = abs(closest_offset["reference_point_x"]-left_most_offset["reference_point_x"])
+    left_most_offset_delta = abs(closest_offset["reference_point_x"] - left_most_offset["reference_point_x"])
     right_most_offset = max(closest_offsets[1:4], key=lambda offset: offset["reference_point_x"])
-    right_most_offset_delta = abs(right_most_offset["reference_point_x"]-closest_offset["reference_point_x"])
+    right_most_offset_delta = abs(right_most_offset["reference_point_x"] - closest_offset["reference_point_x"])
     other_offset = util.complement_of_list(closest_offsets, [left_most_offset, closest_offset, right_most_offset])[0]
     if left_most_offset_delta > right_most_offset_delta:
         right_offset = closest_offset
