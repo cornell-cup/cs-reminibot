@@ -280,7 +280,7 @@ function Chatbot2({ setParentContext, selectedBotName, setActiveMicComponent, ac
 							command: queue[queue.length - 2]
 						})
 					})
-						.then(function (_) {})
+						.then(function (_) { })
 						.catch(function (error) {
 							if (error.response.data.error_msg.length > 0) window.alert(error.response.data.error_msg);
 							else console.log('Speech recognition', error);
