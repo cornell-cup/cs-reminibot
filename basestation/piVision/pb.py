@@ -62,7 +62,7 @@ def classify(command, commands):
     else:
         return ["fake_bot", "stop"] #do nothing if invalid command received 
 
-detector = Detector()
+# detector = Detector()
 bots = base_station.get_active_bots()
 
 file = os.path.join("tag_insns.json")
