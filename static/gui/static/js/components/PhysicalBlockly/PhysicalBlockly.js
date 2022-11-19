@@ -33,7 +33,7 @@ for(var i = 0; i < commands.length; i ++) {
 export default class PhysicalBlockly extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = { stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "", customCommands: new Map(), tempCommandData: new Map(), detectionState: false, detectionCall: null };
+		this.state = { stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "", customCommands: new Map(), tempCommandData: new Map(), detectionState: false, detectionCall: null, unsavedCustomization: false };
 		this.codeRef = React.createRef();
 		this.pollForUpdates = this.pollForUpdates.bind(this);
 		this.respondToTag = this.respondToTag.bind(this);
@@ -126,12 +126,9 @@ export default class PhysicalBlockly extends React.Component {
 		const _this = this;
 		var json = {};
 		for(var i = 0; i < tagMapping.length; i ++) {
-			// var orgColor = choices[i];
-			// _this.getCustomCommandID(i)
 			var newTag = tagMapping[_this.getCustomCommandID(i)];
 			json[tagMapping[i]] = newTag;
 		}
-		console.log(JSON.stringify(json));
 		return JSON.stringify(json);
 	}
 
@@ -253,7 +250,7 @@ export default class PhysicalBlockly extends React.Component {
 		console.log(choice);
 		var newCustomCommand = pb.state.tempCommandData;
 		newCustomCommand.set(command, choice);
-		pb.setState({tempCommandData: newCustomCommand});
+		pb.setState({tempCommandData: newCustomCommand, unsavedCustomization: true});
 	}
 
 	saveSelection() {
@@ -267,7 +264,7 @@ export default class PhysicalBlockly extends React.Component {
             return;
         }
 		let newCustomCommand = this.state.tempCommandData;
-		this.setState({customCommands: newCustomCommand});
+		this.setState({customCommands: newCustomCommand, unsavedCustomization: false});
     }
 
 	detectRFID() {
@@ -402,6 +399,12 @@ export default class PhysicalBlockly extends React.Component {
             marginTop: "15px",
             marginBottom: "10px"
 		}
+
+		let warningLabelStyle = {
+			color: "#ffffff",
+			fontSize: "18px",
+			paddingBottom: "10px"
+		}
 		return (
 			<div className="row">
 				<div className="col">
@@ -411,7 +414,10 @@ export default class PhysicalBlockly extends React.Component {
 							<p className="small-title" style={customTitleStyle}> Customization of Blocks </p>
 							{
 								commands.map((c) => <SelectionBox key={c.id} command={c} choiceList={choices} default={customCommand.get(c)} pb={this} changeSelection={this.updateSelection}/> )
-							};
+							}
+							{
+								this.state.unsavedCustomization ? <div style={warningLabelStyle}>Warning: the current block customization is unsaved.</div> : <span></span>
+							}
 							<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.detectRFID()}>{this.state.detectionState ? "Stop" : "Start"} Detect RFID</button>
 							<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.saveSelection()}>Save</button>
 							<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.physicalBlocklyClick(0)}>Start Camera Mode</button>

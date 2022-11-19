@@ -11,13 +11,11 @@ import requests
 
 # from basestation.routes import base_station
 from basestation.routes.basestation_init import base_station
-from detector import Detector
 
 bot_name = sys.argv[1]
 mode = sys.argv[2] #0 = camera mode, 1=real time 
 pb_map = sys.argv[3]
 pb_map = json.loads(pb_map)
-print(pb_map)
 
 #todo list: 
 #   make sure you can't input other commands while in PB mode 
@@ -62,7 +60,6 @@ def classify(command, commands):
     else:
         return ["fake_bot", "stop"] #do nothing if invalid command received 
 
-detector = Detector()
 bots = base_station.get_active_bots()
 
 file = os.path.join("tag_insns.json")
@@ -128,7 +125,6 @@ while(True):
 
     tag = base_station.get_rfid(bot_name)
     tag = pb_map[tag]
-    # if not seen[tag]:
     args = classify(tag, commands)
     seen[tag] = True
     q.put(args)
