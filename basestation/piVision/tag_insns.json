@@ -1,11 +1,11 @@
 {
     "commands" : {
-        "turn left": [0], 
-        "turn right": [1, 19], 
-        "go forwards": [2, 20], 
-        "stop": [4], 
+        "turn left": ["0x59 0xE3 0xB 0xF4"], 
+        "turn right": ["0x59 0xC8 0x6 0xF4"], 
+        "go forwards": ["0xF9 0x3E 0x4 0xF4"],
+        "go backwards": ["0xC9 0x12 0xD 0xF4"], 
         "repeat": [5, 23, 22], 
-        "end": [3, 21, 18]
+        "end": ["0x69 0xDB 0x6 0xF4"]
     }, 
     "tagRangeStart": 0, 
     "tagRangeEnd": 23
