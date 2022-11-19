@@ -2,6 +2,7 @@ import cv2
 import json
 import numpy as np
 import sys
+from statistics import mean, median
 sys.path.append("..")
 from util.util import undistort_image, read_json
 from util.detector import Detector
@@ -42,7 +43,45 @@ def error_calc(imgfile, calib_file, calib_positions):
     y_errors = tag_y - position_data_y
     angle_errors = tag_angle - position_data_angle
 
+    mean_x_errors = mean(x_errors)
+    mean_y_errors = mean(y_errors)
+    mean_angle_errors = mean(angle_errors)
+
+    median_x_errors = median(x_errors)
+    median_y_errors = median(y_errors)
+    median_angle_errors = median(angle_errors)
+
+    max_x_error = max(x_errors)
+    max_y_error = max(y_errors)
+    max_angle_error = max(angle_errors)
+
+    data_error = [
+        {
+            "data": "X Position",
+            "mean_error": mean_x_errors,
+            "median_error": median_x_errors,
+            "max_error": max_x_error
+        },
+        {
+            "data": "Y Position",
+            "mean_error": mean_y_errors,
+            "median_error": median_y_errors,
+            "max_error": max_y_error
+        },
+        {
+            "data": "Angle",
+            "mean_error": mean_angle_errors,
+            "median_error": median_angle_errors,
+            "max_error": max_angle_error
+        }
+    ]
+
+    # write all the data to a json file
+    with open("error_calc.json", "w") as outfile:
+        json.dump(data_error, outfile)
     
+
+
 
 
 def parse_tag_data(data, tag_file):
