@@ -17,7 +17,7 @@ function InformationBoxModal({ type }) {
         } else if (type == INFOBOXTYPE.VISION) {
             setBoxText(VisionBoxModalText);
             setBoxID(INFOBOXID.VISION);
-        } else {
+        } else if (type == INFOBOXTYPE.APRIL_TAG_ID) {
             setBoxText(AprilTagIdBoxModalText);
             setBoxID(INFOBOXID.APRIL_TAG_ID);
         }
