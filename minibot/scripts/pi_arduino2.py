@@ -100,7 +100,7 @@ def acquire_lock():
     priority = time.time()
     while not tlock.start_transmit(priority):
         time.sleep(0.01)
-    setSlave(1)
+    setSlave(0)
 
 
 def release_lock():

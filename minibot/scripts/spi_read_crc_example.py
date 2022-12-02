@@ -13,7 +13,7 @@ from message_utils import *
 spi = spidev.SpiDev()
 bus = 0
 device = 0
-spi.open(bus,device)
+spi.open(bus, device)
 spi.mode = 0
 spi.max_speed_hz = 115200
 
@@ -21,7 +21,7 @@ spi.max_speed_hz = 115200
 # This assumes the arduino knows to load item 4
 # This is arbitrary, but I set 4 to correspond to
 # a photoresistor wired to the Arduino itself.
-load_req = [ord('L'), ord('O'), ord('A'), ord('D'), 4]
+load_req = [ord('R'), ord('F'), ord('I'), ord('D'), 4]
 load_msg = make_crc_message(load_req)
 
 # Then, make the request for 22 bytes
