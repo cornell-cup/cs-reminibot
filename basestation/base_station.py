@@ -567,6 +567,13 @@ class BaseStation:
         direction = direction.lower()
         bot.sendKV("WHEELS", direction)
 
+    @make_thread_safe
+    def get_rfid(self, bot_name: str):
+        bot = self.get_bot(bot_name)
+        bot.sendKV("RFID", 4)
+        bot.readKV()
+        return bot.rfid_tags
+
     def set_bot_mode(self, bot_name: str, mode: str):
         """ Set the bot to either line follow or object detection mode """
         bot = self.get_bot(bot_name)

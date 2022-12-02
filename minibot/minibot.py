@@ -389,6 +389,16 @@ class Minibot:
                 self.sendKV(sock, key, "LOW")
             else:
                 self.sendKV(sock, key, "")
+        elif key == "RFID":
+            returned_tags = [0, 0, 0, 0]
+
+            thread = Thread(target=ece.rfid(), args=[value, returned_tags])
+            thread.start()
+
+            while thread.is_alive():
+                time.sleep(0.01)
+
+            self.sendKV(sock, key, ' '.join(str(e) for e in returned_tags))
 
     def sendKV(self, sock: socket, key: str, value: str):
         """ Sends a key-value pair to the specified socket. The key value
