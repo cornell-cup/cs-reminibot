@@ -20,6 +20,7 @@ spi.max_speed_hz = 115200
 
 init_msg = "Well Played!"
 byte_msg = make_crc_message(init_msg)
+print("Valid:", validate_crc_message(byte_msg))
 send_message(spi, byte_msg)
 
 

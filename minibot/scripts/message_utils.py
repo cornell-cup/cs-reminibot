@@ -1,6 +1,10 @@
 import binascii
 import spidev
 import time
+#import  scripts.crc
+#from scripts.crc import crc16
+
+import crc
 from crc import crc16
 # Example setup code
 # spi = spidev.SpiDev()
@@ -45,7 +49,7 @@ def send_message(spi, msg, max_tries=100):
                 done = True
                 break
         buf = msg.copy()
-    #print("Sent {} in {} tries".format(msg, numTries))
+    print("Sent {} in {} tries".format(msg, numTries))
 
 
 def read_data(spi, msg, nbytes, validator, max_tries=100):
@@ -76,20 +80,20 @@ def read_data(spi, msg, nbytes, validator, max_tries=100):
     numTries = 0
     while not done and numTries < max_tries:
         # Send empty buffer (to read)
-        # print("Sent {}: {} | {}".format(len(buf), "".join([chr(c) for c in buf]), buf))
+        print("Sent {}: {} | {}".format(len(buf), "".join([chr(c) for c in buf]), buf))
         spi.xfer(buf)
         numTries += 1
         # Validate data
-        # print("Received {}: {} | {}".format(len(buf), "".join([chr(c) for c in buf]), buf))
+        print("Received {}: {} | {}".format(len(buf), "".join([chr(c) for c in buf]), buf))
         if validator(buf):
-            # print("Data OK")
+            print("Data OK")
             data = buf.copy()
             done = True
         else:
             # Ask to resend
             # print("Send load req msg")
             send_message(spi, lod_msg)
-    # print("Read {} in {} tries".format(buf, numTries))
+    print("Read {} in {} tries".format(buf, numTries))
     return data
 
 
