@@ -33,21 +33,24 @@ for(var i = 0; i < commands.length; i ++) {
 export default class PhysicalBlockly extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = { stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "", tempCommandData: new Map(), detectionState: false, detectionCall: null };
+		this.state = { stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "", customCommands: new Map(), tempCommandData: new Map(), detectionState: false, detectionCall: null, unsavedCustomization: false };
 		this.codeRef = React.createRef();
 		this.pollForUpdates = this.pollForUpdates.bind(this);
 		this.respondToTag = this.respondToTag.bind(this);
+		this.saveSelection = this.saveSelection.bind(this);
+		this.getCustomCommandID = this.getCustomCommandID.bind(this);
+		this.getPBMap = this.getPBMap.bind(this);
 		this.bWorkspace = null;
 	}
 
 	componentDidMount() {
-		setInterval(this.pollForUpdates, 1000);
+		// setInterval(this.pollForUpdates, 1000);
 		this.bWorkspace = Blockly.inject('pbBlocklyDiv');
 		this.setState({ code: "" });
-		this.setState({tempCommandData: customCommand});
+		this.setState({customCommands: customCommand, tempCommandData: customCommand});
 		const _this = this;
 		_this.codeRef["current"].getCodeMirror().setValue("");
-		_this.setState({ stage: 1, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "" });
+		// _this.setState({ stage: 1, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "" });
 		_this.bWorkspace.clear();
 	}
 
@@ -59,12 +62,16 @@ export default class PhysicalBlockly extends React.Component {
 	//mode = 0 -> camera mode 
 
 	physicalBlocklyClick(mode) {
+		console.log("start detecting RFID");
+		console.log(this.state.customCommands);
+
 		// setInterval(tempClick, 1000);
 		const _this = this;
 		_this.codeRef["current"].getCodeMirror().setValue("");
 		_this.setState({ stage: 1, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "" }); //text: "", tabs: 0, loopvar: 0
 		// _this.props.setPb("");
 		_this.bWorkspace.clear();
+		var pb_map = _this.getPBMap();
 		axios({
 			method: 'POST',
 			url: '/mode', //url to backend endpoint
@@ -74,6 +81,7 @@ export default class PhysicalBlockly extends React.Component {
 			data: JSON.stringify({
 				bot_name: _this.props.selectedBotName,
 				mode: mode == 0 ? "physical-blockly" : "physical-blockly-2",
+				pb_map: pb_map
 			})
 		}).catch(function (error) {
 			// if (error.response.data.error_msg.length > 0)
@@ -81,11 +89,14 @@ export default class PhysicalBlockly extends React.Component {
 			// else
 			console.log(error.response.data);
 		});
+
+		this.setState({detectionCall: setInterval(this.pollForUpdates, 1000)});
 	}
 
 	endProcess() {
 		// this.setState({ stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [] });
 		const _this = this;
+		clearInterval(this.state.detectionCall);
 		//post request to basestation to stop the process
 		axios.get('/end_physical_blockly')
 			.then(function (response) {
@@ -111,10 +122,20 @@ export default class PhysicalBlockly extends React.Component {
 		// this.setState({ stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [] });
 	}
 
+	getPBMap() {
+		const _this = this;
+		var json = {};
+		for(var i = 0; i < tagMapping.length; i ++) {
+			var newTag = tagMapping[_this.getCustomCommandID(i)];
+			json[tagMapping[i]] = newTag;
+		}
+		return JSON.stringify(json);
+	}
+
 	pollForUpdates() {
 		const _this = this;
 		axios.get('/get-py-command')
-			.then(function (response) {
+		.then(function (response) {
 				let isLoop = false;
 				let isEnd = false;
 				if (response.data == "") {
@@ -164,6 +185,12 @@ export default class PhysicalBlockly extends React.Component {
 					isEnd = true;
 				} else if (response.data.substring(3) == "bot.move_forward(100)") {
 					block.setAttribute("type", "move_power");
+				} else if (response.data.substring(3) == "bot.move_backward(100)") {
+					block.setAttribute("type", "move_power");
+					let dir_field = document.createElement("field");
+					dir_field.setAttribute("name", "direction");
+					dir_field.innerHTML = "backward";
+					block.appendChild(dir_field);
 				} else if (response.data.substring(3) == "bot.stop()") {
 					block.setAttribute("type", "stop_moving");
 				} else if (response.data.substring(3) == "bot.turn_clockwise(100)") {
@@ -218,19 +245,32 @@ export default class PhysicalBlockly extends React.Component {
 	}
 
 	updateSelection(e, pb, command, choice) {
-		// console.log(pb);
-		// console.log(pb.state);
 		console.log("selection");
 		console.log(command);
 		console.log(choice);
 		var newCustomCommand = pb.state.tempCommandData;
 		newCustomCommand.set(command, choice);
-		pb.setState({tempCommandData: newCustomCommand});
+		pb.setState({tempCommandData: newCustomCommand, unsavedCustomization: true});
 	}
+
+	saveSelection() {
+		let commandSet = new Set();
+		for(var val of this.state.tempCommandData.values()) {
+			commandSet.add(val);
+		}
+		console.log(this.state.tempCommandData);
+        if (commandSet.size != commands.length) {
+            alert("Invalid customization! Please make sure that the commands are matched to an unique color!");
+            return;
+        }
+		let newCustomCommand = this.state.tempCommandData;
+		this.setState({customCommands: newCustomCommand, unsavedCustomization: false});
+    }
 
 	detectRFID() {
 		console.log("start detecting RFID");
-		console.log(this);
+		console.log(this.state.customCommands);
+		this.bWorkspace.clear();
 		let detectionState = this.state.detectionState;
 		this.setState({detectionState: !this.state.detectionState});
 		if (detectionState) {
@@ -238,6 +278,18 @@ export default class PhysicalBlockly extends React.Component {
 		} else {
 			this.setState({detectionCall: setInterval(this.respondToTag, 1000)});
 		}
+	}
+
+	getCustomCommandID(id) {
+		var color = choices[id];
+		let mapEntries = this.state.customCommands.entries();
+		for(var i = 0; i < 5; i ++) {
+			var binding = mapEntries.next().value;
+			if(binding[1] == color) {
+				return commands.indexOf(binding[0]);
+			}
+		}
+		return 0;
 	}
 
 	respondToTag() {
@@ -250,7 +302,8 @@ export default class PhysicalBlockly extends React.Component {
 			console.log(response);
 			console.log(response.data);
 			let commandID = tagMapping.indexOf(response.data);
-			// let commandID = testCommand[1];
+			commandID = _this.getCustomCommandID(commandID);
+
 			let isLoop = false;
 			let isEnd = false;
 			if (commandID == -1) {
@@ -315,6 +368,8 @@ export default class PhysicalBlockly extends React.Component {
 				_this.setState({ blockStack: _this.state.blockStack });
 				_this.setState({ lastBlock: lastLoop.nextConnection });
 			}
+		}).catch(function (error) {
+			console.log(error);
 		});
 	}
 
@@ -337,32 +392,40 @@ export default class PhysicalBlockly extends React.Component {
 		};
 
 		let customTitleStyle = {
-			paddingTop: '15px',
-			fontSize: '16px'
+			fontFamily: "Ubuntu",
+            color: "#b1c7ff",
+            fontSize: "22px",
+            paddingBottom: "0px",
+            marginTop: "15px",
+            marginBottom: "10px"
+		}
+
+		let warningLabelStyle = {
+			color: "#ffffff",
+			fontSize: "18px",
+			paddingBottom: "10px"
 		}
 		return (
 			<div className="row">
 				<div className="col">
 					<p className="small-title"> Physical Blockly </p>
-					<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.detectRFID()}>{this.state.detectionState ? "Stop" : "Start"} Detect RFID</button>
-					<p className="small-title" style={customTitleStyle}> Customization of Blocks </p>
-					{
-						commands.map((c) => <SelectionBox key={c.id} command={c} choiceList={choices} default={customCommand.get(c)} pb={this} changeSelection={this.updateSelection}/> )
-					};
 					{this.props.selectedBotName != '' && this.state.stage == 0 ?
 						<div>
-							<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.physicalBlocklyClick(0)}>Start Camera Mode</button>
-							<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.physicalBlocklyClick(1)}>Start Real Time Mode</button>
 							<p className="small-title" style={customTitleStyle}> Customization of Blocks </p>
 							{
 								commands.map((c) => <SelectionBox key={c.id} command={c} choiceList={choices} default={customCommand.get(c)} pb={this} changeSelection={this.updateSelection}/> )
-							};
-							<button className="btn btn-primary element-wrapper mr-1">Save</button>
-						</div> :
-						this.props.selectedBotName != '' && this.state.stage == 1 ?
-							<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.endProcess()}>End Process</button>
-							:
-							<p className="white-label">Please return to Bot Control and connect to a minibot before proceeding.</p>
+							}
+							{
+								this.state.unsavedCustomization ? <div style={warningLabelStyle}>Warning: the current block customization is unsaved.</div> : <span></span>
+							}
+							<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.detectRFID()}>{this.state.detectionState ? "Stop" : "Start"} Detect RFID</button>
+							<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.saveSelection()}>Save</button>
+							<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.physicalBlocklyClick(0)}>Start Camera Mode</button>
+							<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.physicalBlocklyClick(1)}>Start Real Time Mode</button>
+						</div>
+						: this.props.selectedBotName != '' && this.state.stage == 1 ?
+						<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.endProcess()}>End Process</button>
+						: <p className="white-label">Please return to Bot Control and connect to a minibot before proceeding.</p>
 					}
 					<div className='row'>
 						<div style={visStyle}>

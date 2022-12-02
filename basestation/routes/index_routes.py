@@ -125,7 +125,8 @@ def mode():
         error_json = {"error_msg": NO_BOT_ERROR_MSG}
         return json.dumps(error_json), status.HTTP_400_BAD_REQUEST
     mode = data['mode']
-    base_station.set_bot_mode(bot_name, mode)
+    pb_map = data['pb_map']
+    base_station.set_bot_mode(bot_name, mode, pb_map)
     return json.dumps(True), status.HTTP_200_OK
 
 @index_bp.route('/start_physical_blockly', methods=['POST'])

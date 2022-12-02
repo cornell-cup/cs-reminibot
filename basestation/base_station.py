@@ -4,6 +4,7 @@ Base Station for the MiniBot.
 
 import math
 import subprocess
+import sys
 from basestation.bot import Bot
 from basestation.databases.user_database import Submission, User
 from basestation import db
@@ -46,6 +47,7 @@ from .ChatbotWrapper import ChatbotWrapper
 
 
 import subprocess
+import json
 
 MAX_VISION_LOG_LENGTH = 1000
 VISION_UPDATE_FREQUENCY = 30
@@ -86,6 +88,7 @@ class BaseStation:
         self.phys_blockly_py = None
 
         self.py_commands = []
+        self.pb_map = {}
 
         self.blockly_function_map = {
             "move_forward": "fwd",         "move_backward": "back",
@@ -111,14 +114,8 @@ class BaseStation:
         # The Minibot broadcast will allow us to learn the Minibot's ipaddress
         # so that we can connect to the Minibot
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
-        ########################### IMPORTANT ###########################
-        # Only one of the two lines below is necessary, if one is not
-        # working for you then comment it out and uncomment the other one.
-        # NOTE: When you push, make sure only the top one is uncommented.
-
+        
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        # self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
 
         # an arbitrarily small time
         self.sock.settimeout(0.01)
@@ -587,23 +584,31 @@ class BaseStation:
 
     @make_thread_safe
     def get_rfid(self, bot_name: str):
-        bot = self.get_bot(bot_name)
-        bot.sendKV("RFID", 4)
-        bot.readKV()
-        return bot.rfid_tags
-        # return "0xF9 0x3E 0x4 0xF4"
+        # bot = self.get_bot(bot_name)
+        # print(bot)
+        # bot.sendKV("fRFID", 4)
+        # bot.readKV()
+        # print(bot.rfid_tags)
+        # return bot.rfid_tags
+        # TODO: temporary setup using dummy data, should be removed
+        # try:
+        #     tag = self.pb_map['0xF9 0x3E 0x4 0xF4']
+        # except:
+        #     raise Exception(str(self.pb_map.keys()))
+        return '0xF9 0x3E 0x4 0xF4'
 
-    def set_bot_mode(self, bot_name: str, mode: str):
+    def set_bot_mode(self, bot_name: str, mode: str, pb_map: json):
         """ Set the bot to either line follow or object detection mode """
         bot = self.get_bot(bot_name)
+        pb_map = str(pb_map)
         if(mode == "physical-blockly" or mode == "physical-blockly-2"):
             print("starting phys blockly subprocess")
             self.phys_blockly_py = None 
             if(mode == 'physical-blockly'):
-                self.phys_blockly_py = subprocess.Popen(['python', 'pb.py', bot_name, '0'], cwd = 'basestation/piVision', 
+                self.phys_blockly_py = subprocess.Popen(['python', 'pb.py', bot_name, '0', pb_map], cwd = 'basestation/piVision', 
                     stdout=subprocess.PIPE, bufsize=1)
             else: 
-                self.phys_blockly_py = subprocess.Popen(['python', 'pb.py', bot_name, '1'], cwd = 'basestation/piVision', 
+                self.phys_blockly_py = subprocess.Popen(['python', 'pb.py', bot_name, '1', pb_map], cwd = 'basestation/piVision', 
                     stdout=subprocess.PIPE, bufsize=1)
             while True:
                 output = self.phys_blockly_py.stdout.readline()
