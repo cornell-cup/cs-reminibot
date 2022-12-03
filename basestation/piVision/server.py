@@ -346,6 +346,9 @@ if v == 2:
 
         if len(contours) != 0:
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> parent of dd7e93b (detection method changed)
             area = cv2.contourArea(con)
             distance = 966.09*area**(-0.457)
             #M = cv2.moments(con)
