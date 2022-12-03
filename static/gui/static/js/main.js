@@ -2,7 +2,9 @@
 import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { CookiesProvider } from 'react-cookie';
-import { BrowserRouter as Router } from 'react-router-dom';
+
+/*eslint-disable-next-line*/
+import { BrowserRouter as Router, Switch, Route, Link, useLocation } from 'react-router-dom';
 
 // Minibot components import
 import Navbar from './components/Navbar.js';

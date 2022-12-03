@@ -1,7 +1,8 @@
 /* ES6 */
 
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Switch, Route } from 'react-router-dom';
+/*eslint-disable-next-line*/
+import { BrowserRouter as Router, Switch, Route, Link, useLocation } from 'react-router-dom';
 import { withCookies } from 'react-cookie';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
