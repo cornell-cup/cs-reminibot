@@ -345,23 +345,17 @@ if v == 2:
             leftRight -= 1
 
         if len(contours) != 0:
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> parent of dd7e93b (detection method changed)
             area = cv2.contourArea(con)
             distance = 966.09*area**(-0.457)
             #M = cv2.moments(con)
             #Cx = int(M['m10']/M['m00'])
             #Cy = int(M['m01'] / M['m00'])
-=======
             cnt = contours[0]
             area = cv2.contourArea(cnt)
             #distance = 966.09*area**(-0.457)
             M = cv2.moments(con)
             Cx = int(M['m10']/M['m00'])
             Cy = int(M['m01'] / M['m00'])
->>>>>>> parent of 7a6f113 (Revert "Update server.py")
             # S = 'Location of object:' + '(' + str(Cx) + ',' + str(Cy) + ')'
             # cv2.putText(frame, S, (5, 50), font, 2, (0, 0, 255), 2, cv2.LINE_AA)
             S = 'Area of contour: ' + str(area)
