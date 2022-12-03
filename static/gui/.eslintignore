@@ -2,6 +2,8 @@
 
 static/js/vendor/**/*.js
 
+static/js/components/Vision/**/*.js
+
 node_modules/
 
 package.json

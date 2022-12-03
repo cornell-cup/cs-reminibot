@@ -15,15 +15,19 @@ Additional npm linting and prettier scripts can be added under package.json "scr
 This error occurs when you have not introduced the types of the props that are being used in the body of a component. 
 Follow these steps to fix:
 1. Add PropTypes import ```import PropTypes from 'prop-types';```
-2. Replace the names in the brackets in this code block with the appropriate names.
+2. Replace the names in the brackets in this code block with the appropriate names. Refer to this doc for all the possible types: https://reactjs.org/docs/typechecking-with-proptypes.html#proptypes
 ```
 <ComponentName>.propTypes = {
   <nameOfProp>: PropTypes.<type>.isRequired,
   ...
 }
 ```
+3. Place this code after the component.
 
-### 2. Property not defined in the returned HTML.
+### 2. Unused variable in a function
+1. If the function needs to take in a parameter but does not use it such as event handlers that take in event but do not need to process this event. Put an underscore in front of the parameter.
+
+### 3. Property not defined in the returned HTML.
 I am not too sure how to fix this since I think some properties such as "time" in <li> element is custom imported. (See Chatbot2.js) Hence eslint complains about the property not being defined because native <li> element does not have such property.
 
 For now, a temporary fix is too disable eslint on the line with this error. Please make sure that your code is absolutely correct before you do this. If so, add this code line **before** the problematic line.

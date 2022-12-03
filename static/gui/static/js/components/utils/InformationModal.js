@@ -1,10 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-BoxModal.propTypes = {
-	text: PropTypes.string.isRequired
-};
-
 export default class BoxModal extends React.Component {
 	constructor(props) {
 		super(props);
@@ -29,3 +25,7 @@ export default class BoxModal extends React.Component {
 		);
 	}
 }
+
+BoxModal.propTypes = {
+	text: PropTypes.number.isRequired
+};

@@ -5,8 +5,10 @@ import * as Icons from '@fortawesome/free-solid-svg-icons';
 import LoginModal from './Login/LoginModal.js';
 import RegisterModal from './Login/RegisterModal.js';
 import { clear_chatbot_context_stack, commit_context_stack_to_db } from './utils/axios/chatbotAxios.js';
-import { BrowserRouter as Link, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
+
+/*eslint-disable-next-line*/
+import { BrowserRouter as Router, Switch, Route, Link, useLocation } from 'react-router-dom';
 
 const allRoutes = ['/start', '/coding', '/user-analytics', '/history', '/context-history', 'vision'];
 const authorizationRestrictedRoutes = ['/user-analytics', '/history', '/context-history'];
@@ -21,10 +23,6 @@ const ANALYTICS = 2;
 const HIST = 3;
 const VISION = 4;
 const CONTEXTHIST = 5;
-
-Navbar.propTypes = {
-	cookies: PropTypes.cookies
-};
 
 const Navbar = (props) => {
 	const [loginEmail, setLoginEmail] = useState(props.cookies.get('current_user_email') || '');
@@ -43,7 +41,7 @@ const Navbar = (props) => {
 		setActiveIndex(allRoutes.indexOf(location.pathname));
 	}, []);
 
-	function handleLogout(_e) {
+	function handleLogout(_) {
 		console.log('logout');
 		console.log('email', loginEmail);
 		commit_context_stack_to_db(loginEmail);
@@ -90,7 +88,7 @@ const Navbar = (props) => {
 					id='setup-control-link'
 					to='/start'
 					className={`nav-link ${activeIndex === SETUP ? 'active' : ''}`}
-					onClick={(_e) => {
+					onClick={(_) => {
 						setActiveIndex(SETUP);
 					}}
 				>
@@ -100,7 +98,7 @@ const Navbar = (props) => {
 					id='coding-link'
 					to='/coding'
 					className={`nav-link ${activeIndex === CODING ? 'active' : ''}`}
-					onClick={(_e) => {
+					onClick={(_) => {
 						setActiveIndex(CODING);
 					}}
 				>
@@ -110,7 +108,7 @@ const Navbar = (props) => {
 					id='vision-link'
 					to='/vision-page'
 					className={`nav-link ${activeIndex === VISION ? 'active' : ''}`}
-					onClick={(_e) => {
+					onClick={(_) => {
 						setActiveIndex(VISION);
 					}}
 				>
@@ -121,7 +119,7 @@ const Navbar = (props) => {
 						id='analytics-link'
 						to='/user-analytics'
 						className={`nav-link ${activeIndex === ANALYTICS ? 'active' : ''}`}
-						onClick={(_e) => {
+						onClick={(_) => {
 							setActiveIndex(ANALYTICS);
 						}}
 					>
@@ -133,7 +131,7 @@ const Navbar = (props) => {
 						id='history-link'
 						to='/history'
 						className={`nav-link ${activeIndex === HIST ? 'active' : ''}`}
-						onClick={(_e) => {
+						onClick={(_) => {
 							setActiveIndex(HIST);
 						}}
 					>
@@ -145,7 +143,7 @@ const Navbar = (props) => {
 						id='context-history-link'
 						to='/context-history'
 						className={`nav-link ${activeIndex === CONTEXTHIST ? 'active' : ''}`}
-						onClick={(_e) => {
+						onClick={(_) => {
 							setActiveIndex(CONTEXTHIST);
 						}}
 					>
@@ -207,6 +205,10 @@ const Navbar = (props) => {
 			</div>
 		</div>
 	);
+};
+
+Navbar.propTypes = {
+	cookies: PropTypes.object
 };
 
 export default withCookies(Navbar);

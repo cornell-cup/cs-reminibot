@@ -3,10 +3,6 @@ import axios from 'axios';
 import { withCookies } from 'react-cookie';
 import PropTypes from 'prop-types';
 
-RegisterModal.propTypes = {
-	cookies: PropTypes.cookies
-};
-
 class RegisterModal extends React.Component {
 	constructor(props) {
 		super(props);
@@ -152,5 +148,9 @@ class RegisterModal extends React.Component {
 		);
 	}
 }
+
+RegisterModal.propTypes = {
+	cookies: PropTypes.object
+};
 
 export default withCookies(RegisterModal);

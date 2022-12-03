@@ -3,10 +3,6 @@ import axios from 'axios';
 import { withCookies } from 'react-cookie';
 import PropTypes from 'prop-types';
 
-LoginModal.propTypes = {
-	cookies: PropTypes.cookies
-};
-
 class LoginModal extends React.Component {
 	constructor(props) {
 		super(props);
@@ -99,5 +95,9 @@ class LoginModal extends React.Component {
 		);
 	}
 }
+
+LoginModal.propTypes = {
+	cookies: PropTypes.object
+};
 
 export default withCookies(LoginModal);

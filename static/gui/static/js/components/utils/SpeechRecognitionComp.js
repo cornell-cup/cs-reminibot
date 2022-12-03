@@ -22,11 +22,6 @@ recognition.continous = true;
 recognition.interimResults = true;
 recognition.lang = 'en-US';
 
-SpeechRecognitionComp.propTypes = {
-	setText: PropTypes.string.isRequired,
-	mic: PropTypes.bool.isRequired
-};
-
 function SpeechRecognitionComp({ setText, mic }) {
 	async function handleListen() {
 		if (!mic) {
@@ -63,5 +58,10 @@ function SpeechRecognitionComp({ setText, mic }) {
 
 	return <div></div>;
 }
+
+SpeechRecognitionComp.propTypes = {
+	setText: PropTypes.func.isRequired,
+	mic: PropTypes.bool.isRequired
+};
 
 export default SpeechRecognitionComp;

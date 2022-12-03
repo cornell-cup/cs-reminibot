@@ -3,10 +3,6 @@ import { INFOBOXTYPE, INFOBOXID, AprilTagIdBoxModalText } from './Constants';
 import { PortBoxModalText, SetupBoxModalText, VisionBoxModalText } from './Constants';
 import PropTypes from 'prop-types';
 
-InformationBoxModal.propTypes = {
-	type: PropTypes.string.isRequired
-};
-
 function InformationBoxModal({ type }) {
 	const [boxText, setBoxText] = useState('');
 	const [boxID, setBoxID] = useState('');
@@ -44,4 +40,9 @@ function InformationBoxModal({ type }) {
 		</div>
 	);
 }
+
+InformationBoxModal.propTypes = {
+	type: PropTypes.number.isRequired
+};
+
 export default InformationBoxModal;
