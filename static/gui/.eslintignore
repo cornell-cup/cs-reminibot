@@ -1,0 +1,9 @@
+.eslintrc.js
+
+static/js/vendor/**/*.js
+
+node_modules/
+
+package.json
+
+.prettierrc
