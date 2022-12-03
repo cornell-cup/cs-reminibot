@@ -188,6 +188,19 @@ def test_add_local_context_guest(client):
         content_type='application/json'
     )
     data = json.loads(response.data.decode())
+    assert response.status_code == 200    
+
+def test_add_command(client):
+    """ Test that adding commands works.
+    """
+    response = client.post(
+        '/commands',
+        data = json.dumps(dict(
+            command = "bot.move_forward(100)",
+        )),
+        content_type='application/json'
+    )
+    data = json.loads(response.data.decode())
     assert response.status_code == 200
 
 
