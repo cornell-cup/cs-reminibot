@@ -357,7 +357,7 @@ if v == 2:
             # cv2.putText(frame, S, (5, 50), font, 2, (0, 0, 255), 2, cv2.LINE_AA)
             S = 'Area of contour: ' + str(area)
             ##cv2.putText(frame, S, (5, 50), font, 2, (0, 0, 255), 2, cv2.LINE_AA)
-            #S = 'Distance Of Object: ' + str(distance)
+            S = 'Distance Of Object: ' + str(distance)
             cv2.putText(frame, S, (5, 50), cv2.FONT_HERSHEY_SIMPLEX,
                         .5, (0, 0, 255), 2, cv2.LINE_AA)
 

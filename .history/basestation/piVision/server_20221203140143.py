@@ -274,11 +274,6 @@ if v == 2:
         # by using putText function
         fps = str(fps)
 
-        iteration += 1
-        if iteration > 10:
-            iteration = 0
-            leftRight = 0
-
         # resize the frame to have a maximum width of 400 pixels, then
         # grab the frame dimensions and construct a blob
         frame = imutils.resize(frame, width=700, inter=cv2.INTER_NEAREST)
@@ -304,53 +299,12 @@ if v == 2:
         contours, hierarchy = cv2.findContours(opening, cv2.RETR_TREE,
                                                cv2.CHAIN_APPROX_NONE)
 
-        output = cv2.bitwise_and(frame, frame, mask=mask)
-        gray = cv2.cvtColor(output, cv2.COLOR_BGR2GRAY)
-        ret, binary = cv2.threshold(gray, 100, 255, cv2.THRESH_OTSU)
-
-        for c in contours:
-            area = cv2.contourArea(c)
-
-            if area < 20:
-                cv2.fillPoly(binary, pts=[c], color=0)
-
-        binary = cv2.morphologyEx(
-            binary, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (51, 51)))
-        contours, hierarchy = cv2.findContours(
-            binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-
-        rows = len(binary)
-        cols = len(binary[0])
-        middle = cols/2
-        diff = rows * cols
-        if (len(contours) == 0):
-            continue
-
-        con = contours[0]
-        cen = 0
-
-        for c in contours:
-            center, radius = cv2.minEnclosingCircle(c)
-            cen = center[0]
-            area = cv2.contourArea(c)
-            circle = math.pi * radius * radius
-            if (abs(circle-area)/((area + circle)/2) < diff):
-                diff = circle - area
-                con = c
-
-        with_Circularcontours = cv2.drawContours(
-            frame, [con], 0, (0, 255, 0), 3)
-
-        if (cen > middle):
-            leftRight += 1
-        else:
-            leftRight -= 1
-
+       
         if len(contours) != 0:
             cnt = contours[0]
             area = cv2.contourArea(cnt)
-           # distance = 966.09*area**(-0.457)
-            M = cv2.moments(con)
+          #  distance = 966.09*area**(-0.457)
+            M = cv2.moments(cnt)
             Cx = int(M['m10']/M['m00'])
             Cy = int(M['m01'] / M['m00'])
             # S = 'Location of object:' + '(' + str(Cx) + ',' + str(Cy) + ')'
@@ -360,17 +314,7 @@ if v == 2:
             #S = 'Distance Of Object: ' + str(distance)
             cv2.putText(frame, S, (5, 50), cv2.FONT_HERSHEY_SIMPLEX,
                         .5, (0, 0, 255), 2, cv2.LINE_AA)
-
-        # This print statement isn't displaying anywhere
-        if (iteration == 10):
-            print("left" if leftRight < 0 else "right")
-
-        cv2.putText(frame, rpiName, (10, 25),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-
-        # puting the FPS count on the frame
-        cv2.putText(frame, fps, (650, 30), cv2.FONT_HERSHEY_SIMPLEX,
-                    1, (100, 255, 0), 3, cv2.LINE_AA)
+            cv2.drawContours(fra)
 
         cv2.imshow("On-Bot Video Stream", frame)
 

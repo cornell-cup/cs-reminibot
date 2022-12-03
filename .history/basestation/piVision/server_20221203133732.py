@@ -304,15 +304,14 @@ if v == 2:
         contours, hierarchy = cv2.findContours(opening, cv2.RETR_TREE,
                                                cv2.CHAIN_APPROX_NONE)
 
-        output = cv2.bitwise_and(frame, frame, mask=mask)
-        gray = cv2.cvtColor(output, cv2.COLOR_BGR2GRAY)
-        ret, binary = cv2.threshold(gray, 100, 255, cv2.THRESH_OTSU)
-
         for c in contours:
             area = cv2.contourArea(c)
 
             if area < 20:
                 cv2.fillPoly(binary, pts=[c], color=0)
+        
+                gray = cv2.cvtColor(output, cv2.COLOR_BGR2GRAY)
+        ret, binary = cv2.threshold(gray, 100, 255, cv2.THRESH_OTSU)
 
         binary = cv2.morphologyEx(
             binary, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (51, 51)))
@@ -349,15 +348,15 @@ if v == 2:
         if len(contours) != 0:
             cnt = contours[0]
             area = cv2.contourArea(cnt)
-           # distance = 966.09*area**(-0.457)
-            M = cv2.moments(con)
-            Cx = int(M['m10']/M['m00'])
-            Cy = int(M['m01'] / M['m00'])
+            distance = 966.09*area**(-0.457)
+            #M = cv2.moments(con)
+            #Cx = int(M['m10']/M['m00'])
+            #Cy = int(M['m01'] / M['m00'])
             # S = 'Location of object:' + '(' + str(Cx) + ',' + str(Cy) + ')'
             # cv2.putText(frame, S, (5, 50), font, 2, (0, 0, 255), 2, cv2.LINE_AA)
-            S = 'Area of contour: ' + str(area)
+            ##S = 'Area of contour: ' + str(area)
             ##cv2.putText(frame, S, (5, 50), font, 2, (0, 0, 255), 2, cv2.LINE_AA)
-            #S = 'Distance Of Object: ' + str(distance)
+            S = 'Distance Of Object: ' + str(distance)
             cv2.putText(frame, S, (5, 50), cv2.FONT_HERSHEY_SIMPLEX,
                         .5, (0, 0, 255), 2, cv2.LINE_AA)
 
