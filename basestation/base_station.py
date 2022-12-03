@@ -150,6 +150,8 @@ class BaseStation:
             "stop": "Minibot stops",
         }
 
+        self.previous_commands = []
+
         # Keep track of any built-in scripts that are running / should run next
         self.builtin_script_state = {
             "procs": dict(),
@@ -584,12 +586,18 @@ class BaseStation:
     def send_bot_script(self, bot_name: str, script: str):
         """Sends a python program to the specific bot"""
         bot = self.get_bot(bot_name)
+        self.previous_commands.append(script)
+        # print(self.previous_commands)
         # reset the previous script_exec_result
         bot.script_exec_result = None
         parsed_program_string = self.parse_program(script)
         # Now actually send to the bot
         bot.sendKV("SCRIPTS", parsed_program_string)
 
+    # funcion to send the prev command
+    def send_prev_commands(self):
+        return self.previous_commands
+        
     def get_virtual_program_execution_data(self, query_params: Dict[str, Any]) -> Dict[str, List[Dict]]:
         script = query_params['script_code']
         virtual_room_id = query_params['virtual_room_id']
@@ -670,6 +678,7 @@ class BaseStation:
         if not user.verify_password(password):
             return 0, None
         self.login_email = email
+        self.previous_commands = []
         return 1, user.custom_function
 
     def register(self, email: str, password: str) -> int:

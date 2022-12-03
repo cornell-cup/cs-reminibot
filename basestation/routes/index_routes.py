@@ -89,6 +89,13 @@ def script():
     base_station.send_bot_script(bot_name, script_code)
     return json.dumps(True), status.HTTP_200_OK
 
+# add new route
+@index_bp.route('/commands', methods=['POST'])
+def prev_command():
+    data = request.get_json()
+    data_to_send = base_station.send_prev_commands()
+    return json.dumps(data_to_send), status.HTTP_200_OK
+
 @index_bp.route('/compile-virtual-program', methods=['POST'])
 def compile_virtual_program():
     """ Compile a Python script so that it can be use to run virtual minibots """
