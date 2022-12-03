@@ -88,11 +88,17 @@ function ContextHistory(props) {
 		}
 	}, [props.parentContext]);
 
-	const handleCheckbox = (e, index) => {
-		let tmpContextHistory = contextHistory;
-		tmpContextHistory[index].checked = !tmpContextHistory[index].checked;
+	const handleCheckbox = (_e, index) => {
+		console.log('handle checkbox');
+		let tmpContextHistory = contextHistory.map((contextBox) => {
+			if (contextBox.id === index) {
+				return Object.assign({}, contextBox, { checked: !contextBox.checked });
+			} else {
+				return contextBox;
+			}
+		});
 
-		console.log(tmpContextHistory);
+		console.log(contextHistory[index].checked);
 		setContextHistory(tmpContextHistory);
 	};
 
@@ -104,8 +110,7 @@ function ContextHistory(props) {
 					<div key={item.id}>
 						<label htmlFor={item.id}></label>
 						<ContextBox key={item.id} id={item.id} context={item.context} />
-						{/* <input id={item.id} type='checkbox' checked={contextHistory[item.id]} onChange={(e) => handleCheckbox(e, item.id)} /> */}
-						<input id={item.id} type='checkbox' checked={contextHistory[item.id].checked} onChange={(e) => handleCheckbox(e, item.id)} />
+						<input id={item.id} type='checkbox' checked={!contextHistory[item.id].checked} onChange={(e) => handleCheckbox(e, item.id)} />
 					</div>
 				))}
 			</ul>
