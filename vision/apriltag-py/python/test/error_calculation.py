@@ -117,6 +117,79 @@ def parse_tag_data(data, tag_file):
         angle_data.append(data[i]['orientation']) if tag_file else angle_data.append(data[i]['angle'])
     return np.array(x_data), np.array(y_data), np.array(angle_data)
     
+    
+def error_calc_print(average_locations):
+    '''
+    Prints the calculated errors on terminal
+    '''
+
+    # opens and reads the calibration board positions
+    with open('../calib/calibration_board_positions.json', 'r') as data_file:
+        json_data = data_file.read()
+    position_data = json.loads(json_data)
+
+    # Reads the image and undistorts/gray scales the image for detection by the Detector class
+
+    x_errors = []
+    y_errors = []
+    angle_errors = []
+
+    counter = 0
+
+    # calcultes the error of average_locations dictionary
+    for tags in position_data:
+        if tags["id"] == average_locations[counter]["id"]:
+            x_errors.append(abs(average_locations[counter]["x"] - tags["x"]))
+            y_errors.append(abs(average_locations[counter]["y"] - tags["y"]))
+            angle_errors.append(abs(average_locations[counter]["orientation"] - tags["angle"]))
+            counter = counter + 1
+
+    mean_x_errors = mean(x_errors)
+    mean_y_errors = mean(y_errors)
+    mean_angle_errors = mean(angle_errors)
+
+    median_x_errors = median(x_errors)
+    median_y_errors = median(y_errors)
+    median_angle_errors = median(angle_errors)
+
+    max_x_error = max(x_errors)
+    max_y_error = max(y_errors)
+    max_angle_error = max(angle_errors)
+
+    print("Mean X Error: " + str(mean_x_errors))
+    print("Mean Y Error: " + str(mean_y_errors))
+    print("Mean Angle Error: " + str(mean_angle_errors))
+    print("Median X Error: " + str(median_x_errors))
+    print("Median Y Error: " + str(median_y_errors))
+    print("Median Angle Error: " + str(median_angle_errors))
+    print("Max X Error: " + str(max_x_error))
+    print("Max Y Error: " + str(max_y_error))
+    print("Max Angle Error: " + str(max_angle_error))
+
+    # data_error = [
+    #     {
+    #         "data": "X Position",
+    #         "mean_error": mean_x_errors,
+    #         "median_error": median_x_errors,
+    #         "max_error": max_x_error
+    #     },
+    #     {
+    #         "data": "Y Position",
+    #         "mean_error": mean_y_errors,
+    #         "median_error": median_y_errors,
+    #         "max_error": max_y_error
+    #     },
+    #     {
+    #         "data": "Angle",
+    #         "mean_error": mean_angle_errors,
+    #         "median_error": median_angle_errors,
+    #         "max_error": max_angle_error
+    #     }
+    # ]
+
+    # # write all the data to a json file
+    # with open("error_calc.json", "w") as outfile:
+    #     json.dump(data_error, outfile)
 
 if __name__ == "__main__":
     error_calc_part3("../../images/clipboard/clipboard02.png", "../calib/calibration.json", "../calib/calibration_board_positions.json")

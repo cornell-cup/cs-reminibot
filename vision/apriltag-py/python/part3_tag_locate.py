@@ -12,6 +12,7 @@ from platform import node as platform_node
 from random import randint
 from os import environ
 from constants import *
+from test import error_calculation
 
 BASE_STATION_DEVICE_ID = hash(platform_node()+str(randint(0,1000000))+str(randint(0,1000000))+str(DEVICE_ID)+str(time.time()))
 
@@ -133,7 +134,7 @@ def main():
             # y = y_scale_factor * (detected_y + overall_center_y_offset) + y_offset
 
             z = detected_z
-            x_off, y_off, _ = get_x_y_angle_offsets(detected_x, detected_y, center_cell_offsets)
+            x_off, y_off, angle_off = get_x_y_angle_offsets(detected_x, detected_y, center_cell_offsets)
 
             x_offset, y_offset, angle_offset = edge_fudge_factor_adjustments(detected_x, detected_y, x_off, y_off, overall_angle_offset)
             # x = x_scale_factor * (detected_x + overall_center_x_offset) + predict_x_offset
@@ -141,18 +142,20 @@ def main():
             x = x_scale_factor * (detected_x + overall_center_x_offset) + min(x_offset, predict_x_offset)
             y = y_scale_factor * (detected_y + overall_center_y_offset) + min(y_offset, predict_y_offset)
             
-            if (abs(x) > 50 or abs(y) > 20):
+            if (abs(x) > (0.8 * calculate_dimension())/2 or abs(y) > (0.8 * calculate_dimension())/2):
                 continue
 
             # angle fudge factor interpolation still needs work,
             # it may be possible but angle errors are not as predictable
             # as distance errors
 
-            ########Uncomment below
+            ########Uncomment below if performance worsen after testing 
             # angle = ((detected_angle + overall_angle_offset)%360)%360
             (ctr_x, ctr_y) = d.center
 
+            #test this first
             angle = ((detected_angle + angle_offset)%360)%360
+            #test this next
             # angle = ((detected_angle + predict_angle_offset)%360)%360
 
             
@@ -227,9 +230,10 @@ def main():
         # display the undistorted camera view
         cv2.imshow("Tag Locations", undst)
         if cv2.waitKey(1) & 0xFF == ord(" "):
+            error_calculation.error_calc_print(average_locations=average_locations)
             break
-        elif (cv2.waitKey(1) & 0xFF == ord("p")):
-            cv2.imwrite("./test/camera_capture/part3_capture.png", undst)
+        # elif (cv2.waitKey(1) & 0xFF == ord("p")):
+        #     # cv2.imwrite("./test/camera_capture/part3_capture.png", undst)
         else:
             continue
 
@@ -524,10 +528,10 @@ def edge_fudge_factor_adjustments(x, y, x_offset, y_offset, angle_offset):
     #cutoff is the percent of dimension we want to preserve
     cutoff = 0.8
     if (np.abs(x) > (cutoff * dimension[0])/2):
-        x_offset = x_offset/4
+        x_offset = x_offset/3
 
     if (np.abs(y) > (cutoff * dimension[1])/2):
-        y_offset = y_offset/4
+        y_offset = y_offset/3
 
     if (np.abs(x) > (cutoff * dimension[0])/2 and np.abs(y) > (cutoff * dimension[1])/2):
         angle_offset = angle_offset/4
