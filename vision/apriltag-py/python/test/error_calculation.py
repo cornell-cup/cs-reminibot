@@ -8,7 +8,7 @@ from util.util import undistort_image, read_json
 from util.detector import Detector
 from part3_tag_locate import parse_calibration_data, calc_tag_data, get_x_y_angle_offsets
 
-def error_calc(imgfile, calib_file, calib_positions):
+def error_calc_part3(imgfile, calib_file, calib_positions):
     '''
     To streamline error calculations
     '''
@@ -81,7 +81,27 @@ def error_calc(imgfile, calib_file, calib_positions):
         json.dump(data_error, outfile)
     
 
+def error_calc_part1():
+    '''
+    Function that calculates error regarding checkerboard capture in part 1
+    '''
+    # dimensions of a checkerboard (3cm x 3cm)
 
+    # testing what the corners array outputs
+    corners = None
+    found_checkerboard = False
+    # Get checkerboard interactively
+    image = cv2.imread("../calib/calib_checkerboard.jpg")
+
+    # In real time, conver the image to gray-scale
+    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    found_checkerboard, corners = cv2.findChessboardCorners(
+        gray_image, (9, 6), None
+    )
+        
+    print(str(corners))
+
+    return image, gray_image, corners
 
 
 def parse_tag_data(data, tag_file):
@@ -99,7 +119,7 @@ def parse_tag_data(data, tag_file):
     
 
 if __name__ == "__main__":
-    error_calc("../../images/clipboard/clipboard02.png", "../calib/calibration.json", "../calib/calibration_board_positions.json")
-
+    error_calc_part3("../../images/clipboard/clipboard02.png", "../calib/calibration.json", "../calib/calibration_board_positions.json")
+    # error_calc_part1()
 
 

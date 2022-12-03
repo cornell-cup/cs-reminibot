@@ -511,8 +511,8 @@ image of type numpy.uint8.'''
 def _get_demo_searchpath():
 
     return [
-        os.path.join(os.path.dirname(__file__), '../build/lib'),
-        os.path.join(os.getcwd(), '../build/lib')
+        os.path.join(os.path.dirname(__file__), '../../build/lib'),
+        os.path.join(os.getcwd(), '../../build/lib')
     ]
 
 ######################################################################

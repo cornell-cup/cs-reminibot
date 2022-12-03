@@ -1,6 +1,7 @@
 from statistics import mode
 import cv2
 import argparse
+from cv2 import waitKey
 import numpy as np
 import sys
 import time
@@ -126,15 +127,22 @@ def main():
             # TODO debug offset method - is better, but not perfect.
             #center_cell_offset = get_closest_reference_point_offset(detected_x,detected_y,center_cell_offsets)
 
-            ########## Uncomment the 3 lines below if the
+            ########## Uncomment the 3 lines below if the performance drops
             # x_offset, y_offset, _ = get_x_y_angle_offsets(detected_x, detected_y, center_cell_offsets)
             # x = x_scale_factor * (detected_x + overall_center_x_offset) + x_offset
             # y = y_scale_factor * (detected_y + overall_center_y_offset) + y_offset
 
             z = detected_z
+            x_off, y_off, _ = get_x_y_angle_offsets(detected_x, detected_y, center_cell_offsets)
 
-            x = x_scale_factor * (detected_x + overall_center_x_offset) + predict_x_offset
-            y = y_scale_factor * (detected_y + overall_center_y_offset) + predict_y_offset
+            x_offset, y_offset, angle_offset = edge_fudge_factor_adjustments(detected_x, detected_y, x_off, y_off, overall_angle_offset)
+            # x = x_scale_factor * (detected_x + overall_center_x_offset) + predict_x_offset
+            # y = y_scale_factor * (detected_y + overall_center_y_offset) + predict_y_offset
+            x = x_scale_factor * (detected_x + overall_center_x_offset) + min(x_offset, predict_x_offset)
+            y = y_scale_factor * (detected_y + overall_center_y_offset) + min(y_offset, predict_y_offset)
+            
+            if (abs(x) > 50 or abs(y) > 20):
+                continue
 
             # angle fudge factor interpolation still needs work,
             # it may be possible but angle errors are not as predictable
@@ -144,7 +152,8 @@ def main():
             # angle = ((detected_angle + overall_angle_offset)%360)%360
             (ctr_x, ctr_y) = d.center
 
-            angle = ((detected_angle + predict_angle_offset)%360)%360
+            angle = ((detected_angle + angle_offset)%360)%360
+            # angle = ((detected_angle + predict_angle_offset)%360)%360
 
             
             # displaying tag id
@@ -170,6 +179,7 @@ def main():
             for id in list(discovered_ids):
                 locations_with_id = [location for snapshot_locations in location_history for location in snapshot_locations if location["id"] == id]
                 if len(locations_with_id) > 0:
+                    
                     average_locations.append({
                         "id": id, 
                         "image_x": util.average_value_for_key(locations_with_id, "image_x",True,1), 
@@ -180,6 +190,7 @@ def main():
                     })
                 else:
                     discovered_ids.remove(id)
+            
             
             # prints DEVICE_ID tag id x y z angle
             print("id,actual_x,actual_y,actual_angle")
@@ -217,6 +228,8 @@ def main():
         cv2.imshow("Tag Locations", undst)
         if cv2.waitKey(1) & 0xFF == ord(" "):
             break
+        elif (cv2.waitKey(1) & 0xFF == ord("p")):
+            cv2.imwrite("./test/camera_capture/part3_capture.png", undst)
         else:
             continue
 
@@ -329,6 +342,24 @@ def get_args():
         required=False,
         default=TAG_SIZE,
         help="size of tags to detect",
+    )
+
+    parser.add_argument(
+        "-r",
+        "--rows",
+        metavar="<rows>",
+        type=int,
+        required=True,
+        help="# of chessboard corners in vertical direction",
+    )
+
+    parser.add_argument(
+        "-c",
+        "--cols",
+        metavar="<cols>",
+        type=int,
+        required=True,
+        help="# of chessboard corners in horizontal direction",
     )
 
     options = parser.parse_args()
@@ -473,6 +504,35 @@ def distance_from_2_ref_data_points(independent_variable_input, dependent_variab
         pass
         
     return result
+
+def calculate_dimension():
+    """ 
+    Return the dimension of the checkerboard as (row length, column length)
+    """
+    args = get_args()
+    TAG_SIZE = args["size"]
+    cols, rows = args["cols"], args["rows"]
+
+    dimension = [TAG_SIZE * rows, TAG_SIZE * cols]
+    return dimension
+
+def edge_fudge_factor_adjustments(x, y, x_offset, y_offset, angle_offset):
+    """
+    Return the adjusted offset for the tags close to the edges or at the edge of the checkboard
+    """
+    dimension = calculate_dimension()
+    #cutoff is the percent of dimension we want to preserve
+    cutoff = 0.8
+    if (np.abs(x) > (cutoff * dimension[0])/2):
+        x_offset = x_offset/4
+
+    if (np.abs(y) > (cutoff * dimension[1])/2):
+        y_offset = y_offset/4
+
+    if (np.abs(x) > (cutoff * dimension[0])/2 and np.abs(y) > (cutoff * dimension[1])/2):
+        angle_offset = angle_offset/4
+
+    return x_offset, y_offset, angle_offset
 
 
 if __name__ == "__main__":

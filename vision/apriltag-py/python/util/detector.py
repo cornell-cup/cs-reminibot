@@ -14,10 +14,10 @@ from util.detection import Detection
 
 class Detector:
     def __init__(self):
-        self.detector = None
-        if 'apriltag' in sys.modules:
-            self.detector = apriltag.Detector(
-                searchpath=apriltag._get_demo_searchpath())
+        # self.detector = None
+        # if 'apriltag' in sys.modules:
+        self.detector = apriltag.Detector(
+            searchpath=apriltag._get_demo_searchpath())
 
     def detect(self, image, return_image=False):
         data = []

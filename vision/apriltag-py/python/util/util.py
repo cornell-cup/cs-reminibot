@@ -483,6 +483,7 @@ def reject_outliers(data):
     u = np.mean(data)
     s = np.std(data)
     filtered = [e for e in data if (u - 2 * s < e < u + 2 * s)]
+    # May want to lower st.dev for testing performance
     return filtered
     
 def to_dict(self):
