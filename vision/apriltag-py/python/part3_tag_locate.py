@@ -13,6 +13,7 @@ from random import randint
 from os import environ
 from constants import *
 from test import error_calculation
+# import test.error_calculation as error_calculation
 
 BASE_STATION_DEVICE_ID = hash(platform_node()+str(randint(0,1000000))+str(randint(0,1000000))+str(DEVICE_ID)+str(time.time()))
 
@@ -139,10 +140,12 @@ def main():
             x_offset, y_offset, angle_offset = edge_fudge_factor_adjustments(detected_x, detected_y, x_off, y_off, overall_angle_offset)
             # x = x_scale_factor * (detected_x + overall_center_x_offset) + predict_x_offset
             # y = y_scale_factor * (detected_y + overall_center_y_offset) + predict_y_offset
-            x = x_scale_factor * (detected_x + overall_center_x_offset) + min(x_offset, predict_x_offset)
-            y = y_scale_factor * (detected_y + overall_center_y_offset) + min(y_offset, predict_y_offset)
+            x = x_scale_factor * (detected_x + overall_center_x_offset) + x_offset
+            y = y_scale_factor * (detected_y + overall_center_y_offset) + y_offset
             
-            if (abs(x) > (0.8 * calculate_dimension())/2 or abs(y) > (0.8 * calculate_dimension())/2):
+            # (0.8 * calculate_dimension())/2
+
+            if (abs(x) > 50 or abs(y) > 20):
                 continue
 
             # angle fudge factor interpolation still needs work,
@@ -348,23 +351,23 @@ def get_args():
         help="size of tags to detect",
     )
 
-    parser.add_argument(
-        "-r",
-        "--rows",
-        metavar="<rows>",
-        type=int,
-        required=True,
-        help="# of chessboard corners in vertical direction",
-    )
+    # parser.add_argument(
+    #     "-r",
+    #     "--rows",
+    #     metavar="<rows>",
+    #     type=int,
+    #     required=True,
+    #     help="# of chessboard corners in vertical direction",
+    # )
 
-    parser.add_argument(
-        "-c",
-        "--cols",
-        metavar="<cols>",
-        type=int,
-        required=True,
-        help="# of chessboard corners in horizontal direction",
-    )
+    # parser.add_argument(
+    #     "-c",
+    #     "--cols",
+    #     metavar="<cols>",
+    #     type=int,
+    #     required=True,
+    #     help="# of chessboard corners in horizontal direction",
+    # )
 
     options = parser.parse_args()
     args = vars(options)  # get dict of args parsed
@@ -513,11 +516,13 @@ def calculate_dimension():
     """ 
     Return the dimension of the checkerboard as (row length, column length)
     """
-    args = get_args()
-    TAG_SIZE = args["size"]
-    cols, rows = args["cols"], args["rows"]
+    # args = get_args()
+    # TAG_SIZE = args["size"]
+    # cols, rows = args["cols"], args["rows"]
 
-    dimension = [TAG_SIZE * rows, TAG_SIZE * cols]
+    # dimension = [TAG_SIZE * rows, TAG_SIZE * cols]
+    dimension = [TAG_SIZE * 8, TAG_SIZE * 16]
+
     return dimension
 
 def edge_fudge_factor_adjustments(x, y, x_offset, y_offset, angle_offset):
