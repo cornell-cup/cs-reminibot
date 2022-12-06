@@ -1,6 +1,5 @@
 import sys 
 sys.path.append('../../vision/apriltag-py/python')
-sys.path.append('../..')
 import cv2
 import json 
 import os 
@@ -49,16 +48,12 @@ def classify(command, commands):
         return ["fake_bot", "forward"]
     elif command in commands["commands"]["go backwards"]:
         return ["fake_bot", "backward"]
-    elif command in commands["commands"]["stop"]:
-        return ["fake_bot", "stop"]
     elif command in commands["commands"]["repeat"]:
         return ["fake_bot", "repeat"]
     elif command in commands["commands"]["end"]:
         return ["fake_bot", "end"]
     else:
         return ["fake_bot", "stop"] #do nothing if invalid command received 
-
-bots = base_station.get_active_bots()
 
 file = os.path.join("tag_insns.json")
 f = open(file)
@@ -79,12 +74,6 @@ pythonCode = {
     "end": "end"
 }
 
-start = commands["tagRangeStart"]
-end = commands["tagRangeEnd"]
-
-for i in range(start, end+1):
-    seen[i] = False
-
 def worker():
     while True:
         task = q.get()
@@ -100,10 +89,6 @@ def worker():
 
 threading.Thread(target=worker, daemon=True).start()
 
-# Create an object to read camera video 
-camVid = cv2.VideoCapture(0)
-iterations = 0
-
 while(True): 
     tag = base_station.get_rfid(bot_name)
     tag = pb_map[tag]
@@ -114,9 +99,6 @@ while(True):
     if 0xFF == ord('q'):
         break
 
-# release video capture
-# and video write objects
-camVid.release()
 # Closes all the frames
 cv2.destroyAllWindows() 
 
