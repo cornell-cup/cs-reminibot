@@ -14,7 +14,7 @@ MAGENTA = (255, 0, 255) # RGB color mode for magenta
 CYAN = (0, 255, 255)    # RGB color mode for cyan
 
 # Constants (from part3 of calibration)
-DEVICE_ID = 0  # The device the camera is, usually 0.
+DEVICE_ID = 1  # The device the camera is, usually 0.
 FRAME_WIDTH = 1280
 FRAME_HEIGHT = 720
 

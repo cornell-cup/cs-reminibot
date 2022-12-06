@@ -123,8 +123,12 @@ def error_calc_print(average_locations):
     Prints the calculated errors on terminal
     '''
 
+    if len(average_locations) == 0:
+        print("No apriltags detected")
+        return
+
     # opens and reads the calibration board positions
-    with open('../calib/calibration_board_positions.json', 'r') as data_file:
+    with open('calib/calibration_board_positions.json', 'r') as data_file:
         json_data = data_file.read()
     position_data = json.loads(json_data)
 
@@ -136,13 +140,33 @@ def error_calc_print(average_locations):
 
     counter = 0
 
+    print(x_errors)
+    print(y_errors)
+    print(angle_errors)
+    # print(average_locations)
+    print(position_data)
+
     # calcultes the error of average_locations dictionary
-    for tags in position_data:
-        if tags["id"] == average_locations[counter]["id"]:
-            x_errors.append(abs(average_locations[counter]["x"] - tags["x"]))
-            y_errors.append(abs(average_locations[counter]["y"] - tags["y"]))
-            angle_errors.append(abs(average_locations[counter]["orientation"] - tags["angle"]))
-            counter = counter + 1
+    for det_tags in average_locations:
+        for tags in position_data:
+            if tags["id"] == int(det_tags["id"]):
+                x_errors.append(abs(det_tags["x"] - tags["x"]))
+                y_errors.append(abs(det_tags["y"] - tags["y"]))
+
+                calc_angle_error = abs(det_tags["orientation"] - tags["angle"])
+                if ((calc_angle_error) > 180):
+                    calc_angle_error = 360 - calc_angle_error
+
+                angle_errors.append(calc_angle_error)
+                counter = counter + 1
+                break
+
+    # for tags in position_data:
+    #     if tags["id"] == int(average_locations[counter]["id"]):
+    #         x_errors.append(abs(average_locations[counter]["x"] - tags["x"]))
+    #         y_errors.append(abs(average_locations[counter]["y"] - tags["y"]))
+    #         angle_errors.append(abs(average_locations[counter]["orientation"] - tags["angle"]))
+    #         counter = counter + 1
 
     mean_x_errors = mean(x_errors)
     mean_y_errors = mean(y_errors)

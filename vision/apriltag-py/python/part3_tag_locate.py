@@ -13,7 +13,7 @@ from random import randint
 from os import environ
 from constants import *
 from test import error_calculation
-# import test.error_calculation as error_calculation
+import test.error_calculation as error_calculation
 
 BASE_STATION_DEVICE_ID = hash(platform_node()+str(randint(0,1000000))+str(randint(0,1000000))+str(DEVICE_ID)+str(time.time()))
 
@@ -138,8 +138,8 @@ def main():
             x_off, y_off, angle_off = get_x_y_angle_offsets(detected_x, detected_y, center_cell_offsets)
 
             x_offset, y_offset, angle_offset = edge_fudge_factor_adjustments(detected_x, detected_y, x_off, y_off, overall_angle_offset)
-            # x = x_scale_factor * (detected_x + overall_center_x_offset) + predict_x_offset
-            # y = y_scale_factor * (detected_y + overall_center_y_offset) + predict_y_offset
+            # x = x_scale_factor * (detected_x + overall_center_x_offset) + predict_x_offset(np.array(detected_x, detected_y).reshape(1, -1))
+            # y = y_scale_factor * (detected_y + overall_center_y_offset) + predict_y_offset(np.array(detected_x, detected_y).reshape(1, -1))
             x = x_scale_factor * (detected_x + overall_center_x_offset) + x_offset
             y = y_scale_factor * (detected_y + overall_center_y_offset) + y_offset
             
@@ -233,7 +233,7 @@ def main():
         # display the undistorted camera view
         cv2.imshow("Tag Locations", undst)
         if cv2.waitKey(1) & 0xFF == ord(" "):
-            error_calculation.error_calc_print(average_locations=average_locations)
+            error_calculation.error_calc_print(average_locations=snapshot_locations)
             break
         # elif (cv2.waitKey(1) & 0xFF == ord("p")):
         #     # cv2.imwrite("./test/camera_capture/part3_capture.png", undst)
