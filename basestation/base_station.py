@@ -3,6 +3,7 @@ Base Station for the MiniBot.
 """
 
 import math
+import random
 import subprocess
 import sys
 from basestation.bot import Bot
@@ -53,6 +54,13 @@ MAX_VISION_LOG_LENGTH = 1000
 VISION_UPDATE_FREQUENCY = 30
 VISION_DATA_HOLD_THRESHOLD = 5
 
+TAGS = [
+	"0xF9 0x3E 0x4 0xF4",
+	"0xC9 0x12 0xD 0xF4",
+	"0x59 0xE3 0xB 0xF4",
+	"0x59 0xC8 0x6 0xF4",
+	"0x69 0xDB 0x6 0xF4"
+]
 
 def make_thread_safe(func):
     """ Decorator which wraps the specified function with a lock.  This makes
@@ -116,6 +124,7 @@ class BaseStation:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        # self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
 
         # an arbitrarily small time
         self.sock.settimeout(0.01)
@@ -585,17 +594,11 @@ class BaseStation:
     @make_thread_safe
     def get_rfid(self, bot_name: str):
         # bot = self.get_bot(bot_name)
-        # print(bot)
         # bot.sendKV("fRFID", 4)
         # bot.readKV()
-        # print(bot.rfid_tags)
         # return bot.rfid_tags
-        # TODO: temporary setup using dummy data, should be removed
-        # try:
-        #     tag = self.pb_map['0xF9 0x3E 0x4 0xF4']
-        # except:
-        #     raise Exception(str(self.pb_map.keys()))
-        return '0xF9 0x3E 0x4 0xF4'
+        # TODO: temporary setup by returning random tags
+        return TAGS[random.randint(0, 4)]
 
     def set_bot_mode(self, bot_name: str, mode: str, pb_map: json):
         """ Set the bot to either line follow or object detection mode """

@@ -48,7 +48,7 @@ export default class PhysicalBlockly extends React.Component {
 
 	componentDidMount() {
 		// setInterval(this.pollForUpdates, 1000);
-		this.bWorkspace = Blockly.inject('pbBlocklyDiv');
+		this.bWorkspace = window.Blockly.inject('pbBlocklyDiv', {scroll:true});
 		this.setState({ code: "" });
 		this.setState({customCommands: customCommand, tempCommandData: customCommand});
 		const _this = this;

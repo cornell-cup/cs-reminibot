@@ -1,7 +1,6 @@
 import sys 
 sys.path.append('../../vision/apriltag-py/python')
 sys.path.append('../..')
-# sys.path.append('../vision/apriltag-py/python')
 import cv2
 import json 
 import os 
@@ -9,7 +8,6 @@ import threading, queue
 from time import sleep 
 import requests
 
-# from basestation.routes import base_station
 from basestation.routes.basestation_init import base_station
 
 bot_name = sys.argv[1]
@@ -107,22 +105,6 @@ camVid = cv2.VideoCapture(0)
 iterations = 0
 
 while(True): 
-    # _, frame = camVid.read()
-    # gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    # detections, det_image = detector.detect(frame, return_image=True)
-
-    # if(detections != None and len(detections) > 0):
-    #     list.sort(detections, key=lambda d: d.center[1]) #list.sort is stable so sort by y first 
-    #     list.sort(detections, key=lambda d: d.center[0]) #then sort by x to get left to right, 
-    #                                                      #bottom up ordering
-    #     for d in detections:
-    #         if not seen[d.tag_id]:
-    #             args = classify(d.tag_id, commands)
-    #             seen[d.tag_id] = True
-    #             q.put(args)
-    
-    # cv2.imshow("Tag Locations", frame)
-
     tag = base_station.get_rfid(bot_name)
     tag = pb_map[tag]
     args = classify(tag, commands)
