@@ -175,7 +175,7 @@ def fwd(power):
     """ Move minibot forwards, (currently power field is not in use) """
     acquire_lock()
     transmit_once('F')
-    transmit_once(power)
+    transmit_once([power])
     release_lock()
 
 
