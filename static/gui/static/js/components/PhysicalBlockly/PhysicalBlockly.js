@@ -20,13 +20,6 @@ const tagMapping = [
 	"0x59 0xC8 0x6 0xF4",
 	"0x69 0xDB 0x6 0xF4"
 ]
-const commandDisplay = [
-	"bot.move_forward(100)",
-	"bot.move_backward()",
-	"bot.turn_counter_clockwise(100)",
-	"bot.turn_clockwise(100)",
-	"bot.stop()"
-]
 
 const customCommand = new Map();
 for(var i = 0; i < commands.length; i ++) {
@@ -48,10 +41,10 @@ export default class PhysicalBlockly extends React.Component {
 
 	componentDidMount() {
 		// setInterval(this.pollForUpdates, 1000);
-		this.bWorkspace = window.Blockly.inject('pbBlocklyDiv', {scroll:true});
 		this.setState({ code: "" });
 		this.setState({customCommands: customCommand, tempCommandData: customCommand});
 		const _this = this;
+		_this.bWorkspace = window.Blockly.inject('pbBlocklyDiv', {scroll:true});
 		_this.codeRef["current"].getCodeMirror().setValue("");
 		// _this.setState({ stage: 1, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "" });
 		_this.bWorkspace.clear();
@@ -66,7 +59,6 @@ export default class PhysicalBlockly extends React.Component {
 
 	physicalBlocklyClick(mode) {
 		console.log("start detecting RFID");
-		console.log(this.state.customCommands);
 
 		// setInterval(tempClick, 1000);
 		const _this = this;
@@ -250,9 +242,6 @@ export default class PhysicalBlockly extends React.Component {
 	}
 
 	updateSelection(e, pb, command, choice) {
-		console.log("selection");
-		console.log(command);
-		console.log(choice);
 		var newCustomCommand = pb.state.tempCommandData;
 		newCustomCommand.set(command, choice);
 		pb.setState({tempCommandData: newCustomCommand, unsavedCustomization: true});
@@ -263,7 +252,6 @@ export default class PhysicalBlockly extends React.Component {
 		for(var val of this.state.tempCommandData.values()) {
 			commandSet.add(val);
 		}
-		console.log(this.state.tempCommandData);
         if (commandSet.size != commands.length) {
             alert("Invalid customization! Please make sure that the commands are matched to an unique color!");
             return;
