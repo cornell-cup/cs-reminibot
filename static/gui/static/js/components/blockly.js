@@ -65,7 +65,7 @@ class PythonEditor extends React.Component {
         else
             // update the code state to indicate user updates have been made 
             // to the Python code, 
-            codeState = (this.props.pythonCodeState === -1) ? 
+            codeState = (this.props.pythonCodeState === -1) ?
                 0 : this.props.pythonCodeState;
         this.props.setPythonCode(code, codeState);
         if (this.state.codingStart == -1) {
@@ -114,8 +114,8 @@ class PythonEditor extends React.Component {
         if (filename.substring(filename.length - 3) != ".py") {
             filename += ".py";
         }
-        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + 
-                encodeURIComponent(this.props.pythonCode));
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' +
+            encodeURIComponent(this.props.pythonCode));
         element.setAttribute('download', filename);
         element.style.display = 'none';
         document.body.appendChild(element);
@@ -252,7 +252,7 @@ class PythonEditor extends React.Component {
                         <LabeledTextBox
                             type={"text"}
                             name={"function_name"}
-                            placeholder={"default_function"}
+                            placeholder={"default_function_name"}
                             onChange={(event) => this.handleFunctionNameChange(event)}
                         />
                         <Button
@@ -557,8 +557,8 @@ export default class MinibotBlockly extends React.Component {
 
         // Only update the pythonCodeState if there are no user changes, or
         // if the user has said Blockly can overwrite the user changes
-        let code = (pythonCodeState < 0) ? 
-            window.Blockly.Python.workspaceToCode(this.workspace) : 
+        let code = (pythonCodeState < 0) ?
+            window.Blockly.Python.workspaceToCode(this.workspace) :
             this.props.pythonCode;
 
         this.props.setPythonCode(code, pythonCodeState);
@@ -750,7 +750,7 @@ export default class MinibotBlockly extends React.Component {
                         {!this.state.isLoggedIn ? <Button id="register" name="Register" onClick={this.register} /> : null}
                         {!this.state.isLoggedIn ? <Button id="login" name="Login" onClick={this.login} /> : null}
                         {this.state.isLoggedIn ? <label className="white-label"> Logged in as: {this.state.loginEmail} &nbsp; </label> : null}
-                        {this.state.isLoggedIn ? <Button id="logout" name="Logout" onClick={this.logout}/> : null}
+                        {this.state.isLoggedIn ? <Button id="logout" name="Logout" onClick={this.logout} /> : null}
                         <UserAccountModal
                             modalType="register"
                             handleEvent={this.handleRegister}
@@ -783,7 +783,7 @@ export default class MinibotBlockly extends React.Component {
                             </div>
                             <div className="row">
                                 <div className="col horizontalDiv">
-                                    <form style={{ color: "white", paddingLeft: "20px"}}>
+                                    <form style={{ color: "white", paddingLeft: "20px" }}>
                                         <input
                                             type="file"
                                             id="blockUpload"
