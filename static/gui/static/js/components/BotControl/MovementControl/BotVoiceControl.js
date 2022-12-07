@@ -11,7 +11,7 @@ import {
 import SpeechRecognitionComp from "../../utils/SpeechRecognitionComp.js";
 
 var lastLen = 0;
-// todo documentation
+// the starting index where we slice the queue from
 var queueStartIdx = 0;
 
 const micStyle = {
@@ -47,14 +47,16 @@ function BotVoiceControl({
 
   useEffect(() => {
     let queue = text.split(" ");
-    // only read the lastest word in the queue (last item is always ''):
     console.log(queue.slice(queueStartIdx))
+
     if (queue.length > lastLen) {
+      // slice the queue so we only pass in newly heard commands
       let response = match_command(queue.slice(queueStartIdx))
-      let heard_command = response[0]
-      if (heard_command) {
+      let heardCommand = response[0]
+      if (heardCommand) {
+        // update the queueStartIdx
         queueStartIdx += response[1];
-        setInputText(heard_command + ": " + commands[heard_command]);
+        setInputText(heardCommand + ": " + commands[heardCommand]);
 
         // send command to backend
         axios({
@@ -65,7 +67,7 @@ function BotVoiceControl({
           },
           data: JSON.stringify({
             bot_name: selectedBotName,
-            command: heard_command
+            command: heardCommand
           })
         }).then(function (response) {
           // insert response here

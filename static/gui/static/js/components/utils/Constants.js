@@ -4,18 +4,18 @@ export const VisionBoxModalText = "Overhead Vision System - work in progress";
 export const ControlBoxModalText = "Click on any of the movement buttons to make the bot move in a specified direction or stop using the central button. Click on the Start Speech Recognition button to speak commands to the bot. Support available for movement commands by saying move followed by the direction."
 export const AprilTagIdBoxModalText = "If you are adding a virtual object, leave this field empty. If you are registering a physical object, then enter the ID number of its AprilTag in this field and feel free to leave the X position, Y position, and Orientation fields empty if you would like."
 export const INFOBOXTYPE = {
-  PORT: 1,
-  SETUP: 2,
-  VISION: 3,
-  CONTROL: 4,
-  APRIL_TAG_ID: 5
+    PORT: 1,
+    SETUP: 2,
+    VISION: 3,
+    CONTROL: 4,
+    APRIL_TAG_ID: 5
 };
 export const INFOBOXID = {
-  PORT: "PortBox",
-  SETUP: "SetupBox",
-  VISION: "VisionBox",
-  CONTROL: "ControlBox",
-  APRIL_TAG_ID: "APRIL_TAG_ID",
+    PORT: "PortBox",
+    SETUP: "SetupBox",
+    VISION: "VisionBox",
+    CONTROL: "ControlBox",
+    APRIL_TAG_ID: "APRIL_TAG_ID",
 }
 export const CARROT_COLLAPSED = "./static/img/carrot_orange_collapsed.png";
 export const CARROT_EXPAND = "./static/img/carrot_orange_expand.png";
@@ -27,34 +27,35 @@ export const ACT_MIC_CHATBOT = "cb_mic";
 export const ACT_MIC_COMMAND = "bvc_mic";
 
 export const commands = {
-  "forward": "Minibot moves forward",
-  "backward": "Minibot moves backwards",
-  "left": "Minibot moves left",
-  "right": "Minibot moves right",
-  "stop": "Minibot stops",
-  "previous" : "Run the last program"
+    "forward": "Minibot moves forward",
+    "backward": "Minibot moves backwards",
+    "left": "Minibot moves left",
+    "right": "Minibot moves right",
+    "stop": "Minibot stops",
+    "previous": "Run the last program"
 };
 
 // TODO write documentation
 export function match_command(lst) {
-  let command;
-  let command_length = 0;
+    let command;
+    let command_idx = 0;
 
-  var previousIdx = lst.indexOf("previous")
-  var lastIdx = lst.indexOf("last")
+    // recognize a command as run previous program if the user says "previous" or "last" at some point before "program"
+    // i.e. recognizes "last program", "run previous program", "run my last program", etc
+    var previousIdx = lst.indexOf("previous")
+    var lastIdx = lst.indexOf("last")
 
-  if (commands.hasOwnProperty(lst[lst.length - 2])) {
-    command = lst[lst.length - 2];
-    command_length = lst.lastIndexOf(command);
-  }
-  else if (previousIdx >= 0 || lastIdx >= 0) {
-    // if the mic heard the word "previous" or "last" before the word "program"
-
-    if (previousIdx >= 0 && lst.slice(previousIdx).indexOf("program") ||
-    lastIdx >= 0 && lst.slice(lastIdx).indexOf("program")) {
-      command = "previous"
-      command_length = lst.lastIndexOf("program")
+    if (commands.hasOwnProperty(lst[lst.length - 2])) {
+        command = lst[lst.length - 2];
+        command_idx = lst.lastIndexOf(command);
+    } else if (previousIdx >= 0 || lastIdx >= 0) {
+        // if the mic heard the word "previous" or "last" before the word "program"
+        if (previousIdx >= 0 && lst.slice(previousIdx).indexOf("program") ||
+            lastIdx >= 0 && lst.slice(lastIdx).indexOf("program")) {
+            command = "previous"
+            command_idx = lst.lastIndexOf("program")
+        }
     }
-  }
-  return [command, command_length + 1]
+    // return command_idx + 1 so we know where to cut off the queue
+    return [command, command_idx + 1]
 }
