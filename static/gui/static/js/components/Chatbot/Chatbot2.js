@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as Icons from '@fortawesome/free-solid-svg-icons';
 import {
   commands,
+  match_command,
   X_BTN, MIC_BTN, MIC_BTNON,
   ACT_MIC_CHATBOT
 } from "../utils/Constants.js";
@@ -11,6 +12,7 @@ import SpeechRecognitionComp from "../utils/SpeechRecognitionComp.js";
 
 //Voice Control 
 var lastLen = 0;
+var queueStartIdx = 0;
 //Chat messages
 const initialList = [
   {
@@ -263,11 +265,15 @@ function Chatbot2({
     if (!contextMode) {
       let queue = tempCommands.split(" ");
       // Run this code if a new word has been spoken.
+      console.log(queue.slice(queueStartIdx))
       if (queue.length > lastLen) {
         // only read the lastest word in the queue (last item is always '')
-        if (commands.hasOwnProperty(queue[queue.length - 2])) {
-          setInputText(queue[queue.length - 2] + ": " +
-            commands[queue[queue.length - 2]]);
+        let response = match_command(queue.slice(queueStartIdx))
+        let heard_command = response[0]
+        if (heard_command) {
+          queueStartIdx += response[1];
+          setInputText(heard_command + ": " + commands[heard_command]);
+
           // send command to backend
           axios({
             method: 'POST',
@@ -277,14 +283,15 @@ function Chatbot2({
             },
             data: JSON.stringify({
               bot_name: selectedBotName,
-              command: queue[queue.length - 2]
+              command: heard_command
             })
           }).then(function (response) {
           }).catch(function (error) {
-            if (error.response.data.error_msg.length > 0)
-              window.alert(error.response.data.error_msg);
-            else
-              console.log("Speech recognition", error);
+            let error_msg = error.response.data
+            if (error_msg.length > 0) {
+              setInputText(error_msg)
+              window.alert(error_msg)
+            }
           })
         }
       }
