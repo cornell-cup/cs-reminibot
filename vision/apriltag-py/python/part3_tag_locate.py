@@ -90,6 +90,7 @@ def main():
     past_time = time.time()
     location_history = []
     discovered_ids = set()
+    list_max = [0,0,100000,1000000]
     while True:
         if not camera.isOpened():
             print("Failed to open camera")
@@ -115,6 +116,7 @@ def main():
         
         data_for_BS = {"DEVICE_ID": str(BASE_STATION_DEVICE_ID), "TIMESTAMP": time.time(), "DEVICE_CENTER_X": FRAME_WIDTH/2, "DEVICE_CENTER_Y": FRAME_HEIGHT/2, "position_data" : []}
         snapshot_locations = []
+        
         for i, d in enumerate(detections):
             # TODO draw tag - might be better to generalize, because
             # locate_cameras does this too.
@@ -123,6 +125,22 @@ def main():
             (detected_x, detected_y, detected_z, detected_angle) = util.compute_tag_undistorted_pose(
                 camera_matrix, dist_coeffs, transform_matrix, d, TAG_SIZE
             )
+
+            x_point = d.center[0]
+            y_point = d.center[1]
+
+            if (x_point > list_max[0]):
+                list_max[0] = x_point
+                print(str(list_max))
+            if (y_point > list_max[1]):
+                list_max[1] = y_point
+                print(str(list_max))
+            if (x_point < list_max[2]):
+                list_max[2] = x_point
+                print(str(list_max))
+            if (y_point < list_max[3]):
+                list_max[3] = y_point
+                print(str(list_max))
 
             # Scale the coordinates, and print for debugging
             # prints Device ID :: tag id :: x y z angle
@@ -134,17 +152,16 @@ def main():
             # x = x_scale_factor * (detected_x + overall_center_x_offset) + x_offset
             # y = y_scale_factor * (detected_y + overall_center_y_offset) + y_offset
 
-            z = detected_z
-            x_off, y_off, angle_off = get_x_y_angle_offsets(detected_x, detected_y, center_cell_offsets)
+            # z = detected_z
 
-            x_offset, y_offset, angle_offset = edge_fudge_factor_adjustments(detected_x, detected_y, x_off, y_off, overall_angle_offset)
+            x_off, y_off, angle_off1 = get_x_y_angle_offsets(detected_x, detected_y, center_cell_offsets)
+
+            x_offset, y_offset, angle_offset2 = edge_fudge_factor_adjustments(detected_x, detected_y, x_off, y_off, overall_angle_offset)
             # x = x_scale_factor * (detected_x + overall_center_x_offset) + predict_x_offset(np.array(detected_x, detected_y).reshape(1, -1))
             # y = y_scale_factor * (detected_y + overall_center_y_offset) + predict_y_offset(np.array(detected_x, detected_y).reshape(1, -1))
             x = x_scale_factor * (detected_x + overall_center_x_offset) + x_offset
             y = y_scale_factor * (detected_y + overall_center_y_offset) + y_offset
             
-            # (0.8 * calculate_dimension())/2
-
             if (abs(x) > 50 or abs(y) > 20):
                 continue
 
@@ -157,8 +174,8 @@ def main():
             (ctr_x, ctr_y) = d.center
 
             #test this first
-            angle = ((detected_angle + angle_offset)%360)%360
-            #test this next
+            angle = ((detected_angle + max(angle_offset2, angle_off1))%360)%360
+            #test this next once predictor is implemented
             # angle = ((detected_angle + predict_angle_offset)%360)%360
 
             
@@ -201,7 +218,7 @@ def main():
             # prints DEVICE_ID tag id x y z angle
             print("id,actual_x,actual_y,actual_angle")
             average_locations.sort(key=lambda entry : int(entry["id"]))     
-            [print("{},{},{},{}".format(location["id"], location["x"], location["y"], location["orientation"])) for location in average_locations]
+            # [print("{},{},{},{}".format(location["id"], location["x"], location["y"], location["orientation"])) for location in average_locations]
             while len(location_history) >= MAX_LOCATION_HISTORY_LENGTH:
                 location_history.pop(0)
 
@@ -231,7 +248,8 @@ def main():
                         )
                     )
         # display the undistorted camera view
-        cv2.imshow("Tag Locations", undst)
+        bound_img = cv2.rectangle(undst, (int(80 + 40), int(64 + 20)), (int(977 - 30), int(455 - 30)), (0, 255, 0), 2)
+        cv2.imshow("Tag Locations", bound_img)
         if cv2.waitKey(1) & 0xFF == ord(" "):
             error_calculation.error_calc_print(average_locations=snapshot_locations)
             break
@@ -465,13 +483,19 @@ def get_x_y_angle_offsets(x, y, center_cell_offsets):
     y_offsets_distance = distance_from_2_ref_data_points(x,y,"reference_point_x","reference_point_y", bottom_offset, top_offset)
 
     angle_offset = 0
-    if x_offsets_distance != None and y_offsets_distance != None:
+    # if x_offsets_distance != None and y_offsets_distance != None:
+    #     angle_offset = util.weighted_average([angle_offset_x,angle_offset_y],[y_offsets_distance,x_offsets_distance])
+    # elif x_offsets_distance != None:
+    #     angle_offset = angle_offset_x
+    # elif y_offsets_distance != None:
+    #     angle_offset = angle_offset_y
+    if (x > 50 and y > 20 and x_offsets_distance != None and y_offsets_distance != None):
         angle_offset = util.weighted_average([angle_offset_x,angle_offset_y],[y_offsets_distance,x_offsets_distance])
-    elif x_offsets_distance != None:
+    elif (x > 50 and y > 20 and x_offsets_distance != None): 
         angle_offset = angle_offset_x
-    elif y_offsets_distance != None:
+    elif (x > 50 and y > 20 and y_offsets_distance != None): 
         angle_offset = angle_offset_y
-    
+        
 
     return (x_offset, y_offset, angle_offset)
 
@@ -531,7 +555,7 @@ def edge_fudge_factor_adjustments(x, y, x_offset, y_offset, angle_offset):
     """
     dimension = calculate_dimension()
     #cutoff is the percent of dimension we want to preserve
-    cutoff = 0.8
+    cutoff = 0.65
     if (np.abs(x) > (cutoff * dimension[0])/2):
         x_offset = x_offset/3
 
@@ -539,7 +563,7 @@ def edge_fudge_factor_adjustments(x, y, x_offset, y_offset, angle_offset):
         y_offset = y_offset/3
 
     if (np.abs(x) > (cutoff * dimension[0])/2 and np.abs(y) > (cutoff * dimension[1])/2):
-        angle_offset = angle_offset/4
+        angle_offset = angle_offset/2
 
     return x_offset, y_offset, angle_offset
 
