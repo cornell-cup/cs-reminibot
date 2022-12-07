@@ -3,7 +3,7 @@ from bs_repr import BS_Repr
 from collections import deque
 from select import select
 from socket import socket, timeout, AF_INET, SOCK_STREAM, SOCK_DGRAM
-from socket import SOL_SOCKET, SO_REUSEADDR, SO_BROADCAST, SO_REUSEPORT
+from socket import SOL_SOCKET, SO_REUSEADDR, SO_BROADCAST
 from threading import Thread
 from typing import List, Tuple
 import sys
@@ -12,6 +12,7 @@ import argparse
 import signal
 from imutils.video import VideoStream
 from imagezmq import imagezmq
+# from basestation import config
 
 # NOTE: Please add "flush=True" to all print statements so that our test
 # harness (test_minibot.py) can pipe the stdout output, and use it
@@ -123,7 +124,7 @@ class Minibot:
         """
         self.listener_sock = socket(AF_INET, SOCK_STREAM)
         # can immediately rebind if the program is killed and then restarted
-        self.listener_sock.setsockopt(SOL_SOCKET, SO_REUSEPORT, 1)
+        self.listener_sock.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
         # "" means bind to all addresses on this device.  Port 10000 was
         # randomly chosen as the port to bind to
         self.listener_sock.bind(("", self.port_number))

@@ -57,7 +57,6 @@ def test_add_user(client):
             "password":"test123"
         }
     )
-    data = json.loads(response.data.decode())
     print(response)
     assert response.status_code == 200
 
@@ -74,7 +73,6 @@ def test_add_local_context(client):
         )),
         content_type='application/json'
     )
-    data = json.loads(response.data.decode())
     assert response.status_code == 200
 
 

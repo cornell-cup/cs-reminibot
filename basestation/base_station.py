@@ -66,7 +66,7 @@ def make_thread_safe(func):
 
 
 class BaseStation:
-    def __init__(self, app_debug=False, reuseport = config.reuseport):
+    def __init__(self, app_debug=False, reuseport = config.reuseport_basestation):
         self.active_bots = {}
         self.vision_log = []
         self.chatbot = ChatbotWrapper()
@@ -587,7 +587,6 @@ class BaseStation:
         """Sends a python program to the specific bot"""
         bot = self.get_bot(bot_name)
         self.previous_commands.append(script)
-        # print(self.previous_commands)
         # reset the previous script_exec_result
         bot.script_exec_result = None
         parsed_program_string = self.parse_program(script)
@@ -595,8 +594,11 @@ class BaseStation:
         bot.sendKV("SCRIPTS", parsed_program_string)
 
     # funcion to send the prev command
-    def send_prev_commands(self):
-        return self.previous_commands
+    def send_bot_script_previous(self, bot_name: str):
+        if (len(self.previous_commands) > 0):
+            self.send_bot_script(bot_name, self.previous_commands[-1])
+            return 0
+        return -1
         
     def get_virtual_program_execution_data(self, query_params: Dict[str, Any]) -> Dict[str, List[Dict]]:
         script = query_params['script_code']

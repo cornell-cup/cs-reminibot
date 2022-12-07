@@ -76,8 +76,7 @@ function ContextHistory(props) {
 
 
   useEffect(() => {
-    /* When user enters new context in chatbot, fetches the context - 
-    <parentContext> - from parent component and displays it on page. */
+   
     if (props.parentContext != "" && !wait) {
       let newContextHist = contextHistory.concat({ "id": id, "context": props.parentContext })
       setID(id + 1);

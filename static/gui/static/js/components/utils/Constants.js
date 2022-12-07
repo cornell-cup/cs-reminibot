@@ -32,4 +32,29 @@ export const commands = {
   "left": "Minibot moves left",
   "right": "Minibot moves right",
   "stop": "Minibot stops",
+  "previous" : "Run the last program"
 };
+
+// TODO write documentation
+export function match_command(lst) {
+  let command;
+  let command_length = 0;
+
+  var previousIdx = lst.indexOf("previous")
+  var lastIdx = lst.indexOf("last")
+
+  if (commands.hasOwnProperty(lst[lst.length - 2])) {
+    command = lst[lst.length - 2];
+    command_length = lst.lastIndexOf(command);
+  }
+  else if (previousIdx >= 0 || lastIdx >= 0) {
+    // if the mic heard the word "previous" or "last" before the word "program"
+
+    if (previousIdx >= 0 && lst.slice(previousIdx).indexOf("program") ||
+    lastIdx >= 0 && lst.slice(lastIdx).indexOf("program")) {
+      command = "previous"
+      command_length = lst.lastIndexOf("program")
+    }
+  }
+  return [command, command_length + 1]
+}
