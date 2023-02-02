@@ -84,6 +84,6 @@ twython==3.4.0
 typed-ast==0.6.3
 unicornhathd==0.0.4
 urllib3==1.19.1
-Werkzeug==0.11.15
+Werkzeug==0.15.5
 wrapt==1.9.0
 zmq==0.0.0
