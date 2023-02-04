@@ -1,3 +1,21 @@
 .injectionDiv {
     overflow: scroll;
 }
+.customBlockDisplay {
+    border: 2px solid rgb(177, 199, 255);
+    border-radius: 15px;
+    margin: 25px;
+    max-width: 70%;
+}
+.customBlockDisplay ul {
+    padding-left: 0;
+}
+.customBlockDisplay li.list-group-item {
+    color: white;
+    background-color: rgba(0, 0, 0, 0);
+    padding-bottom: 3px;
+}
+#selectionCollapseBtn, #displayCollapseBtn {
+    background-color: rgb(177, 199, 255);
+    box-shadow: "none";
+}

@@ -11,15 +11,18 @@ require('codemirror/mode/python/python');
 import { INFO_ICON } from '../utils/Constants.js';
 import SelectionBox from './SelectionBox';
 
-const commands = ['Move Foward', 'Move Backward', 'Turn Left', 'Turn Right', 'Stop'];
-const choices = ["yellow", "blue", "red", "orange", "purple"]
+const commands = ['Move Foward', 'Move Backward', 'Turn Left', 'Turn Right', 'Stop', 'Start Loop', 'End Loop'];
+const noControlCommands = ['Move Foward', 'Move Backward', 'Turn Left', 'Turn Right', 'Stop'];
+const choices = ["yellow", "blue", "red", "orange", "purple", "color 1", "color 2"];
 const tagMapping = [
 	"0xF9 0x3E 0x4 0xF4",
 	"0xC9 0x12 0xD 0xF4",
 	"0x59 0xE3 0xB 0xF4",
 	"0x59 0xC8 0x6 0xF4",
-	"0x69 0xDB 0x6 0xF4"
-]
+	"0x69 0xDB 0x6 0xF4",
+	"start looping",
+	"end looping"
+];
 
 const customCommand = new Map();
 for(var i = 0; i < commands.length; i ++) {
@@ -29,13 +32,14 @@ for(var i = 0; i < commands.length; i ++) {
 export default class PhysicalBlockly extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = { stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "", customCommands: new Map(), tempCommandData: new Map(), detectionState: false, detectionCall: null, unsavedCustomization: false, collapsedSelection: true };
+		this.state = { stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "", customCommands: new Map(), tempCommandData: new Map(), detectionState: false, detectionCall: null, unsavedCustomization: false, collapsedSelection: true, collapsedDisplay: false, mode: -1, displayCommands: [] };
 		this.codeRef = React.createRef();
 		this.pollForUpdates = this.pollForUpdates.bind(this);
 		this.saveSelection = this.saveSelection.bind(this);
 		this.getCustomCommandID = this.getCustomCommandID.bind(this);
 		this.getPBMap = this.getPBMap.bind(this);
-		this.toggleCollapse = this.toggleCollapse.bind(this);
+		this.toggleSelectionCollapse = this.toggleSelectionCollapse.bind(this);
+		this.toggleDisplayCollapse = this.toggleDisplayCollapse.bind(this);
 		this.bWorkspace = null;
 	}
 
@@ -63,7 +67,12 @@ export default class PhysicalBlockly extends React.Component {
 		// setInterval(tempClick, 1000);
 		const _this = this;
 		_this.codeRef["current"].getCodeMirror().setValue("");
-		_this.setState({ stage: 1, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "" }); //text: "", tabs: 0, loopvar: 0
+		_this.setState({ stage: 1, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "", mode: mode }); //text: "", tabs: 0, loopvar: 0
+		if (mode == 1) {
+			_this.setState({ displayCommands: noControlCommands });
+		} else {
+			_this.setState({ displayCommands: commands });
+		}
 		// _this.props.setPb("");
 		_this.bWorkspace.clear();
 		var pb_map = _this.getPBMap();
@@ -262,7 +271,7 @@ export default class PhysicalBlockly extends React.Component {
 	getCustomCommandID(id) {
 		var color = choices[id];
 		let mapEntries = this.state.customCommands.entries();
-		for(var i = 0; i < 5; i ++) {
+		for(var i = 0; i < this.state.customCommands.size; i ++) {
 			var binding = mapEntries.next().value;
 			if(binding[1] == color) {
 				return commands.indexOf(binding[0]);
@@ -271,8 +280,12 @@ export default class PhysicalBlockly extends React.Component {
 		return 0;
 	}
 
-	toggleCollapse() {
+	toggleSelectionCollapse() {
 		this.setState({collapsedSelection: !this.state.collapsedSelection});
+	}
+
+	toggleDisplayCollapse() {
+		this.setState({collapsedDisplay: !this.state.collapsedDisplay});
 	}
 
 	render(props) {
@@ -351,9 +364,8 @@ export default class PhysicalBlockly extends React.Component {
 					{this.props.selectedBotName != '' && this.state.stage == 0 ?
 						<div>
 							<p>
-								<a class="btn" data-toggle="collapse" href="#selectionBoxCollapse" role="button" aria-expanded="false" aria-controls="selectionBoxCollapse"
-									style={{ backgroundColor: "rgb(177, 199, 255)", boxShadow: "none" }}
-									onClick={this.toggleCollapse}>
+								<a class="btn" data-toggle="collapse" href="#selectionBoxCollapse" role="button" aria-expanded="false" aria-controls="selectionBoxCollapse" 
+									id="selectionCollapseBtn" onClick={this.toggleSelectionCollapse}>
 									<FontAwesomeIcon icon={this.state.collapsedSelection ? Icons.faCaretRight : Icons.faCaretDown} />
 								</a>
 								<span className="small-title" style={customTitleStyle}> Customization of Blocks </span>
@@ -372,7 +384,36 @@ export default class PhysicalBlockly extends React.Component {
 						</div>
 						: this.props.selectedBotName != '' && this.state.stage == 1 ?
 						<div>
-							<div style={warningLabelStyle}>Please be patient as it may take a moment for the blocks to get detected.</div>
+							<p>
+								<a class="btn" data-toggle="collapse" href="#blockDisplayCollapse" role="button" aria-expanded="false" aria-controls="selectionBoxCollapse" 
+									id="displayCollapseBtn" onClick={this.toggleDisplayCollapse}>
+									<FontAwesomeIcon icon={this.state.collapsedDisplay ? Icons.faCaretRight : Icons.faCaretDown} />
+								</a>
+								<span className="small-title" style={customTitleStyle}> Customization of Blocks </span>
+							</p>
+							<div class="collapse" id="blockDisplayCollapse">
+								<div class="customBlockDisplay">
+								<ul>
+									{
+										this.state.displayCommands.map((c) => 
+										<li class="list-group-item">
+											<div className="row">
+												<div class="col-4">
+														<span>{c}</span>
+												</div>
+												<div class="col-4">
+														<span>{this.state.customCommands.get(c)}</span>
+												</div>
+											</div>
+										</li> )
+									}
+								</ul>
+								</div>
+							</div>
+							<div style={warningLabelStyle}>
+								{this.state.mode == 1 ? "Control blocks are not available for the real time mode. " : ""}
+								Please be patient as it may take a moment for the blocks to get detected.
+							</div>
 							<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.endProcess()}>End Process</button>
 						</div>
 						: <p className="white-label">Please return to Bot Control and connect to a minibot before proceeding.</p>
