@@ -9,7 +9,7 @@ chardet==2.3.0
 click==6.6
 colorama==0.3.7
 colorzero==1.1
-cryptography==1.7.1
+cryptography==39.0.1
 cv2==4.5.5 
 docutils==0.13.1
 drumhat==0.1.0
