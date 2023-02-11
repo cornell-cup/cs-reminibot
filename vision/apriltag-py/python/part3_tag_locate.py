@@ -37,10 +37,6 @@ def main():
     FRAME_HEIGHT = camera.get(cv2.CAP_PROP_FRAME_HEIGHT)  # float `height`
     '''---------------------------------------------------------------------------'''
 
-    # ADDED JUST TO SEE WHAT THE FRAME WIDTH AND HEIGHT ARE
-    # print(FRAME_WIDTH)
-    # print(FRAME_HEIGHT)
-
     # Get matrices from calibration file
     print("Parsing calibration file " + calib_file_name + "...")
     predictors = util.get_predictors_with_calibration_file(calib_file_name)
@@ -145,20 +141,17 @@ def main():
             # Scale the coordinates, and print for debugging
             # prints Device ID :: tag id :: x y z angle
             # TODO debug offset method - is better, but not perfect.
-            #center_cell_offset = get_closest_reference_point_offset(detected_x,detected_y,center_cell_offsets)
+            # center_cell_offset = get_closest_reference_point_offset(detected_x,detected_y,center_cell_offsets)
 
-            ########## Uncomment the 3 lines below if the performance drops
-            # x_offset, y_offset, _ = get_x_y_angle_offsets(detected_x, detected_y, center_cell_offsets)
-            # x = x_scale_factor * (detected_x + overall_center_x_offset) + x_offset
-            # y = y_scale_factor * (detected_y + overall_center_y_offset) + y_offset
+            # x = x_scale_factor * (detected_x + overall_center_x_offset) + predict_x_offset(np.array(detected_x, detected_y).reshape(1, -1))
+            # y = y_scale_factor * (detected_y + overall_center_y_offset) + predict_y_offset(np.array(detected_x, detected_y).reshape(1, -1))
 
             # z = detected_z
+
 
             x_off, y_off, angle_off1 = get_x_y_angle_offsets(detected_x, detected_y, center_cell_offsets)
 
             x_offset, y_offset, angle_offset2 = edge_fudge_factor_adjustments(detected_x, detected_y, x_off, y_off, overall_angle_offset)
-            # x = x_scale_factor * (detected_x + overall_center_x_offset) + predict_x_offset(np.array(detected_x, detected_y).reshape(1, -1))
-            # y = y_scale_factor * (detected_y + overall_center_y_offset) + predict_y_offset(np.array(detected_x, detected_y).reshape(1, -1))
             x = x_scale_factor * (detected_x + overall_center_x_offset) + x_offset
             y = y_scale_factor * (detected_y + overall_center_y_offset) + y_offset
             
@@ -170,11 +163,12 @@ def main():
             # as distance errors
 
             ########Uncomment below if performance worsen after testing 
-            # angle = ((detected_angle + overall_angle_offset)%360)%360
             (ctr_x, ctr_y) = d.center
 
+
+            
             #test this first
-            angle = ((detected_angle + max(angle_offset2, angle_off1))%360)%360
+            angle = ((detected_angle + max(angle_offset2, angle_off1))%360)%360 # if max(angle_offset2, angle_off1) is worse, use overall_angle_offset
             #test this next once predictor is implemented
             # angle = ((detected_angle + predict_angle_offset)%360)%360
 
@@ -419,7 +413,9 @@ def linear_interpolation_with_2_ref_points(x1, y1, x2, y2, x):
     return linear_model(x)
 
 def get_x_y_angle_offsets(x, y, center_cell_offsets):
-
+    """
+    Calculates and returns offsets for x, y, and angles
+    """
     closest_offsets = []
     remaining_offsets = center_cell_offsets[:]
     for i in range(4):
@@ -500,6 +496,9 @@ def get_x_y_angle_offsets(x, y, center_cell_offsets):
     return (x_offset, y_offset, angle_offset)
 
 def linear_interpolation_with_2_ref_data_points(independent_variable_input, independent_variable_property, dependent_property, reference_point_1, reference_point_2):
+    '''
+    Returns the result of calculating linear interpolation between two reference points
+    '''
     result = None
     x1 = util.get_property_or_default(reference_point_1,independent_variable_property)
     y1 = util.get_property_or_default(reference_point_1,dependent_property)
@@ -519,7 +518,11 @@ def linear_interpolation_with_2_ref_data_points(independent_variable_input, inde
         
     return result
 
+
 def distance_from_2_ref_data_points(independent_variable_input, dependent_variable_input, independent_variable_property, dependent_property, reference_point_1, reference_point_2):
+    '''
+    Returns the distances between 2 reference points
+    '''
     result = None
     x1 = util.get_property_or_default(reference_point_1,independent_variable_property)
     y1 = util.get_property_or_default(reference_point_1,dependent_property)
@@ -531,7 +534,6 @@ def distance_from_2_ref_data_points(independent_variable_input, dependent_variab
         result = util.distance(independent_variable_input, dependent_variable_input, x1, y1) + \
          util.distance(independent_variable_input, dependent_variable_input, x2, y2)
     else:
-        # print("a point doesn't exist")
         pass
         
     return result
@@ -540,13 +542,7 @@ def calculate_dimension():
     """ 
     Return the dimension of the checkerboard as (row length, column length)
     """
-    # args = get_args()
-    # TAG_SIZE = args["size"]
-    # cols, rows = args["cols"], args["rows"]
-
-    # dimension = [TAG_SIZE * rows, TAG_SIZE * cols]
     dimension = [TAG_SIZE * 8, TAG_SIZE * 16]
-
     return dimension
 
 def edge_fudge_factor_adjustments(x, y, x_offset, y_offset, angle_offset):
@@ -554,6 +550,7 @@ def edge_fudge_factor_adjustments(x, y, x_offset, y_offset, angle_offset):
     Return the adjusted offset for the tags close to the edges or at the edge of the checkboard
     """
     dimension = calculate_dimension()
+
     #cutoff is the percent of dimension we want to preserve
     cutoff = 0.65
     if (np.abs(x) > (cutoff * dimension[0])/2):

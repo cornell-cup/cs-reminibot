@@ -1,4 +1,5 @@
 from collections import Counter
+import os
 from cv2 import *
 import cv2
 import numpy as np
@@ -246,6 +247,11 @@ def read_json(calibration_file_name):
 def get_camera(idx):
     """ returns video capture object """
     camera = cv2.VideoCapture(idx) 
+    
+    # for windows
+    if os.name == 'nt':
+        camera = cv2.VideoCapture("/dev/video1")
+        
     if not cv2.VideoCapture.isOpened(camera):
         raise Exception("Unable to open camera: {}".format(idx))
     camera.set(cv2.CAP_PROP_FRAME_WIDTH, FRAME_WIDTH)
