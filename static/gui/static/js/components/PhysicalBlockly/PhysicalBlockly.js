@@ -44,7 +44,7 @@ export default class PhysicalBlockly extends React.Component {
 		this.setState({ code: "" });
 		this.setState({customCommands: customCommand, tempCommandData: customCommand});
 		const _this = this;
-		_this.bWorkspace = window.Blockly.inject('pbBlocklyDiv', {scroll:true});
+		_this.bWorkspace = window.Blockly.inject('pbBlocklyDiv', {scrollbars:true});
 		_this.codeRef["current"].getCodeMirror().setValue("");
 		// _this.setState({ stage: 1, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "" });
 		_this.bWorkspace.clear();
