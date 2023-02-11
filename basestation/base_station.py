@@ -59,7 +59,9 @@ TAGS = [
 	"0xC9 0x12 0xD 0xF4",
 	"0x59 0xE3 0xB 0xF4",
 	"0x59 0xC8 0x6 0xF4",
-	"0x69 0xDB 0x6 0xF4"
+	"0x69 0xDB 0x6 0xF4",
+    "start looping",
+	"end looping"
 ]
 
 def make_thread_safe(func):
@@ -598,7 +600,8 @@ class BaseStation:
         # bot.readKV()
         # return bot.rfid_tags
         # TODO: temporary setup by returning random tags
-        return TAGS[random.randint(0, 4)]
+        return TAGS[random.randint(0, len(TAGS) - 1)]
+        # return TAGS[0]
 
     def set_bot_mode(self, bot_name: str, mode: str, pb_map: json):
         """ Set the bot to either line follow or object detection mode """

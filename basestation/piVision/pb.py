@@ -79,7 +79,7 @@ def worker():
     while True:
         task = q.get()
         py_code = pythonCode[task[1]]
-        if(mode == '1'): 
+        if mode == '1': 
             if(py_code[0:3] == "bot"):
                 send_request(task)
                 print("pb:" + py_code + "\n")
