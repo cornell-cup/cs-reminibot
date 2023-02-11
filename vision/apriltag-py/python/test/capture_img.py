@@ -1,5 +1,7 @@
 import cv2
-import util
+import sys
+sys.path.append('..')
+from util import util
 import numpy as np
 from constants import VISION_FPS, FRAME_WIDTH, FRAME_HEIGHT
 

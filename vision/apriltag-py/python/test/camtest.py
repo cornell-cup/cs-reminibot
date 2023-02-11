@@ -6,6 +6,8 @@ from __future__ import print_function
 
 from argparse import ArgumentParser
 import cv2
+import sys
+sys.path.append('..')
 import util.apriltag as apriltag
 
 # for some reason pylint complains about members being undefined :(

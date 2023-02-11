@@ -71,7 +71,7 @@ def main():
     # Saving the data into json file
     calib_data = dict()
     calib_data["camera_matrix"] = mat.tolist()
-    calib_data["dist_coeffs"] = dist.tolist()
+    calib_data["dist_coeffs"] = dist.tolist() #distortion coefficients
     calib_data["new_camera_matrix"] = new_mtx.tolist()
     calib_data["roi"] = {
         "x": x,

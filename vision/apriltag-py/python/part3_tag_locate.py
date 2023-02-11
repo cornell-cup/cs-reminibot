@@ -394,14 +394,20 @@ def get_args():
     
 
 def get_closest_reference_point_offset(x, y, center_cell_offsets):
-    """ gets the reference point and its corresponding offsets that are closest to the detected point """
+    """ 
+    returns the reference point and its corresponding offsets that are closest 
+    to the detected point 
+    """
     try:
         return min(center_cell_offsets, key=lambda item: util.distance(x, y, item["reference_point_x"],item["reference_point_y"]))
     except:
         return None
 
 def get_two_point_line_equation(x1, y1, x2, y2):
-    """ computes the slope-intersect form of line between two points (x1,y1) and (x2,y2) """
+    """ 
+    computes the slope-intersect form of line between two points (x1,y1) and 
+    (x2,y2) 
+    """
     try:
         m = (y2-y1)/(x2-x1)
         b = m*(-x2)+y2
@@ -419,7 +425,8 @@ def linear_interpolation_with_2_ref_points(x1, y1, x2, y2, x):
     return linear_model(x)
 
 def get_x_y_angle_offsets(x, y, center_cell_offsets):
-
+    """computes offset to origin to translate real-world coordinates in relation
+      to the center"""
     closest_offsets = []
     remaining_offsets = center_cell_offsets[:]
     for i in range(4):
@@ -538,7 +545,7 @@ def distance_from_2_ref_data_points(independent_variable_input, dependent_variab
 
 def calculate_dimension():
     """ 
-    Return the dimension of the checkerboard as (row length, column length)
+    Return the dimensions of the checkerboard as (row length, column length)
     """
     # args = get_args()
     # TAG_SIZE = args["size"]

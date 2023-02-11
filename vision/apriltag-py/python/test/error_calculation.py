@@ -7,6 +7,7 @@ sys.path.append("..")
 from util.util import undistort_image, read_json
 from util.detector import Detector
 from part3_tag_locate import parse_calibration_data, calc_tag_data, get_x_y_angle_offsets
+# note: could be circular import here
 
 def error_calc_part3(imgfile, calib_file, calib_positions):
     '''
