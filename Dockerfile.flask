@@ -1,0 +1,17 @@
+FROM python:3.7 as python
+
+# set a directory for the app
+WORKDIR /py
+
+# copy all the files to the container
+COPY ./basestation ./basestation
+COPY ./vision/apriltag-py ./vision/apriltag-py
+COPY ./run_BS.sh ./run_BS.sh
+COPY ./.flaskenv ./.flaskenv
+COPY ./app.py ./app.py
+COPY ./minibot_server.py ./minibot_server.py
+
+# install dependencies
+RUN pip install --no-cache-dir -r ./basestation/basestation_requirements_shared.txt
+RUN pip install --no-cache-dir -r ./vision/requirements.in
+RUN pip install python-dotenv

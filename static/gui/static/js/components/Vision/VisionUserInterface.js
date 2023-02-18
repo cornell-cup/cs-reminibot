@@ -4,7 +4,7 @@ import CircleForm from "./Forms/CircleForm.js";
 import RectangleForm from "./Forms/RectangleForm.js";
 import PolygonForm from "./Forms/PolygonForm.js";
 import * as Icons from "@fortawesome/free-solid-svg-icons";
-import RegularPolygonForm from "./Forms/RegularPolygonForm.js";
+import RegularPolygonForm from "./Forms/regularPolygonForm.js";
 import MinibotForm from "./Forms/MinibotForm.js";
 import { withCookies } from "react-cookie";
 import VirtualRoomIdForm from "./Forms/VirtualRoomIdForm.js";

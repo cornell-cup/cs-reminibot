@@ -1,0 +1,1 @@
+docker run -d --rm --name basestation_container --publish 8080:8080 ccr/basestation

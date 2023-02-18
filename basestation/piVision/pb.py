@@ -1,5 +1,6 @@
 import sys 
 sys.path.append('../../vision/apriltag-py/python')
+sys.path.append('../..')
 import cv2
 import json 
 import os 

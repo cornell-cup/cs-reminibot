@@ -15,7 +15,7 @@ import {
 // Minibot components import
 import Navbar from './components/Navbar.js';
 import Platform from './components/Platform.js';
-import Chatbot from './components/Chatbot/chatbot2.js';
+import Chatbot2 from './components/Chatbot/Chatbot2.js';
 
 // Utils import
 import { ACT_MIC_CHATBOT, ACT_MIC_COMMAND } from './components/utils/Constants.js';

@@ -21,7 +21,7 @@ T = 100
 A = np.zeros((2, 2))
 B = r * np.array([[1/2, 1/2], [-1/n, 1/n]])
 C = np.eye(2)
-D = 0
+D = np.zeros((2, 2))
 
 sysc = ctrl.ss(A, B, C, D)
 sysd = ctrl.sample_system(sysc, dt)

@@ -1,0 +1,15 @@
+collision==1.2.2
+control==0.9.2
+Flask==1.1.2
+Flask_API==2.0
+Flask_SQLAlchemy==2.4.1
+imutils==0.5.4
+matplotlib==3.5.1
+numpy==1.21.5
+opencv_contrib_python==4.6.0.66
+pathfinding==1.0.1
+Pint==0.18
+pytest==7.1.1
+python_bcrypt==0.3.2
+pyzmq==25.0.0
+requests==2.27.1
