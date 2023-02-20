@@ -412,17 +412,19 @@ export default class PhysicalBlockly extends React.Component {
 							<div class="collapse" id="selectionBoxCollapse">
 								<div class="container">
 									  <div class="row">
-											<div class="col-8">
+											<div class="col">
 												<span className="small-title" style={customTitleStyle}>Default Blocks</span>
+												<pre></pre>
 												{
-													commands.map((c) => <SelectionBox key={c.id} command={c} choiceList={choices} default={customCommand.get(c)} pb={this} changeSelection={this.updateSelection}/> )
+													commands.slice(0,4).map((c) => <SelectionBox key={c.id} command={c} choiceList={choices} default={customCommand.get(c)} pb={this} changeSelection={this.updateSelection}/> )
 												}
 											</div>
-											<div class="col-4">
-												{this.state.customBlocks.length != 0 
-												? <span className="small-title" style={customTitleStyle}>Custom Blocks</span>
-												: <span></span>}
-												{this.state.customBlocks.map((c, id) => <CustomBlockSelection blockName={c[0]} itemID={id} changeSelection={this.selectCustomBlock} />)}
+											<div class="col">
+												<span className="small-title" style={customTitleStyle}></span>
+												<pre></pre>
+												{
+													commands.slice(4).map((c) => <SelectionBox key={c.id} command={c} choiceList={choices} default={customCommand.get(c)} pb={this} changeSelection={this.updateSelection}/> )
+												}
 											</div>
 										</div>
 								</div>
