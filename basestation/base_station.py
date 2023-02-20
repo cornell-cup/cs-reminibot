@@ -61,7 +61,8 @@ TAGS = [
 	"0x59 0xC8 0x6 0xF4",
 	"0x69 0xDB 0x6 0xF4",
     "start looping",
-	"end looping"
+	"end looping",
+    "custom block rfid"
 ]
 
 def make_thread_safe(func):
@@ -781,6 +782,14 @@ class BaseStation:
         user.custom_function = custom_function
         db.session.commit()
         return True
+
+    def get_custom_function(self):
+        if not self.login_email:
+            return False, ""
+        
+        user = User.query.filter(User.email == self.login_email).first()
+        return True, user.custom_function
+        
 
     # ==================== NEW SPEECH RECOGNITION ============================
     def send_command(self, bot_name, command):

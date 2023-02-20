@@ -10,6 +10,7 @@ require('codemirror/mode/python/python');
 
 import { INFO_ICON } from '../utils/Constants.js';
 import SelectionBox from './SelectionBox';
+import CustomBlockSelection from './CustomBlockSelection.js';
 
 const commands = ['Move Foward', 'Move Backward', 'Turn Left', 'Turn Right', 'Stop', 'Start Loop', 'End Loop'];
 const noControlCommands = ['Move Foward', 'Move Backward', 'Turn Left', 'Turn Right', 'Stop'];
@@ -21,7 +22,7 @@ const tagMapping = [
 	"0x59 0xC8 0x6 0xF4",
 	"0x69 0xDB 0x6 0xF4",
 	"start looping",
-	"end looping"
+	"end looping",
 ];
 
 const customCommand = new Map();
@@ -32,7 +33,8 @@ for(var i = 0; i < commands.length; i ++) {
 export default class PhysicalBlockly extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = { stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "", customCommands: new Map(), tempCommandData: new Map(), detectionState: false, detectionCall: null, unsavedCustomization: false, collapsedSelection: true, collapsedDisplay: false, mode: -1, displayCommands: [] };
+		// customBlocks is stored as an array of tuples, the first element being the block's name and the second element being commands in the block
+		this.state = { stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "", customCommands: new Map(), tempCommandData: new Map(), detectionState: false, detectionCall: null, unsavedCustomization: false, collapsedSelection: true, collapsedDisplay: false, mode: -1, displayCommands: [], customBlocks: [] };
 		this.codeRef = React.createRef();
 		this.pollForUpdates = this.pollForUpdates.bind(this);
 		this.saveSelection = this.saveSelection.bind(this);
@@ -41,12 +43,16 @@ export default class PhysicalBlockly extends React.Component {
 		this.toggleSelectionCollapse = this.toggleSelectionCollapse.bind(this);
 		this.toggleDisplayCollapse = this.toggleDisplayCollapse.bind(this);
 		this.bWorkspace = null;
+		this.getCustomBlocks = this.getCustomBlocks.bind(this);
+		this.selectCustomBlock = this.selectCustomBlock.bind(this);
 	}
 
 	componentDidMount() {
 		// setInterval(this.pollForUpdates, 1000);
+		this.getCustomBlocks();
 		this.setState({ code: "" });
-		this.setState({customCommands: customCommand, tempCommandData: customCommand});
+		this.setState({ customCommands: customCommand, tempCommandData: customCommand });
+		this.setState({ selectedCustomBlock: null });
 		const _this = this;
 		_this.bWorkspace = window.Blockly.inject('pbBlocklyDiv', {scrollbars:true});
 		_this.codeRef["current"].getCodeMirror().setValue("");
@@ -124,6 +130,39 @@ export default class PhysicalBlockly extends React.Component {
 				_this.setState({ stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [] });
 			})
 		// this.setState({ stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [] });
+	}
+
+	getCustomBlocks() {
+		const _this = this;
+		axios.get('/get_custom_function')
+		.then(function (response) {
+			// TODO: remove console logs
+			console.log("custom blocks ----------- ");
+			console.log(JSON.parse(response.data));
+
+			var customBlocks = JSON.parse(response.data);
+			_this.setState({ customBlocks: customBlocks });
+			if (customBlocks.length > 0) {
+				_this.setState({ selectedCustomBlock: customBlocks[0] });
+				console.log("selected custom block");
+				console.log(customBlocks[0]);
+			}
+
+		}).catch(function (error) {
+			console.log(error);
+		});;
+	}
+
+	selectCustomBlock(index) {
+		var blockList = this.state.customBlocks;
+		if (index < 0 || index >= blockList.length) {
+			return;
+		}
+		
+		this.setState({ selectedCustomBlock: blockList[index] });
+		console.log("change selected custom block");
+		console.log(blockList[index]);
+		console.log(this.state.selectedCustomBlock);
 	}
 
 	getPBMap() {
@@ -371,12 +410,23 @@ export default class PhysicalBlockly extends React.Component {
 								<span className="small-title" style={customTitleStyle}> Customization of Blocks </span>
 							</p>
 							<div class="collapse" id="selectionBoxCollapse">
-								{
-									commands.map((c) => <SelectionBox key={c.id} command={c} choiceList={choices} default={customCommand.get(c)} pb={this} changeSelection={this.updateSelection}/> )
-								}
-								{
-									this.state.unsavedCustomization ? <div style={warningLabelStyle}>Warning: the current block customization is unsaved.</div> : <span></span>
-								}
+								<div class="container">
+									  <div class="row">
+											<div class="col-8">
+												<span className="small-title" style={customTitleStyle}>Default Blocks</span>
+												{
+													commands.map((c) => <SelectionBox key={c.id} command={c} choiceList={choices} default={customCommand.get(c)} pb={this} changeSelection={this.updateSelection}/> )
+												}
+											</div>
+											<div class="col-4">
+												{this.state.customBlocks.length != 0 
+												? <span className="small-title" style={customTitleStyle}>Custom Blocks</span>
+												: <span></span>}
+												{this.state.customBlocks.map((c, id) => <CustomBlockSelection blockName={c[0]} itemID={id} changeSelection={this.selectCustomBlock} />)}
+											</div>
+										</div>
+								</div>
+								{this.state.unsavedCustomization ? <div style={warningLabelStyle}>Warning: the current block customization is unsaved.</div> : <span></span>}
 							</div>
 							<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.saveSelection()}>Save</button>
 							<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.physicalBlocklyClick(0)}>Start Camera Mode</button>
