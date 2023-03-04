@@ -53,6 +53,8 @@ def classify(command, commands):
         return ["fake_bot", "repeat"]
     elif command in commands["commands"]["end"]:
         return ["fake_bot", "end"]
+    elif command in commands["commands"]["custom block"]:
+        return ["fake_bot", "custom block"]
     else:
         return ["fake_bot", "stop"] #do nothing if invalid command received 
 
@@ -72,7 +74,8 @@ pythonCode = {
     "right" : "bot.turn_clockwise(100)",
     "left" : "bot.turn_counter_clockwise(100)", 
     "repeat": "for i in range(n):", 
-    "end": "end"
+    "end": "end",
+    "custom block": "#custom block"
 }
 
 def worker():

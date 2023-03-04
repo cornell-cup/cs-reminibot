@@ -62,7 +62,7 @@ TAGS = [
 	"0x69 0xDB 0x6 0xF4",
     "start looping",
 	"end looping",
-    "custom block rfid"
+    "custom block"
 ]
 
 def make_thread_safe(func):

@@ -223,6 +223,18 @@ Blockly.Python['stop_moving'] = function (block) {
   return BOT_HEADER + code + FCN_ENDING;
 };
 
+Blockly.Blocks['custom_block_placeholder'] = {
+  init: function () {
+    this.jsonInit(miniblocks.custom_block_placeholder);
+  }
+};
+
+Blockly.Python['custom_block_placeholder'] = function (block) {
+  // TODO: Assemble Python into code variable.
+  var code = '#custom block';
+  return code + FCN_ENDING;
+};
+
 Blockly.Blocks['set_power'] = {
   init: function () {
     this.jsonInit(miniblocks.set_power);
