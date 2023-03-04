@@ -299,6 +299,15 @@ var miniblocks = {
     tooltip: "",
     helpUrl: ""
   },
+  custom_block_placeholder: {
+    type: "custom_block_placeholder",
+    message0: "custom block placeholder",
+    previousStatement: null,
+    nextStatement: null,
+    colour: 230,
+    tooltip: "",
+    helpUrl: ""
+  },
 
   set_power: {
     type: "set_power",

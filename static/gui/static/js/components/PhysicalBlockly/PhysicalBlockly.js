@@ -10,11 +10,10 @@ require('codemirror/mode/python/python');
 
 import { INFO_ICON } from '../utils/Constants.js';
 import SelectionBox from './SelectionBox';
-import CustomBlockSelection from './CustomBlockSelection.js';
 
-const commands = ['Move Foward', 'Move Backward', 'Turn Left', 'Turn Right', 'Stop', 'Start Loop', 'End Loop'];
+const commands = ['Move Foward', 'Move Backward', 'Turn Left', 'Turn Right', 'Stop', 'Start Loop', 'End Loop', 'Custom Block'];
 const noControlCommands = ['Move Foward', 'Move Backward', 'Turn Left', 'Turn Right', 'Stop'];
-const choices = ["yellow", "blue", "red", "orange", "purple", "color 1", "color 2"];
+const choices = ["yellow", "blue", "red", "orange", "purple", "color 1", "color 2", "color 3"];
 const tagMapping = [
 	"0xF9 0x3E 0x4 0xF4",
 	"0xC9 0x12 0xD 0xF4",
@@ -23,6 +22,7 @@ const tagMapping = [
 	"0x69 0xDB 0x6 0xF4",
 	"start looping",
 	"end looping",
+	"custom block"
 ];
 
 const customCommand = new Map();
@@ -52,7 +52,7 @@ export default class PhysicalBlockly extends React.Component {
 		this.getCustomBlocks();
 		this.setState({ code: "" });
 		this.setState({ customCommands: customCommand, tempCommandData: customCommand });
-		this.setState({ selectedCustomBlock: null });
+		this.setState({ selectedCustomBlock: null, showCustomModal: true });
 		const _this = this;
 		_this.bWorkspace = window.Blockly.inject('pbBlocklyDiv', {scrollbars:true});
 		_this.codeRef["current"].getCodeMirror().setValue("");
@@ -65,7 +65,7 @@ export default class PhysicalBlockly extends React.Component {
 	}
 
 	//mode = 1 -> real time mode
-	//mode = 0 -> camera mode 
+	//mode = 0 -> programming mode 
 
 	physicalBlocklyClick(mode) {
 		console.log("start detecting RFID");
@@ -250,6 +250,8 @@ export default class PhysicalBlockly extends React.Component {
 					dir_field.setAttribute("name", "direction");
 					dir_field.innerHTML = "left"
 					block.appendChild(dir_field);
+				} else if (response.data.substring(3) == "#custom block") {
+					block.setAttribute("type", "custom_block_placeholder");
 				}
 				if (block.getAttribute("type") != null) {
 					let placedBlock = Blockly.Xml.domToBlock(block, _this.bWorkspace);
@@ -391,7 +393,7 @@ export default class PhysicalBlockly extends React.Component {
 									<div class="modal-body" style={modalBodyStyle}>
 										Make sure that you are connected to a bot before continuining. 
 										You can use the toggle boxes in the customization section to select which color corresponds to which command.
-										Make sure to save your selections and then you can use start camera/live mode see the results!
+										Make sure to save your selections and then you can use start programming/live mode see the results!
 									</div>
 									<div class="modal-footer">
 										<button type="button" class="btn btn-secondary" data-dismiss="modal">I got this!</button>
@@ -400,6 +402,35 @@ export default class PhysicalBlockly extends React.Component {
 							</div>
 						</div>
 					</p>
+
+					{/* modal popup for custom block template */}
+					{/* <a data-target="#customModal" role="button" class="btn" data-toggle="modal">
+            <h2 className="small-title" style={customTitleStyle}>
+              Launch demo modal
+            </h2>
+          </a>
+          {this.state.showCustomModal && <div class="modal fade" id="customModal" tabindex="-1" role="dialog" aria-labelledby="customModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h3 id="customModalHeader">Modal header</h3>
+                </div>
+                <div class="modal-body">
+                  <select>
+                    <option>test</option>
+                    <option>test</option>
+                    <option>test</option>
+                    <option>test</option>
+                    <option>test</option>
+                  </select>
+                </div>
+                <div class="modal-footer">
+                  <button class="btn btn-primary">Save Changes</button>
+                </div>
+              </div>
+            </div>
+          </div>} */}
+
 					{this.props.selectedBotName != '' && this.state.stage == 0 ?
 						<div>
 							<p>
