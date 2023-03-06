@@ -75,7 +75,7 @@ pythonCode = {
     "left" : "bot.turn_counter_clockwise(100)", 
     "repeat": "for i in range(n):", 
     "end": "end",
-    "custom block": "#custom block"
+    "custom block": "#custom block no.n"
 }
 
 def worker():

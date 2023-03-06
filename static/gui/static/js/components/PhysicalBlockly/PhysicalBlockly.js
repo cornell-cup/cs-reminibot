@@ -10,6 +10,7 @@ require('codemirror/mode/python/python');
 
 import { INFO_ICON } from '../utils/Constants.js';
 import SelectionBox from './SelectionBox';
+import CustomBlockModal from './CustomBlockModal.js';
 
 const commands = ['Move Foward', 'Move Backward', 'Turn Left', 'Turn Right', 'Stop', 'Start Loop', 'End Loop', 'Custom Block'];
 const noControlCommands = ['Move Foward', 'Move Backward', 'Turn Left', 'Turn Right', 'Stop'];
@@ -44,15 +45,14 @@ export default class PhysicalBlockly extends React.Component {
 		this.toggleDisplayCollapse = this.toggleDisplayCollapse.bind(this);
 		this.bWorkspace = null;
 		this.getCustomBlocks = this.getCustomBlocks.bind(this);
-		this.selectCustomBlock = this.selectCustomBlock.bind(this);
+		this.saveCustomBlockSelection = this.saveCustomBlockSelection.bind(this);
 	}
 
 	componentDidMount() {
 		// setInterval(this.pollForUpdates, 1000);
 		this.getCustomBlocks();
-		this.setState({ code: "" });
+		this.setState({ code: "", customBlockFillCount: 0 });
 		this.setState({ customCommands: customCommand, tempCommandData: customCommand });
-		this.setState({ selectedCustomBlock: null, showCustomModal: true });
 		const _this = this;
 		_this.bWorkspace = window.Blockly.inject('pbBlocklyDiv', {scrollbars:true});
 		_this.codeRef["current"].getCodeMirror().setValue("");
@@ -127,9 +127,13 @@ export default class PhysicalBlockly extends React.Component {
 					_this.state.loopList[x].getChildren(false)[0].setFieldValue(resp, "NUM");
 					x++;
 				}
+
+				// If there is custom block to be filled
+				if (_this.state.customBlockFillCount > 0 && _this.state.customBlocks.length > 0) {
+					$('#customModal').modal('show');
+				}
 				_this.setState({ stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [] });
-			})
-		// this.setState({ stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [] });
+			});
 	}
 
 	getCustomBlocks() {
@@ -142,27 +146,56 @@ export default class PhysicalBlockly extends React.Component {
 
 			var customBlocks = JSON.parse(response.data);
 			_this.setState({ customBlocks: customBlocks });
-			if (customBlocks.length > 0) {
-				_this.setState({ selectedCustomBlock: customBlocks[0] });
-				console.log("selected custom block");
-				console.log(customBlocks[0]);
-			}
 
 		}).catch(function (error) {
 			console.log(error);
 		});;
 	}
 
-	selectCustomBlock(index) {
-		var blockList = this.state.customBlocks;
-		if (index < 0 || index >= blockList.length) {
-			return;
+	saveCustomBlockSelection(e, customBlockSelection) {
+		const _this = this;
+		e.preventDefault();
+		$('#customModal').modal('hide');
+		console.log("received custom block selection");
+		console.log(customBlockSelection);
+
+		let newCode = _this.state.code;
+		let codeList = _this.state.code.split("\n");
+		for(var i = 0; i < _this.state.customBlockFillCount; i ++) {
+			let blockCode = _this.findCustomBlock(customBlockSelection[i], _this.state.customBlocks);
+			blockCode = blockCode.split("\n");
+			if (blockCode != null) {
+				let indent = _this.getCustomBlockIndent(i, codeList);
+				let blockCodeStr = "";
+				for(var j = 0; j < blockCode.length - 1; j ++) {
+					blockCodeStr += indent + blockCode[j] + "\n";
+				}
+				newCode = newCode.replace(indent + "#custom block no." + i + "\n", blockCodeStr);
+			}
 		}
-		
-		this.setState({ selectedCustomBlock: blockList[index] });
-		console.log("change selected custom block");
-		console.log(blockList[index]);
-		console.log(this.state.selectedCustomBlock);
+
+		_this.setState({ code: newCode, customBlockFillCount: 0});
+		_this.codeRef["current"].getCodeMirror().setValue(newCode);
+		// TODO: update the block space, text editor already updated
+		// TODO: test by running multiple sessions
+	}
+
+	findCustomBlock(blockName, customBlocks) {
+		for(var i = 0; i < customBlocks.length; i ++) {
+			if (customBlocks[i][0] == blockName) { 
+				return customBlocks[i][1]; 
+			}
+		}
+		return null;
+	}
+
+	getCustomBlockIndent(index, codeList) {
+		for(var i = 0; i < codeList.length; i ++) {
+			if (codeList[i].includes("#custom block no." + index)) {
+				return codeList[i].substring(0, codeList[i].indexOf("#"));
+			}
+		}
+		return "";
 	}
 
 	getPBMap() {
@@ -202,6 +235,8 @@ export default class PhysicalBlockly extends React.Component {
 						n = n.replace("(n)", "(n" + _this.state.loopvar + ")");
 						_this.setState({ tabs: _this.state.tabs + 1 });
 						_this.setState({ loopvar: _this.state.loopvar + 1 });
+					} else if (response.data.includes("#custom block no.n")) {
+						n = n.replace("#custom block no.n", "#custom block no." + _this.state.customBlockFillCount);
 					}
 				}
 				_this.setState({ code: _this.state.code + n });
@@ -250,8 +285,13 @@ export default class PhysicalBlockly extends React.Component {
 					dir_field.setAttribute("name", "direction");
 					dir_field.innerHTML = "left"
 					block.appendChild(dir_field);
-				} else if (response.data.substring(3) == "#custom block") {
+				} else if (response.data.substring(3) == "#custom block no.n") {
 					block.setAttribute("type", "custom_block_placeholder");
+					let index_field = document.createElement("field");
+					index_field.setAttribute("name", "index");
+					index_field.innerHTML = _this.state.customBlockFillCount;
+					block.appendChild(index_field);
+					_this.setState({ customBlockFillCount: _this.state.customBlockFillCount + 1 });
 				}
 				if (block.getAttribute("type") != null) {
 					let placedBlock = Blockly.Xml.domToBlock(block, _this.bWorkspace);
@@ -402,35 +442,7 @@ export default class PhysicalBlockly extends React.Component {
 							</div>
 						</div>
 					</p>
-
-					{/* modal popup for custom block template */}
-					{/* <a data-target="#customModal" role="button" class="btn" data-toggle="modal">
-            <h2 className="small-title" style={customTitleStyle}>
-              Launch demo modal
-            </h2>
-          </a>
-          {this.state.showCustomModal && <div class="modal fade" id="customModal" tabindex="-1" role="dialog" aria-labelledby="customModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h3 id="customModalHeader">Modal header</h3>
-                </div>
-                <div class="modal-body">
-                  <select>
-                    <option>test</option>
-                    <option>test</option>
-                    <option>test</option>
-                    <option>test</option>
-                    <option>test</option>
-                  </select>
-                </div>
-                <div class="modal-footer">
-                  <button class="btn btn-primary">Save Changes</button>
-                </div>
-              </div>
-            </div>
-          </div>} */}
-
+					<CustomBlockModal count={this.state.customBlockFillCount} customBlocks={this.state.customBlocks} saveSelection={this.saveCustomBlockSelection}/>
 					{this.props.selectedBotName != '' && this.state.stage == 0 ?
 						<div>
 							<p>

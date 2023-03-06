@@ -301,7 +301,14 @@ var miniblocks = {
   },
   custom_block_placeholder: {
     type: "custom_block_placeholder",
-    message0: "custom block placeholder",
+    message0: "custom block placeholder %1",
+    args0: [
+      {
+        type: "field_number",
+        name: "index",
+        value: 0
+      }
+    ],
     previousStatement: null,
     nextStatement: null,
     colour: 230,

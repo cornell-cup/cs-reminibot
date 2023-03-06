@@ -230,8 +230,7 @@ Blockly.Blocks['custom_block_placeholder'] = {
 };
 
 Blockly.Python['custom_block_placeholder'] = function (block) {
-  // TODO: Assemble Python into code variable.
-  var code = '#custom block';
+  var code = '#custom block no.' + block.getFieldValue('index');
   return code + FCN_ENDING;
 };
 
