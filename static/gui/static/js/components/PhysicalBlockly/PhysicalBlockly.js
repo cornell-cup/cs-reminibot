@@ -394,7 +394,7 @@ export default class PhysicalBlockly extends React.Component {
             paddingBottom: "0px",
             marginTop: "15px",
             marginBottom: "10px",
-			marginLeft: "3px"
+			marginLeft: "3px",
 		}
 
 		let warningLabelStyle = {
@@ -454,6 +454,7 @@ export default class PhysicalBlockly extends React.Component {
 							</p>
 							<div class="collapse" id="selectionBoxCollapse">
 								<div class="container">
+									{/* Making the block selector 2 columns */}
 									  <div class="row">
 											<div class="col">
 												<span className="small-title" style={customTitleStyle}>Default Blocks</span>
@@ -488,21 +489,41 @@ export default class PhysicalBlockly extends React.Component {
 							</p>
 							<div class="collapse" id="blockDisplayCollapse">
 								<div class="customBlockDisplay">
-								<ul>
-									{
-										this.state.displayCommands.map((c) => 
+									{/* Making the block display 2 columns */}
+									<div className="row">
+										<div class="col" style={{paddingBottom: "12px"}}>
+										{
+										/* Subtracting this.mode to change the colums to 2x3 in realtime mode*/
+										this.state.displayCommands.slice(0,4-this.state.mode).map((c) =>
 										<li class="list-group-item">
 											<div className="row">
-												<div class="col-4">
+												<div class="col">
 														<span>{c}</span>
 												</div>
-												<div class="col-4">
+												<div class="col">
 														<span>{this.state.customCommands.get(c)}</span>
 												</div>
 											</div>
 										</li> )
-									}
-								</ul>
+										}
+										</div>
+
+										<div class="col" style={{paddingBottom: "12px"}}>
+										{
+										this.state.displayCommands.slice(4-this.state.mode).map((c) => 
+										<li class="list-group-item">
+											<div className="row">
+												<div class="col">
+														<span>{c}</span>
+												</div>
+												<div class="col">
+														<span>{this.state.customCommands.get(c)}</span>
+												</div>
+											</div>
+										</li> )
+										}
+										</div>
+									</div>
 								</div>
 							</div>
 							<div style={warningLabelStyle}>
