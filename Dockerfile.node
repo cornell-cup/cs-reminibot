@@ -1,0 +1,13 @@
+FROM node:16 as node
+
+EXPOSE 8080
+
+# set a directory for the app
+WORKDIR /node
+
+# copy all the files to the container
+COPY ./static/gui ./static/gui
+COPY ./run_BS.sh ./run_BS.sh
+
+RUN npm install ./static/gui --force
+CMD ["npm", "run", "--prefix", "./static/gui", "webpack"]

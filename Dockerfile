@@ -23,6 +23,4 @@ RUN apt-get update -y
 RUN apt-get upgrade -y
 RUN apt-get install nodejs npm -y
 RUN npm install ./static/gui --force
-RUN apt-get install dos2unix
-RUN dos2unix run_BS.sh
 CMD ["sh", "run_BS.sh"]

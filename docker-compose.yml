@@ -1,0 +1,27 @@
+services:
+  flask:
+    build:
+      context: .
+      dockerfile: Dockerfile.flask
+    image: ccr/flask
+    networks:
+      ccr:
+        ipv4_address: 10.5.0.5
+  node:
+    build:
+      context: .
+      dockerfile: Dockerfile.node
+    image: ccr/node
+    ports:
+      - "8080:8080"
+    networks:
+      ccr:
+        ipv4_address: 10.5.0.6
+
+networks:
+  ccr:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.5.0.0/16
+        - gateway: 10.5.0.1
