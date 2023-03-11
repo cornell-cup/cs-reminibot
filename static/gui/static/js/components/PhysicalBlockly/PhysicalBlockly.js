@@ -35,7 +35,7 @@ export default class PhysicalBlockly extends React.Component {
 	constructor(props) {
 		super(props);
 		// customBlocks is stored as an array of tuples, the first element being the block's name and the second element being commands in the block
-		this.state = { stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "", customCommands: new Map(), tempCommandData: new Map(), detectionState: false, detectionCall: null, unsavedCustomization: false, collapsedSelection: true, collapsedDisplay: false, mode: -1, displayCommands: [], customBlocks: [] };
+		this.state = { stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "", customCommands: new Map(), tempCommandData: new Map(), detectionState: false, detectionCall: null, unsavedCustomization: false, collapsedSelection: true, collapsedDisplay: false, mode: -1, displayCommands: [], customBlocks: [], customPlacedBlocks: [] };
 		this.codeRef = React.createRef();
 		this.pollForUpdates = this.pollForUpdates.bind(this);
 		this.saveSelection = this.saveSelection.bind(this);
@@ -140,13 +140,8 @@ export default class PhysicalBlockly extends React.Component {
 		const _this = this;
 		axios.get('/get_custom_function')
 		.then(function (response) {
-			// TODO: remove console logs
-			console.log("custom blocks ----------- ");
-			console.log(JSON.parse(response.data));
-
 			var customBlocks = JSON.parse(response.data);
-			_this.setState({ customBlocks: customBlocks });
-
+			_this.setState({ customBlocks: customBlocks })
 		}).catch(function (error) {
 			console.log(error);
 		});;
@@ -158,6 +153,7 @@ export default class PhysicalBlockly extends React.Component {
 		$('#customModal').modal('hide');
 		console.log("received custom block selection");
 		console.log(customBlockSelection);
+		console.log(_this.state.customPlacedBlocks);
 
 		let newCode = _this.state.code;
 		let codeList = _this.state.code.split("\n");
@@ -172,9 +168,11 @@ export default class PhysicalBlockly extends React.Component {
 				}
 				newCode = newCode.replace(indent + "#custom block no." + i + "\n", blockCodeStr);
 			}
+
+			_this.state.customPlacedBlocks[i].setFieldValue(customBlockSelection[i], "function_content");
 		}
 
-		_this.setState({ code: newCode, customBlockFillCount: 0});
+		_this.setState({ code: newCode, customBlockFillCount: 0, customPlacedBlocks: []});
 		_this.codeRef["current"].getCodeMirror().setValue(newCode);
 		// TODO: update the block space, text editor already updated
 		// TODO: test by running multiple sessions
@@ -214,6 +212,7 @@ export default class PhysicalBlockly extends React.Component {
 		.then(function (response) {
 				let isLoop = false;
 				let isEnd = false;
+				let useCustomBlock = false;
 				if (response.data == "") {
 					return;
 				}
@@ -286,11 +285,36 @@ export default class PhysicalBlockly extends React.Component {
 					dir_field.innerHTML = "left"
 					block.appendChild(dir_field);
 				} else if (response.data.substring(3) == "#custom block no.n") {
-					block.setAttribute("type", "custom_block_placeholder");
-					let index_field = document.createElement("field");
-					index_field.setAttribute("name", "index");
-					index_field.innerHTML = _this.state.customBlockFillCount;
-					block.appendChild(index_field);
+					let newCustomBlocks = [["Create Custom Block", " "]];
+					newCustomBlocks = newCustomBlocks.concat(_this.state.customBlocks);
+
+					Blockly.Blocks["custom_block"] = {
+            init: function () {
+                this.jsonInit({
+                    type: "custom_block",
+                    message0: "function %1",
+                    args0: [
+                        {
+                            "type": "field_dropdown",
+                            "name": "function_content",
+                            "options": newCustomBlocks,
+                        }
+                    ],
+                    previousStatement: null,
+                    nextStatement: null,
+                    colour: 230,
+                    tooltip: "",
+                    helpUrl: ""
+                });
+            }
+        	};
+					console.log(newCustomBlocks);
+					block.setAttribute("type", "custom_block");
+					let name_field = document.createElement("field");
+					name_field.setAttribute("name", "function_content");
+					name_field.innerHTML = newCustomBlocks[0][0];
+					block.appendChild(name_field);
+					useCustomBlock = true;
 					_this.setState({ customBlockFillCount: _this.state.customBlockFillCount + 1 });
 				}
 				if (block.getAttribute("type") != null) {
@@ -307,8 +331,11 @@ export default class PhysicalBlockly extends React.Component {
 						tempList.push(placedBlock);
 						_this.setState({ blockStack: tempStack, loopList: tempList });
 
-					}
-					else {
+					} else if (useCustomBlock) {
+							let newCustomPlacedBlocks = _this.state.customPlacedBlocks;
+							newCustomPlacedBlocks.push(placedBlock);
+							_this.setState({ customPlacedBlocks: newCustomPlacedBlocks, lastBlock: placedBlock.nextConnection });
+					} else {
 						_this.setState({ lastBlock: placedBlock.nextConnection });
 					}
 				}
