@@ -70,7 +70,7 @@ export default class CustomBlockModal extends React.Component {
               <h3 id="customModalHeader">Custom Block Selection</h3>
             </div>
             <div class="modal-body">
-              <h4>
+              <h4 id="customModalBody">
                 For each custom block placeholder, please select a custom block function to assign the placeholder to.
               </h4>
               <ol>
