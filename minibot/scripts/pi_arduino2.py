@@ -17,67 +17,63 @@ class TransmitLock():
     self.is_transmitting = 1 if a thread is transmitting
     """
 
-
-def __init__(self):
-    self.lock = threading.Lock()
-    self.is_transmitting = 0
-    self.timestamp = 0
-
-
-def can_continue_transmitting(self):
-    """ Whether the thread that has currently acquired the lock
-        can continue to transmit, or not because another thread is waiting to
-        acquire the lock
-    """
-    with self.lock:
-        return self.is_transmitting == 1
-
-
-def end_transmit(self):
-    with self.lock:
+    def __init__(self):
+        self.lock = threading.Lock()
         self.is_transmitting = 0
+        self.timestamp = 0
 
-
-def start_transmit(self, timestamp):
-    """ Tries to acquire the lock to start transmitting.  If the lock is acquired
-        by another thread, sets self.is_transmitting = -1 to tell the other thread
-        that it needs to stop transmitting and hand over the lock to the current thread.
-        Arguments:
-            timestamp: (int) The timestamp of the current thread.  This timestamp is used to
-                figure out which thread was waiting for the lock first, so that the thread that
-                was waiting first gets priority when accessing the lock
-        Returns:  (bool) True if the transmit_lock was successfully acquired, False otherwise.
+    def can_continue_transmitting(self):
+        """ Whether the thread that has currently acquired the lock
+            can continue to transmit, or not because another thread is waiting to
+            acquire the lock
         """
-    with self.lock:
-        if self.is_transmitting == 0:
-            # the timestamp field indicates the priority of the thread that
-            # was waiting first for the lock.  If the current thread's timestamp
-            # statement does not have its e priority of the
-            # thread that was waiting first, do not let it enter this code block
-            if self.timestamp == timestamp or self.timestamp == 0:
-                self.is_transmitting = 1
-                # reset the timestamp field, because the current thread
-                # managed to acquire the lock
-                self.timestamp = 0
-                return True
-            # if some other thread is transmitting (self.is_transmitting != 0)
-            # and no other thread has told the thread to stop transmitting
-            # (self.is_transmitting != -1), then that means the current thread
-            # is the first thread that will be waiting for the lock.  Hence,
-            # the current thread tells the thread that is trasmitting to stop
-            # trasmitting (by setting self.is_transmitting = -1).  The current
-            # thread also records its timestamp to indicate that its the next
-            # thread that will get to acquire the lock
-        elif self.is_transmitting == 1:
-            self.is_transmitting = -1
-            self.timestamp = timestamp
-        # otherwise if self.is_transmitting == -1, don't do anything
-        # just return False, this is because some other thread has already
-        # told the currently transmitting thread to stop transmitting,
-        # and that other thread has already saved its timestamp in
-        # self.timestamp so the other thread will acquire the lock before
-        # you can.
-    return False
+        with self.lock:
+            return self.is_transmitting == 1
+
+    def end_transmit(self):
+        with self.lock:
+            self.is_transmitting = 0
+
+    def start_transmit(self, timestamp):
+        """ Tries to acquire the lock to start transmitting.  If the lock is acquired
+            by another thread, sets self.is_transmitting = -1 to tell the other thread
+            that it needs to stop transmitting and hand over the lock to the current thread.
+            Arguments:
+                timestamp: (int) The timestamp of the current thread.  This timestamp is used to
+                    figure out which thread was waiting for the lock first, so that the thread that
+                    was waiting first gets priority when accessing the lock
+            Returns:  (bool) True if the transmit_lock was successfully acquired, False otherwise.
+            """
+        with self.lock:
+            if self.is_transmitting == 0:
+                # the timestamp field indicates the priority of the thread that
+                # was waiting first for the lock.  If the current thread's timestamp
+                # statement does not have its e priority of the
+                # thread that was waiting first, do not let it enter this code block
+                if self.timestamp == timestamp or self.timestamp == 0:
+                    self.is_transmitting = 1
+                    # reset the timestamp field, because the current thread
+                    # managed to acquire the lock
+                    self.timestamp = 0
+                    return True
+                # if some other thread is transmitting (self.is_transmitting != 0)
+                # and no other thread has told the thread to stop transmitting
+                # (self.is_transmitting != -1), then that means the current thread
+                # is the first thread that will be waiting for the lock.  Hence,
+                # the current thread tells the thread that is trasmitting to stop
+                # trasmitting (by setting self.is_transmitting = -1).  The current
+                # thread also records its timestamp to indicate that its the next
+                # thread that will get to acquire the lock
+            elif self.is_transmitting == 1:
+                self.is_transmitting = -1
+                self.timestamp = timestamp
+            # otherwise if self.is_transmitting == -1, don't do anything
+            # just return False, this is because some other thread has already
+            # told the currently transmitting thread to stop transmitting,
+            # and that other thread has already saved its timestamp in
+            # self.timestamp so the other thread will acquire the lock before
+            # you can.
+        return False
 
 
 tlock = TransmitLock()
