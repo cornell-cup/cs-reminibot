@@ -8,12 +8,13 @@ import threading, queue
 from time import sleep 
 import requests
 
-from basestation.routes.basestation_init import base_station
+from basestation.routes.index_routes import *
 
 bot_name = sys.argv[1]
 mode = sys.argv[2] #0 = camera mode, 1=real time 
 pb_map = sys.argv[3]
 pb_map = json.loads(pb_map)
+base_station = get_basestation()
 
 #todo list: 
 #   make sure you can't input other commands while in PB mode 

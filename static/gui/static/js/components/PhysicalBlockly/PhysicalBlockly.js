@@ -69,6 +69,10 @@ export default class PhysicalBlockly extends React.Component {
 
 	physicalBlocklyClick(mode) {
 		console.log("start detecting RFID");
+		axios.get('/active-bots')
+			.then(function (response) {
+				console.log(JSON.stringify(response.data));
+			});
 
 		// setInterval(tempClick, 1000);
 		const _this = this;

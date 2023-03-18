@@ -25,6 +25,9 @@ index_bp = Blueprint('index',
                      __name__,
                      url_prefix='/')
 
+def get_basestation():
+    raise Exception(hex(id(base_station)) + "!!!!!!!!!!!!!!!")
+    return base_station
 
 @index_bp.route('/start', methods=['GET'])
 def start():
@@ -55,6 +58,7 @@ def get_py_command():
 @index_bp.route('/active-bots', methods=['GET'])
 def active_bots():
     """ Get all Minibots connected to the Basestation """
+    # print(hex(id(base_station)))
     return json.dumps(base_station.get_active_bots()), status.HTTP_200_OK
 
 
