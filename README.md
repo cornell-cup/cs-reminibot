@@ -115,6 +115,13 @@ cd ../..
 ```
 
 # 6. Running the BaseStation & WebGUI
+
+### Setting configuration variables
+
+`config.py` in the `basestation` folder contains configuration variables that might vary from user to user. Please refer to this file and set any necessary configurations before running.
+
+### Running the app
+
 After all dependencies are successfully installed, you can run the WebGUI on your computer and start working with the Minibot.
 
 From the terminal, navigate to the home `cs-reminibot` directory and run the following command.

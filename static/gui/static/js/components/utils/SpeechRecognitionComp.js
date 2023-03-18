@@ -25,15 +25,19 @@ recognition.lang = 'en-US'
 function SpeechRecognitionComp({ setText, mic }) {
 
   async function handleListen() {
-    if (mic) {
-      console.log("start listening");
-      await recognition.start()
-      recognition.onend = () => recognition.start()
-    } else {
-      await recognition.stop()
+    if (!mic) {
+      await recognition.stop();
       recognition.onend = () => {
         console.log("Stopped listening per click")
       }
+    } else {
+      console.log("start listening");
+      try {
+        recognition.start();
+      } catch (e) {
+        console.log("mic already started")
+      }
+      recognition.onend = async () => await recognition.start()
     }
     let finalTranscript = ''
     recognition.onresult = event => {
@@ -49,7 +53,7 @@ function SpeechRecognitionComp({ setText, mic }) {
     const handleListenWrapper = async () => {
       await handleListen();
     }
-    handleListenWrapper;
+    handleListenWrapper().catch(console.error);
     console.log("mic", mic);
   }, [mic]);
 

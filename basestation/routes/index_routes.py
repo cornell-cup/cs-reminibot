@@ -257,6 +257,13 @@ def logout():
     base_station.login_email = ""
     return content, status.HTTP_200_OK
 
+@index_bp.route('/clear', methods=['POST'])
+def clear():
+    print("clear database")
+    base_station.clear_databases()
+    content = {}
+    return content, status.HTTP_200_OK
+
 
 @index_bp.route('/custom_function/', methods=['POST'])
 def update_custom_function():
