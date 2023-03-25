@@ -610,17 +610,13 @@ class BaseStation:
 
     
     def physical_blockly(self, bot_name: str, mode: str, pb_map: json):
-        print("physical blockly entered", flush=True)
         pb = BlocklyThread(bot_name, mode, pb_map, self.py_commands)
-        print("pb thread created", flush=True)
         def tag_producer():
-            while True:
+            while not self.pb_stopped:
                 tag = self.get_rfid(bot_name)
-                pb.rfid_tags.put(tag)
-                if self.get_flag():
-                    pb.stop_pb = True
-                    break
+                pb.rfid_tags.put(tag) 
                 sleep(1.0)
+            pb.pb_stopped = True   
         threading.Thread(target=pb.tag_consumer).start()
         threading.Thread(target=tag_producer).start()        
 
@@ -630,7 +626,7 @@ class BaseStation:
         bot = self.get_bot(bot_name)
         pb_map = str(pb_map)
         if(mode == "physical-blockly" or mode == "physical-blockly-2"):
-            self.stop_pb = False
+            self.pb_stopped = False
             #self.phys_blockly_event = threading.Event()
             if(mode == 'physical-blockly'):
                 print("starting physical blockly thread")
@@ -651,12 +647,9 @@ class BaseStation:
                 self.bot_vision_server.kill()
 
         bot.sendKV("MODE", mode)
-   
-    def get_flag(self):
-        return self.stop_pb
 
     def end_physical_blockly(self): 
-        self.stop_pb = True
+        self.pb_stopped = True
         print("ending physical blockly thread", flush=True)
 
     def get_next_py_command(self):

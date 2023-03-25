@@ -34,24 +34,22 @@ class BlocklyThread:
     rfid_tags = queue.Queue()
     
     def __init__(self, bot_name: str, mode: str, pb_map: json, commands: queue):
-        #print("init started")
         self.bot_name = bot_name
         self.mode = mode
         self.pb_map = json.loads(pb_map)
         self.py_commands = commands
-        self.stop_pb = False
+        self.pb_stopped = False
         
     def get_flag(self):
-        return self.stop_pb
+        return self.pb_stopped
 
     # mode 0 = camera mode, 1 = real time 
     def send_request(self, args):
         url = "http://localhost:8080/wheels"
-
-        # url = "/wheels"
         headers = {
             "Content-Type": "application/json"
         }
+        
         data=json.dumps({
             "bot_name": self.bot_name, 
             "direction": args[1], 
@@ -79,19 +77,17 @@ class BlocklyThread:
             return ["fake_bot", "stop"] #do nothing if invalid command received
 
     def tag_consumer(self):
-        while True:
+        while not self.pb_stopped:
             print("worker", flush=True)
             tag = self.rfid_tags.get()
             if tag in self.pb_map.keys():
                 tag = self.pb_map[tag]
                 task = self.classify(tag, self.commands)    
                 py_code = self.pythonCode[task[1]]
+                
                 if self.mode == '1': 
                     if(py_code[0:3] == "bot"):
                         self.send_request(task)
                 self.py_commands.put("pb:" + py_code)
                 #print("working...", flush=True)
             sleep(1.0)
-            if self.get_flag():
-                print("subflag broke", flush=True)
-                break
