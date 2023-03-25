@@ -9,6 +9,7 @@ import sys
 from basestation.bot import Bot
 from basestation.databases.user_database import Submission, User
 from basestation import db
+from basestation.piVision.pb import BlocklyThread
 from basestation.util.stoppable_thread import StoppableThread, ThreadSafeVariable
 from basestation.util.helper_functions import distance
 
@@ -98,9 +99,8 @@ class BaseStation:
         self.virtual_objects = {}
         self.vision_snapshot = {}
         self.vision_object_map = {}
-        self.phys_blockly_py = None
 
-        self.py_commands = []
+        self.py_commands = queue.Queue()
         self.pb_map = {}
 
         self.blockly_function_map = {
@@ -128,8 +128,8 @@ class BaseStation:
         # so that we can connect to the Minibot
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         
-        # self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        # self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
 
         # an arbitrarily small time
         self.sock.settimeout(0.01)
@@ -608,96 +608,21 @@ class BaseStation:
         return TAGS[random.randint(0, len(TAGS) - 1)]
         # return TAGS[0]
 
-    @make_thread_safe
+    
     def physical_blockly(self, bot_name: str, mode: str, pb_map: json):
-        # mode 0 = camera mode, 1 = real time 
-        def send_request(args):
-            url = "http://localhost:8080/wheels"
-
-            # url = "/wheels"
-            headers = {
-                "Content-Type": "application/json"
-            }
-            data=json.dumps({
-                "bot_name": bot_name, 
-                "direction": args[1], 
-                "power": "5", 
-                "mode": "physical blockly"
-            })
-            requests.post(url, data=data, headers=headers)
-        
-        def classify(command, commands):
-            if command in commands["commands"]["turn left"]: 
-                return ["fake_bot", "left"]
-            elif command in commands["commands"]["turn right"]:
-                return ["fake_bot", "right"]
-            elif command in commands["commands"]["go forwards"]:
-                return ["fake_bot", "forward"]
-            elif command in commands["commands"]["go backwards"]:
-                return ["fake_bot", "backward"]
-            elif command in commands["commands"]["repeat"]:
-                return ["fake_bot", "repeat"]
-            elif command in commands["commands"]["end"]:
-                return ["fake_bot", "end"]
-            elif command in commands["commands"]["custom block"]:
-                return ["fake_bot", "custom block"]
-            else:
-                return ["fake_bot", "stop"] #do nothing if invalid command received
-        
-        pythonCode = {
-            "forward" : "bot.move_forward(100)",
-            "backward" : "bot.move_backward(100)",
-            "stop" : "bot.stop()",
-            "right" : "bot.turn_clockwise(100)",
-            "left" : "bot.turn_counter_clockwise(100)", 
-            "repeat": "for i in range(n):", 
-            "end": "end",
-            "custom block": "#custom block no.n"
-        }
-
-        commands = {
-            "commands" : {
-                "turn left": ["0x59 0xE3 0xB 0xF4"], 
-                "turn right": ["0x59 0xC8 0x6 0xF4"], 
-                "go forwards": ["0xF9 0x3E 0x4 0xF4"],
-                "go backwards": ["0xC9 0x12 0xD 0xF4"], 
-                "repeat": ["start looping"], 
-                "end": ["end looping"],
-                "stop": ["0x69 0xDB 0x6 0xF4"],
-                "custom block": ["custom block"]
-            }, 
-            "tagRangeStart": 0, 
-            "tagRangeEnd": 23
-        }
-        pb_map = json.loads(pb_map)
-        q = queue.Queue()
-        q2 = queue.Queue()
-
-        def worker():
+        print("physical blockly entered", flush=True)
+        pb = BlocklyThread(bot_name, mode, pb_map, self.py_commands)
+        print("pb thread created", flush=True)
+        def tag_producer():
             while True:
-                task = q.get()
-                py_code = pythonCode[task[1]]
-                if mode == '1': 
-                    if(py_code[0:3] == "bot"):
-                        send_request(task)
-                self.py_commands.append("pb:" + py_code)
-                print("working...", flush=True)
-                sleep(1.0)
-                if self.get_sub_flag():
-                    print("subflag broke")
+                tag = self.get_rfid(bot_name)
+                pb.rfid_tags.put(tag)
+                if self.get_flag():
+                    pb.stop_pb = True
                     break
-
-        self.sub_phys_blockly_py = threading.Thread(target=worker)
-        self.sub_phys_blockly_py.start()
-
-        while True:
-            tag = self.get_rfid(bot_name)
-            if tag in pb_map.keys():
-                tag = pb_map[tag]
-                args = classify(tag, commands)
-                q.put(args)
-            if self.get_flag():
-                break
+                sleep(1.0)
+        threading.Thread(target=pb.tag_consumer).start()
+        threading.Thread(target=tag_producer).start()        
 
     @make_thread_safe
     def set_bot_mode(self, bot_name: str, mode: str, pb_map: json):
@@ -705,17 +630,14 @@ class BaseStation:
         bot = self.get_bot(bot_name)
         pb_map = str(pb_map)
         if(mode == "physical-blockly" or mode == "physical-blockly-2"):
-            print("starting phys blockly thread")
-            self.phys_blockly_py = None 
-            self.sub_pb_flag = False
-            self.pb_flag = False
-            self.phys_blockly_event = threading.Event()
+            self.stop_pb = False
+            #self.phys_blockly_event = threading.Event()
             if(mode == 'physical-blockly'):
-                self.phys_blockly_py = threading.Thread(target=self.physical_blockly, args=(bot_name, 0, pb_map))
-                self.phys_blockly_py.start()
+                print("starting physical blockly thread")
+                self.physical_blockly(bot_name, 0, pb_map)
             else:
-                self.phys_blockly_py = threading.Thread(target=self.physical_blockly, args=(bot_name, 1, pb_map))
-                self.phys_blockly_py.start()
+                print("starting physical blockly 2 thread")
+                self.physical_blockly(bot_name, 1, pb_map)
         elif mode == "object_detection":
             self.bot_vision_server = subprocess.Popen(
                 ['python', './basestation/piVision/server.py', '-p MobileNetSSD_deploy.prototxt',
@@ -731,21 +653,17 @@ class BaseStation:
         bot.sendKV("MODE", mode)
    
     def get_flag(self):
-        return self.pb_flag
-    
-    def get_sub_flag(self):
-        return self.sub_pb_flag
+        return self.stop_pb
 
     def end_physical_blockly(self): 
-        self.sub_pb_flag = True
-        self.pb_flag = True
-        print("ending physical blockly thread")
+        self.stop_pb = True
+        print("ending physical blockly thread", flush=True)
 
     def get_next_py_command(self):
-        if(len(self.py_commands) == 0):
+        #not reliable?
+        if(self.py_commands.qsize() == 0):
             return ""
-        val = self.py_commands[0]
-        self.py_commands.pop(0) 
+        val = self.py_commands.get(False)
         return val
 
     def send_bot_script(self, bot_name: str, script: str):
