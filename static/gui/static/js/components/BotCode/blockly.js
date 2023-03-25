@@ -81,6 +81,19 @@ class PythonEditor extends React.Component {
         reader.readAsText(file);
     }
 
+
+    uploadZip(event) {
+        const _this = this;
+        const file = event.target.files[0];
+        const reader = new FileReader();
+        reader.onload = function (event) {
+            _this.getEditor().setValue(event.target.result);
+        };
+        reader.readAsText(file);
+    }
+
+
+
     /* Target function for the button "Download". Downloads the code in the
             editor as a python file with name as specified */
     downloadPython(event) {
@@ -89,6 +102,23 @@ class PythonEditor extends React.Component {
         let filename = this.state.filename;
         if (filename.substring(filename.length - 3) != ".py") {
             filename += ".py";
+        }
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' +
+            encodeURIComponent(this.props.pythonCode));
+        element.setAttribute('download', filename);
+        element.style.display = 'none';
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+    }
+
+
+    downloadPython_zip(event) {
+        event.preventDefault();
+        const element = document.createElement('a');
+        let filename = this.state.filename;
+        if (filename.substring(filename.length - 4) != ".zip") {
+            filename += ".zip";
         }
         element.setAttribute('href', 'data:text/plain;charset=utf-8,' +
             encodeURIComponent(this.props.pythonCode));
@@ -226,6 +256,19 @@ class PythonEditor extends React.Component {
                         <Button id="download_python" onClick={this.downloadPython} name="Download" />
                     </div>
                 </div>
+                {/* <div className="row">
+                    <div className="col">
+                        <input type="file"
+                            id="uploadzip"
+                            hidden="hidden" />
+                        <button
+                            type="button"
+                            id="zip_upload_button">
+                            UPLOAD ZIP FILE
+                        </button>
+
+                    </div>
+                </div> */}
                 <div className="row">
                     <div className="col horizontalDiv">
                         <LabeledTextBox

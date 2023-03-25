@@ -6,9 +6,12 @@ import {
   commands,
   match_command,
   X_BTN, MIC_BTN, MIC_BTNON,
-  ACT_MIC_CHATBOT
+  ACT_MIC_CHATBOT,
+  ZIP_FILE_UPLOAD
 } from "../utils/Constants.js";
 import SpeechRecognitionComp from "../utils/SpeechRecognitionComp.js";
+
+
 
 //Voice Control 
 var lastLen = 0;
@@ -35,6 +38,9 @@ const defaultFontSize = {
 }
 const emptyStr = "";
 
+
+
+
 function Chatbot2({
   setParentContext,
   selectedBotName,
@@ -60,6 +66,19 @@ function Chatbot2({
   const [tempCommands, setTempCommands] = useState("");
   const [isAnimating, setAnimating] = useState(false);
 
+
+
+  const [selectedFiles, setSelectedFiles] = useState(undefined);
+  const [currentFile, setCurrentFile] = useState(undefined);
+  const [progress, setProgress] = useState(0);
+  const [message, setMessage] = useState("");
+
+  const [fileInfos, setFileInfos] = useState([]);
+
+
+
+
+
   // style for the overall chatbot window
   const styles = {
     leftWindow: {
@@ -77,14 +96,14 @@ function Chatbot2({
 
   // functions responding to commands changing the appearance of the chatbot windows
   const changeInputText = (event) => {
-    event.preventDefault();
+    // event.preventDefault();
     if (!contextMode) return;
     const input = event.currentTarget.value;
     setInputText(input);
   }
 
   const openChatbox = (e) => {
-    e.preventDefault();
+    // e.preventDefault();
     if (!open) {
       setOpen(true);
       setExpand("expand");
@@ -100,31 +119,31 @@ function Chatbot2({
   }
 
   const closeChatbox = (e) => {
-    e.preventDefault();
+    // e.preventDefault();
     setOpen(false);
     setExpand("");
     setEnter("");
   }
 
   const switchSide = (e) => {
-    e.preventDefault();
+    // e.preventDefault();
     if (expand == "expand") {
       setRight(!right);
     }
   }
 
   const toggleWindowSize = (e) => {
-    e.preventDefault();
+    // e.preventDefault();
     setFullSize(!fullSize);
   }
 
   const toggleChangeFont = (e) => {
-    e.preventDefault();
+    // e.preventDefault();
     setCanChangeFont(!canChangeFont);
   }
 
   const changeFontSize = (e, i) => {
-    e.preventDefault();
+    // e.preventDefault();
     if (!canChangeFont || (fontSize.body['fontSize'] <= 5 && i < 0) || (fontSize.body['fontSize'] >= 50 && i > 0)) return;
     const newFontSize = {
       header: {
@@ -152,7 +171,7 @@ function Chatbot2({
 
   // functions processing commands: sending context, question, toggling mics
   const sendContext = (e) => {
-    e.preventDefault();
+    // e.preventDefault();
     if (inputText === emptyStr) return;
     var temp_id = id + 1;
     setId(temp_id);
@@ -172,7 +191,7 @@ function Chatbot2({
       })
     }).then(function (response) {
       if (response.data) {
-        // console.log("context is sent successfully")
+        console.log("context is sent successfully");
       }
     }).catch(function (error) {
       if (error.response.data.error_msg.length > 0)
@@ -183,7 +202,7 @@ function Chatbot2({
   }
 
   const sendQuestion = (e) => {
-    e.preventDefault();
+    // e.preventDefault();
     if (inputText === emptyStr) return;
     var temp_id = id + 1;
     let newList = messages.concat({ id: temp_id, who: "self", message: inputText, timeStamp: getTimeStamp() });
@@ -203,6 +222,7 @@ function Chatbot2({
         question: inputText
       })
     }).then(function (response) {
+      console.log("question is sent successfully");
       if (response.data) {
         const res = response.data;
         newList = newList.concat({ id: temp_id, who: "other", message: res, timeStamp: getTimeStamp() });
@@ -210,6 +230,8 @@ function Chatbot2({
         setAnimating(false);
       }
     }).catch(function (error) {
+      console.log("Error branch");
+      console.error(error.response.data);
       setAnimating(false);
       if (error.response.data.error_msg.length > 0)
         window.alert(error.response.data.error_msg);
@@ -219,7 +241,7 @@ function Chatbot2({
   }
 
   const toggleMic = (e) => {
-    e.preventDefault();
+    // e.preventDefault();
     if (contextMode || selectedBotName) {
       if (activeMicComponent == ACT_MIC_CHATBOT) {
         var temp = !mic;
@@ -232,8 +254,34 @@ function Chatbot2({
     }
   }
 
+
+
+
+  const hiddenFileInput = React.useRef();
+  const handleClick = () => {
+    hiddenFileInput.current.click();
+  }
+  const handleChange = (event) => {
+    const fileUploaded = event.target.files[0];
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      getEditor().setValue(event.target.result);
+    };
+    // reader.readAsText(fileUploaded);
+  }
+
+  const selectFile = (event) => {
+    console.log("entered");
+    setSelectedFiles(event.target.files);
+  };
+
+
+
+
+
+
   const alertInfo = (e) => {
-    e.preventDefault();
+    // e.preventDefault();
     alert("This the ultimate guide to Chatbot! Yeah!\n  - To send a message: hit enter or use the send button.\n  - To ask a question: hit the ~ key or use the question mark.\n  - To input a message via speech, use the microphone.\n  - There are 4 buttons next to this info key: for switching the side, toggling the size of the window, making the font smaller and bigger.");
   }
 
@@ -300,6 +348,9 @@ function Chatbot2({
     }
   }, [tempCommands, contextMode]);
 
+
+
+
   // rendering front end HTML elements
   return (
     <div class={"floating-chat enter " + expand} style={expand === "expand" ? (right ? styles.leftWindow : styles.rightWindow) : styles.empty}
@@ -347,9 +398,9 @@ function Chatbot2({
             <div key={item.id}>
               <li class={item.who} time={item.timeStamp} style={fontSize.body}>{
                 isAnimating & messages[messages.length - 1] == item ?
-                <img src = "https://media.tenor.com/On7kvXhzml4AAAAj/loading-gif.gif" width="5%"/>
-                : item.message
-                }
+                  <img src="https://media.tenor.com/On7kvXhzml4AAAAj/loading-gif.gif" width="5%" />
+                  : item.message
+              }
               </li>
               <li class={"timestamp " + item.who + "t"} style={fontSize.body}>{item.timeStamp}</li>
             </div>
@@ -385,9 +436,10 @@ function Chatbot2({
                 :
                 <input type="image"
                   src={mic ? MIC_BTNON : MIC_BTN}
-                  style={{ width: "75%", height: "75%", objectFit: "contain", }}
+                  style={{ width: "50%", height: "50%", objectFit: "contain", }}
                   onClick={(e) => { toggleMic(e); }} />}
             </span>
+
             {/* selectively rendering send context and question buttons based on contextMode */}
             {contextMode ?
               <span>
@@ -402,7 +454,30 @@ function Chatbot2({
                   </button>
                 </span>
               </span>
-              : <div></div>
+              :
+
+              <span>
+                <input type="image"
+                  id='zipFileUpload'
+                  src={ZIP_FILE_UPLOAD}
+                  style={{ width: "50%", height: "50%", objectFit: "contain", }}
+                  onClick={handleClick} />
+
+                <input
+                  type="file"
+                  id="zipfile"
+                  ref={hiddenFileInput}
+                  accept=".zip"
+                  onChange={handleChange}
+                  style={{ display: 'none' }}
+                />
+              </span>
+
+
+
+
+
+
             }
           </div>
         </div>

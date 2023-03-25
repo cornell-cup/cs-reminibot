@@ -26,6 +26,8 @@ export const MIC_BTNON = "./static/img/microphone-green.png";
 export const ACT_MIC_CHATBOT = "cb_mic";
 export const ACT_MIC_COMMAND = "bvc_mic";
 
+export const ZIP_FILE_UPLOAD = "./static/img/zipfile.png";
+
 export const commands = {
     "forward": "Minibot moves forward",
     "backward": "Minibot moves backwards",
