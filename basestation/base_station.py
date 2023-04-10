@@ -23,7 +23,7 @@ import time
 import threading
 # import speech_recognition as sr
 from copy import deepcopy
-import queue 
+import queue
 
 from basestation.bot import Bot
 from basestation.controller.minibot_sim_gui_adapter import run_program_string_for_gui_data
@@ -50,7 +50,7 @@ from .ChatbotWrapper import ChatbotWrapper
 
 import subprocess
 import json
-from time import sleep 
+from time import sleep
 import requests
 
 MAX_VISION_LOG_LENGTH = 1000
@@ -58,15 +58,20 @@ VISION_UPDATE_FREQUENCY = 30
 VISION_DATA_HOLD_THRESHOLD = 5
 
 TAGS = [
-	"0xF9 0x3E 0x4 0xF4",
-	"0xC9 0x12 0xD 0xF4",
-	"0x59 0xE3 0xB 0xF4",
-	"0x59 0xC8 0x6 0xF4",
-	"0x69 0xDB 0x6 0xF4",
-    "start looping",
-	"end looping",
-    "custom block"
+    # "0xF9 0x3E 0x4 0xF4",
+    # "0xC9 0x12 0xD 0xF4",
+    # "0x59 0xE3 0xB 0xF4",
+    # "0x59 0xC8 0x6 0xF4",
+    # "0x69 0xDB 0x6 0xF4",
+    # "start looping",
+    # "end looping",
+    # "custom block"
+    "E",
+    "F",
+    "G",
+    "H",
 ]
+
 
 def make_thread_safe(func):
     """ Decorator which wraps the specified function with a lock.  This makes
@@ -127,7 +132,7 @@ class BaseStation:
         # The Minibot broadcast will allow us to learn the Minibot's ipaddress
         # so that we can connect to the Minibot
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        
+
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         # self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
 
@@ -600,25 +605,26 @@ class BaseStation:
 
     def get_rfid(self, bot_name: str):
         # raise Exception(self.get_active_bots())
-        # bot = self.get_bot(bot_name)
-        # bot.sendKV("RFID", 4)
-        # bot.readKV()
-        # return bot.rfid_tags
+        bot = self.get_bot(bot_name)
+        bot.sendKV("RFID", 4)
+        bot.readKV()
+        print("rfid tag: " + bot.rfid_tags)
+        return bot.rfid_tags
         # TODO: temporary setup by returning random tags
-        return TAGS[random.randint(0, len(TAGS) - 1)]
+        # return TAGS[random.randint(0, len(TAGS) - 1)]
         # return TAGS[0]
 
-    
     def physical_blockly(self, bot_name: str, mode: str, pb_map: json):
         pb = BlocklyThread(bot_name, mode, pb_map, self.py_commands)
+
         def tag_producer():
             while not self.pb_stopped:
                 tag = self.get_rfid(bot_name)
-                pb.rfid_tags.put(tag) 
+                pb.rfid_tags.put(tag)
                 sleep(1.0)
-            pb.pb_stopped = True   
+            pb.pb_stopped = True
         threading.Thread(target=pb.tag_consumer).start()
-        threading.Thread(target=tag_producer).start()        
+        threading.Thread(target=tag_producer).start()
 
     @make_thread_safe
     def set_bot_mode(self, bot_name: str, mode: str, pb_map: json):
@@ -648,12 +654,12 @@ class BaseStation:
 
         bot.sendKV("MODE", mode)
 
-    def end_physical_blockly(self): 
+    def end_physical_blockly(self):
         self.pb_stopped = True
         print("ending physical blockly thread", flush=True)
 
     def get_next_py_command(self):
-        #not reliable?
+        # not reliable?
         if(self.py_commands.qsize() == 0):
             return ""
         val = self.py_commands.get(False)
@@ -794,12 +800,12 @@ class BaseStation:
     def get_custom_function(self):
         if not self.login_email:
             return False, ""
-        
+
         user = User.query.filter(User.email == self.login_email).first()
         return True, user.custom_function
-        
 
     # ==================== NEW SPEECH RECOGNITION ============================
+
     def send_command(self, bot_name, command):
         if command in self.commands:
             self.move_bot_wheels(bot_name, command, 100)

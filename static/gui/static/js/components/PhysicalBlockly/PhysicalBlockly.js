@@ -16,11 +16,11 @@ const commands = ['Move Foward', 'Move Backward', 'Turn Left', 'Turn Right', 'St
 const noControlCommands = ['Move Foward', 'Move Backward', 'Turn Left', 'Turn Right', 'Stop'];
 const choices = ["yellow", "blue", "red", "orange", "purple", "color 1", "color 2", "color 3"];
 const tagMapping = [
-	"0xF9 0x3E 0x4 0xF4",
-	"0xC9 0x12 0xD 0xF4",
-	"0x59 0xE3 0xB 0xF4",
-	"0x59 0xC8 0x6 0xF4",
-	"0x69 0xDB 0x6 0xF4",
+	"249 62 4 244",
+	"201 18 13 244",
+	"89 277 11 244",
+	"89 200 6 244",
+	"105 219 6 244",
 	"start looping",
 	"end looping",
 	"custom block"
