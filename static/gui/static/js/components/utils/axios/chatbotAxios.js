@@ -11,11 +11,11 @@ export function clear_chatbot_context_stack() {
         data: JSON.stringify({
             command: 'reset-context-stack',
         })
-    }).then(function(response) {
+    }).then(function (response) {
         if (response.data) {
             console.log("Successfully clear context stack")
         }
-    }).catch(function(error) {
+    }).catch(function (error) {
         console.log("Chatbot", error);
     })
 }
@@ -31,11 +31,11 @@ export function commit_context_stack_to_db(user_email) {
             command: 'commit-to-db',
             userEmail: user_email
         })
-    }).then(function(response) {
+    }).then(function (response) {
         if (response.data) {
             console.log("Successfully commits context to db.")
         }
-    }).catch(function(error) {
+    }).catch(function (error) {
         console.log("Chatbot", error);
     })
 }
@@ -51,12 +51,12 @@ export function replace_chatbot_context_stack(contextArr, action) {
             command: 'replace-context-stack',
             contextStack: contextArr,
         })
-    }).then(function(response) {
+    }).then(function (response) {
         if (response.data) {
             console.log("successfully replaced context stack with", contextArr);
             action(contextArr);
         }
-    }).catch(function(error) {
+    }).catch(function (error) {
         console.log("Chatbot", error);
     })
 }
@@ -71,10 +71,10 @@ export function get_all_db_context(action) {
         data: JSON.stringify({
             command: 'get-all-db-context',
         })
-    }).then(function(response) {
+    }).then(function (response) {
         console.log("got db context", response.data['context'])
         action(response.data['context'])
-    }).catch(function(error) {
+    }).catch(function (error) {
         console.log("Chatbot", error);
     })
 }
@@ -95,12 +95,12 @@ export function get_all_local_context(action) {
         data: JSON.stringify({
             command: 'get-all-local-context',
         })
-    }).then(function(response) {
+    }).then(function (response) {
         if (response.data) {
             console.log("got local context stack", response.data["context"])
             action(response.data['context']);
         }
-    }).catch(function(error) {
+    }).catch(function (error) {
         console.log("Chatbot", error);
     })
 }

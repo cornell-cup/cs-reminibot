@@ -10,7 +10,9 @@ import {
   ZIP_FILE_UPLOAD
 } from "../utils/Constants.js";
 import SpeechRecognitionComp from "../utils/SpeechRecognitionComp.js";
+import JSZip from 'jszip';
 
+import { upload_with_file } from '../BotCode/blockly.js';
 
 
 //Voice Control 
@@ -37,6 +39,7 @@ const defaultFontSize = {
   }
 }
 const emptyStr = "";
+let initialUpload = [];
 
 
 
@@ -66,14 +69,7 @@ function Chatbot2({
   const [tempCommands, setTempCommands] = useState("");
   const [isAnimating, setAnimating] = useState(false);
 
-
-
-  const [selectedFiles, setSelectedFiles] = useState(undefined);
-  const [currentFile, setCurrentFile] = useState(undefined);
-  const [progress, setProgress] = useState(0);
-  const [message, setMessage] = useState("");
-
-  const [fileInfos, setFileInfos] = useState([]);
+  const [upload, setUpload] = useState(initialUpload);
 
 
 
@@ -262,18 +258,56 @@ function Chatbot2({
     hiddenFileInput.current.click();
   }
   const handleChange = (event) => {
-    const fileUploaded = event.target.files[0];
-    const reader = new FileReader();
-    reader.onload = function (event) {
-      getEditor().setValue(event.target.result);
-    };
-    // reader.readAsText(fileUploaded);
+    let fileUploaded = event.target.files[0];
+    let filenames = "";
+    JSZip.loadAsync(fileUploaded).then(function (zip) {
+      Object.values(zip.files).forEach(function (file) {
+        if (!file.dir) {
+          setUpload([...upload, file]);
+          let formData = new FormData();
+          formData.append(file.name, file);
+          axios({
+            method: 'POST',
+            url: '/chatbot-upload',
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            },
+            data: formData
+          }).then(function (response) {
+            console.log("file is sent successfully");
+          }).catch(function (error) {
+            console.log("Error branch");
+            console.error(error.response.data);
+          })
+
+          filenames += file.name + ", ";
+          // upload_with_file(file);
+        }
+      })
+      filenames = filenames.substring(0, filenames.length - 2);   //trims the trailing comma
+      axios({
+        method: 'POST',
+        url: '/chatbot-upload',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        data: JSON.stringify({
+          filename: filenames,
+          command: "upload-name"
+        }),
+      }).then(function (response) {
+        console.log("names are sent successfully");
+      }).catch(function (error) {
+        console.log("Error branch");
+        console.error(error.response.data);
+      })
+    })
+
   }
 
-  const selectFile = (event) => {
-    console.log("entered");
-    setSelectedFiles(event.target.files);
-  };
+  useEffect(() => {
+    //console.log(upload)
+  })
 
 
 
@@ -322,6 +356,7 @@ function Chatbot2({
           // update the queueStartIdx
           queueStartIdx += response[1];
           setInputText(heardCommand + ": " + commands[heardCommand]);
+          console.log("command heard is:" + heardCommand);
 
           // send command to backend
           axios({
@@ -455,7 +490,6 @@ function Chatbot2({
                 </span>
               </span>
               :
-
               <span>
                 <input type="image"
                   id='zipFileUpload'
@@ -472,11 +506,6 @@ function Chatbot2({
                   style={{ display: 'none' }}
                 />
               </span>
-
-
-
-
-
 
             }
           </div>

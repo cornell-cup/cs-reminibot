@@ -81,6 +81,17 @@ class PythonEditor extends React.Component {
         reader.readAsText(file);
     }
 
+    upload_with_file(file) {
+        const uploaded_file = file;
+        const reader = new FileReader();
+        reader.onload = function (event) {
+            _this.getEditor().setValue(event.target.result);
+        };
+        reader.readAsText(uploaded_file);
+    }
+
+
+
 
     uploadZip(event) {
         const _this = this;
@@ -826,3 +837,4 @@ export default class MinibotBlockly extends React.Component {
         );
     }
 }
+// export function upload_with_file()

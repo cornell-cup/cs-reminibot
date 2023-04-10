@@ -8,6 +8,7 @@ import ContextBox from './ContextBox.js';
 import { replace_chatbot_context_stack, get_all_db_context, get_all_local_context } from '../utils/axios/chatbotAxios.js';
 import { faArrowAltCircleDown } from '@fortawesome/free-solid-svg-icons';
 
+
 const initialHistory = []
 
 function ContextHistory(props) {
@@ -62,6 +63,7 @@ function ContextHistory(props) {
   }
 
   useEffect(() => {
+
     if (!props.contextHistoryLoaded) {
       console.log("context history loaded", props.contextHistoryLoaded)
       /* Fetches contexts and displays them on page 
@@ -76,7 +78,7 @@ function ContextHistory(props) {
 
 
   useEffect(() => {
-   
+
     if (props.parentContext != "" && !wait) {
       let newContextHist = contextHistory.concat({ "id": id, "context": props.parentContext })
       setID(id + 1);
