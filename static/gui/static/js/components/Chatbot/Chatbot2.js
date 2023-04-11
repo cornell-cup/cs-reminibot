@@ -12,7 +12,7 @@ import {
 import SpeechRecognitionComp from "../utils/SpeechRecognitionComp.js";
 import JSZip from 'jszip';
 
-import { upload_with_file } from '../BotCode/blockly.js';
+import MinibotBlockly, { PythonEditor, upload_with_file } from '../BotCode/blockly.js';
 
 
 //Voice Control 
@@ -261,11 +261,12 @@ function Chatbot2({
     let fileUploaded = event.target.files[0];
     let filenames = "";
     JSZip.loadAsync(fileUploaded).then(function (zip) {
-      Object.values(zip.files).forEach(function (file) {
-        if (!file.dir) {
-          setUpload([...upload, file]);
+      Object.keys(zip.files).forEach(function (filename) {
+        zip.files[filename].async('blob').then(function (fileData) {
+
+          setUpload([...upload, fileData]);
           let formData = new FormData();
-          formData.append(file.name, file);
+          formData.append(filename, fileData);
           axios({
             method: 'POST',
             url: '/chatbot-upload',
@@ -280,9 +281,15 @@ function Chatbot2({
             console.error(error.response.data);
           })
 
-          filenames += file.name + ", ";
-          // upload_with_file(file);
-        }
+          filenames += filename + ", ";
+          console.log(fileData);
+          // upload_with_file(fileData);
+          const editor = new PythonEditor();
+          // editor.upload_with_file(fileData);
+          editor.getEditor();
+          console.log(editor);
+          // const bloc = new MinibotBlockly();
+        })
       })
       filenames = filenames.substring(0, filenames.length - 2);   //trims the trailing comma
       axios({
