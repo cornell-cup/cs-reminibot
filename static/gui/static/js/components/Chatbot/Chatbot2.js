@@ -253,21 +253,20 @@ function Chatbot2({
 
 
 
-
+  //Handles upload zip file event through chatbot's command mode
   const hiddenFileInput = React.useRef();
   const handleClick = () => {
     hiddenFileInput.current.click();
   }
+  //parses uploaded zip file as python scripts and send file names & content to backend
   const handleChange = (event) => {
     let fileUploaded = event.target.files[0];
-    let filenames = "";
+    var filenames = "";
     JSZip.loadAsync(fileUploaded).then(function (zip) {
       Object.keys(zip.files).forEach(function (filename) {
         zip.files[filename].async('text').then(function (fileData) {
 
           setUpload([...upload, fileData]);
-          // let formData = new FormData();
-          // formData.append(filename, fileData);
           axios({
             method: 'POST',
             url: '/chatbot-upload',
@@ -286,30 +285,8 @@ function Chatbot2({
             console.log("Error branch");
             console.error(error.response.data);
           })
-
-          filenames += filename + ", ";
-
-          console.log(fileData);
-
-          // console.log("read code as \n" + fileData);
-
-          // axios({
-          //   method: 'POST',
-          //   url: '/script',
-          //   headers: {
-          //     'Content-Type': 'application/json'
-          //   },
-          //   data: JSON.stringify({
-          //     bot_name: selectedBotName,
-          //     script_code: fileData,
-          //     login_email: "test111@gmail.com"
-          //   }),
-          // }).then(function (response) {
-          //   console.log('sent script');
-          // }).catch(function (error) {
-          //   console.log(error.response.data)
-          // });
         })
+        filenames += filename + ", ";
       })
       filenames = filenames.substring(0, filenames.length - 2);   //trims the trailing comma
       axios({
@@ -327,15 +304,11 @@ function Chatbot2({
       }).catch(function (error) {
         console.log("Error branch");
         console.error(error.response.data);
+
       })
+
     })
-
-
   }
-
-  useEffect(() => {
-    //console.log(upload)
-  })
 
 
 
@@ -380,6 +353,8 @@ function Chatbot2({
         let response = "";
         // slice the queue so we only pass in newly heard commands
         let new_command = queue.slice(queueStartIdx);
+
+        //if new command contains the keyword run followed by minimum of one other word indicating file name:
         if (new_command.lastIndexOf("run") >= 0 && new_command.length >= 2) {   //assuming file is named with one word
           response = match_file_command(new_command);
           console.log("response is " + response + ", index: " + queueStartIdx + ", queue is: " + queue);
@@ -421,6 +396,7 @@ function Chatbot2({
               }
             }).catch(function (error) {
               console.log(error.response.data);
+              window.alert("Please indicate an existing file name.\nYou can ask for a list of uploaded files in Q&A Mode.")
             })
 
           }

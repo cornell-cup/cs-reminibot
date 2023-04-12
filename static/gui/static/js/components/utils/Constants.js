@@ -37,7 +37,11 @@ export const commands = {
     "run": "Run a designated uploaded file"
 };
 
-// TODO write documentation
+/*
+*   Parses commands for basic minibot movements (everything in commands list
+    excepts "run").
+    Returns: list - [command, command_index + 1]
+*/
 export function match_command(lst) {
     let command;
     let command_idx = 0;
@@ -62,6 +66,13 @@ export function match_command(lst) {
     return [command, command_idx + 1]
 }
 
+
+/*
+* Function takes care of command-parsing when the keyword heard is "run", 
+* indicating that the user wants to run a uploaded script.
+* Returns: list - [command, filename, command_index + 1]
+* Current Assumption: files are named with a single word
+*/
 export function match_file_command(lst) {
     let command;
     let command_idx = 0;

@@ -100,6 +100,9 @@ class Chatbot(db.Model):
 
 
 class Chatbot_Uploads(db.Model):
+
+    """ Class to store python scripts uploaded as zip folders by a certain user.
+    """
     __tablename__ = 'chatbot_uploads'
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String, nullable=False)
