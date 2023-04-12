@@ -9,6 +9,7 @@ from flask import Flask
 
 db = SQLAlchemy()
 
+
 class Submission(db.Model):
     __tablename__ = 'submission'
     id = db.Column(db.Integer, primary_key=True)
@@ -18,14 +19,12 @@ class Submission(db.Model):
     result = db.Column(db.String, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
-    
     def __init__(self, code, time, duration, user_id, result='Not completed'):
         self.code = code
         self.time = time
         self.duration = duration
         self.result = result
         self.user_id = user_id
-
 
     def serialize(self):
         return {
@@ -97,4 +96,25 @@ class Chatbot(db.Model):
         return{
             'id': self.user_id,
             'context': self.context
+        }
+
+
+class Chatbot_Uploads(db.Model):
+    __tablename__ = 'chatbot_uploads'
+    id = db.Column(db.Integer, primary_key=True)
+    code = db.Column(db.String, nullable=False)
+    filename = db.Column(db.String, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+    def __init__(self, code, filename, user_id):
+        self.code = code
+        self.filename = filename
+        self.user_id = user_id
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'code': self.code,
+            'filename': self.filename,
+            'user_id': self.user_id
         }

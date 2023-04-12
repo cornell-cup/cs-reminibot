@@ -15,10 +15,10 @@ def create_app(test_config=None):
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SQLALCHEMY_ECHO'] = True
 
-    if test_config is None: # initialize database normally
+    if test_config is None:  # initialize database normally
         db_filename = 'program.db'
         app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_filename}'
-    else: # initialize database for testing
+    else:  # initialize database for testing
         db_filename = 'test.db'
         app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_filename}'
 

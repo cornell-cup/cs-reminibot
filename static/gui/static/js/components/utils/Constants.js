@@ -33,7 +33,8 @@ export const commands = {
     "left": "Minibot moves left",
     "right": "Minibot moves right",
     "stop": "Minibot stops",
-    "previous": "Run the last program"
+    "previous": "Run the last program",
+    "run": "Run a designated uploaded file"
 };
 
 // TODO write documentation
@@ -59,4 +60,21 @@ export function match_command(lst) {
     }
     // return command_idx + 1 so we know where to cut off the queue
     return [command, command_idx + 1]
+}
+
+export function match_file_command(lst) {
+    let command;
+    let command_idx = 0;
+    let filename = "";
+
+    //assuming file is named with one word
+    if (commands.hasOwnProperty(lst[lst.length - 3])) {
+        command = lst[lst.length - 3];
+        command_idx = lst.lastIndexOf(command + 1);
+        filename = lst[lst.length - 2];
+    }
+
+    //return name of file to be run; assuming file is named with a single word
+    return [command, filename, command_idx + 1]
+
 }

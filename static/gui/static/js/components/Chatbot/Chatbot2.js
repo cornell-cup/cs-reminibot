@@ -5,6 +5,7 @@ import * as Icons from '@fortawesome/free-solid-svg-icons';
 import {
   commands,
   match_command,
+  match_file_command,
   X_BTN, MIC_BTN, MIC_BTNON,
   ACT_MIC_CHATBOT,
   ZIP_FILE_UPLOAD
@@ -262,18 +263,23 @@ function Chatbot2({
     let filenames = "";
     JSZip.loadAsync(fileUploaded).then(function (zip) {
       Object.keys(zip.files).forEach(function (filename) {
-        zip.files[filename].async('blob').then(function (fileData) {
+        zip.files[filename].async('text').then(function (fileData) {
 
           setUpload([...upload, fileData]);
-          let formData = new FormData();
-          formData.append(filename, fileData);
+          // let formData = new FormData();
+          // formData.append(filename, fileData);
           axios({
             method: 'POST',
             url: '/chatbot-upload',
             headers: {
-              'Content-Type': 'multipart/form-data'
+              'Content-Type': 'application/json',
+              'Upload-Content': 'code'
             },
-            data: formData
+            data: JSON.stringify({
+              script_code: fileData,
+              script_name: filename,
+              login_email: "test111@gmail.com"    //temporary place holder for user email
+            })
           }).then(function (response) {
             console.log("file is sent successfully");
           }).catch(function (error) {
@@ -282,13 +288,27 @@ function Chatbot2({
           })
 
           filenames += filename + ", ";
+
           console.log(fileData);
-          // upload_with_file(fileData);
-          const editor = new PythonEditor();
-          // editor.upload_with_file(fileData);
-          editor.getEditor();
-          console.log(editor);
-          // const bloc = new MinibotBlockly();
+
+          // console.log("read code as \n" + fileData);
+
+          // axios({
+          //   method: 'POST',
+          //   url: '/script',
+          //   headers: {
+          //     'Content-Type': 'application/json'
+          //   },
+          //   data: JSON.stringify({
+          //     bot_name: selectedBotName,
+          //     script_code: fileData,
+          //     login_email: "test111@gmail.com"
+          //   }),
+          // }).then(function (response) {
+          //   console.log('sent script');
+          // }).catch(function (error) {
+          //   console.log(error.response.data)
+          // });
         })
       })
       filenames = filenames.substring(0, filenames.length - 2);   //trims the trailing comma
@@ -296,11 +316,11 @@ function Chatbot2({
         method: 'POST',
         url: '/chatbot-upload',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Upload-Content': 'filenames'
         },
         data: JSON.stringify({
           filename: filenames,
-          command: "upload-name"
         }),
       }).then(function (response) {
         console.log("names are sent successfully");
@@ -309,6 +329,7 @@ function Chatbot2({
         console.error(error.response.data);
       })
     })
+
 
   }
 
@@ -356,35 +377,89 @@ function Chatbot2({
       // Run this code if a new word has been spoken.
       console.log(queue.slice(queueStartIdx))
       if (queue.length > lastLen) {
+        let response = "";
         // slice the queue so we only pass in newly heard commands
-        let response = match_command(queue.slice(queueStartIdx))
-        let heardCommand = response[0]
-        if (heardCommand) {
-          // update the queueStartIdx
-          queueStartIdx += response[1];
-          setInputText(heardCommand + ": " + commands[heardCommand]);
-          console.log("command heard is:" + heardCommand);
+        let new_command = queue.slice(queueStartIdx);
+        if (new_command.lastIndexOf("run") >= 0 && new_command.length >= 2) {   //assuming file is named with one word
+          response = match_file_command(new_command);
+          console.log("response is " + response + ", index: " + queueStartIdx + ", queue is: " + queue);
+          let heardCommand = response[0];
+          let filename = response[1] + ".py";
+          console.log(heardCommand);
+          if (heardCommand) {
+            queueStartIdx += response[2];
+            setInputText(heardCommand + ": " + commands[heardCommand]);
+            console.log("command heard is:" + heardCommand + "; filename is: " + filename);
 
-          // send command to backend
-          axios({
-            method: 'POST',
-            url: '/speech_recognition',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            data: JSON.stringify({
-              bot_name: selectedBotName,
-              command: heardCommand
+            //sending axios command to backend to fetch file's data by filename
+            axios({
+              method: 'GET',
+              url: '/chatbot-upload',
+              headers: {
+                'File-Name': filename,
+                'User-Email': "test111@gmail.com"    //temporary place holder for user email address
+              }
+            }).then(function (response) {
+              console.log("get method result: " + response.data);
+              if (response.data) {
+                axios({
+                  method: 'POST',
+                  url: '/script',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  data: JSON.stringify({
+                    bot_name: selectedBotName,
+                    script_code: response.data,
+                    login_email: "test111@gmail.com"
+                  }),
+                }).then(function (response) {
+                  console.log('sent script');
+                }).catch(function (error) {
+                  console.log(error.response.data)
+                });
+              }
+            }).catch(function (error) {
+              console.log(error.response.data);
             })
-          }).then(function (response) {
-          }).catch(function (error) {
-            let error_msg = error.response.data
-            if (error_msg.length > 0) {
-              setInputText(error_msg)
-              window.alert(error_msg)
-            }
-          })
+
+          }
         }
+
+        else {
+          response = match_command(new_command);
+          console.log("response is " + response + ", index: " + queueStartIdx + ", queue is: " + queue);
+          let heardCommand = response[0]
+          console.log(heardCommand);
+          if (heardCommand) {
+            // update the queueStartIdx
+            queueStartIdx += response[1];
+            setInputText(heardCommand + ": " + commands[heardCommand]);
+            console.log("command heard is:" + heardCommand);
+
+            // send command to backend
+            axios({
+              method: 'POST',
+              url: '/speech_recognition',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              data: JSON.stringify({
+                bot_name: selectedBotName,
+                command: heardCommand
+              })
+            }).then(function (response) {
+            }).catch(function (error) {
+              let error_msg = error.response.data
+              if (error_msg.length > 0) {
+                setInputText(error_msg)
+                window.alert(error_msg)
+              }
+            })
+          }
+        }
+
+
       }
       lastLen = queue.length;
     }

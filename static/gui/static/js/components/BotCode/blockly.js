@@ -4,16 +4,6 @@ import { Button, LabeledTextBox } from '../utils/Util.js';
 import CodeMirror from 'react-codemirror';
 require('codemirror/mode/python/python');
 
-export function upload_with_file(file) {
-    const uploaded_file = file;
-    const reader = new FileReader();
-    reader.onload = function (event) {
-        let obj = new PythonEditor();
-        obj.getEditor().setValue(event.target.result);
-    };
-    reader.readAsText(uploaded_file);
-}
-
 
 export class PythonEditor extends React.Component {
     constructor(props) {
@@ -248,6 +238,7 @@ export class PythonEditor extends React.Component {
                     >
                         <CodeMirror
                             ref="editor"
+                            id="blockly_editor"
                             value={this.props.pythonCode}
                             onChange={(code) => this.updateCode(code)}
                             options={options}

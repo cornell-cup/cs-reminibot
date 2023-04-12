@@ -80,15 +80,24 @@ def chatbot_ask():
 @chatbot_bp.route('/chatbot-upload', methods=['POST', 'GET'])
 def chatbot_upload():
     if request.method == 'POST':
-        header = request.headers['Content-Type']
-        if header == 'application/json':
+        content_header = request.headers['Upload-Content']
+        if content_header == 'filenames':
             data = request.get_json()
             filename = data['filename']
             base_station.update_chatbot_context(
                 "I have uploaded files: " + filename)
             return json.dumps(True), status.HTTP_200_OK
         else:
-            uploaded = request.form.to_dict()
-            print(list(uploaded.values()), file=sys.stderr)
-            print("here",  file=sys.stderr)
-            return "ok"
+            # uploaded = request.form.to_dict()
+            # print(list(uploaded.values()), file=sys.stderr)
+
+            data = request.get_json()
+            filename = data['script_name']
+            fileData = data['script_code']
+            userEmail = data['login_email']
+            base_station.chatbot_upload_file(fileData, filename, userEmail)
+            return json.dumps(True), status.HTTP_200_OK
+    else:
+        filename_header = request.headers['File-Name']
+        user_header = request.headers['User-Email']
+        return base_station.chatbot_get_upload(filename_header, user_header)
