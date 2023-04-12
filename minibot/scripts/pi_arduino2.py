@@ -137,16 +137,17 @@ def rfid(id, returned_tags):
     Ask the Arduino to provide each of the RFID Tag bytes(id1, id2, id3, id4)
     """
     acquire_lock()
-    load_req = [ord('R'),  ord('F'), ord('I'), ord('D'), id]
+    load_req = [ord('R'),  ord('F'), ord('I'), ord('D')]
     load_msg = msglib.make_crc_message(load_req)
     data, numTries = msglib.read_data(
         spi, load_msg, 22, msglib.validate_crc_message)
     data = msglib.unpack_crc_message(data)
-    returned_tags[0] = data[0]
-    returned_tags[1] = data[1]
-    returned_tags[2] = data[2]
-    returned_tags[3] = data[3]
-    print("Data:" + data)
+    if len(data) != 0:
+        returned_tags[0] = data[0]
+        returned_tags[1] = data[1]
+        returned_tags[2] = data[2]
+        returned_tags[3] = data[3]
+    #print("Data:" + data)
     release_lock()
 
 
@@ -156,9 +157,9 @@ def stop():
     To stop an individual motor, set its power to 0 with motor()
     """
     acquire_lock()
-    data = "STOP"
+    data = [ord('S'), ord('T'), ord('O'), ord('P')]
     msg = msglib.make_crc_message(data)
-    msglib.send_message(msg)
+    msglib.send_message(spi, msg)
     release_lock()
 
 

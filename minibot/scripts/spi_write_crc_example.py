@@ -13,7 +13,7 @@ from message_utils import *
 # Set up an SPI instance
 spi = spidev.SpiDev()
 bus = 0
-device = 0
+device = 1
 spi.open(bus,device)
 spi.mode = 0
 spi.max_speed_hz = 115200
@@ -25,7 +25,7 @@ spi.max_speed_hz = 115200
 # T:5 means 5 seconds
 
 # You might encode this as a list:
-data = [ord('M'), 1, ord('D'), ord('F'), ord('P'), 70, ord('T'), 5]
+data = [ord('R'), ord('F'), ord('I'), ord('D'), 4]
 
 # Then, you'll have to send the data over
 msg = make_crc_message(data)

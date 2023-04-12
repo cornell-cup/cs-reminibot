@@ -1,7 +1,7 @@
 import binascii
 import spidev
 import time
-from crc import crc16
+from scripts.crc import crc16
 # Example setup code
 # spi = spidev.SpiDev()
 # bus = 0
@@ -45,7 +45,9 @@ def send_message(spi, msg, max_tries=100):
                 done = True
                 break
         buf = msg.copy()
-    #print("Sent {} in {} tries".format(msg, numTries))
+    # print("Sent {} in {} tries".format(msg, numTries))
+
+
 
 
 def read_data(spi, msg, nbytes, validator, max_tries=100):
@@ -76,13 +78,13 @@ def read_data(spi, msg, nbytes, validator, max_tries=100):
     numTries = 0
     while not done and numTries < max_tries:
         # Send empty buffer (to read)
-        # print("Sent {}: {} | {}".format(len(buf), "".join([chr(c) for c in buf]), buf))
+        # print("Sent {}: {} | {}".format(len(buf), "".join([chr(c) for c in bu>
         spi.xfer(buf)
         numTries += 1
         # Validate data
-        # print("Received {}: {} | {}".format(len(buf), "".join([chr(c) for c in buf]), buf))
-        if validator(buf):
-            # print("Data OK")
+        # print("Received {}: {} | {}".format(len(buf), "".join([chr(c) for c in >
+        if validate_crc_message(buf):
+            print("Data OK")
             data = buf.copy()
             done = True
         else:
@@ -90,7 +92,7 @@ def read_data(spi, msg, nbytes, validator, max_tries=100):
             # print("Send load req msg")
             send_message(spi, lod_msg)
     # print("Read {} in {} tries".format(buf, numTries))
-    return data
+    return [data, numTries]
 
 
 def make_crc_message(data, data_len=DATA_LEN):
@@ -105,8 +107,11 @@ def make_crc_message(data, data_len=DATA_LEN):
     if len(data) > data_len:
         # This is changeable to fit future needs
         raise ValueError(f"Messages can be up to {data_len} bytes.")
-    if type(data) == type("STRING"):
-        data = [ord(d) for d in data]
+    for i in range(len(data)): 
+        if type(data[i]) == type('a'):
+            data[i] = ord(data[i])
+        else:
+            data[i] = int(data[i])
     while len(data) < data_len:
         data.append(0)
     start = bytes([ord(x) for x in "CC"])
@@ -118,8 +123,6 @@ def make_crc_message(data, data_len=DATA_LEN):
     return start + data_hash_bytes + bytes(data) + end
 
 # Validate whether a message is complete
-
-
 def validate_crc_message(msg, data_len=DATA_LEN):
     """
     Validate whether a received message is complete.
@@ -134,7 +137,7 @@ def validate_crc_message(msg, data_len=DATA_LEN):
     data_hash = crc16(msg[4:4+data_len])
     msg_hash = int.from_bytes(msg[2:4], byteorder='big')  # bytes 2 and 3
     hash_ok = (data_hash == msg_hash)
-
+    #print(hash_ok)
     return start_ok and end_ok and hash_ok
 
 
