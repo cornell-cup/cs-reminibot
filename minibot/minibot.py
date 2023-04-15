@@ -303,11 +303,6 @@ class Minibot:
             # shrink the data_str with the remaining portion of the commands
             data_str = data_str[end + token_len:]
 
-    def rfid_method(self, sock: socket, key: str, value: str):
-        returned_tags = [0, 0, 0, 0]
-        ece.rfid(value, returned_tags)
-        self.sendKV(sock, key, ' '.join(str(e) for e in returned_tags))
-
     def execute_command(self, sock: socket, key: str, value: str):
         """ Executes a command using the given key-value pair 
 
@@ -381,16 +376,12 @@ class Minibot:
             else:
                 self.sendKV(sock, key, "")
         elif key == "RFID":
-            #returned_tags = [0, 0, 0, 0]
-
-            #thread = Thread(target=ece.rfid, args=[value, returned_tags])
-            #thread.start()
-
-            #while thread.is_alive():
-            #    time.sleep(0.01)
-            #ece.rfid(value, returned_tags)
-            #self.sendKV(sock, key, ' '.join(str(e) for e in returned_tags))
-            thread = Thread(target=self.rfid_method, args=[sock, key, value])
+            def pass_tags(self, sock: socket, key: str, value: str):
+                returned_tags = [0, 0, 0, 0]
+                ece.rfid(value, returned_tags)
+                self.sendKV(sock, key, ' '.join(str(e) for e in returned_tags))
+                
+            thread = Thread(target=pass_tags, args=[sock, key, value])
             thread.start()
 
     def sendKV(self, sock: socket, key: str, value: str):
