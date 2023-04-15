@@ -93,7 +93,7 @@ function Chatbot2({
 
   // functions responding to commands changing the appearance of the chatbot windows
   const changeInputText = (event) => {
-    // event.preventDefault();
+    event.preventDefault();
     if (!contextMode) return;
     const input = event.currentTarget.value;
     setInputText(input);
@@ -116,31 +116,31 @@ function Chatbot2({
   }
 
   const closeChatbox = (e) => {
-    // e.preventDefault();
+    e.preventDefault();
     setOpen(false);
     setExpand("");
     setEnter("");
   }
 
   const switchSide = (e) => {
-    // e.preventDefault();
+    e.preventDefault();
     if (expand == "expand") {
       setRight(!right);
     }
   }
 
   const toggleWindowSize = (e) => {
-    // e.preventDefault();
+    e.preventDefault();
     setFullSize(!fullSize);
   }
 
   const toggleChangeFont = (e) => {
-    // e.preventDefault();
+    e.preventDefault();
     setCanChangeFont(!canChangeFont);
   }
 
   const changeFontSize = (e, i) => {
-    // e.preventDefault();
+    e.preventDefault();
     if (!canChangeFont || (fontSize.body['fontSize'] <= 5 && i < 0) || (fontSize.body['fontSize'] >= 50 && i > 0)) return;
     const newFontSize = {
       header: {
@@ -168,7 +168,7 @@ function Chatbot2({
 
   // functions processing commands: sending context, question, toggling mics
   const sendContext = (e) => {
-    // e.preventDefault();
+    e.preventDefault();
     if (inputText === emptyStr) return;
     var temp_id = id + 1;
     setId(temp_id);
@@ -199,7 +199,7 @@ function Chatbot2({
   }
 
   const sendQuestion = (e) => {
-    // e.preventDefault();
+    e.preventDefault();
     if (inputText === emptyStr) return;
     var temp_id = id + 1;
     let newList = messages.concat({ id: temp_id, who: "self", message: inputText, timeStamp: getTimeStamp() });
@@ -238,7 +238,7 @@ function Chatbot2({
   }
 
   const toggleMic = (e) => {
-    // e.preventDefault();
+    e.preventDefault();
     if (contextMode || selectedBotName) {
       if (activeMicComponent == ACT_MIC_CHATBOT) {
         var temp = !mic;
@@ -316,7 +316,7 @@ function Chatbot2({
 
 
   const alertInfo = (e) => {
-    // e.preventDefault();
+    e.preventDefault();
     alert("This the ultimate guide to Chatbot! Yeah!\n  - To send a message: hit enter or use the send button.\n  - To ask a question: hit the ~ key or use the question mark.\n  - To input a message via speech, use the microphone.\n  - There are 4 buttons next to this info key: for switching the side, toggling the size of the window, making the font smaller and bigger.");
   }
 
