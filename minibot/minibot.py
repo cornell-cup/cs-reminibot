@@ -75,6 +75,13 @@ class Minibot:
         loop continuously listens for commands from the basestation, and 
         connects/reconnects to the basestation if there is no connection.
         """
+        
+        def remove_closed_sockets(SOCKET_LIST):
+            for sock in SOCKET_LIST:
+            # Remove file descriptor if closed
+                if sock.fileno < 0:
+                    SOCKET_LIST.remove(sock)
+        
         self.create_listener_sock()
         # Add listener sock to input_socks so that we are alerted if any
         # connections are trying to be created and add listener sock to
@@ -89,6 +96,14 @@ class Minibot:
             # with us (the minibot)
             if len(self.readable_socks) == 1:
                 self.broadcast_to_base_station()
+                
+            #Remove all closed sockets to prevent select errors. Note: not sure
+            #whether to perform this before or after checking whether reconnection
+            #is necessary.
+            remove_closed_sockets(self.readable_socks)
+            remove_closed_sockets(self.writable_socks)
+            remove_closed_sockets(self.errorable_socks)
+                
             # select returns new lists of sockets that are read ready (have
             # received data), write ready (have initialized their buffers, and
             # are ready to be written to), or errored out (have thrown an error)
