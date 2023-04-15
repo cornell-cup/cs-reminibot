@@ -75,13 +75,14 @@ class Minibot:
         loop continuously listens for commands from the basestation, and 
         connects/reconnects to the basestation if there is no connection.
         """
-        
+
         def remove_closed_sockets(SOCKET_LIST):
-            for sock in SOCKET_LIST:
+            sockets = SOCKET_LIST.copy()
+            for sock in sockets:
             # Remove file descriptor if closed
                 if sock != None and sock.fileno() < 0:
                     SOCKET_LIST.remove(sock)
-        
+
         self.create_listener_sock()
         # Add listener sock to input_socks so that we are alerted if any
         # connections are trying to be created and add listener sock to
