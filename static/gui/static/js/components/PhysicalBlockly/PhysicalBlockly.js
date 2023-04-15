@@ -52,7 +52,7 @@ export default class PhysicalBlockly extends React.Component {
 		// setInterval(this.pollForUpdates, 1000);
 		this.getCustomBlocks();
 		this.setState({ code: "", customBlockFillCount: 0 });
-		this.setState({ customCommands: customCommand, tempCommandData: customCommand });
+		this.setState({ customCommands: customCommand, tempCommandData: new Map(customCommand) });
 		const _this = this;
 		_this.bWorkspace = window.Blockly.inject('pbBlocklyDiv', {scrollbars:true});
 		_this.codeRef["current"].getCodeMirror().setValue("");
@@ -77,7 +77,7 @@ export default class PhysicalBlockly extends React.Component {
 		// setInterval(tempClick, 1000);
 		const _this = this;
 		_this.codeRef["current"].getCodeMirror().setValue("");
-		_this.setState({ stage: 1, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "", mode: mode }); //text: "", tabs: 0, loopvar: 0
+		_this.setState({ stage: 1, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "", mode: mode, tempCommandData: new Map(_this.customCommands), unsavedCustomization: false }); //text: "", tabs: 0, loopvar: 0
 		if (mode == 1) {
 			_this.setState({ displayCommands: noControlCommands });
 		} else {

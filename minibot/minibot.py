@@ -75,13 +75,14 @@ class Minibot:
         loop continuously listens for commands from the basestation, and 
         connects/reconnects to the basestation if there is no connection.
         """
-        
+
         def remove_closed_sockets(SOCKET_LIST):
-            for sock in SOCKET_LIST:
+            sockets = SOCKET_LIST.copy()
+            for sock in sockets:
             # Remove file descriptor if closed
                 if sock != None and sock.fileno() < 0:
                     SOCKET_LIST.remove(sock)
-        
+
         self.create_listener_sock()
         # Add listener sock to input_socks so that we are alerted if any
         # connections are trying to be created and add listener sock to
@@ -302,11 +303,6 @@ class Minibot:
             # shrink the data_str with the remaining portion of the commands
             data_str = data_str[end + token_len:]
 
-    def rfid_method(self, sock: socket, key: str, value: str):
-        returned_tags = [0, 0, 0, 0]
-        ece.rfid(value, returned_tags)
-        self.sendKV(sock, key, ' '.join(str(e) for e in returned_tags))
-
     def execute_command(self, sock: socket, key: str, value: str):
         """ Executes a command using the given key-value pair 
 
@@ -380,16 +376,12 @@ class Minibot:
             else:
                 self.sendKV(sock, key, "")
         elif key == "RFID":
-            #returned_tags = [0, 0, 0, 0]
-
-            #thread = Thread(target=ece.rfid, args=[value, returned_tags])
-            #thread.start()
-
-            #while thread.is_alive():
-            #    time.sleep(0.01)
-            #ece.rfid(value, returned_tags)
-            #self.sendKV(sock, key, ' '.join(str(e) for e in returned_tags))
-            thread = Thread(target=self.rfid_method, args=[sock, key, value])
+            def pass_tags(self, sock: socket, key: str, value: str):
+                returned_tags = [0, 0, 0, 0]
+                ece.rfid(value, returned_tags)
+                self.sendKV(sock, key, ' '.join(str(e) for e in returned_tags))
+                
+            thread = Thread(target=pass_tags, args=[sock, key, value])
             thread.start()
 
     def sendKV(self, sock: socket, key: str, value: str):
