@@ -45,7 +45,7 @@ export default class PhysicalBlockly extends React.Component {
 		this.toggleDisplayCollapse = this.toggleDisplayCollapse.bind(this);
 		this.bWorkspace = null;
 		this.getCustomBlocks = this.getCustomBlocks.bind(this);
-		this.saveCustomBlockSelection = this.saveCustomBlockSelection.bind(this);
+		this.saveCustomSelection = this.saveCustomSelection.bind(this);
 	}
 
 	componentDidMount() {
@@ -114,26 +114,26 @@ export default class PhysicalBlockly extends React.Component {
 		//post request to basestation to stop the process
 		axios.get('/end_physical_blockly')
 			.then(function (response) {
-				let x = 0;
-				while (x < _this.state.loopvar) {
-					let repl = prompt("What number would you like to replace n" + x + " with?", "5");
-					let resp = parseInt(repl);
-					if (isNaN(resp)) {
-						resp = 5;
-					}
-					//Replacing loop value in python
-					_this.setState({ code: _this.state.code.replace("n" + x, resp) });
-					// _this.props.setPb(_this.props.pb.replace("n" + x, resp));
-					// _this.codeRef["current"].getCodeMirror().setValue(_this.props.pb);
-					_this.codeRef["current"].getCodeMirror().setValue(_this.state.code);
+				// let x = 0;
+				// while (x < _this.state.loopvar) {
+				// 	let repl = prompt("What number would you like to replace n" + x + " with?", "5");
+				// 	let resp = parseInt(repl);
+				// 	if (isNaN(resp)) {
+				// 		resp = 5;
+				// 	}
+				// 	//Replacing loop value in python
+				// 	_this.setState({ code: _this.state.code.replace("n" + x, resp) });
+				// 	// _this.props.setPb(_this.props.pb.replace("n" + x, resp));
+				// 	// _this.codeRef["current"].getCodeMirror().setValue(_this.props.pb);
+				// 	_this.codeRef["current"].getCodeMirror().setValue(_this.state.code);
 
-					//Replacing in blockly
-					_this.state.loopList[x].getChildren(false)[0].setFieldValue(resp, "NUM");
-					x++;
-				}
+				// 	//Replacing in blockly
+				// 	_this.state.loopList[x].getChildren(false)[0].setFieldValue(resp, "NUM");
+				// 	x++;
+				// }
 
-				// If there is custom block to be filled
-				if (_this.state.customBlockFillCount > 0 && _this.state.customBlocks.length > 0) {
+				// If there is loop num or custom block to be filled
+				if (_this.state.loopvar > 0 || (_this.state.customBlockFillCount > 0 && _this.state.customBlocks.length > 0)) {
 					$('#customModal').modal('show');
 				}
 				_this.setState({ stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [] });
@@ -151,14 +151,19 @@ export default class PhysicalBlockly extends React.Component {
 		});;
 	}
 
-	saveCustomBlockSelection(e, customBlockSelection) {
+	saveCustomSelection(e, loopSelection, customBlockSelection) {
 		const _this = this;
 		e.preventDefault();
 		$('#customModal').modal('hide');
-		console.log("received custom block selection");
-		console.log(customBlockSelection);
-		console.log(_this.state.customPlacedBlocks);
 
+		for(var i = 0; i < _this.state.loopvar; i ++) {
+			var val = loopSelection[i];
+			_this.setState({ code: _this.state.code.replace("n" + i, val) });
+			_this.codeRef["current"].getCodeMirror().setValue(_this.state.code);
+			_this.state.loopList[i].getChildren(false)[0].setFieldValue(val, "NUM");
+		}
+
+		console.log("received custom block selection");
 		let newCode = _this.state.code;
 		let codeList = _this.state.code.split("\n");
 		for(var i = 0; i < _this.state.customBlockFillCount; i ++) {
@@ -178,8 +183,6 @@ export default class PhysicalBlockly extends React.Component {
 
 		_this.setState({ code: newCode, customBlockFillCount: 0, customPlacedBlocks: []});
 		_this.codeRef["current"].getCodeMirror().setValue(newCode);
-		// TODO: update the block space, text editor already updated
-		// TODO: test by running multiple sessions
 	}
 
 	findCustomBlock(blockName, customBlocks) {
@@ -473,7 +476,7 @@ export default class PhysicalBlockly extends React.Component {
 							</div>
 						</div>
 					</p>
-					<CustomBlockModal count={this.state.customBlockFillCount} customBlocks={this.state.customBlocks} saveSelection={this.saveCustomBlockSelection}/>
+					<CustomBlockModal customCount={this.state.customBlockFillCount} loopCount={this.state.loopvar} customBlocks={this.state.customBlocks} saveSelection={this.saveCustomSelection}/>
 					{this.props.selectedBotName != '' && this.state.stage == 0 ?
 						<div>
 							<p>
