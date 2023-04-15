@@ -302,6 +302,11 @@ class Minibot:
             # shrink the data_str with the remaining portion of the commands
             data_str = data_str[end + token_len:]
 
+    def rfid_method(self, sock: socket, key: str, value: str):
+        returned_tags = [0, 0, 0, 0]
+        ece.rfid(value, returned_tags)
+        self.sendKV(sock, key, ' '.join(str(e) for e in returned_tags))
+
     def execute_command(self, sock: socket, key: str, value: str):
         """ Executes a command using the given key-value pair 
 
@@ -375,15 +380,17 @@ class Minibot:
             else:
                 self.sendKV(sock, key, "")
         elif key == "RFID":
-            returned_tags = [0, 0, 0, 0]
+            #returned_tags = [0, 0, 0, 0]
 
-            thread = Thread(target=ece.rfid(), args=[value, returned_tags])
+            #thread = Thread(target=ece.rfid, args=[value, returned_tags])
+            #thread.start()
+
+            #while thread.is_alive():
+            #    time.sleep(0.01)
+            #ece.rfid(value, returned_tags)
+            #self.sendKV(sock, key, ' '.join(str(e) for e in returned_tags))
+            thread = Thread(target=self.rfid_method, args=[sock, key, value])
             thread.start()
-
-            while thread.is_alive():
-                time.sleep(0.01)
-
-            self.sendKV(sock, key, ' '.join(str(e) for e in returned_tags))
 
     def sendKV(self, sock: socket, key: str, value: str):
         """ Sends a key-value pair to the specified socket. The key value
@@ -396,6 +403,7 @@ class Minibot:
             self.writable_sock_message_queue_map[sock].append(message)
         else:
             self.writable_sock_message_queue_map[sock] = deque([message])
+
 
     def sigint_handler(self, sig: int, frame: object):
         """ Closes open resources before terminating the program, when 

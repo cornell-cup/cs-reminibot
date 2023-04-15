@@ -18,7 +18,7 @@ const choices = ["yellow", "blue", "red", "orange", "purple", "color 1", "color 
 const tagMapping = [
 	"249 62 4 244",
 	"201 18 13 244",
-	"89 277 11 244",
+	"89 227 11 244",
 	"89 200 6 244",
 	"105 219 6 244",
 	"start looping",

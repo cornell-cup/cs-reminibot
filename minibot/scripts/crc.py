@@ -36,10 +36,9 @@ crc16_table = [
 def crc16(data):
   crc = 0xffff
   for c in data:
+    c = int(c)
     crc = ((crc << 8) ^ crc16_table[((crc >> 8) ^ c) & 0xff]) & 0xffff
-
   if crc == 0:
     crc = 1
 
   return crc
-
