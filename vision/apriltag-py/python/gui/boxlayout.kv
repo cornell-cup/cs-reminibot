@@ -1,34 +1,19 @@
-
 WindowManager:
-	FirstWindow:
+	FirstWindow: 
+	SecondWindow: 
 	InputWindow:
 	DirectionsWindow:
 
 
+# first window allows you to run part three, and links to other pages
 <FirstWindow>
 	name: "first"
 
-	BoxLayout:
+	BoxLayout: 
 		size: root.width, root.height
 		padding: 50
 		spacing: 10
 		orientation: "vertical"
-
-		ScaleLabel: 
-			font_size: 90
-			font_name: "RobotoMono-Regular"
-			color: (1, 1, 1, 1)
-			text: "Calibration"
-			background_color: (23/255, 37/255, 41/255, 1)
-			pos_hint: {'center_x': 0.5}
-			size_hint: (1, 0.2)
-			canvas.before:
-				Color:
-					rgba: self.background_color
-				Rectangle:
-					size: self.size
-					pos: self.pos
-			color: (1, 1, 1, 1)
 
 		ScaleLabel: 
 			font_size: 40
@@ -47,21 +32,156 @@ WindowManager:
 				Rectangle:
 					size: self.size
 					pos: self.pos
-			color: (1, 1, 1, 1)					
+			color: (1, 1, 1, 1)		
 
 		ScaleButton:
 			font_size: 80
 			font_name: "RobotoMono-Regular"
 			background_color: (240/255, 116/255, 112/255,1)
 			color: (1, 1, 1, 1)
-			text: "Start"
+			text: "Did you change the mat?"
 			pos_hint: {'center_x': 0.5}
 			size_hint: (0.5, 0.2)
 			on_release: 
 				app.root.current = "input"
-			
+
+		ScaleButton:
+			font_size: 80
+			font_name: "RobotoMono-Regular"
+			background_color: (240/255, 116/255, 112/255,1)
+			color: (1, 1, 1, 1)
+			text: "Did you move the camera?"
+			pos_hint: {'center_x': 0.5}
+			size_hint: (0.5, 0.2)
+			on_release: 
+				app.root.current = "second"
+
+		ScaleButton:
+			id: calibrationButton
+			font_size: 80
+			font_name: "RobotoMono-Regular"
+			color: (1, 1, 1, 1)
+			background_color: (240/255, 116/255, 112/255,1)
+			pos_hint: {'center_x': 0.5}
+			size_hint: (0.4, 0.1)
+			text: "Begin"
+			on_press:
+				app.root.current: "progress"
+				root.part_3()
+				
+
+# second window allows you to run part two and three 
+<SecondWindow>
+	name: "second"
+
+	FloatLayout:
+		ScaleButton:
+			id: calibrationChooser
+			background_color: (0,1/255,1/255,1)
+			font_size: 20
+			font_name: "RobotoMono-Regular"
+			pos_hint: {'center_x': 0.5, 'center_y': 0.55}
+			size_hint: (0.2, 0.1)
+			text: "Select Calibration File"
+			on_press: root.showCalibrationChooser = not root.showCalibrationChooser
+
+		ScaleButton:
+			id: positionChooser
+			background_color: (0,1/255,1/255,1)
+			font_size: 20
+			font_name: "RobotoMono-Regular"
+			pos_hint: {'center_x': 0.5, 'center_y': 0.4}
+			size_hint: (0.2, 0.1)
+			text: "Select Position File"
+			on_press: root.showPositionChooser = not root.showPositionChooser
+
+		ScaleButton:
+			id: backButton
+			font_size: 80
+			font_name: "RobotoMono-Regular"
+			color: (1, 1, 1, 1)
+			background_color: (240/255, 116/255, 112/255,1)
+			pos_hint: {'center_x' : 0.2, 'center_y': 0.2}
+			size_hint: (0.4, 0.1)
+			text: "Back"
+			on_release:
+				app.root.current = "first"
+
+		ScaleButton:
+			id: calibrationButton
+			font_size: 80
+			font_name: "RobotoMono-Regular"
+			color: (1, 1, 1, 1)
+			background_color: (240/255, 116/255, 112/255,1)
+			pos_hint: {'center_x': 0.8, 'center_y': 0.2}
+			size_hint: (0.4, 0.1)
+			text: "Begin"
+			on_press:
+				app.root.current: "progress"
+				root.part_2(fileCalibrationChooser.selection, filePositionChooser.selection)
+	
+	BoxLayout:
+		#layout for the FileChooser
+		orientation: 'vertical'
+		size_hint_y: 1 if root.showCalibrationChooser else 0
+		size_hint_x: 1 if root.showCalibrationChooser else 0
+		pos_hint: {'center_x': 0.5, 'center_y': 0.5} if root.showCalibrationChooser else {'center_x': -1, 'center_y': -1}
+		FileChooserListView:
+			id: fileCalibrationChooser
+			canvas.before:
+				Color:
+					rgba: 23/255, 37/255, 41/255, 1
+				Rectangle:
+					pos: self.pos
+					size: self.size
+				#on_selection: root.file_fire_select(*args)
+			RoundedButton:
+				id: test
+				canvas.before:
+					Color:
+						rgba: 140/255, 60/255, 60/255, 1
+					RoundedRectangle:
+						size: self.size
+						pos: self.pos
+						radius: [10]
+				font_size: 40
+				pos_hint: {'center_x': 0.5, 'center_y': 0.955}
+				size_hint: (0.1, 0.05)
+				text: "Exit"
+				on_press: root.showCalibrationChooser = not root.showCalibrationChooser
+				
+	BoxLayout:
+		#layout for the PositionsChooser
+		orientation: 'vertical'
+		size_hint_y: 1 if root.showPositionChooser else 0
+		size_hint_x: 1 if root.showPositionChooser else 0
+		pos_hint: {'center_x': 0.5, 'center_y': 0.5} if root.showPositionChooser else {'center_x': -1, 'center_y': -1}
+		FileChooserListView:
+			id: filePositionChooser
+			canvas.before:
+				Color:
+					rgba: 23/255, 37/255, 41/255, 1
+				Rectangle:
+					pos: self.pos
+					size: self.size
+				#on_selection: root.file_fire_select(*args)
+			RoundedButton:
+				id: test
+				canvas.before:
+					Color:
+						rgba: 140/255, 60/255, 60/255, 1
+					RoundedRectangle:
+						size: self.size
+						pos: self.pos
+						radius: [10]
+				font_size: 40
+				pos_hint: {'center_x': 0.5, 'center_y': 0.955}
+				size_hint: (0.1, 0.05)
+				text: "Exit"
+				on_press: root.showPositionChooser = not root.showPositionChooser
 
 
+# input window allows you to run part one two and part three 
 <InputWindow>
 	name: "input"
 
@@ -102,34 +222,6 @@ WindowManager:
 				font_size: rows.height/2
 				font_name: "RobotoMono-Regular"
 				color: (1, 1, 1, 1)
-			
-
-		ScaleButton:
-			id: calibrationButton
-			font_size: 80
-			font_name: "RobotoMono-Regular"
-			color: (1, 1, 1, 1)
-			background_color: (240/255, 116/255, 112/255,1)
-			pos_hint: {'center_x': 0.8, 'center_y': 0.2}
-			size_hint: (0.4, 0.1)
-			text: "Begin"
-			on_press:
-				app.root.current: "progress"
-				root.handle_input(rowsInput.text,columnsInput.text, fileCalibrationChooser.selection, filePositionChooser.selection)
-		ScaleButton:
-			id: backButton
-			font_size: 80
-			font_name: "RobotoMono-Regular"
-			color: (1, 1, 1, 1)
-			background_color: (240/255, 116/255, 112/255,1)
-			pos_hint: {'center_x' : 0.2, 'center_y': 0.2}
-			size_hint: (0.4, 0.1)
-			text: "Back"
-			on_release:
-				app.root.current = "first"
-
-				
-
 
 		ScaleButton:
 			id: calibrationChooser
@@ -150,7 +242,32 @@ WindowManager:
 			size_hint: (0.2, 0.1)
 			text: "Select Position File"
 			on_press: root.showPositionChooser = not root.showPositionChooser
-		
+
+		ScaleButton:
+			id: backButton
+			font_size: 80
+			font_name: "RobotoMono-Regular"
+			color: (1, 1, 1, 1)
+			background_color: (240/255, 116/255, 112/255,1)
+			pos_hint: {'center_x' : 0.2, 'center_y': 0.2}
+			size_hint: (0.4, 0.1)
+			text: "Back"
+			on_release:
+				app.root.current = "first"
+
+		ScaleButton:
+			id: calibrationButton
+			font_size: 80
+			font_name: "RobotoMono-Regular"
+			color: (1, 1, 1, 1)
+			background_color: (240/255, 116/255, 112/255,1)
+			pos_hint: {'center_x': 0.8, 'center_y': 0.2}
+			size_hint: (0.4, 0.1)
+			text: "Begin"
+			on_press:
+				app.root.current: "progress"
+				root.handle_input(rowsInput.text,columnsInput.text, fileCalibrationChooser.selection, filePositionChooser.selection)
+
 		ScaleButton:
 			id: toDirections
 			color: (117/255, 117/255, 117/255, 1)
@@ -160,8 +277,7 @@ WindowManager:
 			size_hint: (0.2, 0.1)
 			text: "Directions"
 			on_press: app.root.current = "directions"
-
-			
+	
 	BoxLayout:
 		#layout for the FileChooser
 		orientation: 'vertical'
@@ -253,9 +369,36 @@ WindowManager:
 			pos_hint: {'center_x': 0.5, 'center_y': 0.2}
 			on_press: app.root.current = "input"
 
+<DirectionsWindow>
+	name: "directions_one"
+
+	FloatLayout:
+		#layout for directions to use the gui
+		orientation: 'vertical'
+		size_hint_y: 1
+		size_hint_x: 1
+		pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+		ScaleLabel:
+			font_size: 80
+			font_name: "RobotoMono-Regular"
+			text: "How To Calibrate"
+			pos_hint: {'center_x': 0.5, 'center_y': 0.95}
+		ScaleLabel:
+			text: "1.) When camera identifies the AprilTags (shows red dots on them), press the Spacebar\n\n2.) The vision system is now calibrated and the camera picks up the AprilTags (can see the green outline)\n\n3.) Press the Spacebar to close the camera window"
+			pos_hint: {'center_x': 0.5, 'center_y': 0.6}
+			size_hint: (0.9, 0.9)
+			font_size: 70
+			font_name: "RobotoMono-Regular"
+		ScaleButton:
+			font_size: 30
+			background_color: (240/255, 81/255, 87/255, 1)
+			font_name: "RobotoMono-Regular"
+			size_hint: (0.2, 0.1)
+			text: "Got it!" 
+			pos_hint: {'center_x': 0.5, 'center_y': 0.2}
+			on_press: app.root.current = "input"
+
 			
-
-
 <RoundedButton@Button>
 	background_color: (0,0,0,0)
 	background_normal: ''
@@ -269,7 +412,7 @@ WindowManager:
 
 #helps scale the text of a Label widget
 <ScaleLabel@Label>:
-    _scale: 1. if self.texture_size[0] < self.width else float(self.width) / self.texture_size[0]
+    _scale: 1. if self.texture_size[0] < self.width else float(self.width) / (self.texture_size[0] + 1)
     canvas.before:
         PushMatrix
         Scale:
@@ -280,7 +423,7 @@ WindowManager:
         PopMatrix
 
 <ScaleTextInput@TextInput>
-	_scale: 1. if self.texture_size[0] < self.width else float(self.width) / self.texture_size[0]
+	_scale: 1. if self.texture_size[0] < self.width else float(self.width) / (self.texture_size[0] + 1)
 	canvas.before:
         PushMatrix
         Scale:
@@ -292,7 +435,7 @@ WindowManager:
 
 <-ScaleButton@Button>:
 	state_image: self.background_normal if self.state == 'normal' else self.background_down
-	_scale: 1. if self.texture_size[0] < self.width else float(self.width) / self.texture_size[0]
+	_scale: 1. if self.texture_size[0] < self.width else float(self.width) / (self.texture_size[0] + 1)
 	canvas:
 		Color:
 			rgba: self.background_color
