@@ -13,7 +13,6 @@ import {
 import SpeechRecognitionComp from "../utils/SpeechRecognitionComp.js";
 import JSZip from 'jszip';
 
-import MinibotBlockly, { PythonEditor, upload_with_file } from '../BotCode/blockly.js';
 
 
 //Voice Control 
