@@ -52,7 +52,7 @@ export default class PhysicalBlockly extends React.Component {
 		// setInterval(this.pollForUpdates, 1000);
 		this.getCustomBlocks();
 		this.setState({ code: "", customBlockFillCount: 0 });
-		this.setState({ customCommands: customCommand, tempCommandData: customCommand });
+		this.setState({ customCommands: customCommand, tempCommandData: new Map(customCommand) });
 		const _this = this;
 		_this.bWorkspace = window.Blockly.inject('pbBlocklyDiv', {scrollbars:true});
 		_this.codeRef["current"].getCodeMirror().setValue("");
@@ -119,7 +119,7 @@ export default class PhysicalBlockly extends React.Component {
 					let repl = prompt("What number would you like to replace n" + x + " with?", "5");
 					let resp = parseInt(repl);
 					if (isNaN(resp)) {
-						resp = 5;
+						resp = 2;
 					}
 					//Replacing loop value in python
 					_this.setState({ code: _this.state.code.replace("n" + x, resp) });
