@@ -9,13 +9,13 @@ import sys
 from basestation.bot import Bot
 from basestation.databases.user_database import Submission, User
 from basestation import db
-from basestation.piVision.pb import BlocklyThread
 from basestation.util.stoppable_thread import StoppableThread, ThreadSafeVariable
 from basestation.util.helper_functions import distance
+import basestation.piVision.pb as pb
 
 from random import choice, randint
 from string import digits, ascii_lowercase, ascii_uppercase
-from typing import Tuple, Optional
+from typing import Any, Dict, List, Tuple, Optional
 import os
 import re
 import socket
@@ -40,18 +40,12 @@ from basestation.util.units import AngleUnits, LengthUnits, convert_angle, conve
 import shlex
 from basestation.util.world_builder import WorldBuilder
 
-from random import choice, randint
-from string import digits, ascii_lowercase, ascii_uppercase
-from typing import Any, Dict, List, Tuple, Optional
-from copy import deepcopy
-
 from .ChatbotWrapper import ChatbotWrapper
 
 
 import subprocess
 import json
 from time import sleep
-import requests
 
 MAX_VISION_LOG_LENGTH = 1000
 VISION_UPDATE_FREQUENCY = 30
@@ -615,15 +609,30 @@ class BaseStation:
         # return TAGS[0]
 
     def physical_blockly(self, bot_name: str, mode: str, pb_map: json):
-        pb = BlocklyThread(bot_name, mode, pb_map, self.py_commands)
-
+        rfid_tags = queue.Queue()
+        
         def tag_producer():
             while not self.pb_stopped:
                 tag = self.get_rfid(bot_name)
-                pb.rfid_tags.put(tag)
+                rfid_tags.put(tag)
                 sleep(1.0)
-            pb.pb_stopped = True
-        threading.Thread(target=pb.tag_consumer).start()
+            
+        def tag_consumer(self):
+            while not self.pb_stopped:
+                #print("queue size: " + str(self.rfid_tags.qsize()), flush=True)
+                tag = rfid_tags.get()
+                if tag in pb_map.keys():
+                    tag = pb_map[tag]
+                    task = pb.classify(tag, self.commands)
+                    py_code = pb.pythonCode[task[1]]
+
+                    if mode == '1':
+                        if(py_code[0:3] == "bot"):
+                            pb.send_request(task)
+                    self.py_commands.put("pb:" + py_code)
+                sleep(1.0)
+                
+        threading.Thread(target=tag_consumer).start()
         threading.Thread(target=tag_producer).start()
 
     @make_thread_safe
