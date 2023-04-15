@@ -11,7 +11,7 @@ from basestation.databases.user_database import Submission, User
 from basestation import db
 from basestation.util.stoppable_thread import StoppableThread, ThreadSafeVariable
 from basestation.util.helper_functions import distance
-import basestation.piVision.pb as pb
+import basestation.piVision.pb_utils as pb_utils
 
 from random import choice, randint
 from string import digits, ascii_lowercase, ascii_uppercase
@@ -623,12 +623,12 @@ class BaseStation:
                 tag = rfid_tags.get()
                 if tag in pb_map.keys():
                     tag = pb_map[tag]
-                    task = pb.classify(tag, self.commands)
-                    py_code = pb.pythonCode[task[1]]
+                    task = pb_utils.classify(tag, self.commands)
+                    py_code = pb_utils.pythonCode[task[1]]
 
                     if mode == '1':
                         if(py_code[0:3] == "bot"):
-                            pb.send_request(task)
+                            pb_utils.send_request(task)
                     self.py_commands.put("pb:" + py_code)
                 sleep(1.0)
                 
