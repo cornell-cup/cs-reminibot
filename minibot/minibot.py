@@ -79,7 +79,7 @@ class Minibot:
         def remove_closed_sockets(SOCKET_LIST):
             for sock in SOCKET_LIST:
             # Remove file descriptor if closed
-                if sock.fileno < 0:
+                if sock != None and sock.fileno() < 0:
                     SOCKET_LIST.remove(sock)
         
         self.create_listener_sock()
