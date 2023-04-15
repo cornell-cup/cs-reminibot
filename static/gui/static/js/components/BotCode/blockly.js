@@ -77,7 +77,7 @@ export class PythonEditor extends React.Component {
         const file = event.target.files[0];
         const reader = new FileReader();
         reader.onload = function (event) {
-            _this.getEditor().setValue(event.target.result);
+            _this.updateCode(event.target.result);
         };
         reader.readAsText(file);
     }
