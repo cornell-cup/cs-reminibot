@@ -602,7 +602,7 @@ class BaseStation:
         bot = self.get_bot(bot_name)
         bot.sendKV("RFID", 4)
         bot.readKV()
-        print("rfid tag: " + bot.rfid_tags)
+        print("rfid tag: " + bot.rfid_tags, flush=True)
         return bot.rfid_tags
         # TODO: temporary setup by returning random tags
         # return TAGS[random.randint(0, len(TAGS) - 1)]
@@ -610,6 +610,7 @@ class BaseStation:
 
     def physical_blockly(self, bot_name: str, mode: str, pb_map: json):
         rfid_tags = queue.Queue()
+        pb_map = json.loads(pb_map)
         
         def tag_producer():
             while not self.pb_stopped:
@@ -617,19 +618,22 @@ class BaseStation:
                 rfid_tags.put(tag)
                 sleep(1.0)
             
-        def tag_consumer(self):
+        def tag_consumer():
             while not self.pb_stopped:
-                #print("queue size: " + str(self.rfid_tags.qsize()), flush=True)
-                tag = rfid_tags.get()
-                if tag in pb_map.keys():
-                    tag = pb_map[tag]
-                    task = pb_utils.classify(tag, self.commands)
-                    py_code = pb_utils.pythonCode[task[1]]
+                print("queue size: " + str(rfid_tags.qsize()), flush=True)
+                try:
+                    tag = rfid_tags.get(block=False)
+                    if tag in pb_map.keys():
+                        tag = pb_map[tag]
+                        task = pb_utils.classify(tag, pb_utils.commands)
+                        py_code = pb_utils.pythonCode[task[1]]
 
-                    if mode == '1':
-                        if(py_code[0:3] == "bot"):
-                            pb_utils.send_request(task)
-                    self.py_commands.put("pb:" + py_code)
+                        if mode == '1':
+                            if(py_code[0:3] == "bot"):
+                                pb_utils.send_request(bot_name, task)
+                        self.py_commands.put("pb:" + py_code)
+                except:
+                    pass
                 sleep(1.0)
                 
         threading.Thread(target=tag_consumer).start()

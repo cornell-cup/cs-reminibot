@@ -27,21 +27,21 @@ commands = {
     "tagRangeEnd": 23
 }
 
-def send_request(self, args):
+def send_request(bot_name, args):
     url = "http://localhost:8080/wheels"
     headers = {
         "Content-Type": "application/json"
     }
 
     data = json.dumps({
-        "bot_name": self.bot_name,
+        "bot_name": bot_name,
         "direction": args[1],
         "power": "5",
         "mode": "physical blockly"
     })
     requests.post(url, data=data, headers=headers)
 
-def classify(self, command, commands):
+def classify(command, commands):
         if command in commands["commands"]["turn left"]:
             return ["fake_bot", "left"]
         elif command in commands["commands"]["turn right"]:
