@@ -26,12 +26,12 @@ load_msg = make_crc_message(load_req)
 
 # Then, make the request for 22 bytes
 # (i.e. 2 start chars + 2 crc16 chars + 16 data bytes + 2 end chars)
-data = read_data(spi, load_msg, 22, validate_crc_message)
+data, numTries = read_data(spi, load_msg, 22, validate_crc_message)
 
 # Then remove the start, end, and checksum to get your data
 data = unpack_crc_message(data)
 print(f"Your data: {data}")
-print("This should return TEXT in the data field.")
+print("The data should be [84, 69, 88, 84, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]")
 
 # What you do with that data afterwards is up to you...
 # I know the photoresistor returns an integer, so I parse it
