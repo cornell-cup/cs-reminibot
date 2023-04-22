@@ -21,7 +21,7 @@ spi.max_speed_hz = 115200
 # This assumes the arduino knows to load item 4
 # This is arbitrary, but I set 4 to correspond to
 # a photoresistor wired to the Arduino itself.
-load_req = [ord('R'), ord('F'), ord('I'), ord('D'), 4]
+load_req = [ord('T'), ord('E'), ord('S'), ord('T')]
 load_msg = make_crc_message(load_req)
 
 # Then, make the request for 22 bytes
@@ -31,11 +31,12 @@ data = read_data(spi, load_msg, 22, validate_crc_message)
 # Then remove the start, end, and checksum to get your data
 data = unpack_crc_message(data)
 print(f"Your data: {data}")
+print("This should return TEXT in the data field.")
 
 # What you do with that data afterwards is up to you...
 # I know the photoresistor returns an integer, so I parse it
 # and print it.
-sensor_val = int.from_bytes(bytes(data[0:4]), 'big', signed=True)
-print(f"Sensor reads: {sensor_val}")
+# sensor_val = int.from_bytes(bytes(data[0:4]), 'big', signed=True)
+# print(f"Read: {sensor_val}")
 
 # It's usually a good idea to send processed data to the base station.
