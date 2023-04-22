@@ -51,21 +51,6 @@ MAX_VISION_LOG_LENGTH = 1000
 VISION_UPDATE_FREQUENCY = 30
 VISION_DATA_HOLD_THRESHOLD = 5
 
-TAGS = [
-    # "0xF9 0x3E 0x4 0xF4",
-    # "0xC9 0x12 0xD 0xF4",
-    # "0x59 0xE3 0xB 0xF4",
-    # "0x59 0xC8 0x6 0xF4",
-    # "0x69 0xDB 0x6 0xF4",
-    # "start looping",
-    # "end looping",
-    # "custom block"
-    "E",
-    "F",
-    "G",
-    "H",
-]
-
 
 def make_thread_safe(func):
     """ Decorator which wraps the specified function with a lock.  This makes
@@ -598,19 +583,16 @@ class BaseStation:
         bot.sendKV("WHEELS", direction)
 
     def get_rfid(self, bot_name: str):
-        # raise Exception(self.get_active_bots())
         bot = self.get_bot(bot_name)
         bot.sendKV("RFID", 4)
         bot.readKV()
         print("rfid tag: " + bot.rfid_tags, flush=True)
         return bot.rfid_tags
-        # TODO: temporary setup by returning random tags
-        # return TAGS[random.randint(0, len(TAGS) - 1)]
-        # return TAGS[0]
 
     def physical_blockly(self, bot_name: str, mode: str, pb_map: json):
         rfid_tags = queue.Queue()
         pb_map = json.loads(pb_map)
+        print(pb_map)
         
         def tag_producer():
             while not self.pb_stopped:
@@ -620,9 +602,9 @@ class BaseStation:
             
         def tag_consumer():
             while not self.pb_stopped:
-                print("queue size: " + str(rfid_tags.qsize()), flush=True)
+                #print("queue size: " + str(rfid_tags.qsize()), flush=True)
                 try:
-                    tag = rfid_tags.get(block=False)
+                    tag = rfid_tags.get(block=False).strip()
                     if tag in pb_map.keys():
                         tag = pb_map[tag]
                         task = pb_utils.classify(tag, pb_utils.commands)
@@ -648,10 +630,10 @@ class BaseStation:
             self.pb_stopped = False
             #self.phys_blockly_event = threading.Event()
             if(mode == 'physical-blockly'):
-                print("starting physical blockly thread")
+                #print("starting physical blockly thread")
                 self.physical_blockly(bot_name, 0, pb_map)
             else:
-                print("starting physical blockly 2 thread")
+                #print("starting physical blockly 2 thread")
                 self.physical_blockly(bot_name, 1, pb_map)
         elif mode == "object_detection":
             self.bot_vision_server = subprocess.Popen(
