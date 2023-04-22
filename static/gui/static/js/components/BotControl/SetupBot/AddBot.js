@@ -263,6 +263,25 @@ export default class AddBot extends React.Component {
         });
     }
 
+    testConnectionOnClick() {
+        const _this = this;
+        axios({
+            method: 'POST',
+            url: '/test_connection', //url to backend endpoint
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: JSON.stringify({
+                bot_name: _this.props.selectedBotName,
+            })
+        }).catch(function (error) {
+            if (error.response.data.error_msg.length > 0)
+                window.alert(error.response.data.error_msg);
+            else
+                console.log(error);
+        });
+    }
+
     render() {
         const _this = this;
         return (
@@ -315,6 +334,10 @@ export default class AddBot extends React.Component {
                             <p className="small-title"> Custom Modes </p>
                             <button className="btn btn-success element-wrapper mr-1" onClick={() => this.modeSelectionOnClick("object_detection")}>Object Detection</button>
                             <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.modeSelectionOnClick("color_detection")}>Color Detection</button>
+                        </div>
+                        <div className="col horizontalDivCenter">
+                            <p className="small-title"> Test </p>
+                            <button className="btn btn-success element-wrapper mr-1" onClick={() => this.modeSelectionOnClick("object_detection")}>Test</button>
                         </div>
                     </div>
                     <br />
