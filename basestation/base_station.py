@@ -50,8 +50,6 @@ from time import sleep
 MAX_VISION_LOG_LENGTH = 1000
 VISION_UPDATE_FREQUENCY = 30
 VISION_DATA_HOLD_THRESHOLD = 5
-
-
 def make_thread_safe(func):
     """ Decorator which wraps the specified function with a lock.  This makes
     sure that there aren't concurrent calls to the basestation functions.  The
@@ -588,6 +586,12 @@ class BaseStation:
         bot.readKV()
         print("rfid tag: " + bot.rfid_tags, flush=True)
         return bot.rfid_tags
+        
+    def get_test(self, bot_name: str):
+        bot = self.get_bot(bot_name)
+        bot.sendKV("TEST")
+        bot.readKV()
+        return bot.test_msg
 
     def physical_blockly(self, bot_name: str, mode: str, pb_map: json):
         rfid_tags = queue.Queue()
@@ -651,6 +655,7 @@ class BaseStation:
 
     def end_physical_blockly(self):
         self.pb_stopped = True
+        self.py_commands = queue.Queue()
         print("ending physical blockly thread", flush=True)
 
     def get_next_py_command(self):

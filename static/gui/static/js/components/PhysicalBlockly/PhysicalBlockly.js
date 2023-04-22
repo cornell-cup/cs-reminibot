@@ -50,14 +50,12 @@ export default class PhysicalBlockly extends React.Component {
 	}
 
 	componentDidMount() {
-		// setInterval(this.pollForUpdates, 1000);
 		this.getCustomBlocks();
 		this.setState({ code: "", customBlockFillCount: 0 });
 		this.setState({ customCommands: customCommand, tempCommandData: new Map(customCommand) });
 		const _this = this;
 		_this.bWorkspace = window.Blockly.inject('pbBlocklyDiv', { scrollbars: true });
 		_this.codeRef["current"].getCodeMirror().setValue("");
-		// _this.setState({ stage: 1, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "" });
 		_this.bWorkspace.clear();
 	}
 
@@ -75,16 +73,15 @@ export default class PhysicalBlockly extends React.Component {
 				console.log(JSON.stringify(response.data));
 			});
 
-		// setInterval(tempClick, 1000);
 		const _this = this;
 		_this.codeRef["current"].getCodeMirror().setValue("");
-		_this.setState({ stage: 1, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "", mode: mode, tempCommandData: new Map(_this.customCommands), unsavedCustomization: false }); //text: "", tabs: 0, loopvar: 0
+		_this.setState({ stage: 1, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "", mode: mode, unsavedCustomization: false }); //text: "", tabs: 0, loopvar: 0
 		if (mode == 1) {
 			_this.setState({ displayCommands: noControlCommands });
 		} else {
 			_this.setState({ displayCommands: commands });
 		}
-		// _this.props.setPb("");
+
 		_this.bWorkspace.clear();
 		var pb_map = _this.getPBMap();
 		axios({
@@ -99,9 +96,6 @@ export default class PhysicalBlockly extends React.Component {
 				pb_map: pb_map
 			})
 		}).catch(function (error) {
-			// if (error.response.data.error_msg.length > 0)
-			// 	window.alert(error.response.data.error_msg);
-			// else
 			console.log(error.response.data);
 		});
 
@@ -109,35 +103,17 @@ export default class PhysicalBlockly extends React.Component {
 	}
 
 	endProcess() {
-		// this.setState({ stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [] });
 		const _this = this;
 		clearInterval(this.state.detectionCall);
 		//post request to basestation to stop the process
 		axios.get('/end_physical_blockly')
 			.then(function (response) {
-				// let x = 0;
-				// while (x < _this.state.loopvar) {
-				// 	let repl = prompt("What number would you like to replace n" + x + " with?", "5");
-				// 	let resp = parseInt(repl);
-				// 	if (isNaN(resp)) {
-				// 		resp = 5;
-				// 	}
-				// 	//Replacing loop value in python
-				// 	_this.setState({ code: _this.state.code.replace("n" + x, resp) });
-				// 	// _this.props.setPb(_this.props.pb.replace("n" + x, resp));
-				// 	// _this.codeRef["current"].getCodeMirror().setValue(_this.props.pb);
-				// 	_this.codeRef["current"].getCodeMirror().setValue(_this.state.code);
-
-				// 	//Replacing in blockly
-				// 	_this.state.loopList[x].getChildren(false)[0].setFieldValue(resp, "NUM");
-				// 	x++;
-				// }
-
 				// If there is loop num or custom block to be filled
 				if (_this.state.loopvar > 0 || (_this.state.customBlockFillCount > 0 && _this.state.customBlocks.length > 0)) {
 					$('#customModal').modal('show');
+				} else {
+					_this.setState({ stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [] });
 				}
-				_this.setState({ stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [] });
 			});
 	}
 
@@ -154,18 +130,17 @@ export default class PhysicalBlockly extends React.Component {
 
 	saveCustomSelection(e, loopSelection, customBlockSelection) {
 		const _this = this;
+		let newCode = _this.state.code;
 		e.preventDefault();
 		$('#customModal').modal('hide');
 
 		for (var i = 0; i < _this.state.loopvar; i++) {
 			var val = loopSelection[i];
-			_this.setState({ code: _this.state.code.replace("n" + i, val) });
-			_this.codeRef["current"].getCodeMirror().setValue(_this.state.code);
+			newCode = newCode.replace("n" + i, val);
 			_this.state.loopList[i].getChildren(false)[0].setFieldValue(val, "NUM");
 		}
 
 		console.log("received custom block selection");
-		let newCode = _this.state.code;
 		let codeList = _this.state.code.split("\n");
 		for (var i = 0; i < _this.state.customBlockFillCount; i++) {
 			let blockCode = _this.findCustomBlock(customBlockSelection[i], _this.state.customBlocks);
@@ -182,7 +157,7 @@ export default class PhysicalBlockly extends React.Component {
 			_this.state.customPlacedBlocks[i].setFieldValue(customBlockSelection[i], "function_content");
 		}
 
-		_this.setState({ code: newCode, customBlockFillCount: 0, customPlacedBlocks: [] });
+		_this.setState({ stage: 0, code: newCode, customBlockFillCount: 0, customPlacedBlocks: [] });
 		_this.codeRef["current"].getCodeMirror().setValue(newCode);
 	}
 
@@ -447,12 +422,9 @@ export default class PhysicalBlockly extends React.Component {
 		return (
 			<div className="row">
 				<div className="col">
-					<p className="small-title"> Physical Blockly
+					<p className="small-title">Physical Blockly
 						<span style={{ leftMargin: "0.3em" }}> </span>
-						<button className="btn"
-							data-toggle="modal"
-							data-target="#pbinfo"
-							style={{ backgroundColor: "transparent", boxShadow: "none" }}>
+						<button className="btn" data-toggle="modal" data-target="#pbinfo" style={{ backgroundColor: "transparent", boxShadow: "none" }}>
 							<img src={INFO_ICON} style={{ width: "18px", height: "18px" }} />
 						</button>
 
@@ -495,14 +467,14 @@ export default class PhysicalBlockly extends React.Component {
 											<span className="small-title" style={customTitleStyle}>Default Blocks</span>
 											<pre></pre>
 											{
-												commands.slice(0, 4).map((c) => <SelectionBox key={c.id} command={c} choiceList={choices} default={customCommand.get(c)} pb={this} changeSelection={this.updateSelection} />)
+												commands.slice(0, 4).map((c) => <SelectionBox key={c.id} command={c} choiceList={choices} default={this.state.customCommands.get(c)} pb={this} changeSelection={this.updateSelection} />)
 											}
 										</div>
 										<div class="col">
 											<span className="small-title" style={customTitleStyle}></span>
 											<pre></pre>
 											{
-												commands.slice(4).map((c) => <SelectionBox key={c.id} command={c} choiceList={choices} default={customCommand.get(c)} pb={this} changeSelection={this.updateSelection} />)
+												commands.slice(4).map((c) => <SelectionBox key={c.id} command={c} choiceList={choices} default={this.state.customCommands.get(c)} pb={this} changeSelection={this.updateSelection} />)
 											}
 										</div>
 									</div>

@@ -35,6 +35,7 @@ class Bot:
         self.is_socket_connected = True
         self._script_exec_result = None
         self.rfid_tags = ""
+        self.test_msg = ""
 
     def try_receive_data(self, peek: bool = False) -> Optional[str]:
         """ Tries to receive data from the Minibot. 
@@ -112,6 +113,11 @@ class Bot:
                     self.rfid_tags = ""
                 else:
                     self.rfid_tags = value
+            elif key == "TEST":
+                if value == "":
+                    self.test_msg = ""
+                else:
+                    self.test_msg = value
 
             data_str = data_str[end + token_len:]
 

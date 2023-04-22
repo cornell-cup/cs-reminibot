@@ -29,9 +29,6 @@ export default class CustomBlockModal extends React.Component {
 
     selection[id] = value;
     this.setState({ selectedCustomBlock : selection});
-
-    console.log("current custom block selection");
-    console.log(selection);
   }
 
   getSelectList() {

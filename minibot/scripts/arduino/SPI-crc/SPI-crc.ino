@@ -7,8 +7,6 @@
 
 #include <SPI.h>
 #include "CRC.h"
-// #include <Wire.h>
-// #include <Adafruit_PN532.h>
 #include <Wire.h>
 #include <PN532_I2C.h>
 #include <PN532.h>
@@ -70,7 +68,6 @@ ISR(SPI_STC_vect)
   }
   else if (idx == limit)
   {
-    //    Serial.println("Sending ACK back");
     SPDR = (byte)result;
   }
   else
@@ -116,12 +113,13 @@ bool checkBuffer()
 
 void useBuffer()
 {
-  //  //print the message you just got, but can decrease reliability
-  //   Serial.print("Received message: ");
-  //   for (int i = START_SEQ_SIZE + 2; i < limit - END_SEQ_SIZE; i++) {
-  //     Serial.print(buf[i]);
-  //   }
-  //   Serial.print("\n");
+  // print the message you just got, but can decrease reliability
+  Serial.print("Received message: ");
+  for (int i = START_SEQ_SIZE + 2; i < limit - END_SEQ_SIZE; i++)
+  {
+    Serial.print(buf[i]);
+  }
+  Serial.print("\n");
 
   // Respond to message
   if (buf[4] == 'R' && buf[5] == 'F' && buf[6] == 'I' && buf[7] == 'D')
@@ -146,6 +144,26 @@ void useBuffer()
     dataIdx = 1;
     readNFC();
   }
+  else if (buf[4] == 'T' && buf[5] == 'E' && buf[6] == 'S' && buf[7] == 'T')
+  {
+    dataBuf[0] = 'C';
+    dataBuf[1] = 'C';
+    dataBuf[20] = 'R';
+    dataBuf[21] = 'T';
+
+    // RFID
+    dataBuf[4] = 'T';
+    dataBuf[5] = 'E';
+    dataBuf[6] = 'X';
+    dataBuf[7] = 'T';
+
+    int hash = encode(dataBuf + 4, 22 - 6);
+    dataBuf[3] = (byte)(hash & 0xFF);
+    dataBuf[2] = (byte)((hash >> 8) & 0xFF);
+    spiRead = true;
+    SPDR = dataBuf[0];
+    dataIdx = 1;
+  }
 }
 void readNFC()
 {
@@ -157,7 +175,7 @@ void readNFC()
   }
   else
   {
-    // Serial.println("Didn't find anything");
+    Serial.println("Didn't find anything");
     nuidPICC[0] = 100;
     nuidPICC[1] = 100;
     nuidPICC[2] = 100;
