@@ -137,7 +137,7 @@ def rfid(id, returned_tags):
     Ask the Arduino to provide each of the RFID Tag bytes(id1, id2, id3, id4)
     """
     acquire_lock()
-    load_req = [ord('R'),  ord('F'), ord('I'), ord('D')]
+    load_req = [ord('R'), ord('F'), ord('I'), ord('D')]
     load_msg = msglib.make_crc_message(load_req)
     data, numTries = msglib.read_data(
         spi, load_msg, 22, msglib.validate_crc_message)
@@ -193,6 +193,30 @@ def line_follow():
  # transmit_continuously('O')
  # release_lock()
 
+ 
+def test(returned):
+    acquire_lock()
+    data = [ord('T'), ord('E'), ord('S'), ord('T')]
+    msg = msglib.make_crc_message(data)
+    data, numTries = msglib.read_data(
+        spi, load_msg, 22, msglib.validate_crc_message)
+    data = msglib.unpack_crc_message(data)
+
+    t = time.localtime()
+    current_time = time.strftime("%H:%M:%S", t)
+    returned[4] = current_time
+
+    returned[0] = data[0]
+    returned[1] = data[1]
+    returned[2] = data[2]
+    returned[3] = data[3]
+
+    t = time.localtime()
+    current_time = time.strftime("%H:%M:%S", t)
+    returned[5] = current_time
+
+    release_lock()
+    
 def set_ports(ports):
     """ Tell minibot which motors and sensor correspond to
     which ports.

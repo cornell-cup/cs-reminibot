@@ -587,6 +587,12 @@ class BaseStation:
         bot.readKV()
         print("rfid tag: " + bot.rfid_tags, flush=True)
         return bot.rfid_tags
+        
+    def get_test(self, bot_name: str):
+        bot = self.get_bot(bot_name)
+        bot.sendKV("TEST")
+        bot.readKV()
+        return bot.test_msg
 
     def physical_blockly(self, bot_name: str, mode: str, pb_map: json):
         rfid_tags = queue.Queue()

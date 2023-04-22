@@ -146,6 +146,13 @@ def end_physical_blockly():
     base_station.end_physical_blockly()
     return json.dumps(True), status.HTTP_200_OK
 
+@index_bp.route('/test_connection', methods=['POST'])
+def test_connection_method():
+    data = request.get_json()
+    bot_name = data['bot_name']
+    test_message = base_station.get_test(bot_name)
+    return json.dumps(test_message), status.HTTP_200_OK
+
 @index_bp.route('/vision', methods=['POST', 'GET'])
 def vision():
     """Updates vision status"""
