@@ -49,14 +49,12 @@ export default class PhysicalBlockly extends React.Component {
 	}
 
 	componentDidMount() {
-		// setInterval(this.pollForUpdates, 1000);
 		this.getCustomBlocks();
 		this.setState({ code: "", customBlockFillCount: 0 });
 		this.setState({ customCommands: customCommand, tempCommandData: new Map(customCommand) });
 		const _this = this;
 		_this.bWorkspace = window.Blockly.inject('pbBlocklyDiv', {scrollbars:true});
 		_this.codeRef["current"].getCodeMirror().setValue("");
-		// _this.setState({ stage: 1, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "" });
 		_this.bWorkspace.clear();
 	}
 
@@ -74,16 +72,15 @@ export default class PhysicalBlockly extends React.Component {
 				console.log(JSON.stringify(response.data));
 			});
 
-		// setInterval(tempClick, 1000);
 		const _this = this;
 		_this.codeRef["current"].getCodeMirror().setValue("");
-		_this.setState({ stage: 1, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "", mode: mode, tempCommandData: new Map(_this.customCommands), unsavedCustomization: false }); //text: "", tabs: 0, loopvar: 0
+		_this.setState({ stage: 1, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "", mode: mode, unsavedCustomization: false }); //text: "", tabs: 0, loopvar: 0
 		if (mode == 1) {
 			_this.setState({ displayCommands: noControlCommands });
 		} else {
 			_this.setState({ displayCommands: commands });
 		}
-		// _this.props.setPb("");
+
 		_this.bWorkspace.clear();
 		var pb_map = _this.getPBMap();
 		axios({
@@ -98,9 +95,6 @@ export default class PhysicalBlockly extends React.Component {
 				pb_map: pb_map
 			})
 		}).catch(function (error) {
-			// if (error.response.data.error_msg.length > 0)
-			// 	window.alert(error.response.data.error_msg);
-			// else
 			console.log(error.response.data);
 		});
 
@@ -108,7 +102,6 @@ export default class PhysicalBlockly extends React.Component {
 	}
 
 	endProcess() {
-		// this.setState({ stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [] });
 		const _this = this;
 		clearInterval(this.state.detectionCall);
 		//post request to basestation to stop the process
@@ -357,13 +350,13 @@ export default class PhysicalBlockly extends React.Component {
 		for(var val of this.state.tempCommandData.values()) {
 			commandSet.add(val);
 		}
-        if (commandSet.size != commands.length) {
-            alert("Invalid customization! Please make sure that the commands are matched to an unique color!");
-            return;
-        }
+		if (commandSet.size != commands.length) {
+				alert("Invalid customization! Please make sure that the commands are matched to an unique color!");
+				return;
+		}
 		let newCustomCommand = this.state.tempCommandData;
 		this.setState({customCommands: newCustomCommand, unsavedCustomization: false});
-    }
+  }
 
 	getCustomCommandID(id) {
 		var color = choices[id];
@@ -428,12 +421,9 @@ export default class PhysicalBlockly extends React.Component {
 		return (
 			<div className="row">
 				<div className="col">
-					<p className="small-title"> Physical Blockly 
+					<p className="small-title">Physical Blockly 
 						<span style={{ leftMargin: "0.3em" }}> </span>
-						<button className="btn"
-							data-toggle="modal"
-							data-target="#pbinfo"
-							style={{ backgroundColor: "transparent", boxShadow: "none" }}>
+						<button className="btn" data-toggle="modal" data-target="#pbinfo" style={{ backgroundColor: "transparent", boxShadow: "none" }}>
 								<img src={INFO_ICON} style={{ width: "18px", height: "18px" }} />
 						</button>
 
@@ -476,14 +466,14 @@ export default class PhysicalBlockly extends React.Component {
 												<span className="small-title" style={customTitleStyle}>Default Blocks</span>
 												<pre></pre>
 												{
-													commands.slice(0,4).map((c) => <SelectionBox key={c.id} command={c} choiceList={choices} default={customCommand.get(c)} pb={this} changeSelection={this.updateSelection}/> )
+													commands.slice(0,4).map((c) => <SelectionBox key={c.id} command={c} choiceList={choices} default={this.state.customCommands.get(c)} pb={this} changeSelection={this.updateSelection}/> )
 												}
 											</div>
 											<div class="col">
 												<span className="small-title" style={customTitleStyle}></span>
 												<pre></pre>
 												{
-													commands.slice(4).map((c) => <SelectionBox key={c.id} command={c} choiceList={choices} default={customCommand.get(c)} pb={this} changeSelection={this.updateSelection}/> )
+													commands.slice(4).map((c) => <SelectionBox key={c.id} command={c} choiceList={choices} default={this.state.customCommands.get(c)} pb={this} changeSelection={this.updateSelection}/> )
 												}
 											</div>
 										</div>

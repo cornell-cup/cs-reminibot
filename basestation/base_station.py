@@ -51,22 +51,6 @@ MAX_VISION_LOG_LENGTH = 1000
 VISION_UPDATE_FREQUENCY = 30
 VISION_DATA_HOLD_THRESHOLD = 5
 
-TAGS = [
-    # "0xF9 0x3E 0x4 0xF4",
-    # "0xC9 0x12 0xD 0xF4",
-    # "0x59 0xE3 0xB 0xF4",
-    # "0x59 0xC8 0x6 0xF4",
-    # "0x69 0xDB 0x6 0xF4",
-    # "start looping",
-    # "end looping",
-    # "custom block"
-    "E",
-    "F",
-    "G",
-    "H",
-]
-
-
 def make_thread_safe(func):
     """ Decorator which wraps the specified function with a lock.  This makes
     sure that there aren't concurrent calls to the basestation functions.  The
@@ -598,15 +582,11 @@ class BaseStation:
         bot.sendKV("WHEELS", direction)
 
     def get_rfid(self, bot_name: str):
-        # raise Exception(self.get_active_bots())
         bot = self.get_bot(bot_name)
         bot.sendKV("RFID", 4)
         bot.readKV()
         print("rfid tag: " + bot.rfid_tags, flush=True)
         return bot.rfid_tags
-        # TODO: temporary setup by returning random tags
-        # return TAGS[random.randint(0, len(TAGS) - 1)]
-        # return TAGS[0]
 
     def physical_blockly(self, bot_name: str, mode: str, pb_map: json):
         rfid_tags = queue.Queue()
@@ -669,6 +649,7 @@ class BaseStation:
 
     def end_physical_blockly(self):
         self.pb_stopped = True
+        self.py_commands = queue.Queue()
         print("ending physical blockly thread", flush=True)
 
     def get_next_py_command(self):
