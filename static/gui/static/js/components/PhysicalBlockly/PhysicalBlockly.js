@@ -114,29 +114,12 @@ export default class PhysicalBlockly extends React.Component {
 		//post request to basestation to stop the process
 		axios.get('/end_physical_blockly')
 			.then(function (response) {
-				// let x = 0;
-				// while (x < _this.state.loopvar) {
-				// 	let repl = prompt("What number would you like to replace n" + x + " with?", "5");
-				// 	let resp = parseInt(repl);
-				// 	if (isNaN(resp)) {
-				// 		resp = 5;
-				// 	}
-				// 	//Replacing loop value in python
-				// 	_this.setState({ code: _this.state.code.replace("n" + x, resp) });
-				// 	// _this.props.setPb(_this.props.pb.replace("n" + x, resp));
-				// 	// _this.codeRef["current"].getCodeMirror().setValue(_this.props.pb);
-				// 	_this.codeRef["current"].getCodeMirror().setValue(_this.state.code);
-
-				// 	//Replacing in blockly
-				// 	_this.state.loopList[x].getChildren(false)[0].setFieldValue(resp, "NUM");
-				// 	x++;
-				// }
-
 				// If there is loop num or custom block to be filled
 				if (_this.state.loopvar > 0 || (_this.state.customBlockFillCount > 0 && _this.state.customBlocks.length > 0)) {
 					$('#customModal').modal('show');
+				} else {
+					_this.setState({ stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [] });
 				}
-				_this.setState({ stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [] });
 			});
 	}
 
@@ -153,18 +136,17 @@ export default class PhysicalBlockly extends React.Component {
 
 	saveCustomSelection(e, loopSelection, customBlockSelection) {
 		const _this = this;
+		let newCode = _this.state.code;
 		e.preventDefault();
 		$('#customModal').modal('hide');
 
 		for(var i = 0; i < _this.state.loopvar; i ++) {
 			var val = loopSelection[i];
-			_this.setState({ code: _this.state.code.replace("n" + i, val) });
-			_this.codeRef["current"].getCodeMirror().setValue(_this.state.code);
+			newCode = newCode.replace("n" + i, val);
 			_this.state.loopList[i].getChildren(false)[0].setFieldValue(val, "NUM");
 		}
 
 		console.log("received custom block selection");
-		let newCode = _this.state.code;
 		let codeList = _this.state.code.split("\n");
 		for(var i = 0; i < _this.state.customBlockFillCount; i ++) {
 			let blockCode = _this.findCustomBlock(customBlockSelection[i], _this.state.customBlocks);
@@ -181,7 +163,7 @@ export default class PhysicalBlockly extends React.Component {
 			_this.state.customPlacedBlocks[i].setFieldValue(customBlockSelection[i], "function_content");
 		}
 
-		_this.setState({ code: newCode, customBlockFillCount: 0, customPlacedBlocks: []});
+		_this.setState({ stage: 0, code: newCode, customBlockFillCount: 0, customPlacedBlocks: []});
 		_this.codeRef["current"].getCodeMirror().setValue(newCode);
 	}
 

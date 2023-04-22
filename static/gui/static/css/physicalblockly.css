@@ -39,17 +39,17 @@
     font-family: "Audiowide", cursive;
     margin-top: 15px;
 }
-#customModalBody {
+#customModalBody, #loopModalBody {
     font-size: 1.25em;
     font-weight: 300;
     color: rgb(177, 199, 255);
     padding-bottom: 10px;
 }
-#customModal li {
+#customModal li, #loopIterationSection div {
     margin-top: 10px;
     color: rgb(177, 199, 255);
 }
-#customModal li select {
+#customModal li select, #loopIterationSection ol div input {
     padding: 5px;
     border-radius: 0;
     margin-left: 10px;
