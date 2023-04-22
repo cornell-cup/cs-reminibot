@@ -607,6 +607,12 @@ class BaseStation:
         # TODO: temporary setup by returning random tags
         # return TAGS[random.randint(0, len(TAGS) - 1)]
         # return TAGS[0]
+        
+    def get_test(self, bot_name: str):
+        bot = self.get_bot(bot_name)
+        bot.sendKV("TEST")
+        bot.readKV()
+        return bot.test_msg
 
     def physical_blockly(self, bot_name: str, mode: str, pb_map: json):
         rfid_tags = queue.Queue()
