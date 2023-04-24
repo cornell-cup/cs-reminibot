@@ -274,6 +274,10 @@ export default class AddBot extends React.Component {
             data: JSON.stringify({
                 bot_name: _this.props.selectedBotName,
             })
+        }).then(function (response) {
+            if (response.data) {
+                console.log(response.data);
+            }
         }).catch(function (error) {
             if (error.response.data.error_msg.length > 0)
                 window.alert(error.response.data.error_msg);
@@ -337,7 +341,7 @@ export default class AddBot extends React.Component {
                         </div>
                         <div className="col horizontalDivCenter">
                             <p className="small-title"> Test </p>
-                            <button className="btn btn-success element-wrapper mr-1" onClick={() => this.modeSelectionOnClick("object_detection")}>Test</button>
+                            <button className="btn btn-success element-wrapper mr-1" onClick={() => this.testConnectionOnClick()}>Test</button>
                         </div>
                     </div>
                     <br />
