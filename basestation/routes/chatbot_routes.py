@@ -8,6 +8,7 @@ import time
 from flask import Flask, request, jsonify
 import os
 import openai
+from dotenv import load_dotenv
 
 # Minibot imports.
 from .basestation_init import base_station
@@ -73,6 +74,7 @@ def chatbot_context():
 
 app = Flask(__name__)
 
+load_dotenv()
 openai.api_key = os.environ.get('API_KEY')
 
 
