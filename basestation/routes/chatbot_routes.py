@@ -81,12 +81,12 @@ def chatbot_ask():
     if request.method == 'POST':
         data = request.get_json()
         question = data['question']
-        if question.startswith("gpt:") == True:
+        if question.startswith("gpt:"):
             response = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
                 messages=[{"role": "user", "content": question}]
             )
-            answer = response['choices'][0]['message']['content']
+            answer = response["choices"][0]["message"]["content"]
         else:
             answer = base_station.chatbot_compute_answer(question)
         return json.dumps(answer), status.HTTP_200_OK
