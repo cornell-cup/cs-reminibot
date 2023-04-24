@@ -5,6 +5,9 @@ import os.path
 import json
 import sys
 import time
+from flask import Flask, request, jsonify
+import os
+import openai
 
 # Minibot imports.
 from .basestation_init import base_station
@@ -68,12 +71,24 @@ def chatbot_context():
             return json.dumps({"res": res}), status.HTTP_200_OK
 
 
+app = Flask(__name__)
+
+openai.api_key = os.environ.get('API_KEY')
+
+
 @chatbot_bp.route('/chatbot-ask', methods=['POST', 'GET'])
 def chatbot_ask():
     if request.method == 'POST':
         data = request.get_json()
         question = data['question']
-        answer = base_station.chatbot_compute_answer(question)
+        if question.startswith("gpt:") == True:
+            response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[{"role": "user", "content": question}]
+            )
+            answer = response['choices'][0]['message']['content']
+        else:
+            answer = base_station.chatbot_compute_answer(question)
         return json.dumps(answer), status.HTTP_200_OK
 
 
