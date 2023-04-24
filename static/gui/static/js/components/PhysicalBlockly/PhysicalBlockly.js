@@ -136,7 +136,7 @@ export default class PhysicalBlockly extends React.Component {
 				if (_this.state.loopvar > 0 || (_this.state.customBlockFillCount > 0 && _this.state.customBlocks.length > 0)) {
 					$('#customModal').modal('show');
 				}
-				_this.setState({ stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [] });
+				// _this.setState({ stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [] });
 			});
 	}
 
@@ -376,7 +376,8 @@ export default class PhysicalBlockly extends React.Component {
 			commandSet.add(val);
 		}
         if (commandSet.size != commands.length) {
-            alert("Invalid customization! Please make sure that the commands are matched to an unique color!");
+            // alert("Invalid customization! Please make sure that the commands are matched to an unique color!");
+			$('#customModal').modal('show');
             return;
         }
 		let newCustomCommand = this.state.tempCommandData;
