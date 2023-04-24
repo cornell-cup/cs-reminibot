@@ -1,4 +1,5 @@
 import binascii
+import random
 import time
 import threading
 from statistics import median
@@ -7,6 +8,20 @@ from statistics import median
 STOP_CMD = "S"
 START_TRASMISSION_CMD = "\n"
 END_TRASMISSION_CMD = "\r"
+
+TAGS = [
+    ["89", "227", "11" ,"244"],
+    ["89", "200", "6", "244"],
+    ["249", "62", "4", "244"],
+    ["201", "18", "13", "244"],
+    ["105", "219", "6", "244"],
+    #dummmy tag for start loop, same as pb_utils and physical_blockly
+    ["101", "101", "1", "244"],
+    #dummy tag for end loop
+    ["102", "102", "2", "244"],
+    #dummy tag for custom block
+    ["103", "103", "3", "244"]
+]
 
 
 class TransmitLock():
@@ -240,6 +255,16 @@ def object_detection():
     """ Tell minibot to detect objects using RFID """
     acquire_lock()
     transmit_continuously('O')
+    release_lock()
+
+def rfid(id, returned_tags):
+    """
+    Ask the Arduino to provide each of the RFID Tag bytes(id1, id2, id3, id4)
+    """
+    acquire_lock()
+    data = TAGS[random.randint(0, len(TAGS) - 1)]
+    for i in range(0, 4):
+        returned_tags[i] = data[i]
     release_lock()
 
 def set_ports(ports):

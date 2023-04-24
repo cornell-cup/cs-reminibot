@@ -381,7 +381,7 @@ class Minibot:
                 ece.rfid(value, returned_tags)
                 self.sendKV(sock, key, ' '.join(str(e) for e in returned_tags))
                 
-            thread = Thread(target=pass_tags, args=[sock, key, value])
+            thread = Thread(target=pass_tags, args=[self, sock, key, value])
             thread.start()
         elif key == "TEST":
             return_val = []

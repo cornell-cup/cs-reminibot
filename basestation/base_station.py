@@ -50,7 +50,6 @@ from time import sleep
 MAX_VISION_LOG_LENGTH = 1000
 VISION_UPDATE_FREQUENCY = 30
 VISION_DATA_HOLD_THRESHOLD = 5
-
 def make_thread_safe(func):
     """ Decorator which wraps the specified function with a lock.  This makes
     sure that there aren't concurrent calls to the basestation functions.  The
@@ -597,6 +596,7 @@ class BaseStation:
     def physical_blockly(self, bot_name: str, mode: str, pb_map: json):
         rfid_tags = queue.Queue()
         pb_map = json.loads(pb_map)
+        print(pb_map)
         
         def tag_producer():
             while not self.pb_stopped:
@@ -606,9 +606,9 @@ class BaseStation:
             
         def tag_consumer():
             while not self.pb_stopped:
-                print("queue size: " + str(rfid_tags.qsize()), flush=True)
+                #print("queue size: " + str(rfid_tags.qsize()), flush=True)
                 try:
-                    tag = rfid_tags.get(block=False)
+                    tag = rfid_tags.get(block=False).strip()
                     if tag in pb_map.keys():
                         tag = pb_map[tag]
                         task = pb_utils.classify(tag, pb_utils.commands)
@@ -634,10 +634,10 @@ class BaseStation:
             self.pb_stopped = False
             #self.phys_blockly_event = threading.Event()
             if(mode == 'physical-blockly'):
-                print("starting physical blockly thread")
+                #print("starting physical blockly thread")
                 self.physical_blockly(bot_name, 0, pb_map)
             else:
-                print("starting physical blockly 2 thread")
+                #print("starting physical blockly 2 thread")
                 self.physical_blockly(bot_name, 1, pb_map)
         elif mode == "object_detection":
             self.bot_vision_server = subprocess.Popen(
