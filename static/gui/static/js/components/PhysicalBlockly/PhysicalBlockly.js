@@ -353,7 +353,8 @@ export default class PhysicalBlockly extends React.Component {
 			commandSet.add(val);
 		}
         if (commandSet.size != commands.length) {
-            alert("Invalid customization! Please make sure that the commands are matched to an unique color!");
+            // alert("Invalid customization! Please make sure that the commands are matched to an unique color!");
+			$('#customModal').modal('show');
             return;
         }
 		let newCustomCommand = this.state.tempCommandData;
