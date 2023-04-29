@@ -54,7 +54,7 @@ export default class CustomBlockModal extends React.Component {
     for(var i = 0; i < this.props.loopCount; i ++) {
       let inputID = "n" + i;
       let label = <label>n{i}</label>;
-      let input = <input type="number" placeholder='2' id={inputID} />;
+      let input = <input type="number" placeholder={this.props.defaultLoopIteration} id={inputID} />;
       loopElements.push(<div class="loopSelector">{label}{input}</div>);
     }
 
@@ -66,8 +66,8 @@ export default class CustomBlockModal extends React.Component {
     for(var i = 0; i < this.props.loopCount; i ++) {
       let inputID = "n" + i;
       let value = document.getElementById(inputID).value;
-      if (value == null || isNaN(parseInt(value))) {
-        loopSelection.push(2);
+      if (value == null || isNaN(parseInt(value)) || parseInt(value) < 1) {
+        loopSelection.push(this.props.defaultLoopIteration);
       } else {
         loopSelection.push(parseInt(value));
       }
@@ -94,7 +94,7 @@ export default class CustomBlockModal extends React.Component {
               {this.props.loopCount > 0 ? 
                 <div id="loopIterationSection">
                   <h4 id="loopModalBody">
-                    For each loop, enter the number of iterations to fill the loop with. The default is 2.
+                    For each loop, enter the number of iterations to fill the loop with. The default is {this.props.defaultLoopIteration}.
                   </h4>
                   <ol>
                     {this.getLoopElements()}

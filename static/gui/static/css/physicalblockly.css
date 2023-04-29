@@ -14,7 +14,7 @@
 }
 #selectionCollapseBtn, #displayCollapseBtn {
     background-color: rgb(177, 199, 255);
-    box-shadow: "none";
+    box-shadow: none;
 }
 #customModal .modal {
     color: white;
@@ -61,4 +61,32 @@
     background-color: #ff8484;
     border: none;
     color: white;
+}
+#selectionBoxCollapse {
+    color: rgb(177, 199, 255);
+    font-family: "Ubuntu";
+    font-size: 18px;
+}
+.selectionBox label {
+    text-align: right;
+}
+.customTitle {
+    font-family: "Ubuntu";
+    font-size: 22px;
+    padding-bottom: 0px;
+    margin-top: 15px;
+    margin-bottom: 10px;
+    margin-left: 3px;
+    color: rgb(177, 199, 255);
+}
+#pbInfoModal {
+    color: black;
+    font-size: 16px;
+    font-family: arial;   
+}
+#wheel-power {
+    max-width: 80%;
+}
+.customLabel {
+    display: block;
 }
