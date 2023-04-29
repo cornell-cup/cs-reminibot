@@ -11,6 +11,7 @@ require('codemirror/mode/python/python');
 import { INFO_ICON } from '../utils/Constants.js';
 import SelectionBox from './SelectionBox';
 import CustomBlockModal from './CustomBlockModal.js';
+import CannotSaveModal from './CannotSaveModal.js';
 
 const commands = ['Move Foward', 'Move Backward', 'Turn Left', 'Turn Right', 'Stop', 'Start Loop', 'End Loop', 'Custom Block'];
 const noControlCommands = ['Move Foward', 'Move Backward', 'Turn Left', 'Turn Right', 'Stop'];
@@ -76,7 +77,7 @@ export default class PhysicalBlockly extends React.Component {
 		console.log("start detecting RFID");
 		const _this = this;
 		_this.codeRef["current"].getCodeMirror().setValue("");
-		_this.setState({ stage: 1, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "", mode: mode, unsavedCustomization: false }); //text: "", tabs: 0, loopvar: 0
+		_this.setState({ stage: 1, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "", mode: mode, unsavedCustomization: false, tempCommandData: new Map(this.state.customCommands) }); //text: "", tabs: 0, loopvar: 0
 		if (mode == 1) {
 			_this.setState({ displayCommands: noControlCommands });
 		} else {
@@ -115,6 +116,7 @@ export default class PhysicalBlockly extends React.Component {
 				} else {
 					_this.setState({ stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [] });
 				}
+
 			});
 	}
 
@@ -367,11 +369,12 @@ export default class PhysicalBlockly extends React.Component {
 		for (var val of this.state.tempCommandData.values()) {
 			commandSet.add(val);
 		}
-		if (commandSet.size != commands.length) {
-			alert("Invalid customization! Please make sure that the commands are matched to an unique color!");
-			return;
-		}
-		let newCustomCommand = this.state.tempCommandData;
+        if (commandSet.size != commands.length) {
+            // alert("Invalid customization! Please make sure that the commands are matched to an unique color!");
+			$('#saveModal').modal('show');
+            return;
+        }
+		let newCustomCommand = new Map(this.state.tempCommandData);
 		this.setState({ customCommands: newCustomCommand, unsavedCustomization: false });
 	}
 
@@ -465,6 +468,7 @@ export default class PhysicalBlockly extends React.Component {
 						</div>
 					</p>
 					<CustomBlockModal customCount={this.state.customBlockFillCount} loopCount={this.state.loopvar} defaultLoopIteration={this.state.defaultLoopIteration} customBlocks={this.state.customBlocks} saveSelection={this.saveCustomSelection} />
+					<CannotSaveModal />
 					{this.props.selectedBotName != '' && this.state.stage == 0 ?
 						<div>
 							<p>

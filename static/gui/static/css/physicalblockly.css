@@ -90,3 +90,18 @@
 .customLabel {
     display: block;
 }
+#saveModal .modal {
+    color: white;
+}
+#saveModal .modal-content {
+    background-color: black;
+    padding: 10px;
+    border: 2px #ff8484 solid;
+}
+#saveModal .modal-header {
+    padding-top: 10px;
+    border: none;
+}
+#saveModal .modal-footer {
+    border: none;
+}
