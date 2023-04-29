@@ -23,9 +23,9 @@ const tagMapping = [
 	"89 200 6 244",
 	"105 219 6 244",
 	//repeat, end, and custom block have dummy tags, same as dummy_ops2 and physical_blockly
-	"101 101 1 244",
-	"102 102 2 244",
-	"103 103 3 244"
+	"9 110 7 244",
+	"201 127 7 244",
+	"153 252 7 244"
 ];
 
 const customCommand = new Map();
@@ -37,7 +37,10 @@ export default class PhysicalBlockly extends React.Component {
 	constructor(props) {
 		super(props);
 		// customBlocks is stored as an array of tuples, the first element being the block's name and the second element being commands in the block
-		this.state = { stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "", customCommands: new Map(), tempCommandData: new Map(), detectionState: false, detectionCall: null, unsavedCustomization: false, collapsedSelection: true, collapsedDisplay: false, mode: -1, displayCommands: [], customBlocks: [], customPlacedBlocks: [], loggedin: false };
+		this.state = { stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "", 
+			customCommands: new Map(), tempCommandData: new Map(), detectionState: false, detectionCall: null, 
+			unsavedCustomization: false, collapsedSelection: true, collapsedDisplay: false, mode: -1, 
+			displayCommands: [], customBlocks: [], customPlacedBlocks: [], motorPower: 100, tempLoopIteration: 2, defaultLoopIteration: 2, loggedin: false};
 		this.codeRef = React.createRef();
 		this.pollForUpdates = this.pollForUpdates.bind(this);
 		this.saveSelection = this.saveSelection.bind(this);
@@ -45,6 +48,9 @@ export default class PhysicalBlockly extends React.Component {
 		this.getPBMap = this.getPBMap.bind(this);
 		this.toggleSelectionCollapse = this.toggleSelectionCollapse.bind(this);
 		this.toggleDisplayCollapse = this.toggleDisplayCollapse.bind(this);
+		this.updateMotorPowerValue = this.updateMotorPowerValue.bind(this);
+		this.updateLoopIteration = this.updateLoopIteration.bind(this);
+		this.updateTempLoopIteration = this.updateTempLoopIteration.bind(this);
 		this.bWorkspace = null;
 		this.getCustomBlocks = this.getCustomBlocks.bind(this);
 		this.saveCustomSelection = this.saveCustomSelection.bind(this);
@@ -69,11 +75,6 @@ export default class PhysicalBlockly extends React.Component {
 
 	physicalBlocklyClick(mode) {
 		console.log("start detecting RFID");
-		axios.get('/active-bots')
-			.then(function (response) {
-				console.log(JSON.stringify(response.data));
-			});
-
 		const _this = this;
 		_this.codeRef["current"].getCodeMirror().setValue("");
 		_this.setState({ stage: 1, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "", mode: mode, unsavedCustomization: false, tempCommandData: new Map(this.state.customCommands) }); //text: "", tabs: 0, loopvar: 0
@@ -197,13 +198,13 @@ export default class PhysicalBlockly extends React.Component {
 		axios.get('/get-py-command')
 			.then(function (response) {
 				let isLoop = false;
-				let isEnd = false;
 				let useCustomBlock = false;
 				if (response.data == "") {
 					return;
 				}
 				let n = "";
-				if (response.data.substring(3) == "end") {
+				let textBlock = response.data.substring(3);
+				if (textBlock == "end") {
 					_this.setState({ tabs: _this.state.tabs - 1 });
 					for (let i = 0; i < _this.state.tabs; i++) {
 						n += "    ";
@@ -215,7 +216,13 @@ export default class PhysicalBlockly extends React.Component {
 					for (let i = 0; i < _this.state.tabs; i++) {
 						n += "    ";
 					}
-					n += response.data.substring(3) + "\n";
+					
+					let updatedTextBlock = textBlock;
+					if(textBlock == "bot.move_forward(100)" || textBlock == "bot.move_backward(100)" || textBlock == "bot.turn_clockwise(100)" || textBlock == "bot.turn_counter_clockwise(100)") {
+						let index = textBlock.indexOf("(");
+						updatedTextBlock = textBlock.substring(0, index + 1) + _this.state.motorPower + ")"; 
+					}
+					n += updatedTextBlock + "\n";
 					if (response.data.includes("range")) {
 						n = n.replace("(n)", "(n" + _this.state.loopvar + ")");
 						_this.setState({ tabs: _this.state.tabs + 1 });
@@ -225,14 +232,19 @@ export default class PhysicalBlockly extends React.Component {
 					}
 				}
 				_this.setState({ code: _this.state.code + n });
-				// _this.props.setPb(_this.props.pb + n);
-				// _this.codeRef["current"].getCodeMirror().setValue(_this.props.pb);
 				_this.codeRef["current"].getCodeMirror().setValue(_this.state.code);
 
-				console.log(response.data.substring(3));
+				console.log(textBlock);
 
 				let block = document.createElement("block");
-				if (response.data.substring(3) == "for i in range(n):") {
+				let motorSpeedField = document.createElement("field");
+				motorSpeedField.setAttribute("name", "speed");
+				motorSpeedField.innerHTML = _this.state.motorPower;
+				let motorPercentField = document.createElement("field");
+				motorPercentField.setAttribute("name", "percent");
+				motorPercentField.innerHTML = _this.state.motorPower;
+
+				if (textBlock == "for i in range(n):") {
 					isLoop = true;
 					block.setAttribute("type", "controls_repeat_ext");
 					let value = document.createElement("value");
@@ -246,31 +258,35 @@ export default class PhysicalBlockly extends React.Component {
 					shadow.appendChild(num);
 					value.appendChild(shadow);
 					block.appendChild(value);
-				} else if (response.data.substring(3) == "end") {
+				} else if (textBlock == "end") {
 					isEnd = true;
-				} else if (response.data.substring(3) == "bot.move_forward(100)") {
+				} else if (textBlock == "bot.move_forward(100)") {
 					block.setAttribute("type", "move_power");
-				} else if (response.data.substring(3) == "bot.move_backward(100)") {
+					block.appendChild(motorSpeedField);
+				} else if (textBlock == "bot.move_backward(100)") {
 					block.setAttribute("type", "move_power");
 					let dir_field = document.createElement("field");
 					dir_field.setAttribute("name", "direction");
 					dir_field.innerHTML = "backward";
 					block.appendChild(dir_field);
-				} else if (response.data.substring(3) == "bot.stop()") {
+					block.appendChild(motorSpeedField);
+				} else if (textBlock == "bot.stop()") {
 					block.setAttribute("type", "stop_moving");
-				} else if (response.data.substring(3) == "bot.turn_clockwise(100)") {
+				} else if (textBlock == "bot.turn_clockwise(100)") {
 					block.setAttribute("type", "turn_power")
 					let dir_field = document.createElement("field");
 					dir_field.setAttribute("name", "direction");
 					dir_field.innerHTML = "right"
 					block.appendChild(dir_field);
-				} else if (response.data.substring(3) == "bot.turn_counter_clockwise(100)") {
+					block.appendChild(motorPercentField);
+				} else if (textBlock == "bot.turn_counter_clockwise(100)") {
 					block.setAttribute("type", "turn_power")
 					let dir_field = document.createElement("field");
 					dir_field.setAttribute("name", "direction");
 					dir_field.innerHTML = "left"
 					block.appendChild(dir_field);
-				} else if (response.data.substring(3) == "#custom block no.n" && this.state.loggedin) {
+					block.appendChild(motorPercentField);
+				} else if (textBlock == "#custom block no.n" && this.state.loggedin) {
 					let newCustomBlocks = [["Create Custom Block", " "]];
 					newCustomBlocks = newCustomBlocks.concat(_this.state.customBlocks);
 
@@ -354,11 +370,10 @@ export default class PhysicalBlockly extends React.Component {
 		for (var val of this.state.tempCommandData.values()) {
 			commandSet.add(val);
 		}
-        if (commandSet.size != commands.length) {
-            // alert("Invalid customization! Please make sure that the commands are matched to an unique color!");
+		if (commandSet.size != commands.length) {
 			$('#saveModal').modal('show');
-            return;
-        }
+			return;
+		}
 		let newCustomCommand = new Map(this.state.tempCommandData);
 		this.setState({ customCommands: newCustomCommand, unsavedCustomization: false });
 	}
@@ -383,6 +398,21 @@ export default class PhysicalBlockly extends React.Component {
 		this.setState({ collapsedDisplay: !this.state.collapsedDisplay });
 	}
 
+	updateMotorPowerValue(e, value) {
+		e.preventDefault();
+		this.setState({ motorPower: value });
+	}
+
+	updateLoopIteration(e) {
+		e.preventDefault();
+		this.setState({ defaultLoopIteration: this.state.tempLoopIteration });
+	}
+
+	updateTempLoopIteration(e, value) {
+		e.preventDefault();
+		this.setState({ tempLoopIteration: value });
+	}
+
 	render(props) {
 		var visStyle = {
 			position: "relative",
@@ -401,26 +431,10 @@ export default class PhysicalBlockly extends React.Component {
 			mode: 'python',
 		};
 
-		let customTitleStyle = {
-			fontFamily: "Ubuntu",
-			color: "#b1c7ff",
-			fontSize: "22px",
-			paddingBottom: "0px",
-			marginTop: "15px",
-			marginBottom: "10px",
-			marginLeft: "3px",
-		}
-
 		let warningLabelStyle = {
 			color: "#ffffff",
 			fontSize: "18px",
 			paddingBottom: "10px"
-		}
-
-		let modalBodyStyle = {
-			color: "black",
-			fontSize: "16px",
-			fontFamily: "arial"
 		}
 
 		return (
@@ -441,7 +455,7 @@ export default class PhysicalBlockly extends React.Component {
 											<span aria-hidden="true">&times;</span>
 										</button>
 									</div>
-									<div class="modal-body" style={modalBodyStyle}>
+									<div class="modal-body" id="pbInfoModal">
 										Make sure that you are connected to a bot before continuining.
 										You can use the toggle boxes in the customization section to select which color corresponds to which command.
 										Make sure to save your selections and then you can use start programming/live mode see the results!
@@ -453,7 +467,7 @@ export default class PhysicalBlockly extends React.Component {
 							</div>
 						</div>
 					</p>
-					<CustomBlockModal customCount={this.state.customBlockFillCount} loopCount={this.state.loopvar} customBlocks={this.state.customBlocks} saveSelection={this.saveCustomSelection} />
+					<CustomBlockModal customCount={this.state.customBlockFillCount} loopCount={this.state.loopvar} defaultLoopIteration={this.state.defaultLoopIteration} customBlocks={this.state.customBlocks} saveSelection={this.saveCustomSelection} />
 					<CannotSaveModal />
 					{this.props.selectedBotName != '' && this.state.stage == 0 ?
 						<div>
@@ -462,31 +476,42 @@ export default class PhysicalBlockly extends React.Component {
 									id="selectionCollapseBtn" onClick={this.toggleSelectionCollapse}>
 									<FontAwesomeIcon icon={this.state.collapsedSelection ? Icons.faCaretRight : Icons.faCaretDown} />
 								</a>
-								<span className="small-title" style={customTitleStyle}> Customization of Blocks </span>
+								<span className="customTitle"> Customization of Blocks </span>
 							</p>
 							<div class="collapse" id="selectionBoxCollapse">
 								<div class="container">
 									{/* Making the block selector 2 columns */}
 									<div class="row">
 										<div class="col">
-											<span className="small-title" style={customTitleStyle}>Default Blocks</span>
-											<pre></pre>
+											<span className="customTitle">Default Blocks</span>
 											{
 												commands.slice(0, 4).map((c) => <SelectionBox key={c.id} command={c} choiceList={choices} default={this.state.customCommands.get(c)} pb={this} changeSelection={this.updateSelection} />)
 											}
 										</div>
 										<div class="col">
-											<span className="small-title" style={customTitleStyle}></span>
-											<pre></pre>
+											<span className="customTitle"></span>
 											{
 												commands.slice(4).map((c) => <SelectionBox key={c.id} command={c} choiceList={choices} default={this.state.customCommands.get(c)} pb={this} changeSelection={this.updateSelection} />)
 											}
 										</div>
 									</div>
 								</div>
+								<div class="container">
+									<div class="row">
+										<div class="col">
+											<label class="customLabel">Current Power Value: {this.state.motorPower}%</label>
+											<input id="wheel-power" class="custom-range" name="wheel-power" type="range" min="0" max="100" step="5" defaultValue={this.state.motorPower} onChange={e => this.updateMotorPowerValue(e, e.target.value)}></input>
+										</div>
+										<div class="col">
+											<label class="customLabel">Default Loop Iteration: {this.state.defaultLoopIteration}</label>
+											<input id="loop-iteration" name="loop-iteration" type="text" onChange={e => this.updateTempLoopIteration(e, e.target.value)}></input>
+											<button className="btn btn-primary" onClick={e => this.updateLoopIteration(e)}>Submit</button>
+										</div>
+									</div>
+								</div>
 								{this.state.unsavedCustomization ? <div style={warningLabelStyle}>Warning: the current block customization is unsaved.</div> : <span></span>}
 							</div>
-							<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.saveSelection()}>Save</button>
+							{this.state.unsavedCustomization ? <button className="btn btn-primary element-wrapper mr-1" onClick={() => this.saveSelection()}>Save</button> : <span></span>}
 							<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.physicalBlocklyClick(0)}>Start Programming Mode</button>
 							<button className="btn btn-primary element-wrapper mr-1" onClick={() => this.physicalBlocklyClick(1)}>Start Real Time Mode</button>
 						</div>
@@ -497,15 +522,14 @@ export default class PhysicalBlockly extends React.Component {
 										id="displayCollapseBtn" onClick={this.toggleDisplayCollapse}>
 										<FontAwesomeIcon icon={this.state.collapsedDisplay ? Icons.faCaretRight : Icons.faCaretDown} />
 									</a>
-									<span className="small-title" style={customTitleStyle}> Customization of Blocks </span>
+									<span className="customTitle"> Customization of Blocks </span>
 								</p>
 								<div class="collapse" id="blockDisplayCollapse">
 									<div class="customBlockDisplay">
 										{/* Making the block display 2 columns */}
 										<div className="row">
 											<div class="col" style={{ paddingBottom: "12px" }}>
-												{
-													/* Subtracting this.mode to change the colums to 2x3 in realtime mode*/
+												{/* Subtracting this.mode to change the colums to 2x3 in realtime mode*/
 													this.state.displayCommands.slice(0, 4 - this.state.mode).map((c) =>
 														<li class="list-group-item">
 															<div className="row">

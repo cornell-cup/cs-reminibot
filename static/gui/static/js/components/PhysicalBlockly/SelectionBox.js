@@ -6,18 +6,11 @@ export default class SelectionBox extends React.Component {
     }
 
     render(props) {
-        var labelStyle = {
-            fontFamily: "Ubuntu",
-            textAlign: "right",
-            color: "#b1c7ff",
-            fontSize: "18px"
-        }
-
         return (
-            <div class="container" style={{marginBottom: "10px"}}>
+            <div class="container selectionBox" style={{marginBottom: "10px"}}>
                  <div className="row">
                     <div class="col">
-                        <label for="selection" style={labelStyle}>{this.props.command}</label>
+                        <label for="selection">{this.props.command}</label>
                     </div>
                     <div class="col">
                         <select className="custom-select custom-select-sm" id={this.props.command} onChange={(event) => 
