@@ -37,7 +37,7 @@ export default class PhysicalBlockly extends React.Component {
 	constructor(props) {
 		super(props);
 		// customBlocks is stored as an array of tuples, the first element being the block's name and the second element being commands in the block
-		this.state = { stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "", customCommands: new Map(), tempCommandData: new Map(), detectionState: false, detectionCall: null, unsavedCustomization: false, collapsedSelection: true, collapsedDisplay: false, mode: -1, displayCommands: [], customBlocks: [], customPlacedBlocks: [], saving: false };
+		this.state = { stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "", customCommands: new Map(), tempCommandData: new Map(), detectionState: false, detectionCall: null, unsavedCustomization: false, collapsedSelection: true, collapsedDisplay: false, mode: -1, displayCommands: [], customBlocks: [], customPlacedBlocks: [], loggedin: false };
 		this.codeRef = React.createRef();
 		this.pollForUpdates = this.pollForUpdates.bind(this);
 		this.saveSelection = this.saveSelection.bind(this);
@@ -124,8 +124,9 @@ export default class PhysicalBlockly extends React.Component {
 		axios.get('/get_custom_function')
 			.then(function (response) {
 				var customBlocks = JSON.parse(response.data);
-				_this.setState({ customBlocks: customBlocks })
+				_this.setState({ customBlocks: customBlocks, loggedin: true })
 			}).catch(function (error) {
+				_this.setState({ loggedin: false });
 				console.log(error);
 			});;
 	}
@@ -219,7 +220,7 @@ export default class PhysicalBlockly extends React.Component {
 						n = n.replace("(n)", "(n" + _this.state.loopvar + ")");
 						_this.setState({ tabs: _this.state.tabs + 1 });
 						_this.setState({ loopvar: _this.state.loopvar + 1 });
-					} else if (response.data.includes("#custom block no.n")) {
+					} else if (response.data.includes("#custom block no.n") && this.state.loggedin) {
 						n = n.replace("#custom block no.n", "#custom block no." + _this.state.customBlockFillCount);
 					}
 				}
@@ -257,7 +258,7 @@ export default class PhysicalBlockly extends React.Component {
 					block.appendChild(dir_field);
 				} else if (response.data.substring(3) == "bot.stop()") {
 					block.setAttribute("type", "stop_moving");
-				} else if (response.data.substring(3) == "bot.turn_right(100)") {
+				} else if (response.data.substring(3) == "bot.turn_clockwise(100)") {
 					block.setAttribute("type", "turn_power")
 					let dir_field = document.createElement("field");
 					dir_field.setAttribute("name", "direction");
@@ -269,7 +270,7 @@ export default class PhysicalBlockly extends React.Component {
 					dir_field.setAttribute("name", "direction");
 					dir_field.innerHTML = "left"
 					block.appendChild(dir_field);
-				} else if (response.data.substring(3) == "#custom block no.n") {
+				} else if (response.data.substring(3) == "#custom block no.n" && this.state.loggedin) {
 					let newCustomBlocks = [["Create Custom Block", " "]];
 					newCustomBlocks = newCustomBlocks.concat(_this.state.customBlocks);
 
