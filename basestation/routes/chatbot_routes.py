@@ -83,7 +83,7 @@ def chatbot_ask():
     if request.method == 'POST':
         data = request.get_json()
         question = data['question']
-        if question.startswith("gpt:"):
+        if question.lower().startswith("gpt:") or question.lower().startswith("chatgpt:"):
             response = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
                 messages=[{"role": "user", "content": question}]

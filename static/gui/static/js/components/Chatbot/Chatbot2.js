@@ -25,8 +25,12 @@ const initialList = [
     who: "other",
     message: "Hello, I am Chatbot. How are you today?",
   }
-];
-//Font size style
+  ,
+  {
+    id: 2,
+    who: "other",
+    message: "You can start your question with the keyword \"ChatGPT:\" to chat with ChatGPT.",
+  }];
 let lineHeightMultiplier = 0.10;
 const defaultFontSize = {
   header: {
@@ -227,6 +231,7 @@ function Chatbot2({
       }
     }).catch(function (error) {
       console.log("Error branch");
+      console.log("error is " + error)
       console.error(error.response.data);
       setAnimating(false);
       if (error.response.data.error_msg.length > 0)
@@ -338,8 +343,10 @@ function Chatbot2({
   }, [messages]);
 
   useEffect(() => {
-    initialList[0].timeStamp = getTimeStamp();
     setMessages(initialList);
+    initialList[0].timeStamp = getTimeStamp();
+    initialList[1].timeStamp = getTimeStamp();
+
   }, []);
 
   /***************************** Bot Voice Control ***************************/
