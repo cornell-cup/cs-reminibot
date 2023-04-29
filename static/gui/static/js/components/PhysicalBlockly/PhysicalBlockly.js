@@ -11,6 +11,7 @@ require('codemirror/mode/python/python');
 import { INFO_ICON } from '../utils/Constants.js';
 import SelectionBox from './SelectionBox';
 import CustomBlockModal from './CustomBlockModal.js';
+import CannotSaveModal from './CannotSaveModal.js';
 
 const commands = ['Move Foward', 'Move Backward', 'Turn Left', 'Turn Right', 'Stop', 'Start Loop', 'End Loop', 'Custom Block'];
 const noControlCommands = ['Move Foward', 'Move Backward', 'Turn Left', 'Turn Right', 'Stop'];
@@ -36,7 +37,7 @@ export default class PhysicalBlockly extends React.Component {
 	constructor(props) {
 		super(props);
 		// customBlocks is stored as an array of tuples, the first element being the block's name and the second element being commands in the block
-		this.state = { stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "", customCommands: new Map(), tempCommandData: new Map(), detectionState: false, detectionCall: null, unsavedCustomization: false, collapsedSelection: true, collapsedDisplay: false, mode: -1, displayCommands: [], customBlocks: [], customPlacedBlocks: [] };
+		this.state = { stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "", customCommands: new Map(), tempCommandData: new Map(), detectionState: false, detectionCall: null, unsavedCustomization: false, collapsedSelection: true, collapsedDisplay: false, mode: -1, displayCommands: [], customBlocks: [], customPlacedBlocks: [], saving: false };
 		this.codeRef = React.createRef();
 		this.pollForUpdates = this.pollForUpdates.bind(this);
 		this.saveSelection = this.saveSelection.bind(this);
@@ -75,7 +76,7 @@ export default class PhysicalBlockly extends React.Component {
 
 		const _this = this;
 		_this.codeRef["current"].getCodeMirror().setValue("");
-		_this.setState({ stage: 1, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "", mode: mode, unsavedCustomization: false }); //text: "", tabs: 0, loopvar: 0
+		_this.setState({ stage: 1, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "", mode: mode, unsavedCustomization: false, tempCommandData: new Map(this.state.customCommands) }); //text: "", tabs: 0, loopvar: 0
 		if (mode == 1) {
 			_this.setState({ displayCommands: noControlCommands });
 		} else {
@@ -256,7 +257,7 @@ export default class PhysicalBlockly extends React.Component {
 					block.appendChild(dir_field);
 				} else if (response.data.substring(3) == "bot.stop()") {
 					block.setAttribute("type", "stop_moving");
-				} else if (response.data.substring(3) == "bot.turn_clockwise(100)") {
+				} else if (response.data.substring(3) == "bot.turn_right(100)") {
 					block.setAttribute("type", "turn_power")
 					let dir_field = document.createElement("field");
 					dir_field.setAttribute("name", "direction");
@@ -354,10 +355,10 @@ export default class PhysicalBlockly extends React.Component {
 		}
         if (commandSet.size != commands.length) {
             // alert("Invalid customization! Please make sure that the commands are matched to an unique color!");
-			$('#customModal').modal('show');
+			$('#saveModal').modal('show');
             return;
         }
-		let newCustomCommand = this.state.tempCommandData;
+		let newCustomCommand = new Map(this.state.tempCommandData);
 		this.setState({ customCommands: newCustomCommand, unsavedCustomization: false });
 	}
 
@@ -452,6 +453,7 @@ export default class PhysicalBlockly extends React.Component {
 						</div>
 					</p>
 					<CustomBlockModal customCount={this.state.customBlockFillCount} loopCount={this.state.loopvar} customBlocks={this.state.customBlocks} saveSelection={this.saveCustomSelection} />
+					<CannotSaveModal />
 					{this.props.selectedBotName != '' && this.state.stage == 0 ?
 						<div>
 							<p>

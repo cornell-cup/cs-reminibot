@@ -88,12 +88,12 @@ export default class CustomBlockModal extends React.Component {
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
-              {this.props.customCount > 0 || this.props.loopCount > 0 ?
+              {(this.props.customCount > 0 || this.props.loopCount > 0) ?
                 <h3 id="customModalHeader">Physical Blockly Custom Selections</h3>
                 : <h3 id="customModalHeader">Cannot Save Block Selection</h3>}
             </div>
             <div class="modal-body">
-              {this.props.loopCount > 0 ? 
+              {this.props.loopCount > 0 && !this.props.saving ? 
                 <div id="loopIterationSection">
                   <h4 id="loopModalBody">
                     For each loop, enter the number of iterations to fill the loop with. The default is 2.
@@ -111,7 +111,7 @@ export default class CustomBlockModal extends React.Component {
                     {this.getSelectList()}
                   </ol>
                 </div> : <div></div>}
-              {this.props.customCount <= 0 && this.props.loopCount <= 0 ?
+              {this.props.saving ?
                 <h4 id="customModalBody">
                   Invalid customization! Please make sure that the commands are matched to an unique color!
                 </h4> : <div></div>}
