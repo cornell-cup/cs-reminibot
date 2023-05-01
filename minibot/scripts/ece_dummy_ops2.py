@@ -16,11 +16,11 @@ TAGS = [
     ["201", "18", "13", "244"],
     ["105", "219", "6", "244"],
     #dummmy tag for start loop, same as pb_utils and physical_blockly
-    ["101", "101", "1", "244"],
+    ["9", "110", "7", "244"],
     #dummy tag for end loop
-    ["102", "102", "2", "244"],
+    ["201", "127", "7", "244"],
     #dummy tag for custom block
-    ["103", "103", "3", "244"]
+    ["153", "252", "7", "244"]
 ]
 
 
