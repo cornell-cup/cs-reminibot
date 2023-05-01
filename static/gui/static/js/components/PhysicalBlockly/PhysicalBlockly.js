@@ -22,7 +22,6 @@ const tagMapping = [
 	"89 227 11 244",
 	"89 200 6 244",
 	"105 219 6 244",
-	//repeat, end, and custom block have dummy tags, same as dummy_ops2 and physical_blockly
 	"9 110 7 244",
 	"201 127 7 244",
 	"153 252 7 244"
@@ -37,10 +36,12 @@ export default class PhysicalBlockly extends React.Component {
 	constructor(props) {
 		super(props);
 		// customBlocks is stored as an array of tuples, the first element being the block's name and the second element being commands in the block
-		this.state = { stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "", 
-			customCommands: new Map(), tempCommandData: new Map(), detectionState: false, detectionCall: null, 
-			unsavedCustomization: false, collapsedSelection: true, collapsedDisplay: false, mode: -1, 
-			displayCommands: [], customBlocks: [], customPlacedBlocks: [], motorPower: 100, tempLoopIteration: 2, defaultLoopIteration: 2, loggedin: false};
+		this.state = {
+			stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "",
+			customCommands: new Map(), tempCommandData: new Map(), detectionState: false, detectionCall: null,
+			unsavedCustomization: false, collapsedSelection: true, collapsedDisplay: false, mode: -1,
+			displayCommands: [], customBlocks: [], customPlacedBlocks: [], motorPower: 100, tempLoopIteration: 2, defaultLoopIteration: 2, loggedin: false
+		};
 		this.codeRef = React.createRef();
 		this.pollForUpdates = this.pollForUpdates.bind(this);
 		this.saveSelection = this.saveSelection.bind(this);
@@ -216,11 +217,11 @@ export default class PhysicalBlockly extends React.Component {
 					for (let i = 0; i < _this.state.tabs; i++) {
 						n += "    ";
 					}
-					
+
 					let updatedTextBlock = textBlock;
-					if(textBlock == "bot.move_forward(100)" || textBlock == "bot.move_backward(100)" || textBlock == "bot.turn_clockwise(100)" || textBlock == "bot.turn_counter_clockwise(100)") {
+					if (textBlock == "bot.move_forward(100)" || textBlock == "bot.move_backward(100)" || textBlock == "bot.turn_clockwise(100)" || textBlock == "bot.turn_counter_clockwise(100)") {
 						let index = textBlock.indexOf("(");
-						updatedTextBlock = textBlock.substring(0, index + 1) + _this.state.motorPower + ")"; 
+						updatedTextBlock = textBlock.substring(0, index + 1) + _this.state.motorPower + ")";
 					}
 					n += updatedTextBlock + "\n";
 					if (response.data.includes("range")) {

@@ -19,10 +19,9 @@ commands = {
         "go forwards": ["249 62 4 244"],
         "go backwards": ["201 18 13 244"],
         "stop": ["105 219 6 244"],
-        #repeat, end, and custom block have dummy tags, same as dummy_ops2 and physical_blockly
-        "repeat": ["101 101 1 244"],
-        "end": ["102 102 2 244"],
-        "custom block": ["103 103 3 244"]
+        "repeat": ["9 110 7 244"],
+        "end": ["201 127 7 244"],
+        "custom block": ["153 252 7 244"]
     },
     "tagRangeStart": 0,
     "tagRangeEnd": 23
