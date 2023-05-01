@@ -40,7 +40,7 @@ export default class PhysicalBlockly extends React.Component {
 		this.state = { stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "", 
 			customCommands: new Map(), tempCommandData: new Map(), detectionState: false, detectionCall: null, 
 			unsavedCustomization: false, collapsedSelection: true, collapsedDisplay: false, mode: -1, 
-			displayCommands: [], customBlocks: [], customPlacedBlocks: [], motorPower: 100, tempLoopIteration: 2, defaultLoopIteration: 2};
+			displayCommands: [], customBlocks: [], customPlacedBlocks: [], motorPower: 100, tempLoopIteration: 2, defaultLoopIteration: 2, loggedin: false};
 		this.codeRef = React.createRef();
 		this.pollForUpdates = this.pollForUpdates.bind(this);
 		this.saveSelection = this.saveSelection.bind(this);
@@ -125,8 +125,9 @@ export default class PhysicalBlockly extends React.Component {
 		axios.get('/get_custom_function')
 			.then(function (response) {
 				var customBlocks = JSON.parse(response.data);
-				_this.setState({ customBlocks: customBlocks })
+				_this.setState({ customBlocks: customBlocks, loggedin: true })
 			}).catch(function (error) {
+				_this.setState({ loggedin: false });
 				console.log(error);
 			});;
 	}
@@ -226,7 +227,7 @@ export default class PhysicalBlockly extends React.Component {
 						n = n.replace("(n)", "(n" + _this.state.loopvar + ")");
 						_this.setState({ tabs: _this.state.tabs + 1 });
 						_this.setState({ loopvar: _this.state.loopvar + 1 });
-					} else if (response.data.includes("#custom block no.n")) {
+					} else if (response.data.includes("#custom block no.n") && this.state.loggedin) {
 						n = n.replace("#custom block no.n", "#custom block no." + _this.state.customBlockFillCount);
 					}
 				}
@@ -285,7 +286,7 @@ export default class PhysicalBlockly extends React.Component {
 					dir_field.innerHTML = "left"
 					block.appendChild(dir_field);
 					block.appendChild(motorPercentField);
-				} else if (textBlock == "#custom block no.n") {
+				} else if (textBlock == "#custom block no.n" && this.state.loggedin) {
 					let newCustomBlocks = [["Create Custom Block", " "]];
 					newCustomBlocks = newCustomBlocks.concat(_this.state.customBlocks);
 
