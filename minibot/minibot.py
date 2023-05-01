@@ -397,11 +397,11 @@ class Minibot:
 
             def test_rfid(self, sock: socket, key: str, value: str):
                 start_time = time.time()
-                returned_tags = [0, 0, 0, 0, 0]
+                returned_tags = [0, 0, 0, 0]
                 ece.rfid(value, returned_tags)
-                end_time = time.time()
-                returned_tags[4] = end_time - start_time
-                self.sendKV(sock, key, ' '.join(str(e) for e in returned_tags))
+                latency = time.time() - start_time
+                return_str = "RFID Tag: " + ' '.join(str(e) for e in returned_tags) + " Latency: " + str(latency)
+                self.sendKV(sock, key, return_str)
                 
             thread = Thread(target=test_rfid, args=[self, sock, key, value])
             thread.start()
