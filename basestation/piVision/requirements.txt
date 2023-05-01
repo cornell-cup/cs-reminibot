@@ -15,7 +15,7 @@ docutils==0.13.1
 drumhat==0.1.0
 envirophat==1.0.0
 ExplorerHAT==0.4.2
-Flask==0.12.1
+Flask==2.3.2
 fourletterphat==0.1.0
 gpiozero==1.5.0
 idna==2.2
