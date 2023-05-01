@@ -23,9 +23,9 @@ const tagMapping = [
 	"89 200 6 244",
 	"105 219 6 244",
 	//repeat, end, and custom block have dummy tags, same as dummy_ops2 and physical_blockly
-	"9 110 7 244",
-	"201 127 7 244",
-	"153 252 7 244"
+	"101 101 1 244",
+	"102 102 2 244",
+	"103 103 3 244"
 ];
 
 const customCommand = new Map();
@@ -404,7 +404,13 @@ export default class PhysicalBlockly extends React.Component {
 
 	updateLoopIteration(e) {
 		e.preventDefault();
-		this.setState({ defaultLoopIteration: this.state.tempLoopIteration });
+		let tempLoopIteration = this.state.tempLoopIteration;
+		if(isNaN(parseInt(tempLoopIteration)) || parseInt(tempLoopIteration) < 1) {
+			this.setState({ tempLoopIteration: this.state.defaultLoopIteration });
+		} else {
+			this.setState({ defaultLoopIteration: tempLoopIteration });
+		}
+		document.getElementById("loop-iteration").value = "";
 	}
 
 	updateTempLoopIteration(e, value) {
