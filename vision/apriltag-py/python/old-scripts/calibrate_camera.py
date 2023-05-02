@@ -6,6 +6,7 @@ from cv2 import VideoCapture
 import argparse
 import time
 import numpy as np
+from constants import VISION_FPS, FRAME_WIDTH, FRAME_HEIGHT
 from util import get_image, write_matrix_to_file
 
 
@@ -52,7 +53,7 @@ def main_with_video():
     # TODO TERM_CRITERIA_ITER used in C++, using MAX_ITER OK?
     TERM_CRITERIA = (
         TERM_CRITERIA_EPS + TERM_CRITERIA_MAX_ITER,
-        30,
+        VISION_FPS,
         0.001,
     )  # 0.1 --> 0.001
 
@@ -63,9 +64,9 @@ def main_with_video():
         obj_points.insert(i, [])  # List of points we define for camera i
         if VideoCapture.isOpened(camera):
             # Set up the camera
-            camera.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-            camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
-            camera.set(cv2.CAP_PROP_FPS, 30)
+            camera.set(cv2.CAP_PROP_FRAME_WIDTH, FRAME_WIDTH)
+            camera.set(cv2.CAP_PROP_FRAME_HEIGHT, FRAME_HEIGHT)
+            camera.set(cv2.CAP_PROP_FPS, VISION_FPS)
             cameras.append(camera)
             camera_ids.append(i)
             pass

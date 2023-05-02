@@ -1,6 +1,9 @@
 import cv2
-import util
+import sys
+sys.path.append('..')
+from util import util
 import numpy as np
+from constants import VISION_FPS, FRAME_WIDTH, FRAME_HEIGHT
 
 
 def main():
@@ -16,7 +19,7 @@ def main():
     # Compute transform matrix
     # From tutorial:
     # https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_calib3d/py_calibration/py_calibration.html#calibration
-    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
+    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, VISION_FPS, 0.001)
     obj_points = np.zeros((6*9, 3), np.float32)
     obj_points[:, :2] = np.mgrid[0:9, 0:6].T.reshape(-1, 2)
     img_points = cv2.cornerSubPix(
@@ -64,23 +67,13 @@ def get_checkerboard_interactive(camera, cols, rows):
     return image, gray_image, corners
 
 
-def get_image_on_keypress(camera):
-    image = None
-    while True:
-        image = util.get_image(camera)
-        cv2.imshow("Raw Image", image)
-        if cv2.waitKey(1) & 0xFF == ord("q"):
-            break
-    return image
-
-
 def get_camera():
     camera = cv2.VideoCapture(0)
     if not cv2.VideoCapture.isOpened(camera):
         raise Exception("Unable to open camera")
-    camera.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-    camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
-    camera.set(cv2.CAP_PROP_FPS, 30)
+    camera.set(cv2.CAP_PROP_FRAME_WIDTH, FRAME_WIDTH)
+    camera.set(cv2.CAP_PROP_FRAME_HEIGHT, FRAME_HEIGHT)
+    camera.set(cv2.CAP_PROP_FPS, VISION_FPS)
     return camera
 
 

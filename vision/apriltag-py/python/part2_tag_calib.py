@@ -3,11 +3,12 @@ import argparse
 import sys
 import numpy as np
 import time
-import util
+import util.util as util
 import json
 import math
-from detector import Detector
-from detection import Detection
+from util.detection import Detection
+from util.detector import Detector
+from constants import *
 
 
 MAX_DETECTOR_SNAPSHOTS = 100
@@ -21,7 +22,6 @@ def main():
     positions_file, positions_data = util.read_json(positions_file_name)
     NUM_DETECTIONS = len(positions_data)
 
-    
 
 
     
@@ -29,7 +29,7 @@ def main():
     x_offset = 0
     y_offset = 0
 
-    camera = util.get_camera(0)
+    camera = util.get_camera(DEVICE_ID)
 
     # Get matrices from file
     calib_file, calib_data = util.read_json(calib_file_name)
@@ -103,14 +103,14 @@ def main():
             overall_y_center += ctr_y
 
             # Draw onto the frame
-            cv2.circle(undst, (int(ctr_x), int(ctr_y)), 5, (0, 0, 255), 3)
+            cv2.circle(undst, (int(ctr_x), int(ctr_y)), 5, BLUE, 3)
 
             
 
         overall_x_center /= 1 if len(iteration_detections) == 0 else len(iteration_detections)
         overall_y_center /= 1 if len(iteration_detections) == 0 else len(iteration_detections)
         
-        cv2.circle(undst, (int(overall_x_center), int(overall_y_center)), 5, (255, 0, 0), 3)
+        cv2.circle(undst, (int(overall_x_center), int(overall_y_center)), 5, RED, 3)
         
         
         cv2.imshow("Calibration board", undst)
@@ -229,9 +229,14 @@ def main():
 
 
         
-    detected_xs, detected_ys = get_detected_xs_ys(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, object_angles, camera_to_origin)
+    detected_xs, detected_ys = get_detected_xs_ys(
+        BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, 
+        object_center_points, object_angles, camera_to_origin
+        )
 
-    center_x_offset, center_y_offset, angle_offset = get_world_center_offsets(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, object_angles, camera_to_origin)
+    center_x_offset, center_y_offset, angle_offset = get_world_center_offsets(
+        BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, 
+        object_center_points, object_angles, camera_to_origin)
     calib_data["overall_center_offset"] = {
         "x": center_x_offset,
         "y": center_y_offset,
@@ -239,13 +244,18 @@ def main():
     }
 
     
-    x_scale_factor, y_scale_factor = get_world_scale_factors(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, camera_to_origin, center_x_offset, center_y_offset)
+    x_scale_factor, y_scale_factor = get_world_scale_factors(BOARD_TAG_SIZE, 
+        camera_matrix, dist_coeffs, detections, object_center_points, 
+        camera_to_origin, center_x_offset, center_y_offset)
     calib_data["scale_factors"] = {
         "x": x_scale_factor,
         "y": y_scale_factor
     }
 
-    x_offsets, y_offsets, angle_offsets = get_cell_offsets(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, object_angles, camera_to_origin, center_x_offset, center_y_offset, angle_offset, x_scale_factor, y_scale_factor)
+    x_offsets, y_offsets, angle_offsets = get_cell_offsets(BOARD_TAG_SIZE, 
+        camera_matrix, dist_coeffs, detections, object_center_points, object_angles,
+        camera_to_origin, center_x_offset, center_y_offset, angle_offset, 
+    x_scale_factor, y_scale_factor)
 
 
 
@@ -259,7 +269,7 @@ def main():
     } for detection_index in range(len(detections)) if True] 
         
     
-    cv2.circle(undst, (int(overall_x_center), int(overall_y_center)), 5, (255, 0, 0), 3)
+    cv2.circle(undst, (int(overall_x_center), int(overall_y_center)), 5, RED, 3)
 
     
 
@@ -272,7 +282,10 @@ def main():
 
 
 def get_filtered_detections(positions_file_name, positions_data, detector, gray):
-    """ returns a list of the apriltag detections that correspond with the position file """
+    """ 
+    returns a list of the apriltag detections that correspond with the position 
+    file 
+    """
     detections, det_image = detector.detect(gray, return_image=True)
     if positions_file_name != None:
         detections = filter_detections_from_file(positions_data, detections)
@@ -280,7 +293,10 @@ def get_filtered_detections(positions_file_name, positions_data, detector, gray)
     return detections
 
 def filter_detections_from_file(positions_data, detections):
-    """ filters detection list to return a list of only the apriltag detections that correspond with the position file """
+    """ 
+    filters detection list to return a list of only the apriltag detections 
+    that correspond with the position file 
+    """
     filtered_detections = []
     detected_ids = []
     for detection in detections:
@@ -291,13 +307,20 @@ def filter_detections_from_file(positions_data, detections):
     return detections
 
 def get_position_with_id(positions_data, id):
-    """ returns the ideal position corresponding to the given id as defined by the position file """
+    """ 
+    returns the ideal position corresponding to the given id as defined by 
+    the position file 
+    """
     found_positions = [item for item in positions_data if int(item["id"]) == id]
     return found_positions[0] if found_positions else None
 
 
-def get_detected_xs_ys(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, object_angles, camera_to_origin):
-    """ returns a list of the detected x coordinates and a list of the detected y coordinates for the given list of detected apriltags """
+def get_detected_xs_ys(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, 
+    object_center_points, object_angles, camera_to_origin):
+    """ 
+    returns a list of the detected x coordinates and a list of the detected 
+    y coordinates for the given list of detected apriltags 
+    """
     detected_xs = []
     detected_ys = []
     for detection_index in range(len(detections)):
@@ -308,8 +331,14 @@ def get_detected_xs_ys(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, o
         detected_ys.append(detected_y)
     return detected_xs, detected_ys
 
-def get_cell_offsets(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, object_angles, camera_to_origin, center_x_offset, center_y_offset, angle_offset, x_scale_factor, y_scale_factor):
-    """ returns a list of the x offsets (fudge factors), a list of the y offsets (fudge factors), and a list of the angle offsets (fudge factors) for each individual cell in order to convert detected points to the world points"""
+def get_cell_offsets(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, 
+    object_center_points, object_angles, camera_to_origin, center_x_offset, 
+    center_y_offset, angle_offset, x_scale_factor, y_scale_factor):
+    """ 
+    returns a list of the x offsets (fudge factors), a list of the y offsets 
+    (fudge factors), and a list of the angle offsets (fudge factors) for each 
+    individual cell in order to convert detected points to the world points
+    """
     x_offsets = []
     y_offsets = []
     angle_offsets = []
@@ -328,8 +357,12 @@ def get_cell_offsets(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, obj
         angle_offsets.append((actual_angle - offset_detected_angle)%360)
     return x_offsets, y_offsets, angle_offsets
 
-def get_world_scale_factors(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, camera_to_origin, center_x_offset, center_y_offset):
-    """ returns the x scale factor and the y scale factor for converting detected points to world points """
+def get_world_scale_factors(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, 
+    detections, object_center_points, camera_to_origin, center_x_offset, center_y_offset):
+    """ 
+    returns the x scale factor and the y scale factor for converting detected 
+    points to world points 
+    """
     x_scale_factors = []
     y_scale_factors = []
     for detection_index in range(len(detections)):
@@ -349,8 +382,13 @@ def get_world_scale_factors(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detectio
 
     return x_scale_factor,y_scale_factor
 
-def get_world_center_offsets(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, detections, object_center_points, object_angles, camera_to_origin):
-    """ returns the single x offset, y offset, and angle offset to put the origin of the world points in the correct location and ensure the correct orientation """
+def get_world_center_offsets(BOARD_TAG_SIZE, camera_matrix, dist_coeffs, 
+    detections, object_center_points, object_angles, camera_to_origin):
+    """ 
+    returns the single x offset, y offset, and angle offset to put the 
+    origin of the world points in the correct location and ensure the correct 
+    orientation 
+    """
     actual_x_coords = []
     actual_y_coords = []
     detected_x_coords = []
@@ -397,7 +435,7 @@ def get_args():
         metavar="<board tag size>",
         type=float,
         required=True,
-        default=6.5,
+        default=TAG_SIZE,
         help="size of one side of a tag on the axis calibration \
                             board, in inches",
     )

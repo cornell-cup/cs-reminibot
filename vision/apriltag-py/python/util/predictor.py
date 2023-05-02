@@ -1,8 +1,10 @@
-
 import numpy as np
 
-
 class Predictor:
+  '''
+  The Predictors class takes in a model as a parameter (i.e. LinearRegression), and it is used to more easily
+  make predictions with the model
+  '''
   def __init__(self, model=None):
     self.model = model
   def predict(self, point): 

@@ -1,3 +1,4 @@
+from pickle import FRAME
 from cv2 import *
 import apriltag
 import argparse
@@ -5,6 +6,7 @@ import numpy as np
 import sys
 import time
 import requests
+from constants import VISION_FPS, FRAME_WIDTH, FRAME_HEIGHT, TAG_SIZE
 from util import get_image, get_matrices_from_file, undistort_image, get_offsets_from_file
 from util import compute_tag_undistorted_pose
 
@@ -13,7 +15,6 @@ DEVICE_ID = 0  # The device the camera is, usually 0. TODO make this adjustable
 
 # Arguments
 # These are effectively constant after the argument parser has ran.
-TAG_SIZE = 6.5  # The length of one side of an apriltag, in inches
 MULT_FACTOR = 5  # The scale factor of the output coordinates
 SEND_DATA = True  # Sends data to URL if True. Set to False for debug
 
@@ -34,9 +35,9 @@ def main():
     if (not VideoCapture.isOpened(camera)):
         print("Failed to open video capture device")
         exit(0)
-    camera.set(CAP_PROP_FRAME_WIDTH, 1280)
-    camera.set(CAP_PROP_FRAME_HEIGHT, 720)
-    camera.set(CAP_PROP_FPS, 30)
+    camera.set(CAP_PROP_FRAME_WIDTH, FRAME_WIDTH)
+    camera.set(CAP_PROP_FRAME_HEIGHT, FRAME_HEIGHT)
+    camera.set(CAP_PROP_FPS,VISION_FPS)
 
     # Get matrices from calibration file
     print("Parsing calibration file " + calib_file_name + "...")
@@ -163,7 +164,7 @@ def get_args():
                         help='.calib file to use for un-distortion')
 
     parser.add_argument('-s', '--size', metavar='<size>',
-                        type=float, required=False, default=6.5,
+                        type=float, required=False, default=TAG_SIZE,
                         help='size of tags to detect')
 
     options = parser.parse_args()

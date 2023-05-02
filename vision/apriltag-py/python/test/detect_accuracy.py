@@ -1,9 +1,11 @@
 import cv2
 import numpy as np
-import apriltag
 import argparse
 import time
-import util
+import sys
+sys.path.append('..')
+from util import util
+import util.apriltag as apriltag
 import itertools
 import statistics
 import sys
@@ -21,6 +23,8 @@ False       True        4-5
 
 This DOES NOT include any overhead that our vision
 system may add.
+
+example call: python3 detect_accuracy.py -r 6 -c 9 -i 0 -f "../calib/calibration.json" 
 """
 
 # Configuration Options

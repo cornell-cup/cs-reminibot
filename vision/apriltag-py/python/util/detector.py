@@ -5,19 +5,19 @@ try:
 except ImportError:
     print("could not import pyAprilTag")
     try:
-        import apriltag
+        import util.apriltag as apriltag
     except:
         print("Unable to import any apriltag detection libraries please check the installation of the vision system")
-import util
-from detection import Detection
+import util.util as util
+from util.detection import Detection
 
 
 class Detector:
     def __init__(self):
-        self.detector = None
-        if 'apriltag' in sys.modules:
-            self.detector = apriltag.Detector(
-                searchpath=apriltag._get_demo_searchpath())
+        # self.detector = None
+        # if 'apriltag' in sys.modules:
+        self.detector = apriltag.Detector(
+            searchpath=apriltag._get_demo_searchpath())
 
     def detect(self, image, return_image=False):
         data = []

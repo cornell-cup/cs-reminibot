@@ -180,7 +180,6 @@ class DetectorOptions(object):
     '''Convience wrapper for object to pass into Detector
 initializer. You can also pass in the output of an
 argparse.ArgumentParser on which you have called add_arguments.
-
     '''
 
 # pylint: disable=R0902
@@ -512,8 +511,8 @@ image of type numpy.uint8.'''
 def _get_demo_searchpath():
 
     return [
-        os.path.join(os.path.dirname(__file__), '../build/lib'),
-        os.path.join(os.getcwd(), '../build/lib')
+        os.path.join(os.path.dirname(__file__), '../../build/lib'),
+        os.path.join(os.getcwd(), '../../build/lib')
     ]
 
 ######################################################################
