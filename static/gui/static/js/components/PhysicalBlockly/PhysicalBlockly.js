@@ -15,7 +15,7 @@ import CannotSaveModal from './CannotSaveModal.js';
 
 const commands = ['Move Foward', 'Move Backward', 'Turn Left', 'Turn Right', 'Stop', 'Start Loop', 'End Loop', 'Custom Block'];
 const noControlCommands = ['Move Foward', 'Move Backward', 'Turn Left', 'Turn Right', 'Stop'];
-const choices = ["yellow", "blue", "red", "orange", "purple", "color 1", "color 2", "color 3"];
+const choices = ["yellow", "blue", "red", "orange", "purple", "green", "black", "white"];
 const tagMapping = [
 	"249 62 4 244",
 	"201 18 13 244",
@@ -23,9 +23,9 @@ const tagMapping = [
 	"89 200 6 244",
 	"105 219 6 244",
 	//repeat, end, and custom block have dummy tags, same as dummy_ops2 and physical_blockly
-	"101 101 1 244",
-	"102 102 2 244",
-	"103 103 3 244"
+	"9 110 7 244",
+	"201 127 7 244",
+	"153 252 7 244"
 ];
 
 const customCommand = new Map();
@@ -40,7 +40,7 @@ export default class PhysicalBlockly extends React.Component {
 		this.state = { stage: 0, tabs: 0, loopvar: 0, lastBlock: null, blockStack: [], loopList: [], code: "", 
 			customCommands: new Map(), tempCommandData: new Map(), detectionState: false, detectionCall: null, 
 			unsavedCustomization: false, collapsedSelection: true, collapsedDisplay: false, mode: -1, 
-			displayCommands: [], customBlocks: [], customPlacedBlocks: [], motorPower: 100, tempLoopIteration: 2, defaultLoopIteration: 2, loggedin: false};
+			displayCommands: [], customBlocks: [], customPlacedBlocks: [], motorPower: 100, tempLoopIteration: 2, defaultLoopIteration: 2, customBlockFillCount: 0};
 		this.codeRef = React.createRef();
 		this.pollForUpdates = this.pollForUpdates.bind(this);
 		this.saveSelection = this.saveSelection.bind(this);
@@ -58,7 +58,7 @@ export default class PhysicalBlockly extends React.Component {
 
 	componentDidMount() {
 		this.getCustomBlocks();
-		this.setState({ code: "", customBlockFillCount: 0 });
+		this.setState({ code: "" });
 		this.setState({ customCommands: customCommand, tempCommandData: new Map(customCommand) });
 		const _this = this;
 		_this.bWorkspace = window.Blockly.inject('pbBlocklyDiv', { scrollbars: true });
@@ -125,9 +125,13 @@ export default class PhysicalBlockly extends React.Component {
 		axios.get('/get_custom_function')
 			.then(function (response) {
 				var customBlocks = JSON.parse(response.data);
-				_this.setState({ customBlocks: customBlocks, loggedin: true })
+				console.log(customBlocks);
+				if (customBlocks.length == 0 || customBlocks[0][0] == 'Create Custom Block') {
+					_this.setState({ customBlocks: []});
+				} else {
+					_this.setState({ customBlocks: customBlocks});
+				}
 			}).catch(function (error) {
-				_this.setState({ loggedin: false });
 				console.log(error);
 			});;
 	}
@@ -145,20 +149,22 @@ export default class PhysicalBlockly extends React.Component {
 		}
 
 		console.log("received custom block selection");
-		let codeList = _this.state.code.split("\n");
-		for (var i = 0; i < _this.state.customBlockFillCount; i++) {
-			let blockCode = _this.findCustomBlock(customBlockSelection[i], _this.state.customBlocks);
-			blockCode = blockCode.split("\n");
-			if (blockCode != null) {
-				let indent = _this.getCustomBlockIndent(i, codeList);
-				let blockCodeStr = "";
-				for (var j = 0; j < blockCode.length - 1; j++) {
-					blockCodeStr += indent + blockCode[j] + "\n";
+		if (customBlockSelection.length > 0) {
+			let codeList = _this.state.code.split("\n");
+			for (var i = 0; i < _this.state.customBlockFillCount; i++) {
+				let blockCode = _this.findCustomBlock(customBlockSelection[i], _this.state.customBlocks);
+				blockCode = blockCode.split("\n");
+				if (blockCode != null) {
+					let indent = _this.getCustomBlockIndent(i, codeList);
+					let blockCodeStr = "";
+					for (var j = 0; j < blockCode.length - 1; j++) {
+						blockCodeStr += indent + blockCode[j] + "\n";
+					}
+					newCode = newCode.replace(indent + "#custom block no." + i + "\n", blockCodeStr);
 				}
-				newCode = newCode.replace(indent + "#custom block no." + i + "\n", blockCodeStr);
-			}
 
-			_this.state.customPlacedBlocks[i].setFieldValue(customBlockSelection[i], "function_content");
+				_this.state.customPlacedBlocks[i].setFieldValue(customBlockSelection[i], "function_content");
+			}
 		}
 
 		_this.setState({ stage: 0, code: newCode, customBlockFillCount: 0, customPlacedBlocks: [] });
@@ -227,7 +233,7 @@ export default class PhysicalBlockly extends React.Component {
 						n = n.replace("(n)", "(n" + _this.state.loopvar + ")");
 						_this.setState({ tabs: _this.state.tabs + 1 });
 						_this.setState({ loopvar: _this.state.loopvar + 1 });
-					} else if (response.data.includes("#custom block no.n") && this.state.loggedin) {
+					} else if (response.data.includes("#custom block no.n")) {
 						n = n.replace("#custom block no.n", "#custom block no." + _this.state.customBlockFillCount);
 					}
 				}
@@ -286,7 +292,7 @@ export default class PhysicalBlockly extends React.Component {
 					dir_field.innerHTML = "left"
 					block.appendChild(dir_field);
 					block.appendChild(motorPercentField);
-				} else if (textBlock == "#custom block no.n" && this.state.loggedin) {
+				} else if (textBlock == "#custom block no.n") {
 					let newCustomBlocks = [["Create Custom Block", " "]];
 					newCustomBlocks = newCustomBlocks.concat(_this.state.customBlocks);
 
@@ -332,7 +338,6 @@ export default class PhysicalBlockly extends React.Component {
 						let tempList = _this.state.loopList;
 						tempList.push(placedBlock);
 						_this.setState({ blockStack: tempStack, loopList: tempList });
-
 					} else if (useCustomBlock) {
 						let newCustomPlacedBlocks = _this.state.customPlacedBlocks;
 						newCustomPlacedBlocks.push(placedBlock);
@@ -489,13 +494,11 @@ export default class PhysicalBlockly extends React.Component {
 									{/* Making the block selector 2 columns */}
 									<div class="row">
 										<div class="col">
-											<span className="customTitle">Default Blocks</span>
 											{
 												commands.slice(0, 4).map((c) => <SelectionBox key={c.id} command={c} choiceList={choices} default={this.state.customCommands.get(c)} pb={this} changeSelection={this.updateSelection} />)
 											}
 										</div>
 										<div class="col">
-											<span className="customTitle"></span>
 											{
 												commands.slice(4).map((c) => <SelectionBox key={c.id} command={c} choiceList={choices} default={this.state.customCommands.get(c)} pb={this} changeSelection={this.updateSelection} />)
 											}

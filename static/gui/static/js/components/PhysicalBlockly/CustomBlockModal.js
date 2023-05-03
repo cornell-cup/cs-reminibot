@@ -73,7 +73,10 @@ export default class CustomBlockModal extends React.Component {
       }
     }
 
-    if (this.state.selectedCustomBlock == null || this.state.selectedCustomBlock.length == 0) {
+    if (this.props.customBlocks.length <= 0) {
+      this.props.saveSelection(e, loopSelection, []);
+    }
+    else if (this.state.selectedCustomBlock == null || this.state.selectedCustomBlock.length == 0) {
       let defaultCustomSelection = this.initSelection();
       this.setState({ selectedCustomBlock : defaultCustomSelection });
       this.props.saveSelection(e, loopSelection, defaultCustomSelection);
@@ -102,7 +105,7 @@ export default class CustomBlockModal extends React.Component {
                     {this.getLoopElements()}
                   </ol>
                 </div> : <div></div>}
-              {this.props.customCount > 0 ?
+              {this.props.customCount > 0 && this.props.customBlocks.length > 0 ?
                 <div id="customBlockSection">
                   <h4 id="customModalBody">
                     For each custom block placeholder, please select a custom block function to assign the placeholder to.

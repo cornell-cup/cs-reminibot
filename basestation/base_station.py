@@ -589,7 +589,7 @@ class BaseStation:
         
     def get_test(self, bot_name: str):
         bot = self.get_bot(bot_name)
-        bot.sendKV("TEST")
+        bot.sendKV("TEST", "")
         bot.readKV()
         return bot.test_msg
 
