@@ -147,6 +147,7 @@ def rfid(id, returned_tags):
         returned_tags[1] = data[1]
         returned_tags[2] = data[2]
         returned_tags[3] = data[3]
+    #print("Data:" + data)
     release_lock()
 
 
@@ -193,7 +194,7 @@ def line_follow():
  # release_lock()
 
  
-def test_connection(returned):
+def test(returned):
     acquire_lock()
     data = [ord('T'), ord('E'), ord('S'), ord('T')]
     msg = msglib.make_crc_message(data)
@@ -201,10 +202,18 @@ def test_connection(returned):
         spi, load_msg, 22, msglib.validate_crc_message)
     data = msglib.unpack_crc_message(data)
 
+    t = time.localtime()
+    current_time = time.strftime("%H:%M:%S", t)
+    returned[4] = current_time
+
     returned[0] = data[0]
     returned[1] = data[1]
     returned[2] = data[2]
     returned[3] = data[3]
+
+    t = time.localtime()
+    current_time = time.strftime("%H:%M:%S", t)
+    returned[5] = current_time
 
     release_lock()
     

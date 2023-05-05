@@ -361,6 +361,14 @@ class Minibot:
             while thread.is_alive():
                 time.sleep(0.01)
 
+            now = datetime.now()
+            file = open("/home/pi/Documents/" +
+                        now.strftime('%H:%M:%S.%f') + ".txt", "w")
+
+            file.write("From Arduino\n")
+            file.write(str(return_val))
+            file.close()
+
             if return_val[0] == 0:
                 self.sendKV(sock, key, "HIGH")
             elif return_val[0] == 1:
@@ -376,16 +384,26 @@ class Minibot:
             thread = Thread(target=pass_tags, args=[self, sock, key, value])
             thread.start()
         elif key == "TEST":
-            def test(self, sock: socket, key: str, value: str):
+            # return_val = []
+            # thread = Thread(target=ece.test, args=[return_val])
+            # thread.start()
+
+            # while thread.is_alive():
+            #     time.sleep(0.01)
+
+            # return_str = ''.join(str(e) for e in return_val[0:3])
+            # return_str = ' ,'.join(str(e) for e in [return_str, return_val[4], return_val[5]])
+            # self.sendKV(sock, key, return_str)
+
+            def test_rfid(self, sock: socket, key: str, value: str):
                 start_time = time.time()
                 returned_tags = [0, 0, 0, 0]
-                # ece.rfid(value, returned_tags)
-                ece.test_connection(returned_tags)
+                ece.rfid(value, returned_tags)
                 latency = time.time() - start_time
-                return_str = "Test Message: " + ' '.join(str(e) for e in returned_tags) + " Latency: " + str(latency)
+                return_str = "RFID Tag: " + ' '.join(str(e) for e in returned_tags) + " Latency: " + str(latency)
                 self.sendKV(sock, key, return_str)
                 
-            thread = Thread(target=test, args=[self, sock, key, value])
+            thread = Thread(target=test_rfid, args=[self, sock, key, value])
             thread.start()
 
     def sendKV(self, sock: socket, key: str, value: str):

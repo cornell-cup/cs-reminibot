@@ -110,8 +110,8 @@ class BaseStation:
         # so that we can connect to the Minibot
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-        # self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        # self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
 
         # an arbitrarily small time
         self.sock.settimeout(0.01)
@@ -587,7 +587,7 @@ class BaseStation:
         print("rfid tag: " + bot.rfid_tags, flush=True)
         return bot.rfid_tags
         
-    def test_connection(self, bot_name: str):
+    def get_test(self, bot_name: str):
         bot = self.get_bot(bot_name)
         bot.sendKV("TEST")
         bot.readKV()

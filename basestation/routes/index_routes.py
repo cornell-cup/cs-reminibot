@@ -150,7 +150,7 @@ def end_physical_blockly():
 def test_connection_method():
     data = request.get_json()
     bot_name = data['bot_name']
-    test_message = base_station.test_connection(bot_name)
+    test_message = base_station.get_test(bot_name)
     return json.dumps(test_message), status.HTTP_200_OK
 
 @index_bp.route('/vision', methods=['POST', 'GET'])
