@@ -375,17 +375,17 @@ class Minibot:
                 
             thread = Thread(target=pass_tags, args=[self, sock, key, value])
             thread.start()
+            
         elif key == "TEST":
-            def test(self, sock: socket, key: str, value: str):
+            def method(self, sock: socket, key: str, value: str):
                 start_time = time.time()
                 returned_tags = [0, 0, 0, 0]
-                # ece.rfid(value, returned_tags)
                 ece.test_connection(returned_tags)
                 latency = time.time() - start_time
                 return_str = "Test Message: " + ' '.join(str(e) for e in returned_tags) + " Latency: " + str(latency)
                 self.sendKV(sock, key, return_str)
                 
-            thread = Thread(target=test, args=[self, sock, key, value])
+            thread = Thread(target=method, args=[self, sock, key, value])
             thread.start()
 
     def sendKV(self, sock: socket, key: str, value: str):
