@@ -195,16 +195,17 @@ def line_follow():
  
 def test_connection(returned):
     acquire_lock()
-    load_req = [ord('T'), ord('E'), ord('S'), ord('T')]
-    load_msg = msglib.make_crc_message(load_req)
+    data = [ord('T'), ord('E'), ord('S'), ord('T')]
+    msg = msglib.make_crc_message(data)
     data, numTries = msglib.read_data(
         spi, load_msg, 22, msglib.validate_crc_message)
     data = msglib.unpack_crc_message(data)
-    if len(data) != 0:
-        returned_tags[0] = data[0]
-        returned_tags[1] = data[1]
-        returned_tags[2] = data[2]
-        returned_tags[3] = data[3]
+
+    returned[0] = data[0]
+    returned[1] = data[1]
+    returned[2] = data[2]
+    returned[3] = data[3]
+
     release_lock()
     
 def set_ports(ports):
