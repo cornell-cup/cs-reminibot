@@ -383,7 +383,7 @@ class Minibot:
                 
             thread = Thread(target=pass_tags, args=[self, sock, key, value])
             thread.start()
-        elif key == "TEST":
+        elif key == "TESTRFID":
             def test_rfid(self, sock: socket, key: str, value: str):
                 start_time = time.time()
                 returned_tags = [0, 0, 0, 0]
@@ -394,7 +394,15 @@ class Minibot:
                 
             thread = Thread(target=test_rfid, args=[self, sock, key, value])
             thread.start()
+        elif key == "TEST":
+            start_time = time.time()
+            returned_msg = [0, 0, 0, 0]
+            ece.test(returned_msg)
+            time_elapsed = time.time() - start_time
+            return_str = "RFID Tag: " + ' '.join(str(e) for e in returned_msg)
+            self.sendKV(sock, key, return_str)
 
+            
     def sendKV(self, sock: socket, key: str, value: str):
         """ Sends a key-value pair to the specified socket. The key value
         pair is encoded as <<<<key, value>>>> when sent to the basestation """
