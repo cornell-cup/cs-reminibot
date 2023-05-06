@@ -74,7 +74,10 @@ export default class CustomBlockModal extends React.Component {
       }
     }
 
-    if (this.state.selectedCustomBlock == null || this.state.selectedCustomBlock.length == 0) {
+    if (this.props.customBlocks.length <= 0) {
+      this.props.saveSelection(e, loopSelection, []);
+    }
+    else if (this.state.selectedCustomBlock == null || this.state.selectedCustomBlock.length == 0) {
       let defaultCustomSelection = this.initSelection();
       this.setState({ selectedCustomBlock : defaultCustomSelection });
       this.props.saveSelection(e, loopSelection, defaultCustomSelection);
