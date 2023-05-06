@@ -103,12 +103,12 @@
 }
 
 .main-body {
-  background: #212529;
+  background: #242222;
   padding-bottom: 50px;
 }
 
 .jumbotron {
-  background-color: #212529;
+  background-color: #00fffb;
 }
 
 /* .navbar {
@@ -132,7 +132,7 @@
   top: 0;
   /* Stay at the top */
   right: 0;
-  background-color: #111;
+  background-color: #1D1C1C;
   /* Black*/
   overflow-x: hidden;
   /* Disable horizontal scroll */
@@ -331,11 +331,11 @@ table {
   color: white;
 }
 
-.small-title {
+/* .small-title {
   font-size: 1.75em;
   font-weight: bold;
   color: white;
-}
+} */
 
 #main_nav ul {
   background: transparent;
@@ -451,7 +451,8 @@ table {
 }
 
 .available-bots {
-  padding: 5px;
+  padding: 6px;
+  text-align: left;
 }
 
 .control-option {
@@ -471,9 +472,10 @@ table {
 
 .small-title {
   font-family: "Audiowide", cursive;
-  color: #ff8484;
+  color: #ffffff;
   font-weight: 60;
-  font-size: 20pt;
+  font-size: 24pt;
+  text-align: left;
 }
 
 .info-icon {

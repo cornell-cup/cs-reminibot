@@ -135,22 +135,22 @@ export default class SpeechRecognition extends React.Component {
       });
   }
 
-  render() {
-    return (
-      <React.Fragment>
-        <div id="speech-button" className="row">
-          <button className="btn btn-danger element-wrapper btn-speech"
-            onClick={this.toggle}>
-            <div className="row">
-              <span className="col-md-1 align-self-center"><FontAwesomeIcon icon='microphone' /></span>
-              <span className="col-md align-self-center">{(this.state.on) ? "Stop Speech Recognition" : "Start Speech Recognition"}</span>
-            </div>
-          </button>
-        </div>
-        <div className="row">
-          <div id="speech_recognition_feedback_box" />
-        </div>
-      </React.Fragment>
-    );
-  }
+  // render() {
+  //   return (
+  //     <React.Fragment>
+  //       <div id="speech-button" className="row">
+  //         <button className="btn btn-danger element-wrapper btn-speech"
+  //           onClick={this.toggle}>
+  //           <div className="row">
+  //             <span className="col-md-1 align-self-center"><FontAwesomeIcon icon='microphone' /></span>
+  //             <span className="col-md align-self-center">{(this.state.on) ? "Stop Speech Recognition" : "Start Speech Recognition"}</span>
+  //           </div>
+  //         </button>
+  //       </div>
+  //       <div className="row">
+  //         <div id="speech_recognition_feedback_box" />
+  //       </div>
+  //     </React.Fragment>
+  //   );
+  // }
 }

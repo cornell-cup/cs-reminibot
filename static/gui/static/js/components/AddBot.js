@@ -505,7 +505,7 @@ export default class AddBot extends React.Component {
                     <div className="row">
                         <div className="col text-center">
                             <br />
-                            <p className="small-title"> Minibot Setup </p>
+                            <p className="small-title"> Minibot Setup owo </p>
                         </div>
                     </div>
                     <div className="row">

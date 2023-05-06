@@ -97,8 +97,8 @@ export default class MovementControls extends React.Component {
                         <input id="custom-range-1" className="custom-range" name="wheel_power" type="range" min="0" max="100"
                             step="5" onChange={evt => this.updatePowerValue(evt)} />
                     </div>
-                    <div className="col-md align-self-center">
-                        {/* <SpeechRecognition selectedBotName={this.props.selectedBotName} /> */}
+                    {/* <div className="col-md align-self-center">
+                        (comment out) <SpeechRecognition selectedBotName={this.props.selectedBotName} /> 
                         <BotVoiceControl
                             selectedBotName={this.props.selectedBotName}
                             setActiveMicComponent={this.props.setActiveMicComponent}
@@ -106,7 +106,7 @@ export default class MovementControls extends React.Component {
                             botVoiceControlMic={this.props.botVoiceControlMic}
                             setBotVoiceControlMic={this.props.setBotVoiceControlMic}
                         />
-                    </div>
+                    </div> */}
                 </div>
             </div>
         );
