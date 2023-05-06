@@ -150,7 +150,14 @@ def end_physical_blockly():
 def test_connection_method():
     data = request.get_json()
     bot_name = data['bot_name']
-    test_message = base_station.get_test(bot_name)
+    test_message = base_station.get_connection_test(bot_name)
+    return json.dumps(test_message), status.HTTP_200_OK
+
+@index_bp.route('/test_rfid', methods=['POST'])
+def test_rfid_method():
+    data = request.get_json()
+    bot_name = data['bot_name']
+    test_message = base_station.get_rfid_test(bot_name)
     return json.dumps(test_message), status.HTTP_200_OK
 
 @index_bp.route('/vision', methods=['POST', 'GET'])

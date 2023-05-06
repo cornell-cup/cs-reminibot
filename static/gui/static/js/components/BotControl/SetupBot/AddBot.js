@@ -286,6 +286,28 @@ export default class AddBot extends React.Component {
         });
     }
 
+    testRFIDOnClick() {
+        const _this = this;
+        axios({
+            method: 'POST',
+            url: '/test_rfid', //url to backend endpoint
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: JSON.stringify({
+                bot_name: _this.props.selectedBotName,
+            })
+        }).then(function (response) {
+            if (response.data) {
+                console.log(response.data);
+            }
+        }).catch(function (error) {
+            if (error.response.data.error_msg.length > 0)
+                window.alert(error.response.data.error_msg);
+            else
+                console.log(error);
+        });
+    }
     render() {
         const _this = this;
         return (
@@ -341,7 +363,8 @@ export default class AddBot extends React.Component {
                         </div>
                         <div className="col horizontalDivCenter">
                             <p className="small-title"> Test </p>
-                            <button className="btn btn-success element-wrapper mr-1" onClick={() => this.testConnectionOnClick()}>Test</button>
+                            <button className="btn btn-success element-wrapper mr-1" onClick={() => this.testConnectionOnClick()}>Test Connection</button>
+                            <button className="btn btn-success element-wrapper mr-1" onClick={() => this.testRFIDOnClick()}>Test RFID</button>
                         </div>
                     </div>
                     <br />
