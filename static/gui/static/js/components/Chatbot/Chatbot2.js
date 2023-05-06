@@ -30,9 +30,8 @@ const initialList = [
   {
     id: 2,
     who: "other",
-    message: "You can use the key word \"gpt\" in front of your question to trigger chatgpt response.",
+    message: "You can start your question with the keyword \"ChatGPT:\" to chat with ChatGPT.",
   }];
-//Font size style
 let lineHeightMultiplier = 0.10;
 const defaultFontSize = {
   header: {
@@ -233,6 +232,7 @@ const Chatbot2 = withCookies((props) => {
       }
     }).catch(function (error) {
       console.log("Error branch");
+      console.log("error is " + error)
       console.error(error.response.data);
       setAnimating(false);
       if (error.response.data.error_msg.length > 0)
