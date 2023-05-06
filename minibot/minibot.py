@@ -399,7 +399,7 @@ class Minibot:
             returned_msg = [0, 0, 0, 0]
             ece.test(returned_msg)
             time_elapsed = time.time() - start_time
-            return_str = "RFID Tag: " + ' '.join(str(e) for e in returned_msg)
+            return_str = "Return Message: " + ' '.join(str(e) for e in returned_msg) + " Latency: " + str(time_elapsed)
             self.sendKV(sock, key, return_str)
 
             
