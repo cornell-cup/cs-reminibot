@@ -32,6 +32,7 @@ import VirtualEnviroment from './utils/VirtualEnviroment.js';
 // Context import
 import { PythonCodeContext } from '../context/PythonCodeContext.js';
 import { VirtualEnviromentContext } from '../context/VirtualEnviromentContext.js';
+import Chatbot from './Chatbot/Chatbot2.js';
 
 
 /**
@@ -67,7 +68,6 @@ const Platform = withCookies((props) => {
     let tmp_cont_hist_loaded = props.contextHistoryLoaded && tmp_email == loginEmail
     props.setContextHistoryLoaded(tmp_cont_hist_loaded);
     setLoginEmail(tmp_email);
-
     setVirtualRoomId(props.cookies.get('virtual_room_id') || nanoid());
   }, [document.cookie]);
 

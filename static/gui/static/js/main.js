@@ -20,7 +20,7 @@ import Chatbot from './components/Chatbot/Chatbot2.js';
 // Utils import
 import { ACT_MIC_CHATBOT, ACT_MIC_COMMAND } from './components/utils/Constants.js';
 import { commit_context_stack_to_db, clear_chatbot_context_stack } from './components/utils/axios/chatbotAxios.js';
-import { set } from 'lodash';
+import { property, set } from 'lodash';
 
 
 function ClientGUI({ }) {
@@ -107,6 +107,7 @@ function ClientGUI({ }) {
     setContextHistoryLoaded(false);
   };
 
+
   return (
     <div className="main-body">
       <Router>
@@ -125,15 +126,16 @@ function ClientGUI({ }) {
             contextHistoryLoaded={contextHistoryLoaded}
             setContextHistoryLoaded={setContextHistoryLoaded}
           />
+          <Chatbot
+            setParentContext={setChatbotContext}
+            selectedBotName={selectedBotName}
+            activeMicComponent={activeMicComponent}
+            setActiveMicComponent={setActiveMicComponent}
+            mic={chatbotMic}
+            setMic={setChatbotMic}
+          />
         </div>
-        <Chatbot
-          setParentContext={setChatbotContext}
-          selectedBotName={selectedBotName}
-          activeMicComponent={activeMicComponent}
-          setActiveMicComponent={setActiveMicComponent}
-          mic={chatbotMic}
-          setMic={setChatbotMic}
-        />
+
       </Router>
     </div>
   );

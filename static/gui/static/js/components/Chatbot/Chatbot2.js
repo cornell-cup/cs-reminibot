@@ -12,7 +12,8 @@ import {
 } from "../utils/Constants.js";
 import SpeechRecognitionComp from "../utils/SpeechRecognitionComp.js";
 import JSZip from 'jszip';
-
+import Navbar from '../Navbar.js';
+import { withCookies } from 'react-cookie';
 
 
 //Voice Control 
@@ -25,7 +26,12 @@ const initialList = [
     who: "other",
     message: "Hello, I am Chatbot. How are you today?",
   }
-];
+  ,
+  {
+    id: 2,
+    who: "other",
+    message: "You can use the key word \"gpt\" in front of your question to trigger chatgpt response.",
+  }];
 //Font size style
 let lineHeightMultiplier = 0.10;
 const defaultFontSize = {
@@ -44,13 +50,7 @@ let initialUpload = [];
 
 
 
-function Chatbot2({
-  setParentContext,
-  selectedBotName,
-  setActiveMicComponent,
-  activeMicComponent,
-  mic,
-  setMic }) {
+const Chatbot2 = withCookies((props) => {
   // use states for chatbot window appearance
   const [enter, setEnter] = useState("");
   const [open, setOpen] = useState(false);
@@ -73,6 +73,12 @@ function Chatbot2({
 
 
 
+  const selectedBotName = props.selectedBotName;
+  const setParentContext = props.setParentContext;
+  const activeMicComponent = props.activeMicComponent
+  const setActiveMicComponent = props.setActiveMicComponent;
+  const mic = props.mic;
+  const setMic = props.setMic;
 
 
   // style for the overall chatbot window
@@ -92,7 +98,7 @@ function Chatbot2({
 
   // functions responding to commands changing the appearance of the chatbot windows
   const changeInputText = (event) => {
-    event.preventDefault();
+    //event.preventDefault();
     if (!contextMode) return;
     const input = event.currentTarget.value;
     setInputText(input);
@@ -237,7 +243,7 @@ function Chatbot2({
   }
 
   const toggleMic = (e) => {
-    e.preventDefault();
+    // e.preventDefault();
     if (contextMode || selectedBotName) {
       if (activeMicComponent == ACT_MIC_CHATBOT) {
         var temp = !mic;
@@ -250,7 +256,7 @@ function Chatbot2({
     }
   }
 
-
+  let loginEmail = props.cookies.get('current_user_email') || "";   //gets current user email from cookies (or "" if not logged in)
 
   //Handles upload zip file event through chatbot's command mode
   const hiddenFileInput = React.useRef();
@@ -261,52 +267,57 @@ function Chatbot2({
   const handleChange = (event) => {
     let fileUploaded = event.target.files[0];
     var filenames = "";
-    JSZip.loadAsync(fileUploaded).then(function (zip) {
-      Object.keys(zip.files).forEach(function (filename) {
-        zip.files[filename].async('text').then(function (fileData) {
-
-          setUpload([...upload, fileData]);
-          axios({
-            method: 'POST',
-            url: '/chatbot-upload',
-            headers: {
-              'Content-Type': 'application/json',
-              'Upload-Content': 'code'
-            },
-            data: JSON.stringify({
-              script_code: fileData,
-              script_name: filename,
-              login_email: "test111@gmail.com"    //temporary place holder for user email
+    if (loginEmail == "") {
+      window.alert("Zipfile upload is a registered user functionality. Please log in first.")
+    }
+    else {
+      console.log("user has logged in");
+      JSZip.loadAsync(fileUploaded).then(function (zip) {
+        Object.keys(zip.files).forEach(function (filename) {
+          zip.files[filename].async('text').then(function (fileData) {
+            setUpload([...upload, fileData]);
+            axios({
+              method: 'POST',
+              url: '/chatbot-upload',
+              headers: {
+                'Content-Type': 'application/json',
+                'Upload-Content': 'code'
+              },
+              data: JSON.stringify({
+                script_code: fileData,
+                script_name: filename,
+                login_email: loginEmail
+              })
+            }).then(function (response) {
+              console.log("file is sent successfully");
+            }).catch(function (error) {
+              console.log("Error branch");
+              console.error(error.response.data);
             })
-          }).then(function (response) {
-            console.log("file is sent successfully");
-          }).catch(function (error) {
-            console.log("Error branch");
-            console.error(error.response.data);
           })
+          filenames += filename + ", ";
         })
-        filenames += filename + ", ";
-      })
-      filenames = filenames.substring(0, filenames.length - 2);   //trims the trailing comma
-      axios({
-        method: 'POST',
-        url: '/chatbot-upload',
-        headers: {
-          'Content-Type': 'application/json',
-          'Upload-Content': 'filenames'
-        },
-        data: JSON.stringify({
-          filename: filenames,
-        }),
-      }).then(function (response) {
-        console.log("names are sent successfully");
-      }).catch(function (error) {
-        console.log("Error branch");
-        console.error(error.response.data);
+        filenames = filenames.substring(0, filenames.length - 2);   //trims the trailing comma
+        axios({
+          method: 'POST',
+          url: '/chatbot-upload',
+          headers: {
+            'Content-Type': 'application/json',
+            'Upload-Content': 'filenames'
+          },
+          data: JSON.stringify({
+            filename: filenames,
+          }),
+        }).then(function (response) {
+          console.log("names are sent successfully");
+        }).catch(function (error) {
+          console.log("Error branch");
+          console.error(error.response.data);
+
+        })
 
       })
-
-    })
+    }
   }
 
 
@@ -338,8 +349,10 @@ function Chatbot2({
   }, [messages]);
 
   useEffect(() => {
-    initialList[0].timeStamp = getTimeStamp();
     setMessages(initialList);
+    initialList[0].timeStamp = getTimeStamp();
+    initialList[1].timeStamp = getTimeStamp();
+
   }, []);
 
   /***************************** Bot Voice Control ***************************/
@@ -347,6 +360,7 @@ function Chatbot2({
     if (!contextMode) {
       let queue = tempCommands.split(" ");
       // Run this code if a new word has been spoken.
+      console.log(queueStartIdx);
       console.log(queue.slice(queueStartIdx))
       if (queue.length > lastLen) {
         let response = "";
@@ -371,7 +385,7 @@ function Chatbot2({
               url: '/chatbot-upload',
               headers: {
                 'File-Name': filename,
-                'User-Email': "test111@gmail.com"    //temporary place holder for user email address
+                'User-Email': loginEmail
               }
             }).then(function (response) {
               console.log("get method result: " + response.data);
@@ -385,7 +399,7 @@ function Chatbot2({
                   data: JSON.stringify({
                     bot_name: selectedBotName,
                     script_code: response.data,
-                    login_email: "test111@gmail.com"
+                    login_email: loginEmail
                   }),
                 }).then(function (response) {
                   console.log('sent script');
@@ -570,7 +584,7 @@ function Chatbot2({
       </div>
     </div >
   );
-}
+})
 
 
 export default Chatbot2;
