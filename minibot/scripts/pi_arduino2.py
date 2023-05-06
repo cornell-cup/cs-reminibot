@@ -196,24 +196,16 @@ def line_follow():
  
 def test(returned):
     acquire_lock()
-    data = [ord('T'), ord('E'), ord('S'), ord('T')]
-    msg = msglib.make_crc_message(data)
+    load_req = [ord('T'), ord('E'), ord('S'), ord('T')]
+    load_msg = msglib.make_crc_message(load_req)
     data, numTries = msglib.read_data(
         spi, load_msg, 22, msglib.validate_crc_message)
     data = msglib.unpack_crc_message(data)
-
-    t = time.localtime()
-    current_time = time.strftime("%H:%M:%S", t)
-    returned[4] = current_time
 
     returned[0] = data[0]
     returned[1] = data[1]
     returned[2] = data[2]
     returned[3] = data[3]
-
-    t = time.localtime()
-    current_time = time.strftime("%H:%M:%S", t)
-    returned[5] = current_time
 
     release_lock()
     

@@ -384,17 +384,6 @@ class Minibot:
             thread = Thread(target=pass_tags, args=[self, sock, key, value])
             thread.start()
         elif key == "TEST":
-            # return_val = []
-            # thread = Thread(target=ece.test, args=[return_val])
-            # thread.start()
-
-            # while thread.is_alive():
-            #     time.sleep(0.01)
-
-            # return_str = ''.join(str(e) for e in return_val[0:3])
-            # return_str = ' ,'.join(str(e) for e in [return_str, return_val[4], return_val[5]])
-            # self.sendKV(sock, key, return_str)
-
             def test_rfid(self, sock: socket, key: str, value: str):
                 start_time = time.time()
                 returned_tags = [0, 0, 0, 0]

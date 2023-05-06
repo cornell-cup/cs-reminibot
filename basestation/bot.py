@@ -113,6 +113,11 @@ class Bot:
                     self.rfid_tags = ""
                 else:
                     self.rfid_tags = value
+            elif key == "TESTRFID":
+                if value == "":
+                    self.test_msg = ""
+                else:
+                    self.test_msg = value
             elif key == "TEST":
                 if value == "":
                     self.test_msg = ""
