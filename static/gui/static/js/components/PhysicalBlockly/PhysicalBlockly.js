@@ -147,8 +147,8 @@ export default class PhysicalBlockly extends React.Component {
 			_this.state.loopList[i].getChildren(false)[0].setFieldValue(val, "NUM");
 		}
 
-		console.log("received custom block selection");
-		if (customBlockSelection.length > 0) {
+		if (this.state.customBlocks.length > 0) {
+			console.log("received custom block selection");
 			let codeList = _this.state.code.split("\n");
 			for (var i = 0; i < _this.state.customBlockFillCount; i++) {
 				let blockCode = _this.findCustomBlock(customBlockSelection[i], _this.state.customBlocks);
@@ -215,7 +215,6 @@ export default class PhysicalBlockly extends React.Component {
 						n += "    ";
 					}
 					n += "#ended for loop\n";
-					isEnd = true;
 				}
 				else {
 					for (let i = 0; i < _this.state.tabs; i++) {
@@ -263,8 +262,6 @@ export default class PhysicalBlockly extends React.Component {
 					shadow.appendChild(num);
 					value.appendChild(shadow);
 					block.appendChild(value);
-				} else if (textBlock == "end") {
-					isEnd = true;
 				} else if (textBlock == "bot.move_forward(100)") {
 					block.setAttribute("type", "move_power");
 					block.appendChild(motorSpeedField);
@@ -477,7 +474,7 @@ export default class PhysicalBlockly extends React.Component {
 							</div>
 						</div>
 					</p>
-					<CustomBlockModal customCount={this.state.customBlockFillCount} loopCount={this.state.loopvar} defaultLoopIteration={this.state.defaultLoopIteration} customBlocks={this.state.customBlocks} saveSelection={this.saveCustomSelection} />
+					<CustomBlockModal customCount={this.state.customBlockFillCount} loopCount={this.state.loopvar} defaultLoopIteration={this.state.defaultLoopIteration} customBlocks={this.state.customBlocks} saveSelection={this.saveCustomSelection} loggedin={this.state.loggedin} />
 					<CannotSaveModal />
 					{this.props.selectedBotName != '' && this.state.stage == 0 ?
 						<div>
