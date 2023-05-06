@@ -141,6 +141,9 @@ export default class PhysicalBlockly extends React.Component {
 		e.preventDefault();
 		$('#customModal').modal('hide');
 
+		console.log("BHASSFAKJKJWAFKJAFWKUWFAWKB");
+		console.log(customBlockSelection);
+
 		for (var i = 0; i < _this.state.loopvar; i++) {
 			var val = loopSelection[i];
 			newCode = newCode.replace("n" + i, val);
@@ -150,19 +153,25 @@ export default class PhysicalBlockly extends React.Component {
 		if (this.state.customBlocks.length > 0) {
 			console.log("received custom block selection");
 			let codeList = _this.state.code.split("\n");
-			for (var i = 0; i < _this.state.customBlockFillCount; i++) {
-				let blockCode = _this.findCustomBlock(customBlockSelection[i], _this.state.customBlocks);
-				blockCode = blockCode.split("\n");
-				if (blockCode != null) {
-					let indent = _this.getCustomBlockIndent(i, codeList);
-					let blockCodeStr = "";
-					for (var j = 0; j < blockCode.length - 1; j++) {
-						blockCodeStr += indent + blockCode[j] + "\n";
-					}
-					newCode = newCode.replace(indent + "#custom block no." + i + "\n", blockCodeStr);
-				}
 
-				_this.state.customPlacedBlocks[i].setFieldValue(customBlockSelection[i], "function_content");
+			for (var i = 0; i < _this.state.customBlockFillCount; i++) {
+
+				if (customBlockSelection[i] != null) {
+
+					let blockCode = _this.findCustomBlock(customBlockSelection[i], _this.state.customBlocks);
+					blockCode = blockCode.split("\n");
+					if (blockCode != null) {
+						let indent = _this.getCustomBlockIndent(i, codeList);
+						let blockCodeStr = "";
+						for (var j = 0; j < blockCode.length - 1; j++) {
+							blockCodeStr += indent + blockCode[j] + "\n";
+						}
+						newCode = newCode.replace(indent + "#custom block no." + i + "\n", blockCodeStr);
+					}
+
+					_this.state.customPlacedBlocks[i].setFieldValue(customBlockSelection[i], "function_content");
+
+				}
 			}
 		}
 
@@ -474,7 +483,7 @@ export default class PhysicalBlockly extends React.Component {
 							</div>
 						</div>
 					</p>
-					<CustomBlockModal customCount={this.state.customBlockFillCount} loopCount={this.state.loopvar} defaultLoopIteration={this.state.defaultLoopIteration} customBlocks={this.state.customBlocks} saveSelection={this.saveCustomSelection} loggedin={this.state.loggedin} />
+					<CustomBlockModal customCount={this.state.customBlockFillCount} loopCount={this.state.loopvar} defaultLoopIteration={this.state.defaultLoopIteration} customBlocks={this.state.customBlocks} saveSelection={this.saveCustomSelection} />
 					<CannotSaveModal />
 					{this.props.selectedBotName != '' && this.state.stage == 0 ?
 						<div>

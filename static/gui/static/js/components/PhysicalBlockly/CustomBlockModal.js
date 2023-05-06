@@ -14,7 +14,7 @@ export default class CustomBlockModal extends React.Component {
     let selected = [];
     if (this.props.customBlocks.length == 0) return selected;
     for(var i = 0; i < this.props.customCount; i ++) {
-      selected.push(this.props.customBlocks[0][0]);
+      selected.push(null);
     }
     return selected;
   }
@@ -22,6 +22,7 @@ export default class CustomBlockModal extends React.Component {
   changeCustomBlockSelection(e, id, value) {
     e.preventDefault();
     let selection = [];
+
     if(this.state.selectedCustomBlock == null || this.state.selectedCustomBlock.length == 0) {
       selection = this.initSelection();
     } else {
@@ -35,12 +36,16 @@ export default class CustomBlockModal extends React.Component {
   getSelectList() {
     let selectList = [];
     let selectOption = [];
-    for(var i = 0; i < this.props.customBlocks.length; i ++){
-      selectOption.push(<option key={i}>{this.props.customBlocks[i][0]}</option>);
+     
+    // Create an empty option for the first option
+    selectOption.push(<option key={0}>None</option>);
+
+    for(var i = 1; i < this.props.customBlocks.length+1; i ++){
+      selectOption.push(<option key={i}>{this.props.customBlocks[i-1][0]}</option>);
     }
 
     for(var i = 0; i < this.props.customCount; i ++) {
-      let selectDropdown = <select key={i} id={i}
+      let selectDropdown = <select key={i} id={i} defaultValue={"None"}
         onChange={(event) => this.changeCustomBlockSelection(event, event.target.id, event.target.value)}>
         {selectOption}
       </select>;
