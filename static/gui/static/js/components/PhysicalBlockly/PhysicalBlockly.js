@@ -162,7 +162,8 @@ export default class PhysicalBlockly extends React.Component {
 					newCode = newCode.replace(indent + "#custom block no." + i + "\n", blockCodeStr);
 				}
 
-			_this.state.customPlacedBlocks[i].setFieldValue(customBlockSelection[i], "function_content");
+				_this.state.customPlacedBlocks[i].setFieldValue(customBlockSelection[i], "function_content");
+			}
 		}
 
 		_this.setState({ stage: 0, code: newCode, customBlockFillCount: 0, customPlacedBlocks: [] });
