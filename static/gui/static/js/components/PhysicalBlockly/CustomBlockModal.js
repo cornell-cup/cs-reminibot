@@ -11,7 +11,8 @@ export default class CustomBlockModal extends React.Component {
   }
 
   initSelection() {
-    let selected = []
+    let selected = [];
+    if (this.props.customBlocks.length == 0) return selected;
     for(var i = 0; i < this.props.customCount; i ++) {
       selected.push(this.props.customBlocks[0][0]);
     }
@@ -88,12 +89,10 @@ export default class CustomBlockModal extends React.Component {
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
-              {(this.props.customCount > 0 || this.props.loopCount > 0) ?
                 <h3 id="customModalHeader">Physical Blockly Custom Selections</h3>
-                : <h3 id="customModalHeader">Cannot Save Block Selection</h3>}
             </div>
             <div class="modal-body">
-              {this.props.loopCount > 0 && !this.props.saving ? 
+              {this.props.loopCount > 0 ? 
                 <div id="loopIterationSection">
                   <h4 id="loopModalBody">
                     For each loop, enter the number of iterations to fill the loop with. The default is {this.props.defaultLoopIteration}.
@@ -102,7 +101,7 @@ export default class CustomBlockModal extends React.Component {
                     {this.getLoopElements()}
                   </ol>
                 </div> : <div></div>}
-              {this.props.customCount > 0 ?
+              {this.props.customCount > 0 && this.props.customBlocks.length > 0 ?
                 <div id="customBlockSection">
                   <h4 id="customModalBody">
                     For each custom block placeholder, please select a custom block function to assign the placeholder to.
@@ -111,16 +110,9 @@ export default class CustomBlockModal extends React.Component {
                     {this.getSelectList()}
                   </ol>
                 </div> : <div></div>}
-              {this.props.saving ?
-                <h4 id="customModalBody">
-                  Invalid customization! Please make sure that the commands are matched to an unique color!
-                </h4> : <div></div>}
             </div>
             <div class="modal-footer">
-              {this.props.customCount > 0 || this.props.loopCount > 0 ?
                 <button class="btn btn-primary" onClick={(event) => this.handleSaveSelection(event)}>Save</button>
-                : <button class="btn btn-primary" data-dismiss="modal">Close</button>
-              }
             </div>
           </div>
         </div>

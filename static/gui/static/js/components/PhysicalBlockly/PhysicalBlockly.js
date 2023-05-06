@@ -144,21 +144,23 @@ export default class PhysicalBlockly extends React.Component {
 			_this.state.loopList[i].getChildren(false)[0].setFieldValue(val, "NUM");
 		}
 
-		console.log("received custom block selection");
-		let codeList = _this.state.code.split("\n");
-		for (var i = 0; i < _this.state.customBlockFillCount; i++) {
-			let blockCode = _this.findCustomBlock(customBlockSelection[i], _this.state.customBlocks);
-			blockCode = blockCode.split("\n");
-			if (blockCode != null) {
-				let indent = _this.getCustomBlockIndent(i, codeList);
-				let blockCodeStr = "";
-				for (var j = 0; j < blockCode.length - 1; j++) {
-					blockCodeStr += indent + blockCode[j] + "\n";
+		if (this.state.customBlocks.length > 0) {
+			console.log("received custom block selection");
+			let codeList = _this.state.code.split("\n");
+			for (var i = 0; i < _this.state.customBlockFillCount; i++) {
+				let blockCode = _this.findCustomBlock(customBlockSelection[i], _this.state.customBlocks);
+				blockCode = blockCode.split("\n");
+				if (blockCode != null) {
+					let indent = _this.getCustomBlockIndent(i, codeList);
+					let blockCodeStr = "";
+					for (var j = 0; j < blockCode.length - 1; j++) {
+						blockCodeStr += indent + blockCode[j] + "\n";
+					}
+					newCode = newCode.replace(indent + "#custom block no." + i + "\n", blockCodeStr);
 				}
-				newCode = newCode.replace(indent + "#custom block no." + i + "\n", blockCodeStr);
-			}
 
-			_this.state.customPlacedBlocks[i].setFieldValue(customBlockSelection[i], "function_content");
+				_this.state.customPlacedBlocks[i].setFieldValue(customBlockSelection[i], "function_content");
+			}
 		}
 
 		_this.setState({ stage: 0, code: newCode, customBlockFillCount: 0, customPlacedBlocks: [] });
@@ -227,7 +229,7 @@ export default class PhysicalBlockly extends React.Component {
 						n = n.replace("(n)", "(n" + _this.state.loopvar + ")");
 						_this.setState({ tabs: _this.state.tabs + 1 });
 						_this.setState({ loopvar: _this.state.loopvar + 1 });
-					} else if (response.data.includes("#custom block no.n") && this.state.loggedin) {
+					} else if (response.data.includes("#custom block no.n")) {
 						n = n.replace("#custom block no.n", "#custom block no." + _this.state.customBlockFillCount);
 					}
 				}
@@ -286,7 +288,7 @@ export default class PhysicalBlockly extends React.Component {
 					dir_field.innerHTML = "left"
 					block.appendChild(dir_field);
 					block.appendChild(motorPercentField);
-				} else if (textBlock == "#custom block no.n" && this.state.loggedin) {
+				} else if (textBlock == "#custom block no.n") {
 					let newCustomBlocks = [["Create Custom Block", " "]];
 					newCustomBlocks = newCustomBlocks.concat(_this.state.customBlocks);
 
@@ -467,7 +469,7 @@ export default class PhysicalBlockly extends React.Component {
 							</div>
 						</div>
 					</p>
-					<CustomBlockModal customCount={this.state.customBlockFillCount} loopCount={this.state.loopvar} defaultLoopIteration={this.state.defaultLoopIteration} customBlocks={this.state.customBlocks} saveSelection={this.saveCustomSelection} />
+					<CustomBlockModal customCount={this.state.customBlockFillCount} loopCount={this.state.loopvar} defaultLoopIteration={this.state.defaultLoopIteration} customBlocks={this.state.customBlocks} saveSelection={this.saveCustomSelection} loggedin={this.state.loggedin} />
 					<CannotSaveModal />
 					{this.props.selectedBotName != '' && this.state.stage == 0 ?
 						<div>
