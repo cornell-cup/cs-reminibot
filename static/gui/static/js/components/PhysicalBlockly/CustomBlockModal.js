@@ -55,7 +55,7 @@ export default class CustomBlockModal extends React.Component {
     for(var i = 0; i < this.props.loopCount; i ++) {
       let inputID = "n" + i;
       let label = <label>n{i}</label>;
-      let input = <input type="number" placeholder={this.props.defaultLoopIteration} id={inputID} />;
+      let input = <input class="loopNumberInput" type="number" placeholder={this.props.defaultLoopIteration} id={inputID} />;
       loopElements.push(<div class="loopSelector">{label}{input}</div>);
     }
 
@@ -95,24 +95,48 @@ export default class CustomBlockModal extends React.Component {
                 <h3 id="customModalHeader">Physical Blockly Custom Selections</h3>
             </div>
             <div class="modal-body">
-              {this.props.loopCount > 0 ? 
-                <div id="loopIterationSection">
-                  <h4 id="loopModalBody">
-                    For each loop, enter the number of iterations to fill the loop with. The default is {this.props.defaultLoopIteration}.
-                  </h4>
-                  <ol>
-                    {this.getLoopElements()}
-                  </ol>
-                </div> : <div></div>}
-              {this.props.customCount > 0 && this.props.customBlocks.length > 0 ?
-                <div id="customBlockSection">
-                  <h4 id="customModalBody">
-                    For each custom block placeholder, please select a custom block function to assign the placeholder to.
-                  </h4>
-                  <ol>
-                    {this.getSelectList()}
-                  </ol>
-                </div> : <div></div>}
+              <div class="container">
+                <div class="row">   
+                  {this.props.loopCount > 0 ? 
+                    <div class="col">
+                      <div id="loopIterationSection">
+                        <h4 id="loopModalBody">
+                          Enter number of iterations for each loop.
+                        </h4>
+                        <ol>
+                          {this.getLoopElements()}
+                        </ol>
+                      </div>
+                    </div> : <span></span>}
+                  {this.props.customCount > 0 && this.props.customBlocks.length > 0 ?
+                    <div class="col">
+                      <div id="customBlockSection">
+                        <h4 id="customModalBody">
+                          Select a custom block function for each placeholder.
+                        </h4>
+                        <ol>
+                          {this.getSelectList()}
+                        </ol>
+                      </div>
+                    </div> : <div></div>}
+                </div>
+                {this.props.customCount > 0 && this.props.customBlocks.length > 0 ? 
+                  <div class="row">
+                    <h4 class="modalText">Saved Custom Blocks</h4>
+                    <div class="container">
+                      {this.props.customBlocks.map((c, i) => <div class="customBlockObject">
+                        <button class="btn btn-primary customCollapseButton" type="button" data-toggle="collapse" data-target={"#" + "customCollapse" + i} aria-expanded="false" aria-controls={"customCollapse" + i}>
+                          {c[0]}
+                        </button>
+                        <div class="collapse" id={"customCollapse" + i}>
+                          <div class="card card-body customBlockContent">
+                            {c[1]}
+                          </div>
+                        </div>
+                      </div>)}
+                    </div>
+                  </div> : <span></span>}
+              </div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-primary" onClick={(event) => this.handleSaveSelection(event)}>Save</button>

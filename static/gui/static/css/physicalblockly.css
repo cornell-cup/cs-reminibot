@@ -39,7 +39,7 @@
     font-family: "Audiowide", cursive;
     margin-top: 15px;
 }
-#customModalBody, #loopModalBody {
+#customModalBody, #loopModalBody, .modalText {
     font-size: 1.25em;
     font-weight: 300;
     color: rgb(177, 199, 255);
@@ -58,7 +58,6 @@
     color: rgb(177, 199, 255);
 }
 #customModal button.btn.btn-primary {
-    background-color: #ff8484;
     border: none;
     color: white;
 }
@@ -104,4 +103,22 @@
 }
 #saveModal .modal-footer {
     border: none;
+}
+.loopNumberInput {
+    width: 80%;
+}
+.customBlockObject {
+    display: block;
+}
+#customModal .customCollapseButton {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+#customModal .customBlockContent {
+    background-color: black;
+    border: 2px solid white;
+    white-space: pre-line;
+    color: white;
 }
