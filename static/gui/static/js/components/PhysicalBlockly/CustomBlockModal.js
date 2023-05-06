@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 export default class CustomBlockModal extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {selectedCustomBlock: []};
     this.initSelection = this.initSelection.bind(this);
     this.changeCustomBlockSelection = this.changeCustomBlockSelection.bind(this);
     this.handleSaveSelection = this.handleSaveSelection.bind(this);
@@ -84,11 +84,11 @@ export default class CustomBlockModal extends React.Component {
     }
     else if (this.state.selectedCustomBlock == null || this.state.selectedCustomBlock.length == 0) {
       let defaultCustomSelection = this.initSelection();
-      this.setState({ selectedCustomBlock : defaultCustomSelection });
       this.props.saveSelection(e, loopSelection, defaultCustomSelection);
     } else {
       this.props.saveSelection(e, loopSelection, this.state.selectedCustomBlock);
     }
+    this.setState({ selectedCustomBlock: [] });
   }
 
   render(props) {
