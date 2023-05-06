@@ -587,9 +587,15 @@ class BaseStation:
         print("rfid tag: " + bot.rfid_tags, flush=True)
         return bot.rfid_tags
         
-    def get_test(self, bot_name: str):
+    def get_connection_test(self, bot_name: str):
         bot = self.get_bot(bot_name)
         bot.sendKV("TEST", "")
+        bot.readKV()
+        return bot.test_msg
+    
+    def get_rfid_test(self, bot_name: str):
+        bot = self.get_bot(bot_name)
+        bot.sendKV("TESTRFID", "")
         bot.readKV()
         return bot.test_msg
 
