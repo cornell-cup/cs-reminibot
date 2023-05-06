@@ -215,7 +215,6 @@ export default class PhysicalBlockly extends React.Component {
 						n += "    ";
 					}
 					n += "#ended for loop\n";
-					isEnd = true;
 				}
 				else {
 					for (let i = 0; i < _this.state.tabs; i++) {
@@ -263,8 +262,6 @@ export default class PhysicalBlockly extends React.Component {
 					shadow.appendChild(num);
 					value.appendChild(shadow);
 					block.appendChild(value);
-				} else if (textBlock == "end") {
-					isEnd = true;
 				} else if (textBlock == "bot.move_forward(100)") {
 					block.setAttribute("type", "move_power");
 					block.appendChild(motorSpeedField);
