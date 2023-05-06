@@ -22,7 +22,6 @@ const tagMapping = [
 	"89 227 11 244",
 	"89 200 6 244",
 	"105 219 6 244",
-	//repeat, end, and custom block have dummy tags, same as dummy_ops2 and physical_blockly
 	"9 110 7 244",
 	"201 127 7 244",
 	"153 252 7 244"
@@ -222,11 +221,11 @@ export default class PhysicalBlockly extends React.Component {
 					for (let i = 0; i < _this.state.tabs; i++) {
 						n += "    ";
 					}
-					
+
 					let updatedTextBlock = textBlock;
-					if(textBlock == "bot.move_forward(100)" || textBlock == "bot.move_backward(100)" || textBlock == "bot.turn_clockwise(100)" || textBlock == "bot.turn_counter_clockwise(100)") {
+					if (textBlock == "bot.move_forward(100)" || textBlock == "bot.move_backward(100)" || textBlock == "bot.turn_clockwise(100)" || textBlock == "bot.turn_counter_clockwise(100)") {
 						let index = textBlock.indexOf("(");
-						updatedTextBlock = textBlock.substring(0, index + 1) + _this.state.motorPower + ")"; 
+						updatedTextBlock = textBlock.substring(0, index + 1) + _this.state.motorPower + ")";
 					}
 					n += updatedTextBlock + "\n";
 					if (response.data.includes("range")) {
