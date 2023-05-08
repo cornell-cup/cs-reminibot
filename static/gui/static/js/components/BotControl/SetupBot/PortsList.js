@@ -41,44 +41,44 @@ export default function PortsList({ motorPorts, selectedBotName }) {
 
   function buttonMapListener(value) {
     const _this = this;
-    if (value == "left" || value == "right") {
-      axios({
-        method: 'POST',
-        url: '/wheels',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        data: JSON.stringify({
-          bot_name: selectedBotName,
-          direction: value,
-          power: 50,
-        })
-      }).catch(function (error) {
-        if (error.response.data.error_msg.length > 0)
-          window.alert(error.response.data.error_msg);
-        else
-          console.log(error);
+    // if (value == "left" || value == "right") {
+    axios({
+      method: 'POST',
+      url: '/wheels',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: JSON.stringify({
+        bot_name: selectedBotName,
+        direction: value,
+        power: 50,
       })
-    }
-    if (value == "servo") {
-      axios({
-        method: 'POST',
-        url: '/servo',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        data: JSON.stringify({
-          bot_name: selectedBotName,
-          angle: value,
-        })
-      }).catch(function (error) {
-        if (error.response.data.error_msg.length > 0)
-          window.alert(error.response.data.error_msg);
-        else
-          console.log(error);
-      })
+    }).catch(function (error) {
+      if (error.response.data.error_msg.length > 0)
+        window.alert(error.response.data.error_msg);
+      else
+        console.log(error);
+    })
+    // }
+    // if (value == "servo") {
+    //   axios({
+    //     method: 'POST',
+    //     url: '/servo',
+    //     headers: {
+    //       'Content-Type': 'application/json'
+    //     },
+    //     data: JSON.stringify({
+    //       bot_name: selectedBotName,
+    //       angle: value,
+    //     })
+    //   }).catch(function (error) {
+    //     if (error.response.data.error_msg.length > 0)
+    //       window.alert(error.response.data.error_msg);
+    //     else
+    //       console.log(error);
+    //   })
 
-    }
+    // }
   }
 
   /* Left and right have default ports */
