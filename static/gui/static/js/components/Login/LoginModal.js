@@ -42,6 +42,7 @@ class LoginModal extends React.Component {
                 loginSuccessLabel: "",
                 loginErrorLabel: error.response.data.error_msg
             });
+            window.alert(error.response.data.error_msg);
             console.log(error);
         });
     }

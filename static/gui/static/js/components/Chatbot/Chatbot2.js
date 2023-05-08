@@ -52,10 +52,11 @@ function Chatbot2({
   const [id, setId] = useState(2);
   const [inputText, setInputText] = useState("");
   const [messages, setMessages] = useState([]);
-  const messagesEndRef = useRef(null);
+  const messagesEndRef = useRef();
   const [contextMode, setContextMode] = useState(true);
   const [date, setDate] = useState("");
   const [tempCommands, setTempCommands] = useState("");
+  const [isAnimating, setAnimating] = useState(false);
 
   // style for the overall chatbot window
   const styles = {
@@ -189,6 +190,7 @@ function Chatbot2({
     setId(temp_id);
     setInputText("");
     setMessages(newTempList);
+    setAnimating(true);
     axios({
       method: 'POST',
       url: '/chatbot-ask',
@@ -203,8 +205,10 @@ function Chatbot2({
         const res = response.data;
         newList = newList.concat({ id: temp_id, who: "other", message: res, timeStamp: getTimeStamp() });
         setMessages(newList);
+        setAnimating(false);
       }
     }).catch(function (error) {
+      setAnimating(false);
       if (error.response.data.error_msg.length > 0)
         window.alert(error.response.data.error_msg);
       else
@@ -220,6 +224,9 @@ function Chatbot2({
         setMic(temp);
       } else
         setActiveMicComponent(ACT_MIC_CHATBOT);
+    }
+    else {
+      window.alert("Please connect to a bot!");
     }
   }
 
@@ -240,9 +247,10 @@ function Chatbot2({
       duration: 50,
       delay: 10,
       smooth: false,
-      containerId: 'messages',
+      containerId: 'scroll',
       offset: 120,
     })
+    // messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   useEffect(() => {
@@ -324,15 +332,21 @@ function Chatbot2({
         </div>
 
         {/* messages sent by both the chatbot and user, timestamp below */}
-        <ul class="messages">
+        <ul class="messages" id="scroll">
           <div class="date" style={fontSize.body}>{date}</div>
           <hr class="timeBreak" />
           {messages.map((item) => (
             <div key={item.id}>
-              <li class={item.who} time={item.timeStamp} style={fontSize.body}>{item.message}</li>
+              <li class={item.who} time={item.timeStamp} style={fontSize.body}>{
+                isAnimating & messages[messages.length - 1] == item ?
+                <img src = "https://media.tenor.com/On7kvXhzml4AAAAj/loading-gif.gif" width="5%"/>
+                : item.message
+                }
+              </li>
               <li class={"timestamp " + item.who + "t"} style={fontSize.body}>{item.timeStamp}</li>
             </div>
           ))}
+          <span ref={messagesEndRef}></span>
         </ul>
         <div class="footer">
           {/* textbox for the user to enter text messages */}
@@ -383,7 +397,6 @@ function Chatbot2({
               : <div></div>
             }
           </div>
-          <div ref={messagesEndRef} />
         </div>
       </div>
     </div >

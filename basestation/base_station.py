@@ -27,6 +27,7 @@ import queue
 
 from basestation.bot import Bot
 from basestation.controller.minibot_sim_gui_adapter import run_program_string_for_gui_data
+from basestation import config
 
 # database imports
 from basestation.databases.user_database import User, Chatbot as ChatbotTable, Submission
@@ -74,13 +75,14 @@ def make_thread_safe(func):
 
 
 class BaseStation:
-    def __init__(self, app_debug=False):
+    def __init__(self, app_debug=False, reuseport = config.reuseport):
         self.active_bots = {}
         self.vision_log = []
         self.chatbot = ChatbotWrapper()
         self.virtual_objects = {}
         self.vision_snapshot = {}
         self.vision_object_map = {}
+        self.reuseport = reuseport
 
         self.py_commands = queue.Queue()
         self.pb_map = {}
@@ -110,9 +112,13 @@ class BaseStation:
         # so that we can connect to the Minibot
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        # self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
-
+        if self.reuseport:
+            print("port")
+            self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+        else:
+            print("reuse address")
+            self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                
         # an arbitrarily small time
         self.sock.settimeout(0.01)
 
@@ -767,7 +773,9 @@ class BaseStation:
         """Registers a new user if the email and password are not null and
         there is no account associated wth the email yet"""
         print("registering new account")
-        if not email:
+        regex = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
+
+        if not email or not re.fullmatch(regex, email):
             return -1
         if not password:
             return 0
@@ -790,6 +798,13 @@ class BaseStation:
     def get_user_id_by_email(self, email: str) -> int:
         user = User.query.filter(User.email == email).first()
         return user.id
+
+    def clear_databases(self) -> None:
+        meta = db.metadata
+        for table in reversed(meta.sorted_tables):
+            print ('Clear table %s' % table)
+            db.session.execute(table.delete())
+        db.session.commit()
 
     def update_custom_function(self, custom_function: str) -> bool:
         """Adds custom function(s) for the logged in user if there is a user
