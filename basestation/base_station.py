@@ -113,10 +113,8 @@ class BaseStation:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
         if self.reuseport:
-            print("port")
             self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
         else:
-            print("reuse address")
             self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
                 
         # an arbitrarily small time

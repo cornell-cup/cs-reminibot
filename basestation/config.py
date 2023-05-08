@@ -4,7 +4,7 @@
 A variable controlling socket configuration in base_station.py.
 Windows users: set to False. Mac users: set to True.
 '''
-reuseport = False
+reuseport = True
 
 '''
 Address of the minibot_chatbot server. Default value "http://localhost:8081/qa"
