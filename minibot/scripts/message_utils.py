@@ -107,11 +107,9 @@ def make_crc_message(data, data_len=DATA_LEN):
     if len(data) > data_len:
         # This is changeable to fit future needs
         raise ValueError(f"Messages can be up to {data_len} bytes.")
-    for i in range(len(data)): 
-        if type(data[i]) == type('a'):
-            data[i] = ord(data[i])
-        else:
-            data[i] = int(data[i])
+    
+    if type(data[0]) != type(1):
+        data = [ord(d) for d in data]
     while len(data) < data_len:
         data.append(0)
     start = bytes([ord(x) for x in "CC"])
@@ -119,7 +117,7 @@ def make_crc_message(data, data_len=DATA_LEN):
     # print(data_hash)
     data_hash_bytes = data_hash.to_bytes(2, "big")  # 2-byte CRC
     end = bytes([ord(x) for x in "RT"])
-
+    
     return start + data_hash_bytes + bytes(data) + end
 
 # Validate whether a message is complete
@@ -137,7 +135,7 @@ def validate_crc_message(msg, data_len=DATA_LEN):
     data_hash = crc16(msg[4:4+data_len])
     msg_hash = int.from_bytes(msg[2:4], byteorder='big')  # bytes 2 and 3
     hash_ok = (data_hash == msg_hash)
-    #print(hash_ok)
+    
     return start_ok and end_ok and hash_ok
 
 

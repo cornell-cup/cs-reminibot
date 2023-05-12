@@ -201,11 +201,12 @@ def test(returned):
     data, numTries = msglib.read_data(
         spi, load_msg, 22, msglib.validate_crc_message)
     data = msglib.unpack_crc_message(data)
-
-    returned[0] = data[0]
-    returned[1] = data[1]
-    returned[2] = data[2]
-    returned[3] = data[3]
+    
+    if len(data) != 0:
+    	returned[0] = data[0]
+    	returned[1] = data[1]
+    	returned[2] = data[2]
+    	returned[3] = data[3]
 
     release_lock()
     
