@@ -355,8 +355,7 @@ class Minibot:
                 "left": ece.left,
                 "right": ece.right,
             }
-        elif key == "SERVO":
-            ece.move_servo(value)
+
             if value in cmds_functions_map:
                 # TODO use the appropriate power arg instead of 50 when
                 # that's implemented

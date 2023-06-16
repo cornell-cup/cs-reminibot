@@ -59,26 +59,7 @@ export default function PortsList({ motorPorts, selectedBotName }) {
       else
         console.log(error);
     })
-    // }
-    // if (value == "servo") {
-    //   axios({
-    //     method: 'POST',
-    //     url: '/servo',
-    //     headers: {
-    //       'Content-Type': 'application/json'
-    //     },
-    //     data: JSON.stringify({
-    //       bot_name: selectedBotName,
-    //       angle: value,
-    //     })
-    //   }).catch(function (error) {
-    //     if (error.response.data.error_msg.length > 0)
-    //       window.alert(error.response.data.error_msg);
-    //     else
-    //       console.log(error);
-    //   })
 
-    // }
   }
 
   /* Left and right have default ports */

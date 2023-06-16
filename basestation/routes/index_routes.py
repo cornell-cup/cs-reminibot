@@ -67,17 +67,6 @@ def wheels():
     base_station.move_bot_wheels(bot_name, direction, power)
     return json.dumps(True), status.HTTP_200_OK
 
-@index_bp.route('/servo', methods=['POST'])
-def servo():
-    """ Makes the Minibot move. """
-    data = request.get_json()
-    bot_name = data['bot_name']
-    if not bot_name:
-        error_json = {"error_msg": NO_BOT_ERROR_MSG}
-        return json.dumps(error_json), status.HTTP_400_BAD_REQUEST
-    angle = data['angle']
-    base_station.move_servo(bot_name, angle)
-    return json.dumps(True), status.HTTP_200_OK
 
 
 @index_bp.route('/script', methods=['POST'])

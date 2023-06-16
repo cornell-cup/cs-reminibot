@@ -563,10 +563,7 @@ class BaseStation:
         direction = direction.lower()
         bot.sendKV("WHEELS", direction)
     
-    def move_servo(self, bot_name:str,angle:str):
-        bot = self.get_bot(bot.name)
-        angle = angle.lower
-        bot.sendKV("SERVO",angle)
+
         
     def set_bot_mode(self, bot_name: str, mode: str):
         """ Set the bot to either line follow or object detection mode """
