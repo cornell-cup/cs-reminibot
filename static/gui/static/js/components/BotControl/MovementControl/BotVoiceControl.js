@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { commands } from '../../utils/Constants.js';
+import { commands, match_command } from '../../utils/Constants.js';
 import {
   MIC_BTN, MIC_BTNON,
   ACT_MIC_COMMAND
@@ -11,6 +11,9 @@ import {
 import SpeechRecognitionComp from "../../utils/SpeechRecognitionComp.js";
 
 var lastLen = 0;
+// the starting index where we slice the queue from
+var queueStartIdx = 0;
+
 const micStyle = {
   width: "75%",
   height: "75%",
@@ -31,6 +34,7 @@ function BotVoiceControl({
       if (activeMicComponent == ACT_MIC_COMMAND) {
         setBotVoiceControlMic(!botVoiceControlMic);
         lastLen = 0; // correctly reset queue length if the button is toggled
+        queueStartIdx = 0;
         setInputText("Speak to send a command")
       } else {
         setActiveMicComponent(ACT_MIC_COMMAND)
@@ -43,10 +47,16 @@ function BotVoiceControl({
 
   useEffect(() => {
     let queue = text.split(" ");
-    // only read the lastest word in the queue (last item is always ''):
+    console.log(queue.slice(queueStartIdx))
+
     if (queue.length > lastLen) {
-      if (commands.hasOwnProperty(queue[queue.length - 2])) {
-        setInputText(queue[queue.length - 2] + ": " + commands[queue[queue.length - 2]]);
+      // slice the queue so we only pass in newly heard commands
+      let response = match_command(queue.slice(queueStartIdx))
+      let heardCommand = response[0]
+      if (heardCommand) {
+        // update the queueStartIdx
+        queueStartIdx += response[1];
+        setInputText(heardCommand + ": " + commands[heardCommand]);
 
         // send command to backend
         axios({
@@ -57,17 +67,16 @@ function BotVoiceControl({
           },
           data: JSON.stringify({
             bot_name: selectedBotName,
-            command: queue[queue.length - 2]
+            command: heardCommand
           })
         }).then(function (response) {
-          // insert response code here?
+          // insert response here
         }).catch(function (error) {
-          // tell user to connect to bot in the text box
-          // setInputText("Please connect to a Minibot!")
-          if (error.response.data.error_msg.length > 0)
-            window.alert(error.response.data.error_msg);
-          else
-            console.log("Speech recognition", error);
+          let error_msg = error.response.data
+          if (error_msg.length > 0) {
+            setInputText(error_msg)
+            window.alert(error_msg)
+          }
         })
       }
     }

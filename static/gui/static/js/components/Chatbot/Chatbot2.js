@@ -4,13 +4,21 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as Icons from '@fortawesome/free-solid-svg-icons';
 import {
   commands,
+  match_command,
+  match_file_command,
   X_BTN, MIC_BTN, MIC_BTNON,
-  ACT_MIC_CHATBOT
+  ACT_MIC_CHATBOT,
+  ZIP_FILE_UPLOAD
 } from "../utils/Constants.js";
 import SpeechRecognitionComp from "../utils/SpeechRecognitionComp.js";
+import JSZip from 'jszip';
+import Navbar from '../Navbar.js';
+import { withCookies } from 'react-cookie';
+
 
 //Voice Control 
 var lastLen = 0;
+var queueStartIdx = 0;
 //Chat messages
 const initialList = [
   {
@@ -18,8 +26,12 @@ const initialList = [
     who: "other",
     message: "Hello, I am Chatbot. How are you today?",
   }
-];
-//Font size style
+  ,
+  {
+    id: 2,
+    who: "other",
+    message: "You can start your question with the keyword \"ChatGPT:\" to chat with ChatGPT.",
+  }];
 let lineHeightMultiplier = 0.10;
 const defaultFontSize = {
   header: {
@@ -32,14 +44,12 @@ const defaultFontSize = {
   }
 }
 const emptyStr = "";
+let initialUpload = [];
 
-function Chatbot2({
-  setParentContext,
-  selectedBotName,
-  setActiveMicComponent,
-  activeMicComponent,
-  mic,
-  setMic }) {
+
+
+
+const Chatbot2 = withCookies((props) => {
   // use states for chatbot window appearance
   const [enter, setEnter] = useState("");
   const [open, setOpen] = useState(false);
@@ -58,6 +68,18 @@ function Chatbot2({
   const [tempCommands, setTempCommands] = useState("");
   const [isAnimating, setAnimating] = useState(false);
 
+  const [upload, setUpload] = useState(initialUpload);
+
+
+
+  const selectedBotName = props.selectedBotName;
+  const setParentContext = props.setParentContext;
+  const activeMicComponent = props.activeMicComponent
+  const setActiveMicComponent = props.setActiveMicComponent;
+  const mic = props.mic;
+  const setMic = props.setMic;
+
+
   // style for the overall chatbot window
   const styles = {
     leftWindow: {
@@ -75,14 +97,14 @@ function Chatbot2({
 
   // functions responding to commands changing the appearance of the chatbot windows
   const changeInputText = (event) => {
-    event.preventDefault();
+    //event.preventDefault();
     if (!contextMode) return;
     const input = event.currentTarget.value;
     setInputText(input);
   }
 
   const openChatbox = (e) => {
-    e.preventDefault();
+    // e.preventDefault();
     if (!open) {
       setOpen(true);
       setExpand("expand");
@@ -170,7 +192,7 @@ function Chatbot2({
       })
     }).then(function (response) {
       if (response.data) {
-        // console.log("context is sent successfully")
+        console.log("context is sent successfully");
       }
     }).catch(function (error) {
       if (error.response.data.error_msg.length > 0)
@@ -201,6 +223,7 @@ function Chatbot2({
         question: inputText
       })
     }).then(function (response) {
+      console.log("question is sent successfully");
       if (response.data) {
         const res = response.data;
         newList = newList.concat({ id: temp_id, who: "other", message: res, timeStamp: getTimeStamp() });
@@ -208,6 +231,9 @@ function Chatbot2({
         setAnimating(false);
       }
     }).catch(function (error) {
+      console.log("Error branch");
+      console.log("error is " + error)
+      console.error(error.response.data);
       setAnimating(false);
       if (error.response.data.error_msg.length > 0)
         window.alert(error.response.data.error_msg);
@@ -217,7 +243,7 @@ function Chatbot2({
   }
 
   const toggleMic = (e) => {
-    e.preventDefault();
+    // e.preventDefault();
     if (contextMode || selectedBotName) {
       if (activeMicComponent == ACT_MIC_CHATBOT) {
         var temp = !mic;
@@ -229,6 +255,75 @@ function Chatbot2({
       window.alert("Please connect to a bot!");
     }
   }
+
+  let loginEmail = props.cookies.get('current_user_email') || "";   //gets current user email from cookies (or "" if not logged in)
+
+  //Handles upload zip file event through chatbot's command mode
+  const hiddenFileInput = React.useRef();
+  const handleClick = () => {
+    hiddenFileInput.current.click();
+  }
+  //parses uploaded zip file as python scripts and send file names & content to backend
+  const handleChange = (event) => {
+    let fileUploaded = event.target.files[0];
+    var filenames = "";
+    if (loginEmail == "") {
+      window.alert("Zipfile upload is a registered user functionality. Please log in first.")
+    }
+    else {
+      console.log("user has logged in");
+      JSZip.loadAsync(fileUploaded).then(function (zip) {
+        Object.keys(zip.files).forEach(function (filename) {
+          zip.files[filename].async('text').then(function (fileData) {
+            setUpload([...upload, fileData]);
+            axios({
+              method: 'POST',
+              url: '/chatbot-upload',
+              headers: {
+                'Content-Type': 'application/json',
+                'Upload-Content': 'code'
+              },
+              data: JSON.stringify({
+                script_code: fileData,
+                script_name: filename,
+                login_email: loginEmail
+              })
+            }).then(function (response) {
+              console.log("file is sent successfully");
+            }).catch(function (error) {
+              console.log("Error branch");
+              console.error(error.response.data);
+            })
+          })
+          filenames += filename + ", ";
+        })
+        filenames = filenames.substring(0, filenames.length - 2);   //trims the trailing comma
+        axios({
+          method: 'POST',
+          url: '/chatbot-upload',
+          headers: {
+            'Content-Type': 'application/json',
+            'Upload-Content': 'filenames'
+          },
+          data: JSON.stringify({
+            filename: filenames,
+          }),
+        }).then(function (response) {
+          console.log("names are sent successfully");
+        }).catch(function (error) {
+          console.log("Error branch");
+          console.error(error.response.data);
+
+        })
+
+      })
+    }
+  }
+
+
+
+
+
 
   const alertInfo = (e) => {
     e.preventDefault();
@@ -254,8 +349,10 @@ function Chatbot2({
   }, [messages]);
 
   useEffect(() => {
-    initialList[0].timeStamp = getTimeStamp();
     setMessages(initialList);
+    initialList[0].timeStamp = getTimeStamp();
+    initialList[1].timeStamp = getTimeStamp();
+
   }, []);
 
   /***************************** Bot Voice Control ***************************/
@@ -263,34 +360,102 @@ function Chatbot2({
     if (!contextMode) {
       let queue = tempCommands.split(" ");
       // Run this code if a new word has been spoken.
+      console.log(queueStartIdx);
+      console.log(queue.slice(queueStartIdx))
       if (queue.length > lastLen) {
-        // only read the lastest word in the queue (last item is always '')
-        if (commands.hasOwnProperty(queue[queue.length - 2])) {
-          setInputText(queue[queue.length - 2] + ": " +
-            commands[queue[queue.length - 2]]);
-          // send command to backend
-          axios({
-            method: 'POST',
-            url: '/speech_recognition',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            data: JSON.stringify({
-              bot_name: selectedBotName,
-              command: queue[queue.length - 2]
+        let response = "";
+        // slice the queue so we only pass in newly heard commands
+        let new_command = queue.slice(queueStartIdx);
+
+        //if new command contains the keyword run followed by minimum of one other word indicating file name:
+        if (new_command.lastIndexOf("run") >= 0 && new_command.length >= 2) {   //assuming file is named with one word
+          response = match_file_command(new_command);
+          console.log("response is " + response + ", index: " + queueStartIdx + ", queue is: " + queue);
+          let heardCommand = response[0];
+          let filename = response[1] + ".py";
+          console.log(heardCommand);
+          if (heardCommand) {
+            queueStartIdx += response[2];
+            setInputText(heardCommand + ": " + commands[heardCommand]);
+            console.log("command heard is:" + heardCommand + "; filename is: " + filename);
+
+            //sending axios command to backend to fetch file's data by filename
+            axios({
+              method: 'GET',
+              url: '/chatbot-upload',
+              headers: {
+                'File-Name': filename,
+                'User-Email': loginEmail
+              }
+            }).then(function (response) {
+              console.log("get method result: " + response.data);
+              if (response.data) {
+                axios({
+                  method: 'POST',
+                  url: '/script',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  data: JSON.stringify({
+                    bot_name: selectedBotName,
+                    script_code: response.data,
+                    login_email: loginEmail
+                  }),
+                }).then(function (response) {
+                  console.log('sent script');
+                }).catch(function (error) {
+                  console.log(error.response.data)
+                });
+              }
+            }).catch(function (error) {
+              console.log(error.response.data);
+              window.alert("Please indicate an existing file name.\nYou can ask for a list of uploaded files in Q&A Mode.")
             })
-          }).then(function (response) {
-          }).catch(function (error) {
-            if (error.response.data.error_msg.length > 0)
-              window.alert(error.response.data.error_msg);
-            else
-              console.log("Speech recognition", error);
-          })
+
+          }
         }
+
+        else {
+          response = match_command(new_command);
+          console.log("response is " + response + ", index: " + queueStartIdx + ", queue is: " + queue);
+          let heardCommand = response[0]
+          console.log(heardCommand);
+          if (heardCommand) {
+            // update the queueStartIdx
+            queueStartIdx += response[1];
+            setInputText(heardCommand + ": " + commands[heardCommand]);
+            console.log("command heard is:" + heardCommand);
+
+            // send command to backend
+            axios({
+              method: 'POST',
+              url: '/speech_recognition',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              data: JSON.stringify({
+                bot_name: selectedBotName,
+                command: heardCommand
+              })
+            }).then(function (response) {
+            }).catch(function (error) {
+              let error_msg = error.response.data
+              if (error_msg.length > 0) {
+                setInputText(error_msg)
+                window.alert(error_msg)
+              }
+            })
+          }
+        }
+
+
       }
       lastLen = queue.length;
     }
   }, [tempCommands, contextMode]);
+
+
+
 
   // rendering front end HTML elements
   return (
@@ -339,9 +504,9 @@ function Chatbot2({
             <div key={item.id}>
               <li class={item.who} time={item.timeStamp} style={fontSize.body}>{
                 isAnimating & messages[messages.length - 1] == item ?
-                <img src = "https://media.tenor.com/On7kvXhzml4AAAAj/loading-gif.gif" width="5%"/>
-                : item.message
-                }
+                  <img src="https://media.tenor.com/On7kvXhzml4AAAAj/loading-gif.gif" width="5%" />
+                  : item.message
+              }
               </li>
               <li class={"timestamp " + item.who + "t"} style={fontSize.body}>{item.timeStamp}</li>
             </div>
@@ -377,9 +542,10 @@ function Chatbot2({
                 :
                 <input type="image"
                   src={mic ? MIC_BTNON : MIC_BTN}
-                  style={{ width: "75%", height: "75%", objectFit: "contain", }}
+                  style={{ width: "50%", height: "50%", objectFit: "contain", }}
                   onClick={(e) => { toggleMic(e); }} />}
             </span>
+
             {/* selectively rendering send context and question buttons based on contextMode */}
             {contextMode ?
               <span>
@@ -394,14 +560,31 @@ function Chatbot2({
                   </button>
                 </span>
               </span>
-              : <div></div>
+              :
+              <span>
+                <input type="image"
+                  id='zipFileUpload'
+                  src={ZIP_FILE_UPLOAD}
+                  style={{ width: "50%", height: "50%", objectFit: "contain", }}
+                  onClick={handleClick} />
+
+                <input
+                  type="file"
+                  id="zipfile"
+                  ref={hiddenFileInput}
+                  accept=".zip"
+                  onChange={handleChange}
+                  style={{ display: 'none' }}
+                />
+              </span>
+
             }
           </div>
         </div>
       </div>
     </div >
   );
-}
+})
 
 
 export default Chatbot2;

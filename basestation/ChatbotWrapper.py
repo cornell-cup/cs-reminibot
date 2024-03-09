@@ -14,7 +14,7 @@ Make sure to SMASH the like button and hit \
 subscribe and turn on the notification bell.  \
 See you guys in the next episode. Join my Twitch, Patreon, and Instagram."
 
-default_context = "The sky is blue."
+default_context = ""
 
 SUCCESS = 200
 FAILURE = 400

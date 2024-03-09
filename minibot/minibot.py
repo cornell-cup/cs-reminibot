@@ -12,6 +12,7 @@ import argparse
 import signal
 from imutils.video import VideoStream
 from imagezmq import imagezmq
+# from basestation import config
 
 # NOTE: Please add "flush=True" to all print statements so that our test
 # harness (test_minibot.py) can pipe the stdout output, and use it

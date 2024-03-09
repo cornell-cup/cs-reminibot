@@ -5,7 +5,7 @@ import CodeMirror from 'react-codemirror';
 require('codemirror/mode/python/python');
 
 
-class PythonEditor extends React.Component {
+export class PythonEditor extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -76,10 +76,14 @@ class PythonEditor extends React.Component {
         const file = event.target.files[0];
         const reader = new FileReader();
         reader.onload = function (event) {
-            _this.getEditor().setValue(event.target.result);
+            _this.updateCode(event.target.result);
         };
         reader.readAsText(file);
     }
+
+
+
+
 
     /* Target function for the button "Download". Downloads the code in the
             editor as a python file with name as specified */
@@ -89,6 +93,23 @@ class PythonEditor extends React.Component {
         let filename = this.state.filename;
         if (filename.substring(filename.length - 3) != ".py") {
             filename += ".py";
+        }
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' +
+            encodeURIComponent(this.props.pythonCode));
+        element.setAttribute('download', filename);
+        element.style.display = 'none';
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+    }
+
+
+    downloadPython_zip(event) {
+        event.preventDefault();
+        const element = document.createElement('a');
+        let filename = this.state.filename;
+        if (filename.substring(filename.length - 4) != ".zip") {
+            filename += ".zip";
         }
         element.setAttribute('href', 'data:text/plain;charset=utf-8,' +
             encodeURIComponent(this.props.pythonCode));
@@ -196,6 +217,7 @@ class PythonEditor extends React.Component {
                     >
                         <CodeMirror
                             ref="editor"
+                            id="blockly_editor"
                             value={this.props.pythonCode}
                             onChange={(code) => this.updateCode(code)}
                             options={options}
@@ -285,6 +307,7 @@ class PythonEditor extends React.Component {
 export default class MinibotBlockly extends React.Component {
     constructor(props) {
         super(props);
+        window.blocklyComponent = this;
         this.state = {
             blocklyFilename: 'FileName.xml',
             pyblock: "",
@@ -317,7 +340,21 @@ export default class MinibotBlockly extends React.Component {
         this.updateCustomBlocks = this.updateCustomBlocks.bind(this)
         this.customBlock = this.customBlock.bind(this)
         this.manageDefaultCustomBlocklyFunction = this.manageDefaultCustomBlocklyFunction.bind(this)
+
+        // this.upload_with_file = this.upload_with_file.bind(this)
     }
+
+
+
+    // upload_with_file(file) {
+    //     const uploaded_file = file;
+    //     const reader = new FileReader();
+    //     reader.onload = function (event) {
+    //         _this.getEditor().setValue(event.target.result);
+    //     };
+    //     reader.readAsText(uploaded_file);
+    // }
+
 
     /* Populates the customBlocklyList with a default function if addOrDelete == true
          and if there are no custom function already defined in the customBlocklyList
@@ -782,4 +819,4 @@ export default class MinibotBlockly extends React.Component {
             </div>
         );
     }
-}
+} 

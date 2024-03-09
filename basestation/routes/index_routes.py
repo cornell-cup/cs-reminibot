@@ -80,14 +80,15 @@ def script():
     script_code = data['script_code']
     login_email = data['login_email']
     try:
-        print("script code",script_code)
+        print("script code", script_code)
         submission = base_station.save_submission(script_code, login_email)
-        print("submissions",submission)
+        print("submissions", submission)
         submission_id = submission.id
     except Exception as exception:
         print(exception)
     base_station.send_bot_script(bot_name, script_code)
     return json.dumps(True), status.HTTP_200_OK
+
 
 @index_bp.route('/compile-virtual-program', methods=['POST'])
 def compile_virtual_program():
@@ -137,6 +138,7 @@ def vision():
         info = request.args.to_dict()
         return json.dumps(base_station.get_vision_data(info)), status.HTTP_200_OK
 
+
 @index_bp.route('/object-mapping', methods=['POST', 'GET'])
 def object_mapping():
     """Updates vision object mapping"""
@@ -146,6 +148,7 @@ def object_mapping():
         return json.dumps(True), status.HTTP_200_OK
     else:
         return json.dumps(base_station.get_vision_object_map()), status.HTTP_200_OK
+
 
 @index_bp.route('/virtual-objects', methods=['POST', 'GET'])
 def virtual_objects():
@@ -157,6 +160,7 @@ def virtual_objects():
     else:
         return json.dumps(base_station.get_virtual_objects()), status.HTTP_200_OK
 
+
 @index_bp.route('/delete_virtual_room', methods=['POST', 'GET'])
 def delete_virtual_room():
     """Deletes a virtual enviroment given a virtual_room_id"""
@@ -167,13 +171,13 @@ def delete_virtual_room():
             base_station.delete_virtual_room(info["virtual_room_id"])
             return json.dumps(True), status.HTTP_200_OK
         else:
-            error_json = {"error_msg": "/delete_virtual_room was not given a virtual_room_id field"}
+            error_json = {
+                "error_msg": "/delete_virtual_room was not given a virtual_room_id field"}
             return json.dumps(error_json), status.HTTP_400_BAD_REQUEST
     else:
-        error_json = {"error_msg": "/delete_virtual_room only accepts post requests"}
+        error_json = {
+            "error_msg": "/delete_virtual_room only accepts post requests"}
         return json.dumps(error_json), status.HTTP_400_BAD_REQUEST
-
-
 
 
 @index_bp.route('/result', methods=['POST'])
@@ -257,6 +261,7 @@ def logout():
     base_station.login_email = ""
     return content, status.HTTP_200_OK
 
+
 @index_bp.route('/clear', methods=['POST'])
 def clear():
     print("clear database")
@@ -289,8 +294,15 @@ def speech_recognition():
             print(data["command"])
         command = data["command"]
         print("sent command: " + command)
-        base_station.send_command(bot_name, command)
-        return json.dumps(True), status.HTTP_200_OK
+        if (command == "previous"):
+            response = base_station.send_bot_script_previous(bot_name)
+            if response == -1:
+                return json.dumps("Run a program first!"), status.HTTP_401_UNAUTHORIZED
+            else:
+                return json.dumps(True), status.HTTP_200_OK
+        else:
+            base_station.send_command(bot_name, command)
+            return json.dumps(True), status.HTTP_200_OK
     else:
         return json.dumps(), status.HTTP_200_OK
 
@@ -367,17 +379,21 @@ def analytics():
 def coding():
     return render_template('index.html')
 
+
 @index_bp.route('/user-analytics', methods=['GET'])
 def user_analytics():
     return render_template('index.html')
+
 
 @index_bp.route('/history', methods=['GET'])
 def history():
     return render_template('index.html')
 
+
 @index_bp.route('/context-history', methods=['GET'])
 def context_history():
     return render_template('index.html')
+
 
 @index_bp.route('/vision-page', methods=['GET'])
 def vision_page():
